@@ -149,3 +149,9 @@
 用户截图仅框选首页标题上方的横向 ForFlow 标志，并要求“这个forflow标先去掉”。本次只移除该首页图形及占位，保留 Forflow One 标题、产品介绍、操作入口以及系统应用图标。该决定替代此前首页展示横向字标的设计，不扩展到 Dock／关于或首次引导。改动将随 `.11` 交付，包含 `.10` 的 API 账户功能；`.10` ZIP 保留历史，不原地改写。安装仍等待运行中的 `.9` 正常退出。
 
 后续检查确认 `.9` 已退出，已将 `.11` 安装至 `/Applications/Forflow One.app`，安装前再次检查进程、签名及旧版本哈希，安装后回读版本为 `1.4.205-forflow.11`。`.9` 回退副本位于 `~/Library/Caches/Forflow One/rollback/1.4.205-forflow.9-before-forflow.11/Forflow One.app`，安装器未改写用户数据。四项候选包场景及 1,648 项回归通过；安装后复验结果见随包回执。
+
+## 2026-09-20 系统 CLI 链接权限恢复
+
+用户报告 `cli:getInstallStatus` 读取 `/usr/local/bin/forflow` 时 EACCES。本轮确认是此前保留的 root 所有、0700 权限的系统链接；此前修复新链接创建和错误提示，并未修复这个既存链接。经 macOS 管理员授权，先校验设备／inode 和准确目标 `/Applications/Forflow One.app/Contents/Resources/bin/forflow`，仅对符号链接执行 `chmod -h 755`。目标、inode、所有者及应用二进制未改变。
+
+真实 `forflow --version` 返回 `.11`；已安装应用 IPC 返回 `installed`、`pathConfigured: true`，设置刷新无错误。17 项 CLI 事务／权限回归和已安装应用 smoke 通过。常规 smoke 现要求状态可读取；仅显式权限恢复夹具允许设置 `FORFLOW_QA_ALLOW_CLI_PERMISSION_DENIED=1` 来验证中文失败提示，不能再把真实 CLI 不可用当作正常 smoke 通过。没有重建应用或更换版本。证据位于 `.forflow/evidence/cli-system-link-*`。
