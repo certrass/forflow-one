@@ -25,6 +25,7 @@ vi.mock('electron', () => ({
 }))
 
 import { CliInstaller } from './cli-installer'
+import { buildMacPrivilegedSymlinkTransaction } from './cli-command-filesystem-transaction'
 import { buildUnixDevLauncher } from './cli-dev-launcher'
 
 const createdRoots: string[] = []
@@ -77,29 +78,61 @@ function fixtureInstallerOptions(fixture: Awaited<ReturnType<typeof createPrivil
 describe.skipIf(process.platform !== 'darwin' || process.getuid?.() === 0)(
   'macOS privileged CLI command transaction',
   () => {
-    it('installs and removes through the generated no-overwrite shell transaction', async () => {
-      const fixture = await createPrivilegedFixture()
-      const commands: string[] = []
-      const installer = new CliInstaller({
-        ...fixtureInstallerOptions(fixture),
-        privilegedRunner: async (command) => {
-          commands.push(command)
-          await chmod(fixture.protectedDirectory, 0o700)
-          await executePrivilegedShell(command)
+    it.each(['077', '027'])(
+      'installs readable links and removes them under umask %s',
+      async (mask) => {
+        const fixture = await createPrivilegedFixture()
+        const commands: string[] = []
+        const installer = new CliInstaller({
+          ...fixtureInstallerOptions(fixture),
+          privilegedRunner: async (command) => {
+            commands.push(command)
+            await chmod(fixture.protectedDirectory, 0o700)
+            await executePrivilegedShell(`umask ${mask}; ${command}`)
+          }
+        })
+
+        await chmod(fixture.protectedDirectory, 0o500)
+        const installed = await installer.install()
+        expect(installed.state).toBe('installed')
+        expect((await lstat(fixture.commandPath)).mode & 0o777).toBe(0o755)
+        await expect(readlink(fixture.commandPath)).resolves.toBe(installed.launcherPath)
+
+        await chmod(fixture.protectedDirectory, 0o500)
+        await expect(installer.remove()).resolves.toMatchObject({ state: 'not_installed' })
+        expect(commands).toHaveLength(2)
+        expect(commands.every((command) => command.includes('/bin/ln -P'))).toBe(true)
+        expect(commands.every((command) => !command.includes('mv -f'))).toBe(true)
+      }
+    )
+
+    it.each([false, true])(
+      'preserves existing public directory modes or creates accessible directories (existing=%s)',
+      async (existing) => {
+        const fixture = await createPrivilegedFixture()
+        const publicDirectory = join(fixture.root, 'public-bin')
+        const commandPath = join(publicDirectory, 'forflow')
+        const launcherPath = join(fixture.root, 'launcher')
+        await writeFile(launcherPath, 'launcher')
+        if (existing) {
+          await mkdir(publicDirectory, { mode: 0o711 })
         }
-      })
-
-      await chmod(fixture.protectedDirectory, 0o500)
-      const installed = await installer.install()
-      expect(installed.state).toBe('installed')
-      await expect(readlink(fixture.commandPath)).resolves.toBe(installed.launcherPath)
-
-      await chmod(fixture.protectedDirectory, 0o500)
-      await expect(installer.remove()).resolves.toMatchObject({ state: 'not_installed' })
-      expect(commands).toHaveLength(2)
-      expect(commands.every((command) => command.includes('/bin/ln -P'))).toBe(true)
-      expect(commands.every((command) => !command.includes('mv -f'))).toBe(true)
-    })
+        await executePrivilegedShell(
+          buildMacPrivilegedSymlinkTransaction({
+            action: 'install',
+            commandPath,
+            launcherPath,
+            expected: null,
+            expectedFileSha256: null,
+            expectedRawSymlinkTarget: null
+          })
+        )
+        expect((await lstat(publicDirectory)).mode & 0o777).toBe(existing ? 0o711 : 0o755)
+        expect((await lstat(commandPath)).mode & 0o777).toBe(0o755)
+        await expect(readlink(commandPath)).resolves.toBe(launcherPath)
+        await expect(readdir(publicDirectory)).resolves.toEqual(['forflow'])
+      }
+    )
 
     it('restores a trailing-newline symlink inserted after privileged inspection', async () => {
       const fixture = await createPrivilegedFixture()

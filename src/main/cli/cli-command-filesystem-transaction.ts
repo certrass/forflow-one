@@ -185,7 +185,7 @@ export function buildMacPrivilegedSymlinkTransaction(
     ? `if [ "$captured" -eq 1 ] && { [ "$(/usr/bin/stat -f '%d:%i' ${quoteShell(heldPath)})" != ${quoteShell(`${args.expected.dev}:${args.expected.ino}`)} ]${fileMismatch}${symlinkMismatch}; }; then ${restoreOrPreserve}; exit 73; fi`
     : `if [ "$captured" -eq 1 ]; then ${restoreOrPreserve}; exit 73; fi`
   const capture =
-    `umask 077; /bin/mkdir -p ${quoteShell(commandDirectory)} || exit $?; ` +
+    `umask 077; (umask 022; /bin/mkdir -p ${quoteShell(commandDirectory)}) || exit $?; ` +
     `/bin/mkdir ${quoteShell(transactionDirectory)} || exit $?; captured=0; ` +
     `if [ -e ${quoteShell(args.commandPath)} ] || [ -L ${quoteShell(args.commandPath)} ]; then ` +
     `/bin/mv ${quoteShell(args.commandPath)} ${quoteShell(heldPath)} && captured=1 || exit $?; fi; ` +
@@ -198,9 +198,10 @@ export function buildMacPrivilegedSymlinkTransaction(
   const rollback =
     `/bin/rm -f ${quoteShell(publishPath)}; /bin/rmdir ${quoteShell(publishDirectory)} 2>/dev/null || :; ` +
     `if [ "$captured" -eq 1 ]; then ${restoreOrPreserve}; else /bin/rmdir ${quoteShell(transactionDirectory)}; fi; exit 73`
+  // macOS applies umask to symlinks; a root-owned 0700 link is unreadable to the app.
   return (
     `${capture}if /bin/mkdir ${quoteShell(publishDirectory)} && ` +
-    `/bin/ln -s ${quoteShell(args.launcherPath)} ${quoteShell(publishPath)} && ` +
+    `(umask 022; /bin/ln -s ${quoteShell(args.launcherPath)} ${quoteShell(publishPath)}) && ` +
     `/bin/ln -P ${quoteShell(publishPath)} ${quoteShell(commandDirectory)}; then ` +
     `/bin/rm ${quoteShell(publishPath)}; /bin/rmdir ${quoteShell(publishDirectory)}; ` +
     `if [ "$captured" -eq 1 ]; then /bin/rm ${quoteShell(heldPath)}; fi; ` +

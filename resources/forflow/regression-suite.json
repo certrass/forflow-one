@@ -148,5 +148,7 @@
   "src/renderer/src/components/feature-wall/feature-wall-tour-copy.test.ts",
   "src/main/menu/gpu-acceleration-about-panel.test.ts",
   "src/renderer/src/components/landing-github-star-state.test.ts",
-  "src/main/cli/cli-installer-unreadable-command.test.ts"
+  "src/main/cli/cli-installer-unreadable-command.test.ts",
+  "src/main/cli/cli-command-privileged-transaction.test.ts",
+  "src/main/cli/cli-command-installation-races.test.ts"
 ]

@@ -7,6 +7,7 @@ import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electr
 import { getE2ECompletedOnboardingProfile } from '../e2e/helpers/e2e-completed-onboarding-profile'
 
 import { launch, evidence, packageFingerprint } from './harness'
+import { readCliStatusForSmoke, verifyCliSettingsRecovery } from './cli-status-smoke'
 import releaseProfile from '../../resources/forflow/release-profile.json'
 
 test('smoke: production app starts in Chinese with independent identity and private defaults', async () => {
@@ -55,10 +56,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
           images.some((i) => i instanceof HTMLImageElement && i.naturalWidth === 512 && i.complete)
         )
     ).toBe(true)
-    const cli = await page.evaluate(() => window.api.cli.getInstallStatus())
-    expect(cli.commandName).toBe('forflow')
-    expect(cli.commandPath).toMatch(/\/forflow$/)
-    expect(cli.launcherPath).toMatch(/Forflow One\.app\/Contents\/Resources\/bin\/forflow$/)
+    const cli = await readCliStatusForSmoke(page)
     const nativePermissions = await page.evaluate(() =>
       window.api.computerUsePermissions.getStatus()
     )
@@ -90,6 +88,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
     await closeElectronAppForE2E(app)
     await cleanupE2EDaemons(profile)
   }
+  await verifyCliSettingsRecovery()
 })
 
 test('regression: local project, worktree, Chinese terminal, file editing, diff and restart', async () => {
