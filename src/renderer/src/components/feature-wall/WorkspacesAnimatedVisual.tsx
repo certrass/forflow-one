@@ -3,6 +3,7 @@ import type { JSX } from 'react'
 import { AgentStateDot } from '@/components/AgentStateDot'
 import { installWindowVisibilityInterval } from '@/lib/window-visibility-interval'
 import { ClaudeIcon, OpenCodeGoIcon } from '../status-bar/icons'
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 
 type AgentKind = 'claude' | 'codex' | 'opencode'
 
@@ -137,7 +138,7 @@ export function WorkspacesAnimatedVisual(props: { reducedMotion: boolean }): JSX
                 <span className="inline-block size-[9px] rounded-full bg-emerald-500" />
                 <div className="min-w-0">
                   <div className="truncate text-[15px] font-semibold leading-[1.2] text-foreground">
-                    {ws.name}
+                    {localizedDemoCopy(ws.name)}
                   </div>
                 </div>
               </div>

@@ -8,6 +8,7 @@ import { ClaudeIcon, OpenAIIcon } from '../../status-bar/icons'
 import { installWindowVisibilityInterval } from '@/lib/window-visibility-interval'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
+import { localizedDemoCopy } from '../feature-wall-demo-copy'
 
 type ClaudeActivity = { kind: 'tool'; tool: string; arg: string } | { kind: 'msg'; text: ReactNode }
 
@@ -177,13 +178,13 @@ function AgentRow(props: {
 function ClaudeActivityLine(props: { activity: ClaudeActivity }): JSX.Element {
   const a = props.activity
   if (a.kind === 'msg') {
-    return <span>{a.text}</span>
+    return <span>{typeof a.text === 'string' ? localizedDemoCopy(a.text) : a.text}</span>
   }
   return (
     <span className="inline-flex max-w-full items-center gap-1.5 truncate">
       <span className="inline-flex items-center gap-1 font-semibold text-muted-foreground">
         <Wrench className="size-2.5" aria-hidden />
-        {a.tool}
+        {localizedDemoCopy(a.tool)}
       </span>
       <CodeChip>{a.arg}</CodeChip>
     </span>

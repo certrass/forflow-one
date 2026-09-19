@@ -144,5 +144,8 @@
   "src/renderer/src/lib/workspace-file-drag.test.ts",
   "src/renderer/src/lib/worktree-git-identity-display.test.ts",
   "src/renderer/src/components/settings/terminal-preview-content.test.ts",
-  "src/renderer/src/components/settings/ForflowDomesticConnections.test.tsx"
+  "src/renderer/src/components/settings/ForflowDomesticConnections.test.tsx",
+  "src/renderer/src/components/feature-wall/feature-wall-tour-copy.test.ts",
+  "src/main/menu/gpu-acceleration-about-panel.test.ts",
+  "src/renderer/src/components/landing-github-star-state.test.ts"
 ]

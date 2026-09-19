@@ -14065,8 +14065,8 @@
               "StatusesPage": {
                 "2f549fc0ba": "src/auth/session.test.ts",
                 "139e3d7458": "已更新",
-                "7b26349cb2": "pnpm 迁移最新",
-                "78f0318ac1": "想跑",
+                "7b26349cb2": "pnpm migrate latest",
+                "78f0318ac1": "请求执行",
                 "79971d1539": "重新设计身份验证流程"
               },
               "UsageAccountsCard": {
@@ -14084,7 +14084,7 @@
                 "64265cb295": "29% 已用 5小时",
                 "be5a165875": "切换到",
                 "277a9c65a9": "Codex 账户",
-                "4dce5ca3aa": "4d 3h后重置",
+                "4dce5ca3aa": "4 天 3 小时后重置",
                 "05ce4ecdd3": "已用 38%",
                 "0470aaed99": "每周",
                 "f421abf962": "会话",
@@ -18528,7 +18528,21 @@
       "c7e3192115": "正在修复这两个问题…",
       "b1b9acd9c4": "● Claude Code 会话已启动",
       "loaded": "已从 Forflow One 载入 {{count}} 条评注",
-      "line": "第 {{line}} 行"
+      "line": "第 {{line}} 行",
+      "workspaceSetup": "配置项目初始化",
+      "workspaceLogin": "修复登录并发问题",
+      "workspaceCi": "优化持续集成流程",
+      "inspectMiddleware": "正在检查会话中间件…",
+      "typecheckPassed": "类型检查通过，继续检查登录路由。",
+      "redirectTests": "正在补充重定向路径测试。",
+      "shellCommand": "命令",
+      "zeroUsed": "已用 0%",
+      "almostUsed": "已用 96%",
+      "resetHours": "5 小时后重置",
+      "resetMinutes": "47 分钟后重置",
+      "usageSummary": "5 小时已用 0% · 本周已用 4%",
+      "usageAlmost": "已用 96% · 47 分钟后重置",
+      "team": "团队"
     },
     "speechModels": {
       "parakeet-tdt-0.6b-v3-int8": "支持 25 种欧洲语言，准确度高，包含标点、大小写和词级时间戳。",
@@ -18622,6 +18636,101 @@
       "undetected": "此主机尚未检测到 CLI",
       "workbuddy": "WorkBuddy／CodeBuddy",
       "workbuddyDescription": "Forflow 启动的是腾讯 CodeBuddy CLI。WorkBuddy 是独立桌面应用，安装桌面版不代表已安装独立 CLI，也不会导入其账号与会话。"
+    },
+    "tour": {
+      "workflows": {
+        "workspaces": {
+          "title": "工作区",
+          "meta": "独立目录 · 集中上下文",
+          "lede": "为每项任务创建独立工作目录和分支，并行推进后分别检查修改。共享目录和外部服务仍需协调。"
+        },
+        "tasks": {
+          "title": "任务",
+          "meta": "任务来源 · 仓库集成",
+          "lede": "连接团队使用的任务服务，从任务打开工作区并关联结果；也可以直接从本地项目开始。"
+        },
+        "agents-orchestration": {
+          "title": "智能体",
+          "meta": "执行器 · 状态 · 命令行",
+          "lede": "选择已经安装和认证的智能体，在同一工作台查看任务状态。国内接入路径和历史支持范围可在智能体设置中查看。"
+        },
+        "workbench": {
+          "title": "工作台",
+          "meta": "终端 · 编辑器 · 浏览器 · 文件",
+          "lede": "在工作区内分屏查看智能体、终端、文件和浏览器，运行测试并检查产物。"
+        },
+        "review": {
+          "title": "代码审阅",
+          "meta": "差异 · 反馈 · 代码提交",
+          "lede": "检查文件差异和测试结果，把具体意见反馈给智能体，确认后再提交或推送。"
+        }
+      },
+      "agents": {
+        "statuses": {
+          "name": "运行状态",
+          "subtitle": "查看智能体状态",
+          "description": "查看已适配智能体的运行、等待和阻塞状态；远端失联时先恢复连接并核对任务。"
+        },
+        "orchestration": {
+          "name": "任务编排",
+          "subtitle": "协调多步任务",
+          "description": "安装随包编排技能后，在测试项目验证任务分发、等待和取消。编排的决策提示不替代企业审批。"
+        },
+        "usage": {
+          "name": "用量",
+          "subtitle": "查看已支持的账户用量",
+          "description": "查看已接入提供商的额度和用量。未适配的国内账户不会自动显示统计，实际费用以服务商记录为准。"
+        }
+      },
+      "workbench": {
+        "terminal": {
+          "name": "终端",
+          "subtitle": "运行命令与测试",
+          "description": "在同一工作区打开多个终端，查看智能体、测试和开发日志；执行前核对主机与工作目录。"
+        },
+        "editor": {
+          "name": "编辑器",
+          "subtitle": "编辑文件与工作笔记",
+          "description": "在工作区内编辑代码、Markdown 和工作笔记，并通过差异视图核对修改。"
+        },
+        "browser": {
+          "name": "浏览器",
+          "subtitle": "预览页面并反馈问题",
+          "description": "打开开发页面，选择元素并提供页面信息；安装浏览器技能后可让已配置的智能体操作页面。上传前核对目标与文件。"
+        }
+      },
+      "review": {
+        "notes": {
+          "name": "审阅意见",
+          "subtitle": "查看差异并提出意见",
+          "description": "按文件和具体修改提出意见，把反馈交给智能体继续修订。"
+        },
+        "pr-view": {
+          "name": "合并请求检查",
+          "subtitle": "查看合并请求状态与评论",
+          "description": "连接仓库托管服务后查看支持的检查与评论；本地测试结果仍需单独确认。"
+        },
+        "ship": {
+          "name": "提交准备",
+          "subtitle": "准备提交与合并请求",
+          "description": "配置可用的生成服务后，可辅助起草提交说明和合并请求内容；发送前由你核对文件、目标分支和权限。"
+        }
+      },
+      "footer": "可随时从系统菜单「帮助 → 探索 Forflow One」再次打开。",
+      "continue": "继续",
+      "menu": "产品介绍"
+    },
+    "productDescription": "面向 AI 与研发团队的私有化智能体工作台。",
+    "productWorkflow": "组织并行任务，集中查看文件、终端和浏览器，审阅修改与测试结果。",
+    "about": {
+      "safeGraphics": "已关闭（安全图形模式）",
+      "unknownStatus": "尚无状态信息",
+      "enabled": "已启用",
+      "software": "软件渲染",
+      "disabled": "已关闭",
+      "unavailable": "不可用",
+      "unknown": "未知",
+      "gpu": "图形加速"
     }
   },
   "githubChecks": {

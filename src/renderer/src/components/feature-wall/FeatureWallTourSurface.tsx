@@ -8,9 +8,9 @@ import {
   type FeatureWallWorkflow,
   type FeatureWallWorkflowId
 } from '../../../../shared/feature-wall-workflows'
-import { getAgentsSteps, type AgentsStepId } from '../../../../shared/agents-orchestration-steps'
-import { getWorkbenchSteps, type WorkbenchStepId } from '../../../../shared/workbench-steps'
-import { getReviewSteps, type ReviewStepId } from '../../../../shared/review-steps'
+import type { AgentsStepId } from '../../../../shared/agents-orchestration-steps'
+import type { WorkbenchStepId } from '../../../../shared/workbench-steps'
+import type { ReviewStepId } from '../../../../shared/review-steps'
 import type { FeatureWallOpenSourceTelemetry } from '../../../../shared/telemetry-events'
 import type { FeatureWallTourDepthSummary } from '../../../../shared/feature-wall-tour-depth'
 import { track } from '@/lib/telemetry'
@@ -32,6 +32,7 @@ import { getFeatureWallActiveStepCopy } from './feature-wall-active-step-copy'
 import { getScreenSubmitModifierLabel } from '@/lib/screen-submit-shortcut'
 import { useFeatureWallTourKeyboardShortcut } from './use-feature-wall-tour-keyboard-shortcut'
 import { useFeatureWallTourRailKeydown } from './use-feature-wall-tour-rail-keydown'
+import * as tourCopy from './feature-wall-tour-copy'
 
 type FeatureWallTourSurfaceProps = {
   isOpen: boolean
@@ -55,7 +56,7 @@ export function FeatureWallTourSurface({
   className,
   panelClassName,
   doneLabel = translate('forflow.desktopCopy.11a6767d56', 'Done'),
-  footerText = 'Reopen any time from Help > Explore Orca.',
+  footerText = translate('forflow.tour.footer', 'Reopen any time from Help > Explore Orca.'),
   enableKeyboardShortcut = true,
   compactRail = false,
   detachedFooter = false,
@@ -82,12 +83,12 @@ export function FeatureWallTourSurface({
       ),
     [selectedId]
   )
-  const selected = FEATURE_WALL_WORKFLOWS[selectedIndex]
+  const selected = tourCopy.getLocalizedTourWorkflows()[selectedIndex]
   const taskSourcePresentation = useFeatureWallTaskSourcePresentation(isOpen, selected)
   const selectedPresentation = taskSourcePresentation.workflow
-  const agentsSteps = useMemo(() => getAgentsSteps(), [])
-  const workbenchSteps = useMemo(() => getWorkbenchSteps(), [])
-  const reviewSteps = useMemo(() => getReviewSteps(), [])
+  const agentsSteps = tourCopy.getLocalizedTourAgents()
+  const workbenchSteps = tourCopy.getLocalizedTourWorkbench()
+  const reviewSteps = tourCopy.getLocalizedTourReview()
   const [agentsStepId, setAgentsStepId] = useState<AgentsStepId>(
     () => agentsSteps[0]?.id ?? 'statuses'
   )
@@ -277,7 +278,8 @@ export function FeatureWallTourSurface({
         : workbenchStepIndex < workbenchSteps.length - 1)) ||
     (selected.id === 'review' &&
       (reviewStepIndex < 0 ? reviewSteps.length > 0 : reviewStepIndex < reviewSteps.length - 1))
-  const continueLabel = isLastWorkflow && !hasNextSubStep ? doneLabel : 'Continue'
+  const continueLabel =
+    isLastWorkflow && !hasNextSubStep ? doneLabel : translate('forflow.tour.continue', 'Continue')
   const handleContinue = useCallback((): void => {
     markWorkflowVisited(selected.id)
     if (selected.id === 'agents-orchestration') {

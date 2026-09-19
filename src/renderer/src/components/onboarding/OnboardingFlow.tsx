@@ -243,7 +243,7 @@ export default function OnboardingFlow({
                 aria-hidden="true"
                 className={
                   isForflowBuild()
-                    ? 'h-14 w-14 shrink-0 rounded-xl'
+                    ? 'h-10 w-32 shrink-0 rounded-lg object-cover'
                     : 'h-7 w-auto shrink-0 invert dark:invert-0'
                 }
               />

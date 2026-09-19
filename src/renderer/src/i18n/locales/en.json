@@ -18528,7 +18528,21 @@
       "c7e3192115": "Fixing both issues...",
       "b1b9acd9c4": "● Claude Code session started",
       "loaded": "Loaded {{count}} review notes from Orca",
-      "line": "line {{line}}"
+      "line": "line {{line}}",
+      "workspaceSetup": "set up orca.yaml",
+      "workspaceLogin": "fix login race condition",
+      "workspaceCi": "speed up CI pipeline",
+      "inspectMiddleware": "Looking at the session middleware now…",
+      "typecheckPassed": "Typecheck passes. Pulling on the login route next.",
+      "redirectTests": "Adding tests for the redirect path.",
+      "shellCommand": "Bash",
+      "zeroUsed": "0% used",
+      "almostUsed": "96% used",
+      "resetHours": "Resets in 5h",
+      "resetMinutes": "Resets in 47m",
+      "usageSummary": "0% used 5h · 4% used wk",
+      "usageAlmost": "96% used 47m",
+      "team": "Team"
     },
     "speechModels": {
       "parakeet-tdt-0.6b-v3-int8": "Highest accuracy for 25 European languages. Punctuation, capitalization, and word-level timestamps.",
@@ -18622,6 +18636,101 @@
       "undetected": "CLI not detected on this host",
       "workbuddy": "WorkBuddy / CodeBuddy",
       "workbuddyDescription": "Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations."
+    },
+    "tour": {
+      "workflows": {
+        "workspaces": {
+          "title": "Workspaces",
+          "meta": "Isolated work · Context kept together",
+          "lede": "Orca splits each task into an isolated workspace so agents can run in parallel."
+        },
+        "tasks": {
+          "title": "Tasks",
+          "meta": "GitHub · Linear",
+          "lede": "Start work directly from GitHub or Linear."
+        },
+        "agents-orchestration": {
+          "title": "Agents",
+          "meta": "Agents · Usage · Orca CLI",
+          "lede": "Run several agents at once, track their progress, and let automation drive Orca when it helps."
+        },
+        "workbench": {
+          "title": "Workbench",
+          "meta": "Terminal · Editor · Browser · Files",
+          "lede": "Bring your terminal setup into Orca, then split panes to keep servers, tests, logs, and agents running side by side."
+        },
+        "review": {
+          "title": "Code Review",
+          "meta": "Diffs · Comments · PRs",
+          "lede": "Review what changed, leave focused feedback, and send it back to the agent."
+        }
+      },
+      "agents": {
+        "statuses": {
+          "name": "Visibility",
+          "subtitle": "Agent Visibility",
+          "description": "Know which agents are working, waiting, live, or blocked."
+        },
+        "orchestration": {
+          "name": "Orchestration",
+          "subtitle": "Orchestration",
+          "description": "Enable agents to manage and coordinate Orca workspaces to execute larger tasks."
+        },
+        "usage": {
+          "name": "Usage",
+          "subtitle": "Usage",
+          "description": "Watch your usage and rate limits across every connected account, so you know when to switch."
+        }
+      },
+      "workbench": {
+        "terminal": {
+          "name": "Terminal",
+          "subtitle": "Terminal",
+          "description": "Keep your agents, tests, and dev logs visible at once."
+        },
+        "editor": {
+          "name": "Editor",
+          "subtitle": "Editor",
+          "description": "Use our Notion-style markdown editor to write notes without leaving Orca."
+        },
+        "browser": {
+          "name": "Browser",
+          "subtitle": "Browser",
+          "description": "Run your app in Orca's browser, send selected UI elements to agents, and let your agents interact with your webpage."
+        }
+      },
+      "review": {
+        "notes": {
+          "name": "Notes",
+          "subtitle": "Notes & diffs",
+          "description": "Send focused review notes to an agent."
+        },
+        "pr-view": {
+          "name": "PR checks",
+          "subtitle": "PR checks & comments",
+          "description": "See PR status in the Checks tab."
+        },
+        "ship": {
+          "name": "Ship with AI",
+          "subtitle": "Ship with AI",
+          "description": "Let AI prepare commit and PR drafts for you."
+        }
+      },
+      "footer": "Reopen any time from Help > Explore Orca.",
+      "continue": "Continue",
+      "menu": "Product tour"
+    },
+    "productDescription": "A private agent workbench for AI and development teams.",
+    "productWorkflow": "Organize parallel tasks, inspect changes, and review the results in one workspace.",
+    "about": {
+      "safeGraphics": "Disabled (Safe Graphics Mode)",
+      "unknownStatus": "Status unavailable",
+      "enabled": "Enabled",
+      "software": "Software rendering",
+      "disabled": "Disabled",
+      "unavailable": "Unavailable",
+      "unknown": "Unknown",
+      "gpu": "GPU acceleration"
     }
   },
   "githubChecks": {

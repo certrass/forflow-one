@@ -1,15 +1,15 @@
 import type { JSX, KeyboardEvent } from 'react'
 import { Check } from 'lucide-react'
-import {
-  FEATURE_WALL_WORKFLOWS,
-  type FeatureWallWorkflow,
-  type FeatureWallWorkflowId
+import type {
+  FeatureWallWorkflow,
+  FeatureWallWorkflowId
 } from '../../../../shared/feature-wall-workflows'
 import type { AgentsStep, AgentsStepId } from '../../../../shared/agents-orchestration-steps'
 import type { WorkbenchStep, WorkbenchStepId } from '../../../../shared/workbench-steps'
 import type { ReviewStep, ReviewStepId } from '../../../../shared/review-steps'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
+import { getLocalizedTourWorkflows } from './feature-wall-tour-copy'
 
 const SUB_STEP_LABELS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
@@ -59,7 +59,7 @@ export function FeatureWallRail(props: {
       aria-label={translate('auto.components.feature.wall.FeatureWallRail.7593d15f94', 'Workflows')}
     >
       <div role="tablist" aria-orientation="vertical" className="flex flex-col gap-1.5 pt-1.5">
-        {FEATURE_WALL_WORKFLOWS.map((workflow, index) => {
+        {getLocalizedTourWorkflows().map((workflow, index) => {
           const isSelected = workflow.id === selectedId
           const isDone = workflowDone[workflow.id] === true
           const subSteps =

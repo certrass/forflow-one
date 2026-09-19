@@ -6,6 +6,7 @@ import {
   Github,
   Keyboard,
   Loader2,
+  ListChecks,
   MessageSquareText,
   RefreshCw,
   RotateCw,
@@ -265,16 +266,16 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
             )}
             {showMilestones ? (
               <DropdownMenuItem onSelect={openMilestones}>
-                <img
-                  src={logo}
-                  alt=""
-                  aria-hidden="true"
-                  className={
-                    isForflowBuild()
-                      ? 'size-5 rounded object-contain'
-                      : 'size-3.5 object-contain invert opacity-55 dark:invert-0'
-                  }
-                />
+                {isForflowBuild() ? (
+                  <ListChecks className="size-3.5" />
+                ) : (
+                  <img
+                    src={logo}
+                    alt=""
+                    aria-hidden="true"
+                    className="size-3.5 object-contain invert opacity-55 dark:invert-0"
+                  />
+                )}
                 {translate(
                   'auto.components.sidebar.SidebarSettingsHelpMenu.f8a2c91d4e',
                   'Milestones'
@@ -298,6 +299,12 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
                 'Onboarding'
               )}
             </DropdownMenuItem>
+            {isForflowBuild() && (
+              <DropdownMenuItem onSelect={() => openModal('feature-wall', { source: 'help_menu' })}>
+                <BookOpen className="size-3.5" />
+                {translate('forflow.tour.menu', 'Product tour')}
+              </DropdownMenuItem>
+            )}
             {!isForflowBuild() && (
               <>
                 <ExternalMenuItem

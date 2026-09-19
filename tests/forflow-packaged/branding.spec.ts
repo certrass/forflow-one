@@ -18,6 +18,10 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
     await expect(logo).toBeVisible()
     await expect(logo).toHaveAttribute('src', /forflow-mark/)
     await expect(page.getByRole('heading', { name: 'Forflow One', exact: true })).toBeVisible()
+    await expect(page.getByText('打开 GitHub', { exact: true })).toHaveCount(0)
+    await expect(
+      page.getByText('面向 AI 与研发团队的私有化智能体工作台。', { exact: false })
+    ).toBeVisible()
     await expect(page.getByRole('button', { name: '创建工作区', exact: true })).toBeVisible()
     await expect(page.locator('body')).toContainText('上一个工作区')
     await expect(page.locator('body')).toContainText('下一个工作区')

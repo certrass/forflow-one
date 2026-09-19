@@ -24,6 +24,8 @@ import {
 } from './windows-install-dir-acl-recovery'
 import { mainProcessState as state, gpuFallbackEnvironment } from './main-process-state'
 import { createGpuAccelerationAboutPanelOptions } from '../menu/gpu-acceleration-about-panel'
+import { translateMain } from '../i18n/main-i18n'
+import { isForflowBuild } from '../../shared/product-branding'
 
 export function updateGpuAccelerationAboutPanel(): void {
   app.setAboutPanelOptions(
@@ -32,7 +34,14 @@ export function updateGpuAccelerationAboutPanel(): void {
       appVersion: app.getVersion(),
       platform: process.platform,
       gpuFallbackActive: state.gpuFallbackActiveThisLaunch,
-      gpuFeatureStatus: state.gpuFeatureStatus
+      gpuFeatureStatus: state.gpuFeatureStatus,
+      translate: translateMain,
+      description: isForflowBuild()
+        ? translateMain(
+            'forflow.productDescription',
+            'A private agent workbench for AI and development teams.'
+          )
+        : undefined
     })
   )
 }

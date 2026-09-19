@@ -514,6 +514,7 @@
     "components.workspace.cleanup.browse.chip.kind.git": "Git",
     "dashboardPopout.map.host.ssh": "SSH",
     "dashboardPopout.map.host.wsl": "WSL",
-    "auto.components.right.sidebar.index.6306b48afd": "source-control"
+    "auto.components.right.sidebar.index.6306b48afd": "source-control",
+    "auto.components.feature.wall.agents.orchestration.StatusesPage.7b26349cb2": "pnpm migrate latest"
   }
 }

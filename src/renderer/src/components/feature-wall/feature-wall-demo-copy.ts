@@ -1,6 +1,21 @@
 import { translate } from '@/i18n/i18n'
 
 const copyKeys: Readonly<Record<string, string>> = {
+  '0% used': 'forflow.demoCopy.zeroUsed',
+  '96% used': 'forflow.demoCopy.almostUsed',
+  'Resets in 5h': 'forflow.demoCopy.resetHours',
+  'Resets in 47m': 'forflow.demoCopy.resetMinutes',
+  '0% used 5h · 4% used wk': 'forflow.demoCopy.usageSummary',
+  '96% used 47m': 'forflow.demoCopy.usageAlmost',
+  Team: 'forflow.demoCopy.team',
+
+  'set up orca.yaml': 'forflow.demoCopy.workspaceSetup',
+  'fix login race condition': 'forflow.demoCopy.workspaceLogin',
+  'speed up CI pipeline': 'forflow.demoCopy.workspaceCi',
+  'Looking at the session middleware now…': 'forflow.demoCopy.inspectMiddleware',
+  'Typecheck passes. Pulling on the login route next.': 'forflow.demoCopy.typecheckPassed',
+  'Adding tests for the redirect path.': 'forflow.demoCopy.redirectTests',
+  Bash: 'forflow.demoCopy.shellCommand',
   'Adding the email_verified column…': 'forflow.demoCopy.ac583591c8',
   'Wiring withSession middleware…': 'forflow.demoCopy.c9d391f27a',
   'PR 1/2 ready': 'forflow.demoCopy.519808266b',

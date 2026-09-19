@@ -3,8 +3,31 @@ import {
   createGpuAccelerationAboutPanelOptions,
   describeGpuAcceleration
 } from './gpu-acceleration-about-panel'
+import zh from '../../renderer/src/i18n/locales/zh.json'
 
 describe('GPU acceleration About panel', () => {
+  it('shows the localized product description and keeps diagnostic states readable', () => {
+    const translate = (key: string, fallback: string): string => {
+      const name = key.replace('forflow.about.', '')
+      const entry = Object.entries(zh.forflow.about).find(([id]) => id === name)
+      return entry?.[1] ?? fallback
+    }
+    const options = createGpuAccelerationAboutPanelOptions({
+      appName: 'Forflow One',
+      appVersion: '1.4.205-forflow.7',
+      platform: 'darwin',
+      gpuFallbackActive: true,
+      gpuFeatureStatus: null,
+      translate,
+      description: zh.forflow.productDescription
+    })
+    expect(options.credits).toBe(
+      '面向 AI 与研发团队的私有化智能体工作台。\n图形加速: 已关闭（安全图形模式）'
+    )
+    expect(describeGpuAcceleration({ gpu_compositing: 'new_status' }, false, translate)).toBe(
+      '未知 (new_status)'
+    )
+  })
   it.each([
     ['enabled', 'Enabled'],
     ['disabled_off', 'Disabled'],

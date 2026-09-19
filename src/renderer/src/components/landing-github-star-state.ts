@@ -1,4 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { isForflowBuild } from '../../../shared/product-branding'
 
 export type LandingStarState = 'loading' | 'starred' | 'not-starred' | 'web-fallback' | 'hidden'
 
@@ -16,9 +17,12 @@ export function useLandingOrcaStarState(): [
   LandingStarState,
   Dispatch<SetStateAction<LandingStarState>>
 ] {
-  const [state, setState] = useState<LandingStarState>('loading')
+  const [state, setState] = useState<LandingStarState>(isForflowBuild() ? 'hidden' : 'loading')
 
   useEffect(() => {
+    if (isForflowBuild()) {
+      return
+    }
     let cancelled = false
     void window.api.gh.checkOrcaStarred().then((result) => {
       if (cancelled) {

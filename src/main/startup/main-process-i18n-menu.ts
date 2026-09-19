@@ -17,6 +17,7 @@ import {
 } from './main-window-actions'
 import { ensureAutoUpdaterConfigured } from '../window/attach-main-window-services'
 import { logStartupMilestone } from './startup-diagnostics'
+import { updateGpuAccelerationAboutPanel } from './gpu-lifecycle'
 
 export async function initializeMainProcessI18nAndMenu(): Promise<void> {
   const store = state.store
@@ -25,6 +26,7 @@ export async function initializeMainProcessI18nAndMenu(): Promise<void> {
   }
   await ensureMainI18n()
   await setMainUiLanguage(store.getSettings().uiLanguage)
+  updateGpuAccelerationAboutPanel()
   logStartupMilestone('i18n-ready')
   registerAppMenu({
     appMenuLabel: state.devInstanceIdentity?.name ?? app.name,
