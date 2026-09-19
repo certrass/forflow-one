@@ -17797,7 +17797,7 @@
       "managed": "企业部署策略已关闭产品遥测；本地诊断记录单独管理。"
     },
     "skills": {
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，共其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
       "complete": "内置技能已安装到本机共享目录。",
       "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
       "settingUp": "正在配置能力…",
@@ -17822,7 +17822,9 @@
       "register": "注册 {{path}} 后，可从终端使用 Forflow One。",
       "stale": "现有命令指向旧版本，请重新注册并核对目标路径。",
       "conflict": "命令路径已被其他文件占用，请先检查冲突文件。",
-      "unsupported": "当前运行方式不支持注册命令，请使用完整安装包或联系管理员。"
+      "unsupported": "当前运行方式不支持注册命令，请使用完整安装包或联系管理员。",
+      "statusPermissionDenied": "Cannot read the command path because access was denied. Check its permissions, then refresh the status.",
+      "statusReadFailed": "Could not read the command registration status. Refresh to retry."
     },
     "approval": {
       "allow": "Allow this operation",
@@ -18542,7 +18544,9 @@
       "resetMinutes": "Resets in 47m",
       "usageSummary": "0% used 5h · 4% used wk",
       "usageAlmost": "96% used 47m",
-      "team": "Team"
+      "team": "Team",
+      "shipChecklist": "Ship checklist",
+      "copy": "Copy"
     },
     "speechModels": {
       "parakeet-tdt-0.6b-v3-int8": "Highest accuracy for 25 European languages. Punctuation, capitalization, and word-level timestamps.",
@@ -18731,6 +18735,9 @@
       "unavailable": "Unavailable",
       "unknown": "Unknown",
       "gpu": "GPU acceleration"
+    },
+    "setup": {
+      "notificationsCompletion": "This step tracks the in-app notification switches. Check system permission and delivery below."
     }
   },
   "githubChecks": {
@@ -18764,7 +18771,15 @@
     "help": "Help",
     "paste": "Paste",
     "copy": "Copy",
-    "selectAll": "Select All"
+    "selectAll": "Select All",
+    "about": "About {{app}}",
+    "services": "Services",
+    "hide": "Hide {{app}}",
+    "hideOthers": "Hide Others",
+    "showAll": "Show All",
+    "quit": "Quit {{app}}",
+    "minimize": "Minimize",
+    "zoom": "Zoom"
   },
   "notifications": {
     "agentStatus": {

@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import { useEffect } from 'react'
 import {
   EDITOR_ANIMATION_TIMING,
@@ -234,7 +235,7 @@ export function useEditorAnimatedVisualAnimation(
         if (cancelled) {
           return
         }
-        await typeInto(activeText ?? activeLine, 'Ship checklist', 55)
+        await typeInto(activeText ?? activeLine, localizedDemoCopy('Ship checklist'), 55)
         if (cancelled) {
           return
         }

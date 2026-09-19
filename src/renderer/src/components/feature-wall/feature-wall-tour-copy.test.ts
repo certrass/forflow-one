@@ -1,5 +1,7 @@
 import { afterEach, expect, it } from 'vitest'
 import { i18n } from '@/i18n/i18n'
+import { codeBlockHTML } from './editor-animated-visual-markup'
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import { FEATURE_WALL_WORKFLOWS } from '../../../../shared/feature-wall-workflows'
 import {
   getLocalizedTourWorkflows,
@@ -10,6 +12,17 @@ import {
 
 afterEach(async () => {
   await i18n.changeLanguage('en')
+})
+
+it('localizes generated editor content while keeping code examples executable', async () => {
+  await i18n.changeLanguage('zh')
+  expect(localizedDemoCopy('Ship checklist')).toBe('发布检查清单')
+  expect(codeBlockHTML()).toContain('<span>复制</span>')
+  expect(codeBlockHTML()).toContain('runSmokeTests')
+  expect(codeBlockHTML()).toContain('publish')
+  await i18n.changeLanguage('en')
+  expect(localizedDemoCopy('Ship checklist')).toBe('Ship checklist')
+  expect(codeBlockHTML()).toContain('<span>Copy</span>')
 })
 
 it('localizes every workflow and step while preserving IDs, links and optional setup', async () => {

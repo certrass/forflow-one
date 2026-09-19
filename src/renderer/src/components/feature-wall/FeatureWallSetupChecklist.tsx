@@ -224,6 +224,12 @@ function NotificationAction(): React.JSX.Element {
   const updateSettings = useAppStore((s) => s.updateSettings)
   return (
     <div className="max-w-3xl">
+      <p className="mb-4 text-sm text-muted-foreground">
+        {translate(
+          'forflow.setup.notificationsCompletion',
+          'This step tracks the in-app notification switches. Check system permission and delivery below.'
+        )}
+      </p>
       <NotificationStep settings={settings} updateSettings={updateSettings} />
     </div>
   )

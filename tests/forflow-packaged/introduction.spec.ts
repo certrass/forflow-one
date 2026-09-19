@@ -23,10 +23,15 @@ test('product introduction renders the workflow tour in the installed applicatio
     ] as const
     const pages: Record<string, string> = {}
     for (const [id, steps] of sections) {
-      await dialog.locator(`[data-feature-wall-workflow-id="${id}"]`).click()
       for (const step of steps.length ? steps : ['']) {
+        await expect(dialog.locator(`[data-feature-wall-workflow-id="${id}"]`)).toHaveAttribute(
+          'aria-selected',
+          'true'
+        )
         if (step) {
-          await dialog.getByRole('button', { name: new RegExp(`${step}$`) }).click()
+          await expect(
+            dialog.getByRole('button', { name: new RegExp(`${step}$`) })
+          ).toHaveAttribute('aria-current', 'step')
         }
         const text = await dialog.innerText()
         pages[`${id}-${step}`] = text
@@ -44,13 +49,33 @@ test('product introduction renders the workflow tour in the installed applicatio
           path: path.join(evidence, `introduction-${id}-${step || 'main'}.png`),
           animations: 'disabled'
         })
+        await dialog
+          .getByRole('button', {
+            name: new RegExp(lastPage ? '^已完成(?:\\s+[⌘⌃]|$)' : '^继续(?:\\s+[⌘⌃]|$)')
+          })
+          .click()
       }
     }
     writeFileSync(
       path.join(evidence, 'introduction-pages.json'),
       JSON.stringify({ packageFingerprint, pages }, null, 2)
     )
-    await dialog.getByRole('button', { name: /^已完成(?:\s+[⌘⌃]|$)/ }).click()
+    await expect(dialog).toBeHidden()
+    await page.getByRole('button', { name: '帮助', exact: true }).click()
+    await page.getByRole('menuitem', { name: '产品介绍', exact: true }).click()
+    await expect(dialog.locator('[data-feature-wall-workflow-id="workspaces"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    // The animated content is created after render and was missing from static locale checks.
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await dialog.locator('[data-feature-wall-workflow-id="workbench"]').click()
+    await dialog.getByRole('button', { name: /编辑器$/ }).click()
+    await expect(dialog.getByText('发布检查清单', { exact: true })).toBeVisible({ timeout: 15_000 })
+    await expect(dialog.getByText('复制', { exact: true })).toBeVisible({ timeout: 15_000 })
+    await expect(dialog).not.toContainText('Ship checklist')
+    await page.screenshot({ path: path.join(evidence, 'introduction-editor-animation.png') })
+    await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
     expect(errors).toEqual([])
   } finally {

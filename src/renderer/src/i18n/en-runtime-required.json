@@ -1138,6 +1138,7 @@
         "CliSection": {
           "4c7e3e4c5f": "install",
           "5d432fe44d": "installed",
+          "7baec27029": "Failed to load CLI status.",
           "8a9b784c60": "stale",
           "8d96213669": "remove",
           "cliSkillTerminalAria": "CLI skill install terminal",
@@ -2780,6 +2781,7 @@
       "caa8d47d99": "Run schema + backfill steps in order during migration",
       "cb8f9621f4": "Log skipped rows in result",
       "cd61a6ece2": "PR 2/2 ready",
+      "copy": "Copy",
       "e3907ed521": "Silently skipping rows — log the count or surface it in the result.",
       "ffa444b29d": "› updates avatar",
       "inspectMiddleware": "Looking at the session middleware now…",
@@ -2787,6 +2789,7 @@
       "resetHours": "Resets in 5h",
       "resetMinutes": "Resets in 47m",
       "shellCommand": "Bash",
+      "shipChecklist": "Ship checklist",
       "team": "Team",
       "typecheckPassed": "Typecheck passes. Pulling on the login route next.",
       "usageAlmost": "96% used 47m",
@@ -2979,6 +2982,7 @@
     "skills": {
       "installed": "Installed",
       "missing": "Not detected yet",
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
       "recheck": "Check local skills again",
       "recheckFailed": "Could not check local skills. Check the local skill folders.",
       "registerCli": "Orca needs to register its CLI on PATH.",

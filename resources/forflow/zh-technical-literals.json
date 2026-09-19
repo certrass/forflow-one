@@ -515,6 +515,10 @@
     "dashboardPopout.map.host.ssh": "SSH",
     "dashboardPopout.map.host.wsl": "WSL",
     "auto.components.right.sidebar.index.6306b48afd": "source-control",
-    "auto.components.feature.wall.agents.orchestration.StatusesPage.7b26349cb2": "pnpm migrate latest"
+    "auto.components.feature.wall.agents.orchestration.StatusesPage.7b26349cb2": "pnpm migrate latest",
+    "auto.components.feature.wall.EditorAnimatedVisual.cda56c5915": "notes / launch-plan.md",
+    "auto.components.feature.wall.ReviewPRViewAnimatedVisual.c2062da7ec": "stderr",
+    "auto.components.feature.wall.BrowserAnimatedVisual.73bbb46073": "/pricing",
+    "auto.components.feature.wall.BrowserAnimatedVisual.f39be6ca14": "/signup"
   }
 }

@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { act, cleanup, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getDefaultSettings } from '../../../../shared/constants'
 import type { CliInstallStatus } from '../../../../shared/cli-install-types'
@@ -150,5 +150,69 @@ describe('CliSection install failure surfacing', () => {
     expect(screen.queryByRole('alert')).toBeNull()
     expect(toasts.success).toHaveBeenCalledTimes(1)
     expect(toasts.error).not.toHaveBeenCalled()
+  })
+})
+
+describe('CliSection status recovery', () => {
+  it.each(['EACCES', 'EPERM', 'unavailable'])(
+    'settles %s failures and allows a successful retry',
+    async (code) => {
+      const getInstallStatus = vi
+        .fn()
+        .mockRejectedValueOnce(
+          new Error(
+            `Error invoking remote method 'cli:getInstallStatus': Error: ${code}: readlink '/usr/local/bin/forflow'`
+          )
+        )
+        .mockResolvedValue(notInstalledStatus({ state: 'installed' }))
+      Object.assign(window, {
+        api: {
+          cli: { getInstallStatus },
+          shell: { openPath: vi.fn() }
+        }
+      })
+      render(<CliSection currentPlatform="darwin" settings={getDefaultSettings('/tmp')} />)
+
+      const alert = await screen.findByRole('alert')
+      expect(alert.textContent).toContain(
+        code === 'unavailable'
+          ? 'Could not read the command registration status'
+          : 'Cannot read the command path because access was denied'
+      )
+      expect(alert.textContent).not.toContain('invoking remote method')
+      expect(screen.getByRole('switch').hasAttribute('disabled')).toBe(true)
+      const refresh = screen.getByRole('button', { name: 'Refresh CLI status' })
+      expect(refresh.hasAttribute('disabled')).toBe(false)
+      expect(toasts.error).not.toHaveBeenCalled()
+
+      fireEvent.click(refresh)
+      await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
+      await waitFor(() =>
+        expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true')
+      )
+      expect(getInstallStatus).toHaveBeenCalledTimes(2)
+      expect(screen.getByRole('switch').hasAttribute('disabled')).toBe(false)
+    }
+  )
+
+  it('clears previously installed status when a later refresh fails', async () => {
+    const getInstallStatus = vi
+      .fn()
+      .mockResolvedValueOnce(notInstalledStatus({ state: 'installed' }))
+      .mockRejectedValueOnce(new Error('EACCES: readlink'))
+    Object.assign(window, {
+      api: {
+        cli: { getInstallStatus },
+        shell: { openPath: vi.fn() }
+      }
+    })
+    render(<CliSection currentPlatform="darwin" settings={getDefaultSettings('/tmp')} />)
+    await waitFor(() =>
+      expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true')
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh CLI status' }))
+    await screen.findByRole('alert')
+    expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('false')
+    expect(screen.getByRole('switch').hasAttribute('disabled')).toBe(true)
   })
 })

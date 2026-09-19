@@ -28,3 +28,18 @@ export function forflowCliStatusDescription(status: CliInstallStatus | null): st
       )
   }
 }
+
+export function cliStatusReadFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error)
+  const code = error instanceof Error && 'code' in error ? error.code : null
+  if (code === 'EACCES' || code === 'EPERM' || /\b(?:EACCES|EPERM)\b/.test(message)) {
+    return translate(
+      'forflow.cli.statusPermissionDenied',
+      'Cannot read the command path because access was denied. Check its permissions, then refresh the status.'
+    )
+  }
+  return translate(
+    'forflow.cli.statusReadFailed',
+    'Could not read the command registration status. Refresh to retry.'
+  )
+}

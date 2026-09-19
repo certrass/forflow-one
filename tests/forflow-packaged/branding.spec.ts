@@ -135,9 +135,23 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
     expect(about[0].credits).toContain('面向 AI 与研发团队的私有化智能体工作台。')
     expect(about[0].credits).toContain('图形加速')
     expect(about[0].credits).not.toMatch(/Orca|GPU acceleration|Status unavailable/)
+    const nativeMenu = await app.evaluate(({ Menu }) =>
+      Menu.getApplicationMenu()?.items.flatMap(
+        (item) =>
+          item.submenu?.items.map((entry) => ({ role: entry.role, label: entry.label })) ?? []
+      )
+    )
+    expect(nativeMenu).toEqual(
+      expect.arrayContaining([
+        { role: 'about', label: '关于 Forflow One' },
+        { role: 'hide', label: '隐藏 Forflow One' },
+        { role: 'hideothers', label: '隐藏其他应用' },
+        { role: 'quit', label: '退出 Forflow One' }
+      ])
+    )
     writeFileSync(
       path.join(evidence, 'about-panel-options.json'),
-      JSON.stringify({ packageFingerprint, about }, null, 2)
+      JSON.stringify({ packageFingerprint, about, nativeMenu }, null, 2)
     )
     expect(errors).toEqual([])
   } finally {

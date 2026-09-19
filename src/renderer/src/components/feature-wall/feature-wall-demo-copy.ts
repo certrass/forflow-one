@@ -1,6 +1,8 @@
 import { translate } from '@/i18n/i18n'
 
 const copyKeys: Readonly<Record<string, string>> = {
+  'Ship checklist': 'forflow.demoCopy.shipChecklist',
+  Copy: 'forflow.demoCopy.copy',
   '0% used': 'forflow.demoCopy.zeroUsed',
   '96% used': 'forflow.demoCopy.almostUsed',
   'Resets in 5h': 'forflow.demoCopy.resetHours',

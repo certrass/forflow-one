@@ -1,8 +1,7 @@
 import { isForflowBuild } from '../../../../shared/product-branding'
-import { forflowCliStatusDescription } from './forflow-cli-copy'
+import { cliStatusReadFailure, forflowCliStatusDescription } from './forflow-cli-copy'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FolderOpen, RefreshCw } from 'lucide-react'
-import { toast } from 'sonner'
 import type { CliInstallStatus } from '../../../../shared/cli-install-types'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import {
@@ -86,6 +85,7 @@ export function CliSection({
 }: CliSectionProps): React.JSX.Element {
   const [status, setStatus] = useState<CliInstallStatus | null>(null)
   const [loading, setLoading] = useState(true)
+  const [statusError, setStatusError] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const mountedRef = useMountedRef()
   const agentRuntime = useMemo(
@@ -149,19 +149,14 @@ export function CliSection({
 
   const refreshStatus = useCallback(async (): Promise<void> => {
     setLoading(true)
+    setStatusError(null)
     clearInstallFailure()
     try {
       handleStatusChange(await window.api.cli.getInstallStatus())
     } catch (error) {
       if (mountedRef.current) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : translate(
-                'auto.components.settings.CliSection.7baec27029',
-                'Failed to load CLI status.'
-              )
-        )
+        setStatus(null)
+        setStatusError(cliStatusReadFailure(error))
       }
     } finally {
       if (mountedRef.current) {
@@ -203,6 +198,7 @@ export function CliSection({
               {translate('auto.components.settings.CliSection.38edbb5721', 'Shell command')}
             </Label>
             <p
+              role={statusError ? 'alert' : undefined}
               className={`text-xs ${pathStatusUnknown ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}
             >
               {loading
@@ -210,9 +206,10 @@ export function CliSection({
                     'auto.components.settings.CliSection.d363e5929b',
                     'Checking CLI registration…'
                   )
-                : isForflowBuild()
-                  ? forflowCliStatusDescription(status)
-                  : (status?.detail ?? getInstallDescription(currentPlatform))}
+                : (statusError ??
+                  (isForflowBuild()
+                    ? forflowCliStatusDescription(status)
+                    : (status?.detail ?? getInstallDescription(currentPlatform))))}
             </p>
           </div>
           <div className="flex items-center gap-2">

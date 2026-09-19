@@ -15,6 +15,7 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { translate } from '@/i18n/i18n'
 import { commitMessageAgentLabel } from './ai-commit-pr-settings-helpers'
+import { nativeChatSessionChoiceLabel } from '../native-chat/native-chat-session-option-labels'
 
 type AiCommitPrSettingsFieldsProps = {
   config: CommitMessageAiSettings
@@ -160,7 +161,7 @@ export function AiCommitPrSettingsFields({
             <SelectContent portalContainer={selectPortalRoot} position="popper" align="start">
               {activeModel.thinkingLevels.map((level) => (
                 <SelectItem key={level.id} value={level.id} className="cursor-pointer">
-                  {level.label}
+                  {nativeChatSessionChoiceLabel({ value: level.id, label: level.label })}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -141,17 +141,17 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const macAppMenu: Electron.MenuItemConstructorOptions = {
     label: options.appMenuLabel ?? app.name,
     submenu: [
-      { role: 'about' },
+      { role: 'about', label: translateMain('menu.about', 'About {{app}}', { app: app.name }) },
       checkForUpdatesItem,
       settingsItem,
       { type: 'separator' },
-      { role: 'services' },
+      { role: 'services', label: translateMain('menu.services', 'Services') },
       { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideOthers' },
-      { role: 'unhide' },
+      { role: 'hide', label: translateMain('menu.hide', 'Hide {{app}}', { app: app.name }) },
+      { role: 'hideOthers', label: translateMain('menu.hideOthers', 'Hide Others') },
+      { role: 'unhide', label: translateMain('menu.showAll', 'Show All') },
       { type: 'separator' },
-      { role: 'quit' }
+      { role: 'quit', label: translateMain('menu.quit', 'Quit {{app}}', { app: app.name }) }
     ]
   }
 
@@ -312,7 +312,10 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
 
   const windowMenu: Electron.MenuItemConstructorOptions = {
     label: translateMain('menu.window', 'Window'),
-    submenu: [{ role: 'minimize' }, { role: 'zoom' }]
+    submenu: [
+      { role: 'minimize', label: translateMain('menu.minimize', 'Minimize') },
+      { role: 'zoom', label: translateMain('menu.zoom', 'Zoom') }
+    ]
   }
 
   const helpMenu: Electron.MenuItemConstructorOptions = {
@@ -326,7 +329,10 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
         ? []
         : ([
             { type: 'separator' },
-            { role: 'about' },
+            {
+              role: 'about',
+              label: translateMain('menu.about', 'About {{app}}', { app: app.name })
+            },
             checkForUpdatesItem
           ] satisfies Electron.MenuItemConstructorOptions[]))
     ]

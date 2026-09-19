@@ -13758,15 +13758,15 @@
             "c89534cbe9": "安装 CLI 和技能"
           },
           "AiCommitPrSettingsCard": {
-            "8d4152701a": "例如llama 运行 llama3.1 {{value0}}",
+            "8d4152701a": "例如：ollama run llama3.1 {{value0}}",
             "9ee54037a4": "自定义命令",
-            "4b2fc4b80c": "思考努力",
+            "4b2fc4b80c": "推理强度",
             "be8917699e": "模型",
-            "4d9b6d84df": "不支持。选择 Claude、Codex 或 Custom。",
+            "4d9b6d84df": "不支持。请选择 Claude、Codex 或自定义命令。",
             "560d4feb00": "自定义",
             "29d119fe95": "智能体",
-            "f9382b48a1": "启用AI作者",
-            "1c0cb4fabb": "AI 作者",
+            "f9382b48a1": "启用 AI 撰写",
+            "1c0cb4fabb": "AI 撰写",
             "bd14e9c42a": "未配置",
             "1f9468c5c9": "{{value0}} 不支持"
           },
@@ -13788,8 +13788,8 @@
             "051c97d15a": ".pp-card[data-card=\"starter\"] .pp-cta",
             "4fa59ca545": "✓ 更新",
             "1bec24acc1": "@keyframes browserFlash { 0% { opacity: 0; } 20% { opacity: 0.85; } 100% { opacity: 0; } } @keyframes browserTabIn { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } } @keyframes browserViewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }",
-            "73bbb46073": "/定价",
-            "f39be6ca14": "/报名"
+            "73bbb46073": "/pricing",
+            "f39be6ca14": "/signup"
           },
           "BrowserUseSkillSetupCard": {
             "cbc45022d4": "使智能体能够在 Orca 浏览器中导航和验证页面。",
@@ -13813,8 +13813,8 @@
           "EditorAnimatedVisual": {
             "7a763daf2f": "斜体",
             "8521536429": "粗体 ·",
-            "8341391520": "用于块·",
-            "3fe42a1da0": "类型",
+            "8341391520": "插入内容块 ·",
+            "3fe42a1da0": "输入",
             "8268b2376b": "代码块",
             "37fa4948ce": "项目符号列表",
             "f25687c588": "引用",
@@ -13822,19 +13822,19 @@
             "a26a68d30c": "标题 2",
             "722170663a": "标题 1",
             "1fb29ad710": "标题",
-            "4426aab46f": "新图块落地后更新文档索引。",
+            "4426aab46f": "新功能完成后更新文档目录。",
             "95f0c3a46f": "在新机器上对安装流程进行冒烟测试。",
             "22ae7b4d9d": "给团队的一句简短说明——在发布前汇总剩余工作。",
-            "5a55c00a81": "推出计划",
+            "5a55c00a81": "发布计划",
             "218503f9f3": "自动保存",
-            "cda56c5915": "笔记/launch-plan.md",
+            "cda56c5915": "notes / launch-plan.md",
             "e16479c1c5": "[data-slash-menu] [data-slash-row].slash-active { background: rgba(24,24,27,0.07); box-shadow: inset 0 0 0 1px rgba(24,24,27,0.06); } [data-md-active-line][data-role=\"active\"] { color: rgb(113 113 122); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; } [data-md-active-line][data-role=\"h1\"] { color: inherit; font-family: inherit; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; margin-top: 6px; } [data-md-caret] { display: inline-block; width: 1.5px; height: 1em; background: currentColor; vertical-align: -2px; margin-left: 1px; animation: md-caret-blink 1.05s steps(1) infinite; } @keyframes md-caret-blink { 0%, 50% { opacity: 1 } 51%, 100% { opacity: 0 } } @keyframes md-block-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } } @keyframes md-cursor-ripple { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(1.4); opacity: 0; } } [data-clicking=\"1\"] [data-cursor-ripple] { animation: md-cursor-ripple 460ms ease-out forwards; }"
           },
           "FeatureWallBody": {
             "25ec5356d6": "设置"
           },
           "FeatureWallModal": {
-            "33dca8bbbe": "Orca 的一个简短的、逐个工作流程的浏览。",
+            "33dca8bbbe": "按工作流程了解 Orca。",
             "3567e147c8": "了解 Orca"
           },
           "FeatureWallPreview": {
@@ -13871,29 +13871,29 @@
           "ReviewNotesAnimatedVisual": {
             "5dbd27c4c2": "Codex",
             "09094f25e2": "Claude Code",
-            "294aaff104": "发送注释至",
+            "294aaff104": "发送评注给",
             "ea4e45b71b": "添加备注",
             "271ea0cbf3": "取消",
-            "a7a89d8f94": "线",
-            "5cb213f967": "AI 笔记",
+            "a7a89d8f94": "行号",
+            "5cb213f967": "AI 评注",
             "1eee3a397e": "src/server/migrate.ts（差异）"
           },
           "ReviewPRViewAnimatedVisual": {
-            "7c2808ecff": "合并前截断。",
-            "c2062da7ec": "标准错误",
-            "6f4c2d7cb7": "添加承保案例",
-            "71828fba75": "我们可以将失败的命令包含在诊断负载中吗？",
-            "fb1a856b6d": "打开",
+            "7c2808ecff": "截断场景的测试。",
+            "c2062da7ec": "stderr",
+            "6f4c2d7cb7": "合并前请补充",
+            "71828fba75": "诊断记录中能否包含执行失败的命令？",
+            "fb1a856b6d": "未解决",
             "7a8b896e11": "评论",
             "ca36f7b27c": "通过",
             "25f6838e43": "Lint",
             "2ef0b97954": "类型检查",
             "8ed213397c": "执行中",
-            "d340c052fb": "核实",
-            "9a097cae12": "1 待定",
-            "2f37142229": "压缩合并",
+            "d340c052fb": "验证",
+            "9a097cae12": "1 项待完成",
+            "2f37142229": "合并为一个提交",
             "0aab7ab84a": "添加本地诊断错误跟踪",
-            "dfe313e0c9": "打开",
+            "dfe313e0c9": "待合并",
             "6e3f5223c5": "资源管理器",
             "ab2901bce6": "检查项",
             "d7f80060ca": "源代码控制",
@@ -13902,20 +13902,20 @@
             "f4d5e1a7b2": "3 个检查"
           },
           "ReviewShipAnimatedVisual": {
-            "4d99496b8c": "创建PR",
+            "4d99496b8c": "创建 PR",
             "62544e0852": "取消",
-            "bcd5cae3c4": "PR描述",
+            "bcd5cae3c4": "PR 描述",
             "3774b80eae": "描述",
-            "07da9245cc": "PR标题",
+            "07da9245cc": "PR 标题",
             "54a093c52d": "标题",
             "3b9b96d6a6": "main",
             "ce7d5d3a18": "基础分支",
             "e4473d438f": "用 AI 生成",
-            "c30cd930ff": "创建PR",
+            "c30cd930ff": "创建 PR",
             "ea0100dd15": "查看全部",
             "e725000cd7": "更改",
             "a079083a6c": "提交",
-            "7347fa5839": "信息",
+            "7347fa5839": "提交说明",
             "d1a7f15876": "使用 AI 生成提交信息",
             "cd8a3a39d7": "领先 3 个提交"
           },
@@ -13929,25 +13929,25 @@
             "61ffda7601": "创建工作区"
           },
           "WorkbenchAnimatedVisual": {
-            "633a91e358": "思维…",
+            "633a91e358": "思考中…",
             "932c4b3a97": ">",
             "ca2cfbf188": "向下拆分终端",
             "e370fa8c2b": "向右拆分终端",
             "b85eab49dd": "src/auth/session.ts",
             "99f5224f1e": "编辑",
             "0d93c298a7": "抛出 src/auth",
-            "17cfdc3344": "格雷普",
-            "9923847785": "读",
-            "c0eb94125e": "审查授权边缘情况",
+            "17cfdc3344": "搜索",
+            "9923847785": "读取",
+            "c0eb94125e": "检查认证边界情况",
             "431ca9842a": "Claude Code 会话已开始",
             "000106adfe": "claude",
             "7d9f1d5f7d": "（0.8秒）",
-            "944199e54a": "› 购物车总更新",
+            "944199e54a": "› 更新购物车总额",
             "623881d72e": "checkout.spec.ts",
             "5c5cbd783f": "（1.2秒）",
             "3261c6853b": "› 可以登录",
             "defe550fe2": "login.spec.ts",
-            "0b20782e0f": "使用 4 名工作人员运行 12 项测试",
+            "0b20782e0f": "使用 4 个并行进程运行 12 项测试",
             "4371cc9931": "pnpm playwright test",
             "16877e038d": "向下拆分",
             "a2b114dad0": "向右拆分 ·",
@@ -13987,7 +13987,7 @@
                       "ec0a363633": "多任务并行",
                       "62bac8f43c": "同时在两个不同的工作树中工作。即使属于同一项目，它们也相互隔离，适合同时开发两个功能。",
                       "908898c3ee": "使用 Orca 浏览器",
-                      "43781563c3": "无需离开 Orca 即可浏览 Web 应用。选中任意元素，即可一键将其准确源码与样式发送给智能体。",
+                      "43781563c3": "无需离开 Orca 即可浏览网页应用。选中页面元素，可将其页面结构和样式作为上下文发送给智能体。",
                       "29aa2c2077": "开启通知",
                       "71bd9a8c95": "及时获知智能体已完成工作、需要关注或遇到阻塞。",
                       "46db810da8": "选择默认智能体",
@@ -14070,14 +14070,14 @@
                 "79971d1539": "重新设计身份验证流程"
               },
               "UsageAccountsCard": {
-                "6986b36708": "表面利率限制和内联掉期账户。",
+                "6986b36708": "查看额度限制，并在此切换账户。",
                 "d90d2e1f6d": "跟踪会话和每周使用情况。",
                 "8919321417": "Codex 登录失败。",
                 "c7b90c140b": "添加了 Codex 账户。",
                 "4e71d72912": "Claude 登录失败。",
                 "9ddeb558f9": "已添加 Claude 账户。",
-                "29d0653961": "登入",
-                "945865332e": "登录",
+                "29d0653961": "登录",
+                "945865332e": "正在登录",
                 "accountStatusUnknown": "账号状态未知"
               },
               "UsagePage": {
@@ -17806,10 +17806,12 @@
       "register": "注册 {{path}} 后，可从终端使用 Forflow One。",
       "stale": "现有命令指向旧版本，请重新注册并核对目标路径。",
       "conflict": "命令路径已被其他文件占用，请先检查冲突文件。",
-      "unsupported": "当前运行方式不支持注册命令，请使用完整安装包或联系管理员。"
+      "unsupported": "当前运行方式不支持注册命令，请使用完整安装包或联系管理员。",
+      "statusPermissionDenied": "没有权限读取命令路径，暂时无法确认注册状态。请检查该路径的访问权限后刷新。",
+      "statusReadFailed": "无法读取命令注册状态，请刷新重试。"
     },
     "skills": {
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，共其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
       "complete": "内置技能已安装到本机共享目录。",
       "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
       "settingUp": "正在配置能力…",
@@ -18542,7 +18544,9 @@
       "resetMinutes": "47 分钟后重置",
       "usageSummary": "5 小时已用 0% · 本周已用 4%",
       "usageAlmost": "已用 96% · 47 分钟后重置",
-      "team": "团队"
+      "team": "团队",
+      "shipChecklist": "发布检查清单",
+      "copy": "复制"
     },
     "speechModels": {
       "parakeet-tdt-0.6b-v3-int8": "支持 25 种欧洲语言，准确度高，包含标点、大小写和词级时间戳。",
@@ -18731,6 +18735,9 @@
       "unavailable": "不可用",
       "unknown": "未知",
       "gpu": "图形加速"
+    },
+    "setup": {
+      "notificationsCompletion": "此项按应用内通知开关计入完成。系统是否允许通知、通知能否送达，请在下方检查并发送测试通知。"
     }
   },
   "githubChecks": {
@@ -18764,7 +18771,15 @@
     "help": "帮助",
     "paste": "粘贴",
     "copy": "复制",
-    "selectAll": "全选"
+    "selectAll": "全选",
+    "about": "关于 {{app}}",
+    "services": "服务",
+    "hide": "隐藏 {{app}}",
+    "hideOthers": "隐藏其他应用",
+    "showAll": "显示全部",
+    "quit": "退出 {{app}}",
+    "minimize": "最小化",
+    "zoom": "缩放"
   },
   "notifications": {
     "agentStatus": {
