@@ -31,6 +31,7 @@ import {
 } from './runtime-worktree-startup-readiness'
 import type { CreateWorktreeResult } from '../../shared/worktree/create-types'
 import { provisionWorktreeTerminals } from './runtime-worktree-terminal-provisioning'
+import { resolveLocalProjectRuntimeForRepo } from '../local-project-runtime-resolution'
 
 export class OrcaRuntimeWithActivateManagedWorktree extends OrcaRuntimeWithListManagedWorktrees {
   async activateManagedWorktree(
@@ -131,6 +132,9 @@ export class OrcaRuntimeWithActivateManagedWorktree extends OrcaRuntimeWithListM
       draft,
       ...(requestedAgent ? { requestedAgent } : {}),
       settings: this.store.getSettings(),
+      getPreflightContext: () => ({
+        projectRuntime: resolveLocalProjectRuntimeForRepo(this.store, repo)
+      }),
       getLaunchPlatform: () => this.getAgentLaunchPlatformForRepo(repo)
     })
   }

@@ -163,5 +163,11 @@
   "src/main/automations/automation-skip-coalescing.test.ts",
   "src/main/automations/automation-zero-grace-tick-latency.test.ts",
   "src/main/automations/service.test.ts",
-  "src/renderer/src/components/automations/AutomationsPage.cross-authority-actions.test.tsx"
+  "src/renderer/src/components/automations/AutomationsPage.cross-authority-actions.test.tsx",
+  "src/main/ipc/preflight-agent-detection-no-subprocess.test.ts",
+  "src/main/ipc/preflight-agent-refresh.test.ts",
+  "src/main/runtime/runtime-worktree-agent-startup.test.ts",
+  "src/renderer/src/components/settings/agent-command-settings.test.ts",
+  "src/renderer/src/components/settings/use-agent-command-settings.test.tsx",
+  "src/renderer/src/components/settings/AgentCatalogRow.command.test.tsx"
 ]

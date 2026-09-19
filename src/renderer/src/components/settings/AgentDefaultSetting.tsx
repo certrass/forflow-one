@@ -10,17 +10,20 @@ function DefaultAgentPill({
   active,
   onClick,
   children,
-  title
+  title,
+  disabled = false
 }: {
   active: boolean
   onClick: () => void
   children: React.ReactNode
   title?: string
+  disabled?: boolean
 }): React.JSX.Element {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-pressed={active}
       title={title}
       className={cn(
@@ -41,6 +44,7 @@ export function AgentDefaultSetting({
   enabledDetectedAgents,
   catalog,
   description,
+  detectionBusy = false,
   onSetDefault
 }: {
   defaultAgent: TuiAgent | 'blank' | null
@@ -48,6 +52,7 @@ export function AgentDefaultSetting({
   enabledDetectedAgents: AgentCatalogEntry[]
   catalog: AgentCatalogEntry[]
   description: string
+  detectionBusy?: boolean
   onSetDefault: (agent: TuiAgent | 'blank' | null) => void
 }): React.JSX.Element {
   const storedDefaultAgent =
@@ -82,6 +87,10 @@ export function AgentDefaultSetting({
             <DefaultAgentPill
               key={agent.id}
               active={isActive}
+              disabled={
+                detectionBusy ||
+                !enabledDetectedAgents.some((available) => available.id === agent.id)
+              }
               onClick={() => onSetDefault(agent.id)}
               title={
                 isUndetected

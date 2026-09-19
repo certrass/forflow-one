@@ -18908,6 +18908,11 @@
         "heading": "Remote browsing",
         "headingDescription": "Where remote workspace pages render, and where their network traffic leaves from."
       }
+    },
+    "agentCommand": {
+      "saveFailed": "Unable to save the agent command.",
+      "detectFailed": "Command saved. Detection failed; retry Refresh before launching.",
+      "undetectedHelp": "Set an installed executable path, then wait for detection before choosing this agent. Paths containing spaces must be quoted."
     }
   },
   "sidebar": {

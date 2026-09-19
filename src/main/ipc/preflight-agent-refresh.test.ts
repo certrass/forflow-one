@@ -90,10 +90,26 @@ vi.mock('../gitea/client', () => ({
 
 import { registerPreflightHandlers } from './preflight'
 import { resetPreflightMocks, type HandlerMap } from './preflight-test-harness'
+import type { AgentCommandOverrides } from '../preflight/agent-command-overrides'
 
 describe('preflight', () => {
   const originalPlatform = process.platform
   const handlers: HandlerMap = {}
+
+  it('reads saved overrides again for detection and refresh without falling back to the default', async () => {
+    let agentCmdOverrides: AgentCommandOverrides = { codex: '/custom/codex --profile work' }
+    isCommandOnLocalPathMock.mockImplementation(
+      async (command: string) => command === '/custom/codex' || command === 'codex'
+    )
+    registerPreflightHandlers(() => ({ agentCmdOverrides }))
+    expect(await handlers['preflight:detectAgents']()).toContain('codex')
+    agentCmdOverrides = { codex: '/missing/codex' }
+    const result = await handlers['preflight:refreshAgents']()
+    expect(result).toEqual(
+      expect.objectContaining({ agents: expect.not.arrayContaining(['codex']) })
+    )
+    expect(isCommandOnLocalPathMock).toHaveBeenCalledWith('/missing/codex', expect.anything())
+  })
 
   beforeEach(() => {
     runWslProcessMock.mockReset()

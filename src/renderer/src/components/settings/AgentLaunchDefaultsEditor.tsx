@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { cn } from '@/lib/utils'
@@ -16,8 +16,16 @@ export function AgentCommandOverrideInput({
 }): React.JSX.Element {
   const draftSeed = cmdOverride ?? defaultCmd
   const [cmdDraft, setCmdDraft] = useState(draftSeed)
+  const cancelBlur = useRef(false)
   const commitCmd = (): void => {
+    if (cancelBlur.current) {
+      cancelBlur.current = false
+      return
+    }
     const trimmed = cmdDraft.trim()
+    if (trimmed === draftSeed) {
+      return
+    }
     if (!trimmed || trimmed === defaultCmd) {
       onSaveOverride('')
       setCmdDraft(defaultCmd)
@@ -38,10 +46,10 @@ export function AgentCommandOverrideInput({
           onBlur={commitCmd}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
-              commitCmd()
               event.currentTarget.blur()
             }
             if (event.key === 'Escape') {
+              cancelBlur.current = true
               setCmdDraft(draftSeed)
               event.currentTarget.blur()
             }

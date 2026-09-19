@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
+import { chmod, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { runProcess } from '../../shared/child-process/run-process'
 import type { Repo } from '../../shared/repo-types'
+import { getDefaultSettings } from '../../shared/constants'
 
 const mocks = vi.hoisted(() => ({
   markCodexProjectTrusted: vi.fn(),
@@ -83,6 +88,61 @@ describe('buildWorktreeStartupForAgent host resolution', () => {
 })
 
 describe('buildWorktreeStartupForDraft agent detection', () => {
+  it('uses the local launch settings and WSL detection target for fallback selection', async () => {
+    mocks.detectRemoteAgents.mockClear()
+    mocks.detectInstalledAgentsWithShellPathHydration.mockResolvedValueOnce(['codex'])
+    const agentCmdOverrides = { codex: '/custom/codex --profile work' }
+    const result = await buildWorktreeStartupForDraft({
+      repo: makeRepo({ executionHostId: 'local' }),
+      settings: {
+        ...getDefaultSettings('/tmp/fixture-home'),
+        defaultTuiAgent: null,
+        agentCmdOverrides
+      },
+      draft: 'ship it',
+      getLaunchPlatform: () => 'linux',
+      getPreflightContext: () => ({ wslDistro: 'Ubuntu' })
+    })
+    expect(mocks.detectInstalledAgentsWithShellPathHydration).toHaveBeenCalledWith(
+      { wslDistro: 'Ubuntu' },
+      agentCmdOverrides
+    )
+    expect(mocks.detectRemoteAgents).not.toHaveBeenCalled()
+    expect(result?.agent).toBe('codex')
+    expect(result?.startup.command).toContain('/custom/codex')
+    mocks.detectInstalledAgentsWithShellPathHydration.mockClear()
+  })
+  it.skipIf(process.platform === 'win32')(
+    'launches the configured executable through the generated startup command',
+    async () => {
+      const directory = await mkdtemp(join(tmpdir(), 'agent-launch-'))
+      const executable = join(directory, '自定义 助手')
+      const marker = join(directory, 'launched.txt')
+      try {
+        await writeFile(executable, '#!/bin/sh\nprintf launched > "$MARKER_PATH"\n')
+        await chmod(executable, 0o755)
+        const result = buildWorktreeStartupForAgent({
+          repo: makeRepo({ executionHostId: 'local' }),
+          settings: {
+            ...getDefaultSettings(directory),
+            agentCmdOverrides: { codex: `"${executable}"` }
+          },
+          agent: 'codex',
+          getLaunchPlatform: () => process.platform,
+          toSessionOptions: () => undefined
+        })
+        const launched = await runProcess({
+          program: '/bin/sh',
+          args: ['-c', result.startup.command],
+          env: { ...process.env, MARKER_PATH: marker }
+        })
+        expect(launched.code).toBe(0)
+        expect(await readFile(marker, 'utf8')).toBe('launched')
+      } finally {
+        await rm(directory, { recursive: true, force: true })
+      }
+    }
+  )
   it('probes the SSH host named only by executionHostId instead of this client', async () => {
     mocks.detectRemoteAgents.mockResolvedValueOnce(['claude'])
     mocks.detectInstalledAgentsWithShellPathHydration.mockResolvedValue([])

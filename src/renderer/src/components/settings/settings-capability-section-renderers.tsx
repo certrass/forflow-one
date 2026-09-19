@@ -22,6 +22,7 @@ export function renderAgentsSettingsSection(context: SettingsRenderContext): Rea
     >
       {view.isSectionMounted('agents') ? (
         <AgentsPane
+          updateSettingsOrThrow={model.updateSettingsOrThrow}
           settings={model.settings}
           updateSettings={model.updateSettings}
           wslSupportedPlatform={terminal.localWslSupportedPlatform}

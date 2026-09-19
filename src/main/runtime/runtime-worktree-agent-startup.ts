@@ -23,6 +23,7 @@ import {
 } from '../preflight/agent-detection'
 import { markRemoteAgentWorkspaceTrusted } from '../remote-agent-trust-presets'
 import type { RuntimeStore } from './runtime-store-contract'
+import type { PreflightRuntimeContext } from '../preflight/agent-detection'
 
 export type WorktreeStartupDraftPaste = { agent: TuiAgent; content: string }
 export type WorktreeStartupFollowup = { expectedProcess: string; prompt: string }
@@ -31,6 +32,7 @@ type StartupEnvironment = {
   repo: Repo
   settings: ReturnType<RuntimeStore['getSettings']>
   getLaunchPlatform: () => NodeJS.Platform
+  getPreflightContext?: () => PreflightRuntimeContext
 }
 
 export async function buildWorktreeStartupForDraft(
@@ -63,7 +65,10 @@ export async function buildWorktreeStartupForDraft(
       // Why: startup-draft fallback can run from sparse runtime launch envs too.
       detected = sshConnectionId
         ? await detectRemoteAgents({ connectionId: sshConnectionId })
-        : await detectInstalledAgentsWithShellPathHydration()
+        : await detectInstalledAgentsWithShellPathHydration(
+            environment.getPreflightContext?.(),
+            settings.agentCmdOverrides
+          )
     } catch {
       detected = []
     }
