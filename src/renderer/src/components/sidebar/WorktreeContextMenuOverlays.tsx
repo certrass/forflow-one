@@ -17,7 +17,7 @@ export function WorktreeContextMenuOverlays({ model }: { model: WorktreeContextM
           'Create a group and move this project into it.'
         )}
         initialName={model.repo ? `${model.repo.displayName} group` : ''}
-        confirmLabel="Create"
+        confirmLabel={translate('forflow.jsxCopy.4759498ac2', 'Create')}
         onOpenChange={model.handleCreateGroupDialogOpenChange}
         onSubmit={model.handleSubmitNewProjectGroup}
       />

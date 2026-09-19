@@ -92,7 +92,9 @@ function WorkspaceKanbanStatusLane({
       undefined
     )
   }, [fullWorktreeIds, hasQuery, items])
-  const createTooltip = `New workspace in ${status.label}`
+  const createTooltip = translate('forflow.dynamicCopy.b28501c085', 'New workspace in {{value0}}', {
+    value0: status.label
+  })
   const createButton = (
     <Button
       type="button"

@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type {
   WorkspaceSpaceScanProgress,
   WorkspaceSpaceScanStatus,
@@ -55,7 +56,7 @@ export function getWorkspaceSpaceProgressLabel(
     return null
   }
   if (progress.state === 'cancelling') {
-    return 'Cancelling scan'
+    return translate('forflow.desktopCopy.f9fdcf58fc', 'Cancelling scan')
   }
 
   const current =
@@ -66,7 +67,7 @@ export function getWorkspaceSpaceProgressLabel(
   if (progress.totalRepoCount > 0) {
     return `Scanning ${progress.scannedRepoCount} of ${progress.totalRepoCount} repos · ${current}`
   }
-  return 'Scanning workspace sizes'
+  return translate('forflow.desktopCopy.f2c8367082', 'Scanning workspace sizes')
 }
 
 export function getWorkspaceSpaceStatusLabel(status: WorkspaceSpaceScanStatus): string {
@@ -76,11 +77,11 @@ export function getWorkspaceSpaceStatusLabel(status: WorkspaceSpaceScanStatus): 
     case 'missing':
       return 'Missing'
     case 'permission-denied':
-      return 'No access'
+      return translate('forflow.desktopCopy.9b1f082345', 'No access')
     case 'unavailable':
-      return 'Unavailable'
+      return translate('forflow.desktopCopy.ca18449697', 'Unavailable')
     case 'error':
-      return 'Failed'
+      return translate('forflow.desktopCopy.031a8f0f65', 'Failed')
   }
 }
 

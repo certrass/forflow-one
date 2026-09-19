@@ -4,11 +4,22 @@ import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { translate } from '@/i18n/i18n'
 
-const EXAMPLE_PROMPTS: string[] = [
-  'Using Orca CLI, open https://github.com/notifications and click the first unread pull request.',
-  "Take a screenshot of my open Linear board with the Orca CLI and tell me what's blocked.",
-  'With Orca CLI, go to our staging app, log in (my cookies are imported), and verify the checkout flow works.'
-]
+function getExamplePrompts(): string[] {
+  return [
+    translate(
+      'forflow.examples.BrowserUseExamples.5262314482',
+      'Using Orca CLI, open https://github.com/notifications and click the first unread pull request.'
+    ),
+    translate(
+      'forflow.examples.BrowserUseExamples.ef599883da',
+      "Take a screenshot of my open Linear board with the Orca CLI and tell me what's blocked."
+    ),
+    translate(
+      'forflow.examples.BrowserUseExamples.42be8a25e1',
+      'With Orca CLI, go to our staging app, log in (my cookies are imported), and verify the checkout flow works.'
+    )
+  ]
+}
 
 async function handleCopyText(text: string, label: string): Promise<void> {
   try {
@@ -46,7 +57,7 @@ export function BrowserUseExamples(): React.JSX.Element {
         )}
       </p>
       <ul className="mt-3 space-y-2">
-        {EXAMPLE_PROMPTS.map((prompt) => (
+        {getExamplePrompts().map((prompt) => (
           <li
             key={prompt}
             className="flex items-start gap-2 rounded-lg border border-border/50 bg-background/60 px-3 py-2"
@@ -62,7 +73,12 @@ export function BrowserUseExamples(): React.JSX.Element {
                   <Button
                     variant="ghost"
                     size="icon-xs"
-                    onClick={() => void handleCopyText(prompt, 'prompt')}
+                    onClick={() =>
+                      void handleCopyText(
+                        prompt,
+                        translate('forflow.finalCopy.cf07194ee2', 'prompt')
+                      )
+                    }
                     aria-label={translate(
                       'auto.components.settings.BrowserUseExamples.1188e56af4',
                       'Copy example prompt'

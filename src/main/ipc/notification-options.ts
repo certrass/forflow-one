@@ -29,15 +29,21 @@ export function buildNotificationOptions(args: NotificationDispatchRequest): {
 } {
   if (args.source === 'terminal-bell') {
     return {
-      title: `Bell in ${args.worktreeLabel ?? 'workspace'}`,
-      body: args.repoLabel ? `${args.repoLabel} · Attention requested` : 'Attention requested'
+      title: translateMain('forflow.nativeCopy.a956f9380a', 'Bell in {{workspace}}', {
+        workspace: args.worktreeLabel ?? translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
+      }),
+      body: args.repoLabel
+        ? translateMain('forflow.nativeCopy.2112fe2906', '{{repo}} \u00b7 Attention requested', {
+            repo: args.repoLabel
+          })
+        : translateMain('forflow.nativeCopy.93e52d6412', 'Attention requested')
     }
   }
 
   if (args.source === 'test') {
     return {
-      title: 'Orca notifications are on',
-      body: 'This is a test notification from Orca.'
+      title: translateMain('forflow.nativeCopy.c72b3d5fad', 'Orca notifications are on'),
+      body: translateMain('forflow.nativeCopy.3e9e493e47', 'This is a test notification from Orca.')
     }
   }
 
@@ -93,7 +99,7 @@ function formatNotificationWorktreeContext(args: NotificationDispatchRequest): s
       NOTIFICATION_TITLE_CONTEXT_MAX_LENGTH
     )
   }
-  return worktreeLabel || repoLabel || 'workspace'
+  return worktreeLabel || repoLabel || translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
 }
 
 function hasAgentNotificationSnapshot(args: NotificationDispatchRequest): boolean {
@@ -123,13 +129,18 @@ function buildAgentTaskCompleteRichBody(args: NotificationDispatchRequest): stri
     NOTIFICATION_BODY_PREVIEW_MAX_LENGTH
   )
   if (toolName && toolInput) {
-    return `Using ${toolName}: ${toolInput}`
+    return translateMain('forflow.nativeCopy.19f05a3a09', 'Using {{tool}}: {{input}}', {
+      tool: toolName,
+      input: toolInput
+    })
   }
   if (toolName) {
-    return `Using ${toolName}`
+    return translateMain('forflow.nativeCopy.ba2ee2bae5', 'Using {{tool}}', { tool: toolName })
   }
   if (toolInput) {
-    return `Tool input: ${toolInput}`
+    return translateMain('forflow.nativeCopy.87abf34531', 'Tool input: {{input}}', {
+      input: toolInput
+    })
   }
 
   return null
@@ -140,7 +151,9 @@ function buildAgentTaskCompleteFallbackNotificationOptions(args: NotificationDis
   body: string
 } {
   return {
-    title: `Task complete in ${args.worktreeLabel ?? 'workspace'}`,
+    title: translateMain('forflow.nativeCopy.8107a9ed2f', 'Task complete in {{workspace}}', {
+      workspace: args.worktreeLabel ?? translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
+    }),
     body: buildAgentTaskCompleteFallbackBody(args)
   }
 }
@@ -148,13 +161,14 @@ function buildAgentTaskCompleteFallbackNotificationOptions(args: NotificationDis
 function buildAgentTaskCompleteFallbackBody(args: NotificationDispatchRequest): string {
   return args.repoLabel
     ? `${args.repoLabel}${args.terminalTitle ? ` · ${args.terminalTitle}` : ''}`
-    : (args.terminalTitle ?? 'A coding agent finished working.')
+    : (args.terminalTitle ??
+        translateMain('forflow.nativeCopy.1f2e038865', 'A coding agent finished working.'))
 }
 
 function formatNotificationAgentLabel(agentType: string | null | undefined): string {
   const normalized = normalizeNotificationText(agentType, NOTIFICATION_AGENT_LABEL_MAX_LENGTH)
   if (!normalized || normalized === 'unknown') {
-    return 'Agent'
+    return translateMain('forflow.nativeCopy.11b39c9377', 'Agent')
   }
   return AGENT_TYPE_LABELS[normalized] ?? normalized
 }

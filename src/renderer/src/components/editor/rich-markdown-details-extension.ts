@@ -16,8 +16,6 @@ import {
   type ToggleHeadingVariant
 } from './details-markdown-html'
 
-const RICH_MARKDOWN_PLACEHOLDER = 'Write markdown… Type / for blocks.'
-const TOGGLE_TEXT_PLACEHOLDER = 'text'
 const TOGGLE_HEADING_PLACEHOLDERS: Record<ToggleHeadingVariant, readonly [string, string]> = {
   'heading-1': ['auto.components.editor.rich.markdown.slash.commands.e66e7f04c6', 'Heading 1'],
   'heading-2': ['auto.components.editor.rich.markdown.slash.commands.c209a116b7', 'Heading 2'],
@@ -39,16 +37,18 @@ export function getRichMarkdownPlaceholder({
   Extract<PlaceholderOptions['placeholder'], (...args: never[]) => string>
 >[0]): string {
   if (node.type.name !== 'detailsSummary') {
-    return RICH_MARKDOWN_PLACEHOLDER
+    return translate('forflow.finalCopy.21e2303897', 'Write markdown… Type / for blocks.')
   }
 
   const parent = editor.state.doc.resolve(pos).parent
   if (parent.type.name !== 'details') {
-    return TOGGLE_TEXT_PLACEHOLDER
+    return translate('forflow.finalCopy.982d9e3eb9', 'text')
   }
 
   const variant = parseToggleHeadingVariant(parent.attrs.variant)
-  return variant ? toggleHeadingPlaceholder(variant) : TOGGLE_TEXT_PLACEHOLDER
+  return variant
+    ? toggleHeadingPlaceholder(variant)
+    : translate('forflow.finalCopy.982d9e3eb9', 'text')
 }
 
 export function moveDetailsSummarySelectionToContent(editor: Editor): boolean {

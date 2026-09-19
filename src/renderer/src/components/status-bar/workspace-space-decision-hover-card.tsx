@@ -67,12 +67,12 @@ function getAgentDecisionLabel(details: WorkspaceDecisionDetails): string {
   if (details.completedAgentCount > 0) {
     return `${pluralize(details.completedAgentCount, 'completed agent')} retained`
   }
-  return 'No tracked agents running'
+  return translate('forflow.desktopCopy.f6c134a03f', 'No tracked agents running')
 }
 
 function getTerminalDecisionLabel(details: WorkspaceDecisionDetails): string {
   if (details.terminalTabCount === 0) {
-    return 'No terminal tabs'
+    return translate('forflow.desktopCopy.902b2f45cd', 'No terminal tabs')
   }
   return `${details.liveTerminalCount} live of ${pluralize(details.terminalTabCount, 'terminal tab')}`
 }
@@ -83,19 +83,21 @@ function getGitDecisionLabel(
 ): string {
   if (details.changedFileCount === null) {
     if (gitRefreshState?.error) {
-      return `Git status unavailable: ${gitRefreshState.error}`
+      return translate('forflow.dynamicCopy.d47095904e', 'Git status unavailable: {{value0}}', {
+        value0: gitRefreshState.error
+      })
     }
-    return 'Git status has not loaded yet'
+    return translate('forflow.desktopCopy.5d88721d69', 'Git status has not loaded yet')
   }
   if (details.changedFileCount === 0) {
-    return 'No uncommitted files'
+    return translate('forflow.desktopCopy.f725f27ad4', 'No uncommitted files')
   }
   return pluralize(details.changedFileCount, 'changed file')
 }
 
 function getEditorDecisionLabel(details: WorkspaceDecisionDetails): string {
   if (details.openEditorFileCount === 0) {
-    return 'No editor files open'
+    return translate('forflow.desktopCopy.37388bee81', 'No editor files open')
   }
   if (details.dirtyEditorBufferCount === 0) {
     return `${pluralize(details.openEditorFileCount, 'editor file')} open`
@@ -111,18 +113,18 @@ function getDeleteDecisionLabel(
   details: WorkspaceDecisionDetails
 ): string {
   if (details.isActive) {
-    return 'This is the active workspace'
+    return translate('forflow.desktopCopy.f4c9bdd7e2', 'This is the active workspace')
   }
   if (worktree.status !== 'ok') {
     return worktree.error ?? getWorkspaceSpaceStatusLabel(worktree.status)
   }
   if (worktree.isMainWorktree) {
-    return 'Main worktree is protected'
+    return translate('forflow.desktopCopy.a135371562', 'Main worktree is protected')
   }
   if (!worktree.canDelete) {
-    return 'Workspace is protected'
+    return translate('forflow.desktopCopy.707a044122', 'Workspace is protected')
   }
-  return 'Can be deleted after review'
+  return translate('forflow.desktopCopy.c8571bf358', 'Can be deleted after review')
 }
 
 export function WorkspaceDecisionHoverCard({

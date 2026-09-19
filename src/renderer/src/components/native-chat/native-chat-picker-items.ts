@@ -1,3 +1,4 @@
+import { localizedSlashDescription } from '@/i18n/slash-command-copy'
 import type { DiscoveredSkill, SkillSourceKind } from '../../../../shared/skills'
 import type { SlashCommandSuggestion } from '../../../../shared/native-chat-slash-commands'
 import {
@@ -81,7 +82,9 @@ export function buildNativeChatPickerItems(
         id: `command:${command.name}`,
         name: command.name,
         token: `/${command.name}`,
-        description: command.description ? sanitizePickerText(command.description, 240) : undefined,
+        description: command.description
+          ? sanitizePickerText(localizedSlashDescription(command.description), 240)
+          : undefined,
         argumentHint: command.argumentHint
           ? sanitizePickerText(command.argumentHint, 80)
           : undefined,

@@ -42,7 +42,7 @@ import { BrowserFavicon } from '@/components/browser-favicon'
 
 export function formatBrowserTabUrlLabel(url: string): string {
   if (url === ORCA_BROWSER_BLANK_URL || url === 'about:blank') {
-    return 'New Tab'
+    return translate('forflow.desktopCopy.b2f8fd6392', 'New Tab')
   }
   try {
     const parsed = new URL(url)

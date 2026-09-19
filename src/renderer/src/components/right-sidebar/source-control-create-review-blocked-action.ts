@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type {
   HostedReviewCreationBlockedReason,
   HostedReviewCreationEligibility,
@@ -25,25 +26,32 @@ export function canClickBlockedCreateReviewReason(
 
 export function resolveHostedReviewAuthInstruction(provider: HostedReviewProvider): string {
   if (provider === 'gitlab') {
-    return 'Run glab auth login'
+    return translate('forflow.desktopCopy.85f09431fb', 'Run glab auth login')
   }
   if (provider === 'azure-devops') {
-    return 'Set ORCA_AZURE_DEVOPS_TOKEN'
+    return translate('forflow.desktopCopy.cfce2dbcd5', 'Set ORCA_AZURE_DEVOPS_TOKEN')
   }
   if (provider === 'gitea') {
-    return 'Set ORCA_GITEA_TOKEN'
+    return translate('forflow.desktopCopy.f8ef70334e', 'Set ORCA_GITEA_TOKEN')
   }
   if (provider === 'bitbucket') {
-    return 'Connect Bitbucket in Settings > Integrations'
+    return translate(
+      'forflow.desktopCopy.6723642ac2',
+      'Connect Bitbucket in Settings > Integrations'
+    )
   }
-  return 'Run gh auth login'
+  return translate('forflow.desktopCopy.ac3cb152d8', 'Run gh auth login')
 }
 
 export function resolveUnavailableCreateReviewLookupNoticeMessage(
   provider: HostedReviewProvider
 ): string {
   const copy = localizedHostedReviewCopy(resolveSupportedHostedReviewCopyProvider(provider))
-  return `Create ${copy.shortLabel} failed: Orca could not confirm whether this branch already has a ${copy.reviewLabel}. Retry once the ${copy.providerName} lookup succeeds.`
+  return translate(
+    'forflow.dynamicCopy.7b9ef23cd5',
+    'Create {{value0}} failed: Orca could not confirm whether this branch already has a {{value1}}. Retry once the {{value2}} lookup succeeds.',
+    { value0: copy.shortLabel, value1: copy.reviewLabel, value2: copy.providerName }
+  )
 }
 
 export function resolveBlockedCreateReviewNoticeMessage(
@@ -64,17 +72,45 @@ export function resolveBlockedCreateReviewNoticeMessage(
   )
   switch (reason) {
     case 'dirty':
-      return `Create ${copy.shortLabel} failed: commit or discard local changes before creating a ${copy.reviewLabel}.`
+      return translate(
+        'forflow.dynamicCopy.154152de76',
+        'Create {{value0}} failed: commit or discard local changes before creating a {{value1}}.',
+        { value0: copy.shortLabel, value1: copy.reviewLabel }
+      )
     case 'default_branch':
-      return `Create ${copy.shortLabel} failed: choose a feature branch before creating a ${copy.reviewLabel}.`
+      return translate(
+        'forflow.dynamicCopy.9450369908',
+        'Create {{value0}} failed: choose a feature branch before creating a {{value1}}.',
+        { value0: copy.shortLabel, value1: copy.reviewLabel }
+      )
     case 'no_upstream':
-      return `Create ${copy.shortLabel} failed: publish this branch before creating a ${copy.reviewLabel}.`
+      return translate(
+        'forflow.dynamicCopy.502642ae73',
+        'Create {{value0}} failed: publish this branch before creating a {{value1}}.',
+        { value0: copy.shortLabel, value1: copy.reviewLabel }
+      )
     case 'needs_push':
-      return `Create ${copy.shortLabel} failed: push this branch before creating a ${copy.reviewLabel}.`
+      return translate(
+        'forflow.dynamicCopy.2efc1117af',
+        'Create {{value0}} failed: push this branch before creating a {{value1}}.',
+        { value0: copy.shortLabel, value1: copy.reviewLabel }
+      )
     case 'needs_sync':
-      return `Create ${copy.shortLabel} failed: sync this branch before creating a ${copy.reviewLabel}.`
+      return translate(
+        'forflow.dynamicCopy.b8544d21ca',
+        'Create {{value0}} failed: sync this branch before creating a {{value1}}.',
+        { value0: copy.shortLabel, value1: copy.reviewLabel }
+      )
     case 'auth_required':
-      return `Create ${copy.shortLabel} failed: ${copy.providerName} is not authenticated. Next step: ${resolveHostedReviewAuthInstruction(eligibility.provider)} in this environment.`
+      return translate(
+        'forflow.dynamicCopy.4d6829b46d',
+        'Create {{value0}} failed: {{value1}} is not authenticated. Next step: {{value2}} in this environment.',
+        {
+          value0: copy.shortLabel,
+          value1: copy.providerName,
+          value2: resolveHostedReviewAuthInstruction(eligibility.provider)
+        }
+      )
     case 'detached_head':
     case 'existing_review':
     case 'fork_head_unsupported':

@@ -56,7 +56,7 @@ export function VoiceSpeechModelSection({
         <Label>{translate('auto.components.settings.VoicePane.43fd4f454b', 'Speech Model')}</Label>
         <p className="text-xs text-muted-foreground">
           {selectedModel && selectedIsReady
-            ? `${selectedModel.label} — ${selectedModel.description}`
+            ? `${selectedModel.label} — ${translate(`forflow.speechModels.${selectedModel.id}`, selectedModel.description)}`
             : translate(
                 'auto.components.settings.VoicePane.e24f7d43d2',
                 'Select a speech model. Local models run offline; cloud models require an API key.'
@@ -159,7 +159,7 @@ export function VoiceSpeechModelSection({
                     </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
-                    {manifest.description}
+                    {translate(`forflow.speechModels.${manifest.id}`, manifest.description)}
                   </p>
                 </div>
                 {!isCloud && isReady ? (

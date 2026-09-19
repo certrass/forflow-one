@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { createElement } from 'react'
 import type { LucideProps } from 'lucide-react'
 import logo from '../../../../../resources/logo.svg'
@@ -8,6 +9,6 @@ export function OrcaLogoSettingsIcon({ className }: LucideProps): React.JSX.Elem
     src: logo,
     alt: '',
     'aria-hidden': true,
-    className: cn('object-contain invert dark:invert-0', className)
+    className: cn('object-contain', !isForflowBuild() && 'invert dark:invert-0', className)
   })
 }

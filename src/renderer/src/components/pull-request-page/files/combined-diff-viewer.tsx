@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import type { editor as monacoEditor } from 'monaco-editor'
@@ -359,11 +360,17 @@ export function PRFilesCombinedDiffViewer({
                     retrySection={retrySection}
                     toggleSection={toggleSection}
                     openSection={openFilesOnGitHub}
-                    openSectionTitle="Open files on GitHub"
+                    openSectionTitle={translate(
+                      'forflow.jsxCopy.b8e65c3222',
+                      'Open files on GitHub'
+                    )}
                     renderHeaderTrailingContent={renderViewedCheckbox}
                     onAddLineComment={handleAddLineComment}
-                    addLineCommentLabel="Comment"
-                    addLineCommentPlaceholder="Add a review comment"
+                    addLineCommentLabel={translate('forflow.jsxCopy.44f5e3fbec', 'Comment')}
+                    addLineCommentPlaceholder={translate(
+                      'forflow.jsxCopy.8139b89bcb',
+                      'Add a review comment'
+                    )}
                     getCommentableLineNumbers={getCommentableLineNumbers}
                     setSectionHeights={setSectionHeights}
                     setSections={setSections}

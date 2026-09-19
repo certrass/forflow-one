@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import type { GitHubOwnerRepo } from '../../../../shared/github/pull-request-types'
 import RepoBadgeLabel from '@/components/repo/RepoBadgeLabel'
@@ -29,8 +30,6 @@ export type IssueSourceIndicatorProps = {
 
 // Why: never leak the local remote name ("upstream" / "origin"); it would imply
 // Orca maintains a stable mapping between UI labels and git config.
-const LABEL_PREFIX_LIST = 'Issues from '
-const LABEL_PREFIX_ITEM = 'Issue from '
 
 export function sameGitHubOwnerRepo(
   left: GitHubOwnerRepo | null,
@@ -73,7 +72,10 @@ export default function IssueSourceIndicator({
     host && !isDefaultGitHubHost(host)
       ? `${host}/${issues.owner}/${issues.repo}`
       : `${issues.owner}/${issues.repo}`
-  const prefix = variant === 'item' ? LABEL_PREFIX_ITEM : LABEL_PREFIX_LIST
+  const prefix =
+    variant === 'item'
+      ? translate('forflow.finalCopy.f8288192df', 'Issue from ')
+      : translate('forflow.finalCopy.128ea10284', 'Issues from ')
   return (
     <span
       className={cn(

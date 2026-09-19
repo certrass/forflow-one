@@ -7,6 +7,7 @@ import { createBootstrapFatalExitBanner } from './config/build-plugins/bootstrap
 import { createPlainNodeEntryGuardPlugin } from './config/build-plugins/plain-node-entry-guard'
 import packageJson from './package.json' with { type: 'json' }
 import { forflowBrandingPlugin, forflowBuildEnabled } from './config/build-plugins/forflow-branding'
+import { forflowLocalizationPlugin } from './config/build-plugins/forflow-localization'
 
 const BUNDLED_MAIN_DEPENDENCIES = new Set([
   '@streamparser/json',
@@ -197,6 +198,7 @@ function createMainBootstrapPlugin() {
 
 export const electronViteConfig: UserConfig = {
   main: {
+    plugins: [forflowBrandingPlugin()],
     build: {
       // Why: 'esbuild' makes rolldown disable its own minifier and re-print every
       // chunk through esbuild, which is undeclared here and only resolves via
@@ -308,7 +310,12 @@ export const electronViteConfig: UserConfig = {
         '@': resolve('src/renderer/src')
       }
     },
-    plugins: [react(), tailwindcss(), forflowBrandingPlugin()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      forflowBrandingPlugin(),
+      forflowLocalizationPlugin(forflowBuildEnabled)
+    ],
     worker: {
       format: 'es'
     },

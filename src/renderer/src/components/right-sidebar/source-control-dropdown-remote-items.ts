@@ -98,11 +98,11 @@ export function buildRemoteDropdownItems(ctx: DropdownActionContext): RemoteDrop
     kind: 'pull',
     label: formatCountLabel('Pull', behind),
     title: upstreamLoading
-      ? 'Checking branch status…'
+      ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
       : publishBlockedByPRLoading
-        ? 'Checking PR status…'
+        ? translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
         : publishBlockedByMergedPR
-          ? 'PR is already merged'
+          ? translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
           : publishBlockedByDetachedHead
             ? 'Check out a branch before pulling commits'
             : !hasUpstream
@@ -119,11 +119,11 @@ export function buildRemoteDropdownItems(ctx: DropdownActionContext): RemoteDrop
     kind: 'fast_forward',
     label: formatCountLabel('Fast-forward', behind),
     title: upstreamLoading
-      ? 'Checking branch status…'
+      ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
       : publishBlockedByPRLoading
-        ? 'Checking PR status…'
+        ? translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
         : publishBlockedByMergedPR
-          ? 'PR is already merged'
+          ? translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
           : publishBlockedByDetachedHead
             ? 'Check out a branch before fast-forwarding'
             : !hasUpstream
@@ -142,15 +142,21 @@ export function buildRemoteDropdownItems(ctx: DropdownActionContext): RemoteDrop
     kind: 'sync',
     label: formatSyncLabel('Sync', ahead, behind),
     title: upstreamLoading
-      ? 'Checking branch status…'
+      ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
       : publishBlockedByPRLoading
-        ? 'Checking PR status…'
+        ? translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
         : publishBlockedByMergedPR
-          ? 'PR is already merged'
+          ? translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
           : publishBlockedByDetachedHead
-            ? 'Check out a branch before syncing commits'
+            ? translate(
+                'forflow.desktopCopy.802b798b4b',
+                'Check out a branch before syncing commits'
+              )
             : !hasUpstream
-              ? 'Publish the branch first to sync commits'
+              ? translate(
+                  'forflow.desktopCopy.b5eea319f7',
+                  'Publish the branch first to sync commits'
+                )
               : shouldForcePushWithLease
                 ? 'Use Force Push — remote only has older copies of local commits'
                 : ahead === 0 && behind === 0
@@ -171,12 +177,22 @@ export function buildRemoteDropdownItems(ctx: DropdownActionContext): RemoteDrop
     label: rebaseBaseLabel ? `Rebase from ${rebaseBaseLabel}` : 'Rebase from Base',
     title: ((): string => {
       if (!rebaseBaseLabel || !hasRemoteBaseRef) {
-        return 'Choose a remote base branch to rebase from'
+        return translate(
+          'forflow.desktopCopy.f4f62591ff',
+          'Choose a remote base branch to rebase from'
+        )
       }
       if (hasDirtyLocalChanges) {
-        return 'Try rebasing; git may require committing or stashing local changes first'
+        return translate(
+          'forflow.desktopCopy.88e599e22b',
+          'Try rebasing; git may require committing or stashing local changes first'
+        )
       }
-      return `Rebase current branch with latest commits from ${rebaseBaseLabel}`
+      return translate(
+        'forflow.dynamicCopy.571416b113',
+        'Rebase current branch with latest commits from {{value0}}',
+        { value0: rebaseBaseLabel }
+      )
     })(),
     disabled: globalBusy || !rebaseBaseRef || !hasRemoteBaseRef
   }
@@ -203,13 +219,13 @@ export function buildRemoteDropdownItems(ctx: DropdownActionContext): RemoteDrop
           ? 'Linked Review'
           : publishBlockedByDetachedHead
             ? 'No Branch'
-            : 'Publish Branch',
+            : translate('forflow.desktopCopy.fe4e7d8ab1', 'Publish Branch'),
     title: upstreamLoading
-      ? 'Checking branch status…'
+      ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
       : publishBlockedByPRLoading
-        ? 'Checking PR status…'
+        ? translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
         : publishBlockedByMergedPR
-          ? 'PR is already merged'
+          ? translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
           : publishBlockedByOpenHostedReview
             ? canPushLinkedReviewWithoutUpstream
               ? 'Linked review branch already exists'

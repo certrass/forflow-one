@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type {
   AgentStateHistoryEntry,
   AgentStatusEntry,
@@ -199,7 +200,7 @@ export function getActivityThreadStatusPreview(
   agentState?: AgentStatusState | null
 ): string {
   if (entry.interrupted === true) {
-    return 'Interrupted by user'
+    return translate('forflow.desktopCopy.1fe252d536', 'Interrupted by user')
   }
   const state = agentState ?? entry.state
   const toolPreview = formatAgentToolPreview(entry, state)

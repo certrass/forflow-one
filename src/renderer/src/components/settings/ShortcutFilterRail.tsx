@@ -124,7 +124,7 @@ export function ShortcutFilterRail({
 }): React.JSX.Element {
   const filters = (Object.keys(SHORTCUT_FILTER_LABELS) as ShortcutFilter[]).map((id) => ({
     id,
-    label: SHORTCUT_FILTER_LABELS[id],
+    label: translate(`forflow.shortcuts.filters.${id}`, SHORTCUT_FILTER_LABELS[id]),
     count: filterCounts[id]
   }))
 

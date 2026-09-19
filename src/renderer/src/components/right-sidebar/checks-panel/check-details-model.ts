@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { PRCheckDetail, PRCheckRunDetails } from '../../../../../shared/github/check-types'
 
 export type CheckDetailsLoadState = {
@@ -55,33 +56,33 @@ export function isFailureState(state: string | null | undefined): boolean {
 export function getCheckStatusLabel(check: PRCheckDetail): string {
   const conclusion = getCheckConclusion(check)
   if (conclusion === 'success') {
-    return 'Successful'
+    return translate('forflow.desktopCopy.f3686bb328', 'Successful')
   }
   if (conclusion === 'failure') {
-    return 'Failed'
+    return translate('forflow.desktopCopy.031a8f0f65', 'Failed')
   }
   if (conclusion === 'cancelled') {
-    return 'Cancelled'
+    return translate('forflow.desktopCopy.d353a99eb4', 'Cancelled')
   }
   if (conclusion === 'timed_out') {
-    return 'Timed out'
+    return translate('forflow.desktopCopy.9718cc761c', 'Timed out')
   }
   if (conclusion === 'action_required') {
-    return 'Action required'
+    return translate('forflow.desktopCopy.adf69e75cc', 'Action required')
   }
   if (conclusion === 'neutral') {
-    return 'Neutral'
+    return translate('forflow.desktopCopy.1c6ac69f1e', 'Neutral')
   }
   if (conclusion === 'skipped') {
-    return 'Skipped'
+    return translate('forflow.desktopCopy.12698ce1ea', 'Skipped')
   }
   if (check.status === 'queued') {
-    return 'Queued'
+    return translate('forflow.desktopCopy.661ff40a07', 'Queued')
   }
   if (check.status === 'in_progress') {
-    return 'In progress'
+    return translate('forflow.desktopCopy.c1f88e9d6c', 'In progress')
   }
-  return 'Pending'
+  return translate('forflow.desktopCopy.331551b0de', 'Pending')
 }
 
 export function formatCheckTimestamp(input: string | null | undefined): string | null {

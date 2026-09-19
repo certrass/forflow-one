@@ -58,7 +58,7 @@ function DetailMetric({
 
 function formatGrace(minutes: number): string {
   if (minutes <= 0) {
-    return 'No grace'
+    return translate('forflow.desktopCopy.24712811a4', 'No grace')
   }
   if (minutes < 60) {
     return `${minutes} minutes`
@@ -129,7 +129,7 @@ export function AutomationDetail({
     usageSummary.knownRuns > 0
       ? `${usageSummary.knownRuns}/${runs.length} runs`
       : usageSummary.unavailableRuns > 0
-        ? 'Unavailable'
+        ? translate('forflow.desktopCopy.ca18449697', 'Unavailable')
         : 'No runs'
   const agentLabel =
     getAgentCatalog().find((agent) => agent.id === automation.agentId)?.label ?? automation.agentId

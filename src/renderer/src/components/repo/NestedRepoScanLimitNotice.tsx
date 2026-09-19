@@ -12,7 +12,12 @@ function formatTimeout(timeoutMs: number): string {
 }
 
 export function nestedRepoScanLimitText(scan: NestedRepoScanResult): string {
-  const automaticStops = [`${scan.maxDepth} folder levels`, `${scan.maxRepos} repositories`]
+  const automaticStops = [
+    translate('forflow.dynamicCopy.fc9bb79f62', '{{value0}} folder levels', {
+      value0: scan.maxDepth
+    }),
+    `${scan.maxRepos} repositories`
+  ]
   if (scan.timeoutMs !== null) {
     automaticStops.push(formatTimeout(scan.timeoutMs))
   }

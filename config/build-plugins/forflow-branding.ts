@@ -5,24 +5,43 @@ import product from '../../resources/forflow/product.json'
 
 export const forflowBuildEnabled = process.env.FORFLOW_BUILD === '1'
 
-export function forflowBrandingPlugin(): Plugin {
+export function forflowBrandingPlugin(enabled = forflowBuildEnabled): Plugin {
   const resourceRoot = fileURLToPath(new URL('../../resources/', import.meta.url))
+  const legacyIcons = new Map(
+    [
+      'logo.svg',
+      'icon.png',
+      'icon-dev.png',
+      'app-icons/orca-blue.png',
+      'app-icons/orca-watercolor.png'
+    ].map((asset) => [
+      resolve(resourceRoot, asset),
+      resolve(resourceRoot, 'forflow/forflow-mark.png')
+    ])
+  )
+  for (const asset of ['tray/orca-menu-barTemplate.png', 'tray/orca-menu-barTemplate@2x.png']) {
+    legacyIcons.set(
+      resolve(resourceRoot, asset),
+      resolve(resourceRoot, 'forflow/forflow-lockup-transparent.png')
+    )
+  }
   return {
     name: 'forflow-branding',
     enforce: 'pre',
     resolveId(source, importer) {
+      const [asset, query] = source.split('?')
       if (
-        forflowBuildEnabled &&
+        enabled &&
         importer &&
         source.startsWith('.') &&
-        resolve(dirname(importer), source) === resolve(resourceRoot, 'logo.svg')
+        legacyIcons.has(resolve(dirname(importer), asset))
       ) {
-        return resolve(resourceRoot, 'forflow/forflow-mark.png')
+        return legacyIcons.get(resolve(dirname(importer), asset)) + (query ? `?${query}` : '')
       }
       return null
     },
     transformIndexHtml(html) {
-      return forflowBuildEnabled
+      return enabled
         ? html.replace(/<title>[^<]*<\/title>/, `<title>${product.name}</title>`)
         : html
     }

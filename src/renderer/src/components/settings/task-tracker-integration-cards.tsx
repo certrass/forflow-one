@@ -219,7 +219,7 @@ export function LinearIntegrationCard(): React.JSX.Element {
       <LinearApiKeyDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        connectLabel="Add Linear access"
+        connectLabel={translate('forflow.jsxCopy.3725304f22', 'Add Linear access')}
         onConnected={() => setTestResultByWorkspace({})}
         overlayClassName="z-[110]"
         contentClassName="z-[120]"

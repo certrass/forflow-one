@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { copyFile, mkdir, readFile, rm, stat } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
@@ -21,12 +22,12 @@ export function registerPetHandlers(): void {
     const senderWindow =
       BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow()
     const options: Electron.OpenDialogOptions = {
-      title: 'Pick pet',
+      title: translateMain('forflow.nativeCopy.4e270757b8', 'Pick pet'),
       properties: ['openFile'],
       // Why: omit `apng` — macOS maps dialog extensions to UTIs, and apng's missing UTI can drop siblings like webp (APNG uses .png anyway).
       filters: [
         {
-          name: 'Pet image',
+          name: translateMain('forflow.nativeCopy.cdcec0bdad', 'Pet image'),
           extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
         }
       ]
@@ -40,16 +41,23 @@ export function registerPetHandlers(): void {
     const src = result.filePaths[0]
     const classified = classifyFile(src)
     if (!classified) {
-      throw new Error('Unsupported file. Pick a PNG, APNG, JPG, GIF, WebP, or SVG.')
+      throw new Error(
+        translateMain(
+          'forflow.nativeCopy.0e653cc0a7',
+          'Unsupported file. Pick a PNG, APNG, JPG, GIF, WebP, or SVG.'
+        )
+      )
     }
     let srcStat: Awaited<ReturnType<typeof stat>>
     try {
       srcStat = await stat(src)
     } catch {
-      throw new Error('Could not read the selected file.')
+      throw new Error(
+        translateMain('forflow.nativeCopy.50b46f7493', 'Could not read the selected file.')
+      )
     }
     if (!srcStat.isFile()) {
-      throw new Error('Selected path is not a file')
+      throw new Error(translateMain('forflow.nativeCopy.63cf255e65', 'Selected path is not a file'))
     }
     if (srcStat.size > MAX_BYTES) {
       throw new Error(
@@ -67,7 +75,7 @@ export function registerPetHandlers(): void {
       await copyFile(src, dest)
     } catch {
       await rm(dest, { force: true }).catch(() => {})
-      throw new Error('Could not save the pet.')
+      throw new Error(translateMain('forflow.nativeCopy.035151492a', 'Could not save the pet.'))
     }
 
     const rawLabel = basename(src, extname(src)).trim()

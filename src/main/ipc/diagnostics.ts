@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 // IPC surface for the error-tracking lane (telemetry-error-tracking.md
 // §User controls). Six renderer-facing channels:
 //
@@ -192,14 +193,26 @@ function isTicketId(value: unknown): value is string {
 async function confirmBundleUpload(bundle: CollectedBundle): Promise<boolean> {
   const result = await dialog.showMessageBox({
     type: 'question',
-    buttons: ['Send', 'Cancel'],
+    buttons: [
+      translateMain('forflow.nativeCopy.f6f4688ff2', 'Send'),
+      translateMain('forflow.nativeCopy.19766ed6cc', 'Cancel')
+    ],
     defaultId: 1,
     cancelId: 1,
-    title: 'Send this file to support?',
-    message: 'This uploads the redacted app diagnostics file you reviewed.',
-    detail: `Diagnostic ID: ${bundle.bundleSubmissionId}\nDiagnostic records: ${bundle.spanCount}\nSize: ${Math.round(
-      bundle.bytes / 1024
-    )} KB`
+    title: translateMain('forflow.nativeCopy.e460ad80d2', 'Send this file to support?'),
+    message: translateMain(
+      'forflow.nativeCopy.7604aa7ca5',
+      'This uploads the redacted app diagnostics file you reviewed.'
+    ),
+    detail: translateMain(
+      'forflow.finalCopy.bc57d0c859',
+      'Diagnostic ID: {{id}}\nDiagnostic records: {{count}}\nSize: {{size}} KB',
+      {
+        id: bundle.bundleSubmissionId,
+        count: bundle.spanCount,
+        size: Math.round(bundle.bytes / 1024)
+      }
+    )
   })
   return result.response === 0
 }

@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import type { JSX, ReactNode } from 'react'
 import { translate } from '@/i18n/i18n'
 import { cn } from '@/lib/utils'
@@ -118,7 +119,7 @@ function PlaywrightPane(props: {
         <RunSpinner reducedMotion={props.reducedMotion} />
         <PlaywrightIndex>3</PlaywrightIndex>
         {props.running.name}
-        <PlaywrightName> {props.running.desc}</PlaywrightName>
+        <PlaywrightName> {localizedDemoCopy(props.running.desc)}</PlaywrightName>
       </TermLine>
     </>
   )
@@ -238,7 +239,7 @@ function RightPaneScrollback(props: {
               <span className={cn('mr-1.5', props.promptAccentClass ?? 'text-amber-600')}>
                 {translate('auto.components.feature.wall.WorkbenchAnimatedVisual.932c4b3a97', '>')}
               </span>
-              {line.text}
+              {localizedDemoCopy(line.text)}
             </TermLine>
           )
         }
@@ -259,7 +260,7 @@ function RightPaneScrollback(props: {
           return (
             <TermLine key={key}>
               {line.working ? <RunSpinner /> : <PassedCheck />}
-              <span className="text-foreground">{line.action}</span>
+              <span className="text-foreground">{localizedDemoCopy(line.action)}</span>
               <span className="ml-1.5 truncate text-muted-foreground">{line.target}</span>
             </TermLine>
           )
@@ -288,10 +289,10 @@ function RightPaneScrollback(props: {
 
 function getWorkbenchTerminalLineKey(line: WorkbenchTerminalLine): string {
   if (line.kind === 'submitted-command' || line.kind === 'submitted-prompt') {
-    return `${line.kind}:${line.text}`
+    return `${line.kind}:${localizedDemoCopy(line.text)}`
   }
   if (line.kind === 'agent-action') {
-    return `${line.kind}:${line.action}:${line.target}`
+    return `${line.kind}:${localizedDemoCopy(line.action)}:${line.target}`
   }
   if (line.kind === 'response-skeleton') {
     return `${line.kind}:${line.widthPct}`

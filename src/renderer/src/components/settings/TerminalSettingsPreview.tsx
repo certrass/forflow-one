@@ -12,7 +12,7 @@ import { resolveTerminalMinimumContrastRatio } from '@/lib/terminal-contrast-cor
 import { resolveTerminalFontWeights } from '../../../../shared/terminal-fonts'
 import { resolveTerminalLigaturesEnabled } from '../../../../shared/terminal-ligatures'
 import { normalizeTerminalLineHeight } from '../../../../shared/terminal-line-height-settings'
-import { PREVIEW_BUFFER } from './terminal-preview-content'
+import { localizedPreviewBuffer } from './terminal-preview-content'
 import { SettingsSwitch } from './SettingsFormControls'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import { translate } from '@/i18n/i18n'
@@ -125,6 +125,11 @@ export function TerminalSettingsPreview({
     skipInitialThemeRewriteRef.current = true
     // Why: DOM renderer only — WebGL contexts are scarce and multiple previews can mount at once.
     // Why disableStdin: read-only; tabIndex/aria-hidden on the wrapper don't reach xterm's internal textarea, but this does.
+    Terminal.strings.promptLabel = translate('forflow.accessibility.32822e8808', 'Terminal input')
+    Terminal.strings.tooMuchOutput = translate(
+      'forflow.accessibility.7de3b38e32',
+      'Too much output to announce. Navigate to rows manually to read.'
+    )
     const terminal = new Terminal({
       ...buildDefaultTerminalOptions(),
       disableStdin: true,
@@ -147,7 +152,7 @@ export function TerminalSettingsPreview({
 
     try {
       terminal.open(container)
-      terminal.write(PREVIEW_BUFFER)
+      terminal.write(localizedPreviewBuffer())
     } catch (err) {
       terminalRef.current = null
       terminal.dispose()
@@ -218,7 +223,7 @@ export function TerminalSettingsPreview({
     }
     // Why reset() not clear(): buffer ends mid-line on the prompt, so clear()+write would duplicate the trailing fragment.
     terminal.reset()
-    terminal.write(PREVIEW_BUFFER)
+    terminal.write(localizedPreviewBuffer())
   }, [
     composedTheme,
     effectiveMode,

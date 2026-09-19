@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { GitHubAssignableUser } from '../../../shared/github/pull-request-types'
 import type { GitHubWorkItem } from '../../../shared/github/work-item-types'
 import { isClipboardTextByteLengthOverLimit } from '../../../shared/clipboard-text'
@@ -98,13 +99,13 @@ function formatReviewState(state: string | null | undefined): string {
     case 'APPROVED':
       return 'Approved'
     case 'CHANGES_REQUESTED':
-      return 'Changes requested'
+      return translate('forflow.desktopCopy.10a92a8ad3', 'Changes requested')
     case 'COMMENTED':
       return 'Commented'
     case 'DISMISSED':
       return 'Dismissed'
     case 'PENDING':
-      return 'Pending'
+      return translate('forflow.desktopCopy.331551b0de', 'Pending')
     case null:
     case undefined:
     default:
@@ -124,7 +125,7 @@ export function getGitHubPRReviewLabel(item: ReviewDisplayItem): string {
     return 'Approved'
   }
   if (item.reviewDecision === 'CHANGES_REQUESTED') {
-    return 'Changes requested'
+    return translate('forflow.desktopCopy.10a92a8ad3', 'Changes requested')
   }
   const requestedLabel = formatReviewerLogins(
     uniqueLogins((item.reviewRequests ?? []).map((user) => user.login))
@@ -138,7 +139,7 @@ export function getGitHubPRReviewLabel(item: ReviewDisplayItem): string {
   if (reviewedLabel) {
     return reviewedLabel
   }
-  return 'No reviewers'
+  return translate('forflow.desktopCopy.21aea118bf', 'No reviewers')
 }
 
 export function getGitHubPRPrimaryReviewer(

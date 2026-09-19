@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import { useEffect, useRef } from 'react'
 import type { JSX } from 'react'
 import {
@@ -152,7 +153,7 @@ export function ReviewNotesAnimatedVisual(props: { reducedMotion: boolean }): JS
         lineEl.textContent = lns[1]?.textContent ?? ''
       }
       if (bodyEl) {
-        bodyEl.textContent = target.body
+        bodyEl.textContent = localizedDemoCopy(target.body)
       }
       slot.classList.add('is-visible')
     }
@@ -232,7 +233,7 @@ export function ReviewNotesAnimatedVisual(props: { reducedMotion: boolean }): JS
             return
           }
 
-          await fillPopoverInput(target.body)
+          await fillPopoverInput(localizedDemoCopy(target.body))
           if (cancelled) {
             return
           }

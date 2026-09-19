@@ -21,7 +21,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
     }))
     expect(identity).toMatchObject({
       name: 'Forflow One',
-      version: '1.4.205-forflow.4',
+      version: '1.4.205-forflow.5',
       packaged: true,
       dataPath: profile,
       visibleWindows: 0
@@ -205,6 +205,30 @@ test('regression: local project, worktree, Chinese terminal, file editing, diff 
         .filter({ hasText: '中文保存与重启回归通过。' })
     ).toBeVisible()
     await page.screenshot({ path: path.join(evidence, 'regression-diff.png') })
+    await page.locator('.modified-in-monaco-diff-editor textarea').focus()
+    await page.keyboard.press('ControlOrMeta+F')
+    const findInput = page.getByRole('textbox', { name: '查找', exact: true })
+    writeFileSync(
+      path.join(evidence, 'monaco-find-diagnostic.json'),
+      JSON.stringify(
+        await page.evaluate(() => ({
+          text: document.body.innerText,
+          inputs: [...document.querySelectorAll('input,textarea')].map((el) => ({
+            label: el.getAttribute('aria-label'),
+            placeholder: el.getAttribute('placeholder'),
+            cls: el.className
+          }))
+        })),
+        null,
+        2
+      )
+    )
+    await expect(findInput).toBeVisible()
+    await expect(findInput).toHaveAttribute('placeholder', /查找/)
+    await findInput.fill('中文保存')
+    await expect(findInput).toHaveValue('中文保存')
+    await page.screenshot({ path: path.join(evidence, 'regression-monaco-chinese.png') })
+    await page.keyboard.press('Escape')
     const worktrees = await page.evaluate(
       (repoId) => window.api.worktrees.list({ repoId }),
       result.repo.id

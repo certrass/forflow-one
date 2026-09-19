@@ -18,9 +18,7 @@ import { toPermanentSourceControlRowOpenEvent, type SourceControlRowOpenEvent } 
 import {
   SOURCE_CONTROL_ROW_ACTION_OVERLAY_CLASS,
   SOURCE_CONTROL_TREE_FILE_PADDING_PX,
-  SOURCE_CONTROL_TREE_INDENT_PX,
-  SUBMODULE_WORKTREE_ONLY_LABEL,
-  SUBMODULE_WORKTREE_ONLY_TOOLTIP
+  SOURCE_CONTROL_TREE_INDENT_PX
 } from './row-layout'
 import { STATUS_COLORS, STATUS_LABELS } from '../../status-display'
 
@@ -174,9 +172,12 @@ export const UncommittedEntryRow = React.memo(function UncommittedEntryRow({
             // Why: parent git stages the changed gitlink but not nested worktree dirtiness; keep that boundary visible.
             <div
               className="truncate text-[11px] text-muted-foreground"
-              title={SUBMODULE_WORKTREE_ONLY_TOOLTIP}
+              title={translate(
+                'forflow.finalCopy.9eae4758ed',
+                'The parent repo (including Stage All) cannot stage file changes inside a submodule'
+              )}
             >
-              {SUBMODULE_WORKTREE_ONLY_LABEL}
+              {translate('forflow.finalCopy.d695cccdfb', 'Stage inside submodule')}
             </div>
           )}
         </div>

@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import {
   findKeybindingConflictsForDefinitions,
   formatKeybindingList,
@@ -54,7 +55,10 @@ export function buildShortcutDefinitionCatalog(options: {
     for (const actionId of conflict.actionIds) {
       conflictByAction.set(actionId, [
         ...(conflictByAction.get(actionId) ?? []),
-        `${formatKeybindingList([conflict.binding], options.platform)} conflicts with ${labels}.`
+        translate('forflow.shortcuts.conflict', '{{shortcut}} conflicts with {{actions}}.', {
+          shortcut: formatKeybindingList([conflict.binding], options.platform),
+          actions: labels
+        })
       ])
     }
   }

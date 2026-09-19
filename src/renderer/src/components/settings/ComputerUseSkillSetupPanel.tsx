@@ -55,8 +55,11 @@ export function ComputerUseSkillSetupPanel(): React.JSX.Element {
       )}
       command={installCommand}
       installedCommand={updateCommand}
-      terminalTitle="Computer Use setup"
-      terminalAriaLabel="Computer Use skill install terminal"
+      terminalTitle={translate('forflow.jsxCopy.b5c0567996', 'Computer Use setup')}
+      terminalAriaLabel={translate(
+        'forflow.jsxCopy.5658f05be6',
+        'Computer Use skill install terminal'
+      )}
       terminalWorktreeId="settings-computer-use-skill-terminal"
       terminalShellOverride={activeSkillRuntime.terminalShellOverride}
       terminalRuntime={activeSkillRuntime.agentRuntime}

@@ -1,3 +1,4 @@
+import { defaultEmulatorTitle } from '@/i18n/emulator-copy'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { callRuntimeRpc } from '@/runtime/runtime-rpc-client'
 import { useAppStore } from '@/store'
@@ -151,7 +152,7 @@ export function useEmulatorPaneSession({
       setError(null)
       if (tabId) {
         const row = devices.find((device) => device.udid === target || device.name === target)
-        useAppStore.getState().setTabLabel(tabId, row?.name || 'Mobile Emulator')
+        useAppStore.getState().setTabLabel(tabId, row?.name || defaultEmulatorTitle())
       }
     },
     [devices, resetVisualOrientation, selectedUdid, session, tabId]
@@ -232,7 +233,7 @@ export function useEmulatorPaneSession({
         )
         setError(msg)
         if (tabId) {
-          useAppStore.getState().setTabLabel(tabId, 'Mobile Emulator')
+          useAppStore.getState().setTabLabel(tabId, defaultEmulatorTitle())
         }
       } finally {
         if (mountedRef.current) {

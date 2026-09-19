@@ -11,7 +11,7 @@ const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts']
 const TEST_SUPPORT_FILE_PATTERN =
   /[.-](?:test-harness|test-fixtures?|test-state|test-support|fixtures?)\.[cm]?[jt]sx?$/
 const SKIP_PATH_PARTS = new Set(['.git', 'dist', 'node_modules', 'out', '__snapshots__', 'assets'])
-const LOCALIZATION_CALL_NAMES = new Set(['t', 'translate'])
+const LOCALIZATION_CALL_NAMES = new Set(['t', 'translate', 'translateMain'])
 const USER_VISIBLE_JSX_ATTRIBUTES = new Set([
   'ariaLabel',
   'aria-label',

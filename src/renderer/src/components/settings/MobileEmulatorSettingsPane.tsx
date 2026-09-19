@@ -39,7 +39,8 @@ type MobileEmulatorSettingsPaneProps = {
 }
 
 const AUTOMATIC_DEVICE_VALUE = '__orca_automatic_emulator_device__'
-const AUTOMATIC_DEVICE_LABEL = 'Auto-select device'
+const automaticDeviceLabel = (): string =>
+  translate('forflow.emulator.dbb08b31e0', 'Auto-select device')
 const SIMULATOR_STATE_SUFFIX_RE =
   /\s+\((Booted|Booting|Creating|Shutdown|Shutting Down|Unavailable|Unknown)\)\s*$/i
 
@@ -74,12 +75,12 @@ function deviceLabel(device: SimulatorDeviceRow): string {
   const state = device.state.trim()
   const name = device.name.replace(SIMULATOR_STATE_SUFFIX_RE, '').trim()
   if (device.isAvailable === false) {
-    return `${name} (Unavailable)`
+    return translate('forflow.finalCopy.6a5716b79b', '{{name}} (Unavailable)', { name })
   }
   if (!state || state.toLowerCase() === 'shutdown') {
     return name
   }
-  return `${name} (${state})`
+  return `${name} (${translate(`forflow.emulatorStates.${state.toLowerCase()}`, state)})`
 }
 
 function isAndroidDevice(device: SimulatorDeviceRow): boolean {
@@ -272,10 +273,10 @@ export function MobileEmulatorSettingsPane({
               }
             >
               <SelectTrigger size="sm" className="w-56 max-w-full">
-                <SelectValue placeholder={AUTOMATIC_DEVICE_LABEL} />
+                <SelectValue placeholder={automaticDeviceLabel()} />
               </SelectTrigger>
               <SelectContent position="popper" align="end">
-                <SelectItem value={AUTOMATIC_DEVICE_VALUE}>{AUTOMATIC_DEVICE_LABEL}</SelectItem>
+                <SelectItem value={AUTOMATIC_DEVICE_VALUE}>{automaticDeviceLabel()}</SelectItem>
                 {devices.map((device) => (
                   <SelectItem
                     key={device.udid}

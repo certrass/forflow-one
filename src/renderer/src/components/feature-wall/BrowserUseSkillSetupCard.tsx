@@ -55,8 +55,11 @@ export function BrowserUseSkillSetupCard(props: {
       )}
       command={installCommand}
       installedCommand={updateCommand}
-      terminalTitle="Browser Use setup"
-      terminalAriaLabel="Browser Use skill install terminal"
+      terminalTitle={translate('forflow.jsxCopy.8762c5cfbc', 'Browser Use setup')}
+      terminalAriaLabel={translate(
+        'forflow.jsxCopy.a18f87f1e5',
+        'Browser Use skill install terminal'
+      )}
       terminalWorktreeId="feature-wall-browser-use-skill-terminal"
       terminalShellOverride={activeSkillRuntime.terminalShellOverride}
       terminalRuntime={activeSkillRuntime.agentRuntime}

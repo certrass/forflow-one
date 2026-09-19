@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { Notification } from 'electron'
 import type { NotificationDeliveryProbeResult } from '../../shared/notification-settings-types'
 import { activeNotifications } from './native-notification-lifecycle'
@@ -44,8 +45,11 @@ export function probeNotificationDelivery(): Promise<NotificationDeliveryProbeRe
   permissionDialogTriggeredThisSession = true
 
   const probe = new Notification({
-    title: 'Orca notifications are on',
-    body: 'Orca will alert you when agents finish or terminals need attention.',
+    title: translateMain('forflow.nativeCopy.c72b3d5fad', 'Orca notifications are on'),
+    body: translateMain(
+      'forflow.nativeCopy.8ee2277115',
+      'Orca will alert you when agents finish or terminals need attention.'
+    ),
     silent: true
   })
   activeNotifications.add(probe)

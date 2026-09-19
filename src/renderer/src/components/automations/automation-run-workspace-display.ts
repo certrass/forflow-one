@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { AutomationRun } from '../../../../shared/automations-types'
 import type { Worktree } from '../../../../shared/worktree/types'
 
@@ -33,7 +34,11 @@ export function getAutomationRunWorkspaceDisplay({
 
   const previousName = run.workspaceDisplayName?.trim()
   if (previousName) {
-    const deletedLabel = `${previousName} (no longer available)`
+    const deletedLabel = translate(
+      'forflow.dynamicCopy.4f02bd7323',
+      '{{value0}} (no longer available)',
+      { value0: previousName }
+    )
     return {
       rowLabel: previousName,
       detailLabel: deletedLabel,

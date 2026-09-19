@@ -18,71 +18,112 @@ type BrowserLoadErrorLike = BrowserLoadError | null
 // Unknown Chromium permissions keep their raw name instead of disappearing behind invented copy.
 function humanizePermission(permission: string): string {
   switch (permission) {
+    case 'notifications':
+      return translate('forflow.finalCopy.8bb6922758', 'notifications')
+    case 'fullscreen':
+      return translate('forflow.finalCopy.b58ae57ccd', 'fullscreen')
+    case 'clipboard-read':
+      return translate('forflow.finalCopy.1609d3bcd9', 'clipboard access')
     case 'media':
-      return 'camera or microphone access'
+      return translate('forflow.desktopCopy.92a1b612c3', 'camera or microphone access')
     case 'pointerLock':
-      return 'pointer lock'
+      return translate('forflow.desktopCopy.ef52b4ef7f', 'pointer lock')
     case 'storage-access':
-      return 'access to its own cookies and storage while embedded on this page'
+      return translate(
+        'forflow.desktopCopy.4237dc4fc5',
+        'access to its own cookies and storage while embedded on this page'
+      )
     case 'top-level-storage-access':
-      return 'cookie access on behalf of an embedded site'
+      return translate(
+        'forflow.desktopCopy.2fa5086caa',
+        'cookie access on behalf of an embedded site'
+      )
     case 'geolocation':
-      return 'your location'
+      return translate('forflow.finalCopy.61d03e1356', 'your location')
     case 'idle-detection':
-      return 'permission to detect when you are idle'
+      return translate('forflow.desktopCopy.8e748337bd', 'permission to detect when you are idle')
     case 'display-capture':
-      return 'permission to capture your screen'
+      return translate('forflow.desktopCopy.63fdababc8', 'permission to capture your screen')
     case 'window-management':
-      return 'screen information and multi-screen window placement'
+      return translate(
+        'forflow.desktopCopy.de81baf580',
+        'screen information and multi-screen window placement'
+      )
     case 'keyboardLock':
-      return 'permission to capture keyboard input'
+      return translate('forflow.desktopCopy.d0fc9b2c66', 'permission to capture keyboard input')
     case 'openExternal':
-      return 'permission to open a link outside Orca'
+      return translate('forflow.desktopCopy.f9e654afa6', 'permission to open a link outside Orca')
     case 'fileSystem':
-      return 'access to your files or folders'
+      return translate('forflow.desktopCopy.fe7faed70a', 'access to your files or folders')
     case 'hid':
-      return 'access to a connected human interface device'
+      return translate(
+        'forflow.desktopCopy.b175ce34b5',
+        'access to a connected human interface device'
+      )
     case 'usb':
-      return 'access to a USB device'
+      return translate('forflow.desktopCopy.dec481fb26', 'access to a USB device')
     case 'serial':
-      return 'access to a serial device'
+      return translate('forflow.desktopCopy.06c4e371db', 'access to a serial device')
     case 'midi':
-      return 'access to your MIDI devices'
+      return translate('forflow.desktopCopy.37dac4ab41', 'access to your MIDI devices')
     case 'midiSysex':
-      return 'access to system-exclusive MIDI messages'
+      return translate('forflow.desktopCopy.480994b791', 'access to system-exclusive MIDI messages')
     case 'mediaKeySystem':
-      return 'access to protected media playback'
+      return translate('forflow.desktopCopy.a4293605e3', 'access to protected media playback')
     case 'speaker-selection':
-      return 'permission to choose an audio output device'
+      return translate(
+        'forflow.desktopCopy.f226301b04',
+        'permission to choose an audio output device'
+      )
     default:
       return permission
   }
 }
 
 export function formatPermissionNotice(event: BrowserPermissionDeniedEvent): string {
-  const target = event.origin === 'unknown' ? 'this page' : event.origin
-  return `${target} asked for ${humanizePermission(event.permission)}, and Orca denied it.`
+  const target =
+    event.origin === 'unknown'
+      ? translate('forflow.finalCopy.270e420dd3', 'this page')
+      : event.origin
+  return translate(
+    'forflow.dynamicCopy.f4010d7ba0',
+    '{{value0}} asked for {{value1}}, and Orca denied it.',
+    { value0: target, value1: humanizePermission(event.permission) }
+  )
 }
 
 export function formatPopupNotice(event: BrowserPopupEvent): string | null {
-  const target = event.origin === 'unknown' ? 'A site' : event.origin
+  const target =
+    event.origin === 'unknown' ? translate('forflow.finalCopy.1057608d0a', 'A site') : event.origin
   if (event.action === 'opened-in-orca') {
     return null
   }
   if (event.action === 'opened-external') {
-    return `${target} opened a new window in your default browser.`
+    return translate(
+      'forflow.dynamicCopy.657aee5b04',
+      '{{value0}} opened a new window in your default browser.',
+      { value0: target }
+    )
   }
-  return `${target} tried to open a popup Orca does not support here.`
+  return translate(
+    'forflow.dynamicCopy.2cbc4cc492',
+    '{{value0}} tried to open a popup Orca does not support here.',
+    { value0: target }
+  )
 }
 
 export function formatDownloadFinishedNotice(event: BrowserDownloadFinishedEvent): string {
   if (event.status === 'completed') {
-    return event.savePath ? `Downloaded to ${event.savePath}.` : 'Download complete.'
+    return event.savePath
+      ? translate('forflow.finalCopy.f99482b9fd', 'Downloaded to {{path}}.', {
+          path: event.savePath
+        })
+      : translate('forflow.finalCopy.581ccff7f4', 'Download complete.')
   }
   if (event.status === 'failed') {
-    return event.error ?? 'Download failed.'
+    return event.error ?? translate('forflow.finalCopy.22edbe1fbf', 'Download failed.')
   }
-  return event.error ?? 'Download canceled.'
+  return event.error ?? translate('forflow.finalCopy.ec9841a530', 'Download canceled.')
 }
 
 export function formatByteCount(bytes: number | null): string | null {
@@ -107,13 +148,13 @@ export function formatLoadFailureDescription(
   meta: LoadFailureMeta
 ): string {
   if (!loadError) {
-    return 'The page did not respond.'
+    return translate('forflow.desktopCopy.15460c0056', 'The page did not respond.')
   }
   if (loadError.code === BROWSER_GUEST_RECOVERY_ERROR_CODE) {
     return loadError.description
   }
   if (isChromiumCertificateErrorCode(loadError.code)) {
-    const host = meta.host ?? 'this address'
+    const host = meta.host ?? translate('forflow.finalCopy.2e865ae15c', 'this address')
     if (loadError.code === -200) {
       return translate(
         'browser.loadFailure.certificateNameMismatch',
@@ -142,12 +183,12 @@ export function formatLoadFailureDescription(
     )
   }
   if (meta.isLocalhostLike) {
-    return "We couldn't connect to your local server."
+    return translate('forflow.desktopCopy.b3217a6cbb', "We couldn't connect to your local server.")
   }
   if (loadError.code === 0) {
     return loadError.description
   }
-  return "We couldn't connect to this page."
+  return translate('forflow.desktopCopy.8488141db0', "We couldn't connect to this page.")
 }
 
 export function formatLoadFailureRecoveryHint(
@@ -161,7 +202,10 @@ export function formatLoadFailureRecoveryHint(
   ) {
     return null
   }
-  return 'If this should be a local app, make sure the server is running and listening on the expected port.'
+  return translate(
+    'forflow.desktopCopy.b317967a19',
+    'If this should be a local app, make sure the server is running and listening on the expected port.'
+  )
 }
 
 export function isCertificateLoadError(loadError: BrowserLoadErrorLike): boolean {

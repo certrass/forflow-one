@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { normalizeRuntimePathForComparison } from '../../../shared/cross-platform-path'
 import {
   NATIVE_FILE_DROP_MAX_PATH_BYTES,
@@ -271,7 +272,7 @@ export function getWorkspaceFileDragRejectionMessage(
   reason: WorkspaceFileDragRejectionReason
 ): string {
   if (reason === 'too-many-paths') {
-    return 'Drop contains too many paths.'
+    return translate('forflow.desktopCopy.4b8863c1a7', 'Drop contains too many paths.')
   }
-  return 'Drop path list is too large.'
+  return translate('forflow.desktopCopy.55c5a992e5', 'Drop path list is too large.')
 }

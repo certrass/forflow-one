@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { EditorGet, EditorSet } from '../types/editor-set-get'
 import type { EditorSlice } from '../types/editor-slice'
 import type { OpenFile } from '../types/open-file'
@@ -17,8 +18,8 @@ export function createOpenCombinedDiff(
       const label = areaFilter
         ? ({ staged: 'Staged Changes', unstaged: 'Changes', untracked: 'Untracked Files' }[
             areaFilter
-          ] ?? 'All Changes')
-        : 'All Changes'
+          ] ?? translate('forflow.desktopCopy.b3b853ceef', 'All Changes'))
+        : translate('forflow.desktopCopy.b3b853ceef', 'All Changes')
       set((s) => {
         const branchSummary = s.gitBranchCompareSummaryByWorktree[worktreeId]
         const branchCompare =
@@ -48,8 +49,8 @@ export function createOpenCombinedDiff(
         const label = areaFilter
           ? ({ staged: 'Staged Changes', unstaged: 'Changes', untracked: 'Untracked Files' }[
               areaFilter
-            ] ?? 'All Changes')
-          : 'All Changes'
+            ] ?? translate('forflow.desktopCopy.b3b853ceef', 'All Changes'))
+          : translate('forflow.desktopCopy.b3b853ceef', 'All Changes')
         const runtimeEnvironmentId = resolveDiffRuntimeEnvironmentId(s, worktreeId, undefined)
         const existing = s.openFiles.find((f) => f.id === id)
         if (existing) {

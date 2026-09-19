@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React, { useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { AgentStateDot, agentStateLabel, type AgentDotState } from '@/components/AgentStateDot'
@@ -19,7 +20,7 @@ import { lastEnteredDoneAt } from './agent-finished-timestamp'
 function formatTimeAgo(ts: number, now: number): string {
   const delta = now - ts
   if (delta < 60_000) {
-    return 'just now'
+    return translate('forflow.desktopCopy.7ddb44d8a5', 'just now')
   }
   return `${formatCompactDuration(delta)} ago`
 }
@@ -30,7 +31,7 @@ function stateDotTooltipLabel(
   now: number
 ): string {
   if (agent.entry.interrupted === true) {
-    return 'Interrupted by user'
+    return translate('forflow.desktopCopy.1fe252d536', 'Interrupted by user')
   }
   // Why: report the observation, not a verdict on the agent — the elapsed gap is what
   // lets the user apply context Orca has no way to know (a long build, a slow download).

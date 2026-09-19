@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import {
   simulatorPreviewStreamUrl,
   type EmulatorPaneSession,
@@ -25,7 +26,9 @@ export function buildEmulatorPaneSessionView({
   return {
     displayName: hasSpecificSessionDisplayName
       ? sessionDisplayName
-      : selectedDevice?.name || sessionDisplayName || 'Mobile Emulator',
+      : selectedDevice?.name ||
+        sessionDisplayName ||
+        translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator'),
     previewUrl,
     wsUrl: session?.info?.wsUrl,
     isLive: Boolean(previewUrl && session?.attached),

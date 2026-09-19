@@ -185,7 +185,7 @@ export function EditorPanelHeader({
           comments={diffComments}
           filePath={activeFile.relativePath}
           showFileScope
-          triggerLabel="AI notes"
+          triggerLabel={translate('forflow.jsxCopy.5d7aaf4d00', 'AI notes')}
           triggerCount={fileDiffComments.length}
           triggerClassName="h-6 shrink-0 gap-1 rounded-full border border-border/70 bg-muted/40 px-2 text-[11px] font-medium leading-none text-foreground/80 hover:bg-accent hover:text-foreground"
           iconClassName="size-3"

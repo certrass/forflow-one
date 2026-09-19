@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import { Activity, CircleCheck, CircleDashed } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -46,25 +47,25 @@ export type AgentDotState =
 export function agentStateLabel(state: AgentDotState): string {
   switch (state) {
     case 'working':
-      return 'Working'
+      return translate('forflow.desktopCopy.a92f0449a9', 'Working')
     case 'monitoring':
-      return 'Monitoring background tasks'
+      return translate('forflow.desktopCopy.0f29a33227', 'Monitoring background tasks')
     case 'blocked':
-      return 'Blocked'
+      return translate('forflow.desktopCopy.18f2a0947f', 'Blocked')
     case 'waiting':
-      return 'Waiting for input'
+      return translate('forflow.desktopCopy.9259faf308', 'Waiting for input')
     case 'interrupted':
-      return 'Interrupted'
+      return translate('forflow.desktopCopy.132d124d6b', 'Interrupted')
     case 'failed':
-      return 'Failed'
+      return translate('forflow.desktopCopy.031a8f0f65', 'Failed')
     case 'done':
-      return 'Done'
+      return translate('forflow.desktopCopy.11a6767d56', 'Done')
     case 'idle':
-      return 'Idle'
+      return translate('forflow.desktopCopy.ab0171ca04', 'Idle')
     case 'unverifiable':
-      return 'No recent update'
+      return translate('forflow.desktopCopy.261781f74c', 'No recent update')
     case 'permission':
-      return 'Needs attention'
+      return translate('forflow.desktopCopy.c1ebc78178', 'Needs attention')
   }
 }
 

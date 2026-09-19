@@ -77,7 +77,9 @@ function SourceControlVariableDetails({
     <div className="max-w-80 space-y-2 text-left leading-relaxed">
       <div className="space-y-0.5">
         <div className="font-mono text-[11px]">{`{${variable}}`}</div>
-        <div className="text-muted-foreground">{info.description}</div>
+        <div className="text-muted-foreground">
+          {translate(`forflow.sourceControl.variables.${variable}`, info.description)}
+        </div>
       </div>
       <SourceControlVariableSample
         label={translate(

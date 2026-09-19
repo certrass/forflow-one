@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import { resolveTerminalTabTitle } from '../../../../shared/tab-title-resolution'
 import type { TerminalTab } from '../../../../shared/terminal-tab-types'
@@ -187,7 +188,8 @@ export function renderTabBarItems({
       )
     }
     if (item.type === 'simulator') {
-      const simulatorLabel = item.data.label || 'Mobile Emulator'
+      const simulatorLabel =
+        item.data.label || translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator')
       const simulatorFile: OpenFile & { tabId: string } = {
         id: item.id,
         tabId: item.id,

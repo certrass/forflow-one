@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from '../feature-wall-demo-copy'
 import type { JSX } from 'react'
 import { CircleCheck } from 'lucide-react'
 import { AgentStateDot } from '@/components/AgentStateDot'
@@ -124,7 +125,7 @@ export function AgentRow(props: {
         )}
         style={{ fontSize: 'var(--feature-wall-agent-message-size, 13px)' }}
       >
-        {message}
+        {localizedDemoCopy(message)}
       </span>
     </div>
   )

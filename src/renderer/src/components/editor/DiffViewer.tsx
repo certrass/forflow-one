@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { DiffEditor, type DiffOnMount } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
@@ -387,7 +388,7 @@ export default function DiffViewer({
             lineHeight={popover.lineHeight}
             placeholder={addLineCommentPlaceholder}
             submitLabel={addLineCommentLabel}
-            submittingLabel="Posting…"
+            submittingLabel={translate('forflow.jsxCopy.648a2ef491', 'Posting…')}
             onCancel={() => setPopover(null)}
             onSubmit={handleSubmitComment}
           />

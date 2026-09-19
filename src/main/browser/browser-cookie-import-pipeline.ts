@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { dialog, session, type BrowserWindow } from 'electron'
 import type {
   BrowserCookieImportResult,
@@ -226,10 +227,13 @@ export async function importValidatedCookies(
 // Why: use a main-owned native dialog so a compromised renderer can't turn import into arbitrary file reads.
 export async function pickCookieFile(parentWindow: BrowserWindow | null): Promise<string | null> {
   const opts = {
-    title: 'Import Cookies',
+    title: translateMain('forflow.fileDialog.6d0d47d142', 'Import Cookies'),
     filters: [
-      { name: 'Cookie Files', extensions: ['json'] },
-      { name: 'All Files', extensions: ['*'] }
+      {
+        name: translateMain('forflow.fileDialog.09eafbe457', 'Cookie Files'),
+        extensions: ['json']
+      },
+      { name: translateMain('forflow.fileDialog.c4939c3f7d', 'All Files'), extensions: ['*'] }
     ],
     properties: ['openFile' as const]
   }

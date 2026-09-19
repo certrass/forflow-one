@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { FitAddon } from '@xterm/addon-fit'
 import { SearchAddon } from '@xterm/addon-search'
 import { SerializeAddon } from '@xterm/addon-serialize'
@@ -44,6 +45,11 @@ export function createPaneDOM(
     ...userOpts
   }
 
+  Terminal.strings.promptLabel = translate('forflow.accessibility.32822e8808', 'Terminal input')
+  Terminal.strings.tooMuchOutput = translate(
+    'forflow.accessibility.7de3b38e32',
+    'Too much output to announce. Navigate to rows manually to read.'
+  )
   const terminal = new Terminal(terminalOpts)
   // Why: a synchronous throw inside any link provider's provideLinks (notably
   // xterm web-links' LinkComputer raising RangeError on a pathological wrapped

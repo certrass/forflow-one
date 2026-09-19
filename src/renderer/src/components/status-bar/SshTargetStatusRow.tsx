@@ -20,13 +20,13 @@ function syncStatusLabel(status: RemoteWorkspaceSyncStatus | undefined): string 
   switch (status?.phase) {
     case 'pulling':
     case 'pushing':
-      return 'Workspace syncing'
+      return translate('forflow.desktopCopy.8ffee3a9f3', 'Workspace syncing')
     case 'conflict':
-      return 'Workspace sync conflict'
+      return translate('forflow.desktopCopy.ffa9c20700', 'Workspace sync conflict')
     case 'error':
-      return 'Workspace sync error'
+      return translate('forflow.desktopCopy.bf55524cdf', 'Workspace sync error')
     case 'offline':
-      return 'Workspace sync unavailable'
+      return translate('forflow.desktopCopy.9b0d0e2c6a', 'Workspace sync unavailable')
     case 'synced':
     case 'idle':
     case undefined:

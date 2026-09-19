@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { TaskPageComposerActionsModel } from '../use-task-page-composer-actions'
 import PullRequestPage from '@/components/PullRequestPage'
 import GitHubItemDialog from '@/components/GitHubItemDialog'
@@ -33,7 +34,7 @@ export function TaskPageContent({
         repoPath={dialogRepoPath}
         repoId={dialogWorkItem.repoId}
         sourceContext={dialogSourceContext}
-        backLabel="Pull requests"
+        backLabel={translate('forflow.jsxCopy.d9e3f26028', 'Pull requests')}
         onUse={(item) => {
           setDialogWorkItem(null)
           handleUseWorkItem(item)
@@ -48,7 +49,7 @@ export function TaskPageContent({
         repoPath={dialogRepoPath}
         repoId={dialogWorkItem.repoId}
         sourceContext={dialogSourceContext}
-        backLabel="GitHub list"
+        backLabel={translate('forflow.jsxCopy.351cd4fd97', 'GitHub list')}
         onUse={(item) => {
           setDialogWorkItem(null)
           handleUseWorkItem(item)

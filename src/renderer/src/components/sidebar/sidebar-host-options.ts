@@ -146,11 +146,11 @@ export function getSidebarHostHealthLabel(health: SidebarHostScopeOption['health
     case 'connecting':
       return 'Connecting'
     case 'blocked':
-      return 'Update needed'
+      return translate('forflow.desktopCopy.1d09faf925', 'Update needed')
     case 'disconnected':
       return 'Disconnected'
     case 'error':
-      return 'Needs attention'
+      return translate('forflow.desktopCopy.c1ebc78178', 'Needs attention')
     case 'mixed':
       return 'Mixed'
   }

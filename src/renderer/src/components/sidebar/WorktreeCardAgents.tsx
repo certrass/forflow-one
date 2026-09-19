@@ -363,7 +363,9 @@ const WorktreeCardAgentsBody = React.memo(function WorktreeCardAgentsBody({
     const summaryAgents = hasLineage ? rootAgents : agents
     // Why: compact cards collapse multiple agents to one status line, except in send-target mode where rows are the picker surface.
     const shouldUseSummaryRow = summaryAgents.length > 1 && !isAgentSendTargetModeActive
-    const subjectLabel = `${hasLineage ? rootAgents.length : agents.length} agents`
+    const subjectLabel = translate('forflow.dynamicCopy.ffb8d0d4b3', '{{value0}} agents', {
+      value0: hasLineage ? rootAgents.length : agents.length
+    })
 
     return (
       <div

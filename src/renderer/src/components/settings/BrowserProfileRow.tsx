@@ -140,7 +140,11 @@ export function BrowserProfileRow({
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium">{profile.label}</span>
+          <span className="truncate text-sm font-medium">
+            {profile.id === 'default'
+              ? translate('auto.components.settings.BrowserPane.4399c77caa', 'Default')
+              : profile.label}
+          </span>
           {isActive ? (
             <span className="shrink-0 rounded border border-border/50 px-1.5 text-[10px] font-medium leading-4 text-foreground/80">
               {translate('auto.components.settings.BrowserProfileRow.c29648fe5b', 'Active')}

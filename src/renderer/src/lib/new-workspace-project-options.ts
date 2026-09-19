@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { projectHostSetupProjectionFromRepos } from '../../../shared/project-host-setup-projection'
 import type { ProjectGroup } from '../../../shared/project-group-types'
 import type { Project, ProjectHostSetup } from '../../../shared/project-types'
@@ -88,7 +89,9 @@ function getProjectDetail(project: Project, readySetupCount: number): string {
     return `${project.providerIdentity.owner}/${project.providerIdentity.repo}`
   }
   if (readySetupCount > 1) {
-    return `${readySetupCount} hosts configured`
+    return translate('forflow.dynamicCopy.617dd98ee4', '{{value0}} hosts configured', {
+      value0: readySetupCount
+    })
   }
   return 'Project'
 }

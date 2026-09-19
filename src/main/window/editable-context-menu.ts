@@ -1,35 +1,11 @@
-import {
-  richMarkdownContextMenuCommandChannel,
-  type RichMarkdownContextMenuCommand,
-  type RichMarkdownContextMenuCommandPayload,
-  type RichMarkdownContextMenuTableTarget
-} from '../../shared/rich-markdown-context-menu'
+import { buildMarkdownMenuTemplate } from './rich-markdown-context-menu-template'
+import type { RichMarkdownContextMenuTableTarget } from '../../shared/rich-markdown-context-menu'
 import { translateMain } from '../i18n/main-i18n'
 
-type EditableContextMenuWebContents = Pick<
+export type EditableContextMenuWebContents = Pick<
   Electron.WebContents,
   'replaceMisspelling' | 'send' | 'session'
 >
-
-function markdownCommandItem(
-  label: string,
-  command: RichMarkdownContextMenuCommand,
-  webContents: EditableContextMenuWebContents,
-  point: { x: number; y: number },
-  tableTargetId?: string
-): Electron.MenuItemConstructorOptions {
-  return {
-    label,
-    click: () => {
-      const payload: RichMarkdownContextMenuCommandPayload = {
-        command,
-        ...point,
-        ...(tableTargetId ? { tableTargetId } : {})
-      }
-      webContents.send(richMarkdownContextMenuCommandChannel, payload)
-    }
-  }
-}
 
 function editableContextPasteItem(
   label: string,
@@ -49,145 +25,19 @@ function editableContextPasteItem(
   }
 }
 
-function buildMarkdownMenuTemplate(
-  webContents: EditableContextMenuWebContents,
-  point: { x: number; y: number },
-  tableTarget: RichMarkdownContextMenuTableTarget | null
-): Electron.MenuItemConstructorOptions[] {
-  return [
-    markdownCommandItem('Add link', 'add-link', webContents, point),
-    { type: 'separator' },
-    {
-      label: 'Format',
-      submenu: [
-        markdownCommandItem('Bold', 'bold', webContents, point),
-        markdownCommandItem('Italic', 'italic', webContents, point),
-        markdownCommandItem('Strike', 'strike', webContents, point),
-        markdownCommandItem('Inline code', 'inline-code', webContents, point),
-        markdownCommandItem('Code block', 'code-block', webContents, point),
-        markdownCommandItem('Quote', 'blockquote', webContents, point)
-      ]
-    },
-    {
-      label: 'Paragraph',
-      submenu: [
-        markdownCommandItem('Body text', 'paragraph', webContents, point),
-        markdownCommandItem('Heading 1', 'heading-1', webContents, point),
-        markdownCommandItem('Heading 2', 'heading-2', webContents, point),
-        markdownCommandItem('Heading 3', 'heading-3', webContents, point),
-        markdownCommandItem('Heading 4', 'heading-4', webContents, point),
-        markdownCommandItem('Heading 5', 'heading-5', webContents, point),
-        { type: 'separator' },
-        markdownCommandItem('Bullet list', 'bullet-list', webContents, point),
-        markdownCommandItem('Numbered list', 'ordered-list', webContents, point),
-        markdownCommandItem('Checklist', 'task-list', webContents, point)
-      ]
-    },
-    {
-      label: 'Insert',
-      submenu: [
-        markdownCommandItem('Link', 'add-link', webContents, point),
-        markdownCommandItem('Image', 'image', webContents, point),
-        markdownCommandItem('Divider', 'divider', webContents, point),
-        markdownCommandItem('Code block', 'code-block', webContents, point)
-      ]
-    },
-    ...(tableTarget
-      ? [
-          {
-            label: translateMain('auto.main.window.editableContextMenu.table', 'Table'),
-            submenu: [
-              {
-                ...markdownCommandItem(
-                  translateMain(
-                    'auto.main.window.editableContextMenu.insertRowAbove',
-                    'Insert row above'
-                  ),
-                  'insert-row-above',
-                  webContents,
-                  point,
-                  tableTarget.targetId
-                ),
-                enabled: tableTarget.cellType !== 'header'
-              },
-              markdownCommandItem(
-                translateMain(
-                  'auto.main.window.editableContextMenu.insertRowBelow',
-                  'Insert row below'
-                ),
-                'insert-row-below',
-                webContents,
-                point,
-                tableTarget.targetId
-              ),
-              {
-                ...markdownCommandItem(
-                  translateMain('auto.main.window.editableContextMenu.deleteRow', 'Delete row'),
-                  'delete-row',
-                  webContents,
-                  point,
-                  tableTarget.targetId
-                ),
-                enabled: tableTarget.cellType !== 'header'
-              },
-              { type: 'separator' as const },
-              markdownCommandItem(
-                translateMain(
-                  'auto.main.window.editableContextMenu.insertColumnLeft',
-                  'Insert column left'
-                ),
-                'insert-column-left',
-                webContents,
-                point,
-                tableTarget.targetId
-              ),
-              markdownCommandItem(
-                translateMain(
-                  'auto.main.window.editableContextMenu.insertColumnRight',
-                  'Insert column right'
-                ),
-                'insert-column-right',
-                webContents,
-                point,
-                tableTarget.targetId
-              ),
-              markdownCommandItem(
-                translateMain('auto.main.window.editableContextMenu.deleteColumn', 'Delete column'),
-                'delete-column',
-                webContents,
-                point,
-                tableTarget.targetId
-              ),
-              { type: 'separator' as const },
-              markdownCommandItem(
-                translateMain('auto.main.window.editableContextMenu.deleteTable', 'Delete table'),
-                'delete-table',
-                webContents,
-                point,
-                tableTarget.targetId
-              )
-            ]
-          }
-        ]
-      : []),
-    { type: 'separator' },
-    { role: 'cut' },
-    { role: 'copy' },
-    editableContextPasteItem('Paste', webContents),
-    editableContextPasteItem('Paste as plain text', webContents, { plainTextOnly: true }),
-    { role: 'selectAll' }
-  ]
-}
-
-function buildNativeEditMenuTemplate(
+export function buildNativeEditMenuTemplate(
   webContents: EditableContextMenuWebContents
 ): Electron.MenuItemConstructorOptions[] {
   return [
-    { role: 'cut' },
-    { role: 'copy' },
-    editableContextPasteItem('Paste', webContents),
-    editableContextPasteItem('Paste as plain text', webContents, { plainTextOnly: true }),
-    { role: 'selectAll' }
+    { role: 'cut', label: translateMain('forflow.nativeMenu.1f45f02561', 'Cut') },
+    { role: 'copy', label: translateMain('forflow.nativeMenu.e21f935f11', 'Copy') },
+    editableContextPasteItem(translateMain('forflow.nativeMenu.f3380f7b44', 'Paste'), webContents),
+    editableContextPasteItem(
+      translateMain('forflow.nativeMenu.c95c567f5b', 'Paste as plain text'),
+      webContents,
+      { plainTextOnly: true }
+    ),
+    { role: 'selectAll', label: translateMain('forflow.nativeMenu.1fc9a38765', 'Select all') }
   ]
 }
 
@@ -212,7 +62,7 @@ export function buildEditableContextMenuTemplate(
       template.push({ type: 'separator' })
     }
     template.push({
-      label: 'Add to dictionary',
+      label: translateMain('forflow.nativeMenu.b0f5bc4d99', 'Add to dictionary'),
       click: () => {
         webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
       }
@@ -227,7 +77,8 @@ export function buildEditableContextMenuTemplate(
       ? buildMarkdownMenuTemplate(
           webContents,
           { x: params.x, y: params.y },
-          options?.tableTarget ?? null
+          options?.tableTarget ?? null,
+          buildNativeEditMenuTemplate(webContents)
         )
       : buildNativeEditMenuTemplate(webContents))
   )

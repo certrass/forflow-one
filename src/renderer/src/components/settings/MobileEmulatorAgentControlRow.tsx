@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { forflowCliStatusDescription } from './forflow-cli-copy'
 import { Import, Loader2 } from 'lucide-react'
 import {
   ORCA_CLI_SKILL_INSTALL_COMMAND,
@@ -97,7 +99,11 @@ export function MobileEmulatorAgentControlRow(): React.JSX.Element {
               </p>
             ) : null}
             {!setup.cliEnabled && setup.cliInstallStatus?.detail ? (
-              <p className="text-[11px] text-muted-foreground">{setup.cliInstallStatus.detail}</p>
+              <p className="text-[11px] text-muted-foreground">
+                {isForflowBuild()
+                  ? forflowCliStatusDescription(setup.cliInstallStatus)
+                  : setup.cliInstallStatus.detail}
+              </p>
             ) : null}
             {setup.cliBusy ? (
               <p className="text-[11px] leading-snug text-muted-foreground">
@@ -139,7 +145,9 @@ export function MobileEmulatorAgentControlRow(): React.JSX.Element {
               </TooltipTrigger>
               {!setup.cliSupported && !setup.cliLoading && setup.cliInstallStatus?.detail ? (
                 <TooltipContent side="left" sideOffset={6}>
-                  {setup.cliInstallStatus.detail}
+                  {isForflowBuild()
+                    ? forflowCliStatusDescription(setup.cliInstallStatus)
+                    : setup.cliInstallStatus.detail}
                 </TooltipContent>
               ) : null}
             </Tooltip>
@@ -159,8 +167,11 @@ export function MobileEmulatorAgentControlRow(): React.JSX.Element {
             )}
             command={cliSkillInstallCommand}
             installedCommand={cliSkillUpdateCommand}
-            terminalTitle="Orca CLI skill setup"
-            terminalAriaLabel="Orca CLI skill install terminal"
+            terminalTitle={translate('forflow.jsxCopy.7dba6b16d0', 'Orca CLI skill setup')}
+            terminalAriaLabel={translate(
+              'forflow.jsxCopy.890c7677ae',
+              'Orca CLI skill install terminal'
+            )}
             terminalWorktreeId="settings-mobile-emulator-orca-cli-skill-terminal"
             terminalShellOverride={activeSkillRuntime.terminalShellOverride}
             installed={setup.cliSkillInstalled}
@@ -205,7 +216,7 @@ export function MobileEmulatorAgentControlRow(): React.JSX.Element {
                 key={command}
                 className="block break-all rounded-md border border-border/60 bg-background/60 px-2 py-1 font-mono text-[11px] leading-snug text-foreground"
               >
-                {command}
+                {isForflowBuild() ? command.replace(/^orca\b/, 'forflow') : command}
               </code>
             ))}
           </div>

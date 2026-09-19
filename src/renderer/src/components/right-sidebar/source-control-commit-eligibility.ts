@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 export const COMMIT_MESSAGE_REQUIRED_REASON = 'Enter a commit message to commit' as const
 
 export type CommitEligibilityInputs = {
@@ -17,10 +18,10 @@ export function resolveCommitDisabledReason(
   >
 ): string | null {
   if (inputs.hasUnresolvedConflicts) {
-    return 'Resolve conflicts before committing'
+    return translate('forflow.desktopCopy.efff4259ba', 'Resolve conflicts before committing')
   }
   if (inputs.stagedCount === 0) {
-    return 'Stage at least one file to commit'
+    return translate('forflow.desktopCopy.af19ec9fce', 'Stage at least one file to commit')
   }
   if (!inputs.hasMessage) {
     return COMMIT_MESSAGE_REQUIRED_REASON

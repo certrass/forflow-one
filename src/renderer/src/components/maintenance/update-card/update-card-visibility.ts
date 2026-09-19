@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { UpdateStatus } from '../../../../../shared/update-status-types'
 
 export function isUpdateCardVisible({
@@ -40,19 +41,19 @@ export function isUpdateCardVisible({
 export function getUpdateCardAriaLabel(status: UpdateStatus): string {
   switch (status.state) {
     case 'idle':
-      return 'Update status'
+      return translate('forflow.desktopCopy.1e6bf669df', 'Update status')
     case 'checking':
-      return 'Checking for updates'
+      return translate('forflow.desktopCopy.53b276ad79', 'Checking for updates')
     case 'not-available':
-      return "You're on the latest version"
+      return translate('forflow.desktopCopy.6232df515e', "You're on the latest version")
     case 'available':
-      return 'Update available'
+      return translate('forflow.desktopCopy.ff8b555d81', 'Update available')
     case 'downloading':
-      return 'Downloading update'
+      return translate('forflow.desktopCopy.0143682386', 'Downloading update')
     case 'downloaded':
-      return 'Update ready to install'
+      return translate('forflow.desktopCopy.b4ecd41920', 'Update ready to install')
     case 'error':
-      return 'Update error'
+      return translate('forflow.desktopCopy.c00e76f05d', 'Update error')
   }
 }
 

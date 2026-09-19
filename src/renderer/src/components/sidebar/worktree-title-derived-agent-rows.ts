@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { DashboardAgentRow } from '@/components/dashboard/useDashboardData'
 import { formatAgentTypeLabel, isClaudeManagementTitle } from '@/lib/agent-status'
 import { isCursorAgentTitle } from '../../../../shared/agent-title-core'
@@ -179,7 +180,11 @@ function buildTitleDerivedAgentRow(args: {
   const rowLabel = titleAgentType ? label : formatAgentTypeLabel(agentType)
   const rowState = titleStatusToRowState(status)
   const secondary =
-    status === 'permission' ? 'Needs input' : status === 'working' ? 'Running' : 'Idle'
+    status === 'permission'
+      ? 'Needs input'
+      : status === 'working'
+        ? 'Running'
+        : translate('forflow.desktopCopy.ab0171ca04', 'Idle')
   const entryState: AgentStatusState = rowState === 'waiting' ? 'waiting' : 'working'
   const entry: AgentStatusEntry = {
     paneKey,

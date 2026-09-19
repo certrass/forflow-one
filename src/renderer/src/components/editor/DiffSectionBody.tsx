@@ -102,7 +102,7 @@ export function DiffSectionBody({
           lineHeight={popover.lineHeight}
           placeholder={addLineCommentPlaceholder}
           submitLabel={addLineCommentLabel}
-          submittingLabel="Posting…"
+          submittingLabel={translate('forflow.jsxCopy.648a2ef491', 'Posting…')}
           onCancel={onCancelComment}
           onSubmit={onSubmitComment}
         />

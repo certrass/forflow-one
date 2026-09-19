@@ -1,3 +1,4 @@
+import { localizedKeybinding } from '@/i18n/keybinding-copy'
 import {
   KEYBINDING_DEFINITIONS,
   agentTabActionId,
@@ -35,7 +36,8 @@ export function groupDefinitions(
     if (hiddenAgentActionIds.has(definition.id)) {
       continue
     }
-    groups.set(definition.group, [...(groups.get(definition.group) ?? []), definition])
+    const localized = localizedKeybinding(definition)
+    groups.set(localized.group, [...(groups.get(localized.group) ?? []), localized])
   }
   return Array.from(groups.entries()).map(([title, items]) => ({ title, items }))
 }

@@ -40,11 +40,11 @@ export function buildCommitDropdownItems(ctx: DropdownActionContext): CommitDrop
 
   // Why: compound commit labels omit counts — the commit itself changes ahead/behind, so pre-commit numbers would mislead.
   const commitPushTitle = upstreamLoading
-    ? 'Checking branch status…'
+    ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
     : publishBlockedByPRLoading
-      ? 'Checking PR status…'
+      ? translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
       : publishBlockedByMergedPR
-        ? 'PR is already merged'
+        ? translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
         : publishBlockedByDetachedHead
           ? 'Check out a branch before pushing commits'
           : pushBlockedByOpenHostedReviewTarget
@@ -74,20 +74,23 @@ export function buildCommitDropdownItems(ctx: DropdownActionContext): CommitDrop
 
   const commitSyncTitle = ((): string => {
     if (upstreamLoading) {
-      return 'Checking branch status…'
+      return translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
     }
     if (publishBlockedByPRLoading) {
-      return 'Checking PR status…'
+      return translate('forflow.desktopCopy.2aeedac39f', 'Checking PR status…')
     }
     if (publishBlockedByMergedPR) {
-      return 'PR is already merged'
+      return translate('forflow.desktopCopy.ebbf11f7ae', 'PR is already merged')
     }
     if (publishBlockedByDetachedHead) {
-      return 'Check out a branch before syncing commits'
+      return translate(
+        'forflow.desktopCopy.802b798b4b',
+        'Check out a branch before syncing commits'
+      )
     }
     if (!hasUpstream) {
       // Why: direct the user to Publish Branch (the primary action) rather than naming a nonexistent compound action.
-      return 'Publish the branch first to sync commits'
+      return translate('forflow.desktopCopy.b5eea319f7', 'Publish the branch first to sync commits')
     }
     if (shouldForcePushWithLease) {
       return (

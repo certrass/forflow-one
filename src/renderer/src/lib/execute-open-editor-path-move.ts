@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
 import { renameRuntimePath, type RuntimeFileOperationArgs } from '@/runtime/runtime-file-client'
 import { requestEditorSaveQuiesce } from '@/components/editor/editor-autosave'
@@ -111,7 +112,11 @@ export async function executeOpenEditorPathMove(args: {
       } catch (err) {
         rollbackError = err
       }
-      const base = `Could not retarget open editors for the move (${rekeyResult.reason}).`
+      const base = translate(
+        'forflow.dynamicCopy.99d93b1b62',
+        'Could not retarget open editors for the move ({{value0}}).',
+        { value0: rekeyResult.reason }
+      )
       throw new Error(
         rollbackError
           ? `${base} The on-disk move could not be undone and the file may remain at the new path: ${

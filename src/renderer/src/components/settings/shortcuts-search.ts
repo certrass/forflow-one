@@ -1,3 +1,4 @@
+import { localizedKeybinding } from '@/i18n/keybinding-copy'
 import { KEYBINDING_DEFINITIONS } from '../../../../shared/keybindings'
 import type { SettingsSearchEntry } from './settings-search'
 import { translate } from '@/i18n/i18n'
@@ -35,7 +36,7 @@ export const getTerminalShortcutPolicySearchEntry = createLocalizedCatalog(
 )
 
 const getShortcutDefinitionSearchEntries = createLocalizedCatalog(() =>
-  KEYBINDING_DEFINITIONS.map((item) => ({
+  KEYBINDING_DEFINITIONS.map(localizedKeybinding).map((item) => ({
     actionId: item.id,
     searchEntry: {
       title: item.title,

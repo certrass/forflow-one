@@ -1,3 +1,4 @@
+import { simulatorPaletteTabTitle } from '@/i18n/emulator-copy'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 import type { Tab, TabGroup, WorkspaceVisibleTabType } from '../../../shared/tab-types'
 import type { Worktree } from '../../../shared/worktree/types'
@@ -146,9 +147,7 @@ function positionScore(entry: SearchableSimulatorTab): number {
   return entry.worktreeSortIndex * 100 - (entry.isCurrentWorktree ? 1000 : 0)
 }
 
-export function simulatorPaletteTabTitle(tab: Tab): string {
-  return tab.label || 'Mobile Emulator'
-}
+export { simulatorPaletteTabTitle } from '@/i18n/emulator-copy'
 
 function baseResult(
   entry: SearchableSimulatorTab,

@@ -64,6 +64,7 @@ vi.mock('react', async () => {
 
 vi.mock('@xterm/xterm', () => ({
   Terminal: class Terminal {
+    static strings = { promptLabel: 'Terminal input', tooMuchOutput: 'Too much output' }
     options: Record<string, unknown>
     open: Mock
     write: Mock

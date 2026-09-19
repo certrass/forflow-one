@@ -75,13 +75,19 @@ function getReviewStatusLabel(review: WorktreeCardPrDisplay): string {
     return `${label}: Draft`
   }
   if (review.status === 'failure') {
-    return `${label} checks: Failed`
+    return translate('forflow.dynamicCopy.6959b493d3', '{{value0}} checks: Failed', {
+      value0: label
+    })
   }
   if (review.status === 'pending') {
-    return `${label} checks: Pending`
+    return translate('forflow.dynamicCopy.4ec8fa38e5', '{{value0}} checks: Pending', {
+      value0: label
+    })
   }
   if (review.status === 'success') {
-    return `${label} checks: Passing`
+    return translate('forflow.dynamicCopy.7b0a6793c6', '{{value0}} checks: Passing', {
+      value0: label
+    })
   }
   return `${label}: Open`
 }

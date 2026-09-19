@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../shared/workspace-source'
 import type {
@@ -173,13 +174,13 @@ export function getCreationProgressLabel(
   entry: Pick<PendingWorktreeCreation, 'phase' | 'indeterminate'>
 ): string {
   if (entry.phase === 'provisioning-vm') {
-    return 'Provisioning VM…'
+    return translate('forflow.desktopCopy.5539b1ba30', 'Provisioning VM…')
   }
   if (entry.indeterminate) {
-    return 'Setting up your workspace…'
+    return translate('forflow.desktopCopy.1506263d7c', 'Setting up your workspace…')
   }
   if (entry.phase === 'preparing') {
-    return 'Preparing workspace…'
+    return translate('forflow.desktopCopy.455db8f888', 'Preparing workspace…')
   }
   return entry.phase === 'creating' ? 'Creating worktree…' : 'Fetching base branch…'
 }

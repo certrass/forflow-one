@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { JiraIssue } from '../../../shared/jira-types'
 
 export type TaskPageJiraLoadError = {
@@ -42,24 +43,45 @@ function getErrorDetails(message: string, code: number | null): string | null {
 
 function getIssueSearchErrorSummary(message: string, code: number | null): string {
   if (code === 401) {
-    return 'Jira authentication failed. Reconnect Jira in Settings, then try again.'
+    return translate(
+      'forflow.desktopCopy.fa94bad711',
+      'Jira authentication failed. Reconnect Jira in Settings, then try again.'
+    )
   }
   if (code === 403) {
-    return 'Jira denied access to this issue search. Check project permissions or try a different JQL query.'
+    return translate(
+      'forflow.desktopCopy.c72a5cedc3',
+      'Jira denied access to this issue search. Check project permissions or try a different JQL query.'
+    )
   }
   if (code === 429) {
-    return 'Jira rate-limited this issue search. Try again in a moment.'
+    return translate(
+      'forflow.desktopCopy.1a4c036191',
+      'Jira rate-limited this issue search. Try again in a moment.'
+    )
   }
   if (code !== null && code >= 500) {
-    return 'Jira had a server error while loading issues. Try again in a moment.'
+    return translate(
+      'forflow.desktopCopy.89bb5b48ac',
+      'Jira had a server error while loading issues. Try again in a moment.'
+    )
   }
   if (/\bjql\b|\bsyntax\b/i.test(message)) {
-    return "Jira couldn't run this JQL query. Check the syntax and try again."
+    return translate(
+      'forflow.desktopCopy.91748c2834',
+      "Jira couldn't run this JQL query. Check the syntax and try again."
+    )
   }
   if (/\bnetwork\b|\bfetch failed\b|\btimed? ?out\b|\beconn/i.test(message)) {
-    return "Couldn't reach Jira. Check your connection and try again."
+    return translate(
+      'forflow.desktopCopy.3f893d9724',
+      "Couldn't reach Jira. Check your connection and try again."
+    )
   }
-  return "Couldn't load Jira issues. Try again in a moment."
+  return translate(
+    'forflow.desktopCopy.9120f058ba',
+    "Couldn't load Jira issues. Try again in a moment."
+  )
 }
 
 export function createTaskPageJiraLoadFailureState(error: unknown): TaskPageJiraLoadFailureState {

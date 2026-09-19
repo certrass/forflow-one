@@ -2,13 +2,7 @@ import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
-import {
-  SOURCE_CONTROL_TREE_FILE_PADDING_PX,
-  SOURCE_CONTROL_TREE_INDENT_PX,
-  SUBMODULE_EMPTY_LABEL,
-  SUBMODULE_ERROR_LABEL,
-  SUBMODULE_LOADING_LABEL
-} from './row-layout'
+import { SOURCE_CONTROL_TREE_FILE_PADDING_PX, SOURCE_CONTROL_TREE_INDENT_PX } from './row-layout'
 
 export function SubmodulePlaceholderRow({
   depth,
@@ -21,15 +15,15 @@ export function SubmodulePlaceholderRow({
 }): React.JSX.Element {
   const fallback =
     state === 'error'
-      ? SUBMODULE_ERROR_LABEL
+      ? translate('forflow.finalCopy.9e8fc276af', 'Failed to load submodule changes')
       : state === 'empty'
-        ? SUBMODULE_EMPTY_LABEL
+        ? translate('forflow.finalCopy.01c66fe5a2', 'No changes in submodule')
         : state === 'truncated'
           ? translate(
               'auto.components.right.sidebar.SourceControl.submoduleTruncated',
               'More submodule changes were omitted'
             )
-          : SUBMODULE_LOADING_LABEL
+          : translate('forflow.finalCopy.338e9360a7', 'Loading submodule changes…')
   return (
     <div
       className={cn(

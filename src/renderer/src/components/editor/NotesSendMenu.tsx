@@ -16,7 +16,9 @@ import { cn } from '@/lib/utils'
 import { ReviewNotesSendMenuContent } from './ReviewNotesSendMenuContent'
 import { translate } from '@/i18n/i18n'
 
-const ENABLED_SEND_TOOLTIP = 'Send notes to an agent'
+function enabledSendTooltip(): string {
+  return translate('forflow.finalCopy.ff47109d69', 'Send notes to an agent')
+}
 
 export type NotesSendMenuScope<TNote> = {
   id: string
@@ -69,7 +71,7 @@ export function NotesSendMenu<TNote>({
   triggerLabel,
   triggerCount,
   actionLabel,
-  disabledTooltip = 'All notes sent',
+  disabledTooltip = translate('forflow.finalCopy.118960bbad', 'All notes sent'),
   iconClassName = 'size-3.5',
   align = 'end',
   openRequestNonce = null,
@@ -181,7 +183,7 @@ export function NotesSendMenu<TNote>({
                 triggerClassName
               )}
               disabled={!hasDeliverableNotes}
-              title={hasDeliverableNotes ? ENABLED_SEND_TOOLTIP : disabledTooltip}
+              title={hasDeliverableNotes ? enabledSendTooltip() : disabledTooltip}
               aria-label={
                 triggerLabel
                   ? translate(
@@ -189,7 +191,7 @@ export function NotesSendMenu<TNote>({
                       'Send {{value0}} to an agent',
                       { value0: triggerLabel }
                     )
-                  : ENABLED_SEND_TOOLTIP
+                  : enabledSendTooltip()
               }
               onMouseDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}
@@ -212,7 +214,7 @@ export function NotesSendMenu<TNote>({
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent side="bottom" sideOffset={6}>
-          {hasDeliverableNotes ? ENABLED_SEND_TOOLTIP : disabledTooltip}
+          {hasDeliverableNotes ? enabledSendTooltip() : disabledTooltip}
         </TooltipContent>
       </Tooltip>
       <DropdownMenuContent

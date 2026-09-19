@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { JSX, ReactNode } from 'react'
 import {
@@ -53,7 +54,7 @@ export function FeatureWallTourSurface({
   onDone,
   className,
   panelClassName,
-  doneLabel = 'Done',
+  doneLabel = translate('forflow.desktopCopy.11a6767d56', 'Done'),
   footerText = 'Reopen any time from Help > Explore Orca.',
   enableKeyboardShortcut = true,
   compactRail = false,

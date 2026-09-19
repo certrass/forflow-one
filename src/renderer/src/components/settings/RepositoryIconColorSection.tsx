@@ -59,7 +59,7 @@ export function RepositoryIconColorSection({
                 )
           }
           selected={!isPresetBadgeColor}
-          triggerLabel="Custom"
+          triggerLabel={translate('forflow.jsxCopy.494ca78f73', 'Custom')}
           showHexInTrigger={!isPresetBadgeColor}
           className="h-7 px-2"
         />

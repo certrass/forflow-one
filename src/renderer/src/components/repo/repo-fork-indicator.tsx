@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import { GitFork } from 'lucide-react'
 import type { GitHubRepositoryIdentity } from '../../../../shared/github/pull-request-types'
@@ -18,7 +19,10 @@ export function RepoForkIndicator({
   if (!upstream) {
     return null
   }
-  const label = `Fork of ${upstream.owner}/${upstream.repo}`
+  const label = translate('forflow.dynamicCopy.30d47cbb06', 'Fork of {{value0}}/{{value1}}', {
+    value0: upstream.owner,
+    value1: upstream.repo
+  })
   return (
     <Tooltip>
       <TooltipTrigger asChild>

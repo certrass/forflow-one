@@ -60,7 +60,7 @@ export function activityThreadResponseRenderPreview({
 
 export function agentTitle(event: ActivityEvent): string {
   if (event.state === 'working') {
-    return 'Agent working'
+    return translate('forflow.desktopCopy.250e25c05e', 'Agent working')
   }
   if (event.state === 'done') {
     return event.entry.interrupted ? 'Agent interrupted' : 'Agent finished'

@@ -322,7 +322,7 @@ function formatAgentRelativeTime(agent: DashboardAgentRowData, now: number): str
 function formatTimeAgo(ts: number, now: number): string {
   const delta = now - ts
   if (delta < 60_000) {
-    return 'just now'
+    return translate('forflow.desktopCopy.7ddb44d8a5', 'just now')
   }
   const minutes = Math.floor(delta / 60_000)
   if (minutes < 60) {

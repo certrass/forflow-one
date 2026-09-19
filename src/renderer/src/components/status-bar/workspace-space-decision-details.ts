@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type {
   AgentStatusEntry,
   MigrationUnsupportedPtyEntry
@@ -95,7 +96,7 @@ function getBranchStatus(
     return null
   }
   if (status.ahead === 0 && status.behind === 0) {
-    return 'Synced with upstream'
+    return translate('forflow.desktopCopy.5573371da5', 'Synced with upstream')
   }
   const parts: string[] = []
   if (status.ahead > 0) {

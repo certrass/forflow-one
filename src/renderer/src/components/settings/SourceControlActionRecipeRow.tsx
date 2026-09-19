@@ -80,7 +80,10 @@ export function SourceControlActionRecipeRow({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-0.5">
           <p className="text-xs font-medium text-foreground">
-            {SOURCE_CONTROL_ACTION_LABELS[actionId]}
+            {translate(
+              `forflow.sourceControl.actions.${actionId}`,
+              SOURCE_CONTROL_ACTION_LABELS[actionId]
+            )}
           </p>
           <p className="text-[11px] text-muted-foreground">{getActionDescriptions()[actionId]}</p>
         </div>

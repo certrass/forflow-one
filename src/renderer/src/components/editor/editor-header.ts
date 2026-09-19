@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { OpenFile } from '@/store/slices/editor'
 import type { GitBranchChangeEntry } from '../../../../shared/git-diff-compare-types'
 import type { GitStatusEntry } from '../../../../shared/git-status-types'
@@ -23,8 +24,8 @@ export function getEditorHeaderCopyState(file: OpenFile): EditorHeaderCopyState 
   if (file.mode === 'conflict-review') {
     return {
       copyText: file.filePath,
-      copyToastLabel: 'Worktree path copied',
-      pathLabel: 'Conflict Review',
+      copyToastLabel: translate('forflow.copy.worktreePath', 'Worktree path copied'),
+      pathLabel: translate('forflow.desktopCopy.d4985f0994', 'Conflict Review'),
       pathTitle: file.filePath
     }
   }
@@ -49,7 +50,7 @@ export function getEditorHeaderCopyState(file: OpenFile): EditorHeaderCopyState 
   if (isCombinedDiff) {
     return {
       copyText: file.filePath,
-      copyToastLabel: 'Worktree path copied',
+      copyToastLabel: translate('forflow.copy.worktreePath', 'Worktree path copied'),
       pathLabel: file.relativePath,
       pathTitle: file.filePath
     }
@@ -59,7 +60,7 @@ export function getEditorHeaderCopyState(file: OpenFile): EditorHeaderCopyState 
 
   return {
     copyText: file.filePath,
-    copyToastLabel: 'File path copied',
+    copyToastLabel: translate('forflow.copy.filePath', 'File path copied'),
     pathLabel: displayLabel,
     pathTitle: displayLabel
   }

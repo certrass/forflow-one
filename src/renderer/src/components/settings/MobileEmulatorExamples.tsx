@@ -5,11 +5,22 @@ import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { translate } from '@/i18n/i18n'
 
-const EMULATOR_EXAMPLE_PROMPTS = [
-  'Using Orca CLI, attach to the active iPhone simulator, sign in with the test account, complete onboarding, and tell me where the flow feels confusing.',
-  'With Orca CLI, run through the mobile checkout flow from product search to confirmation, capture any broken screens, and summarize the exact step that fails.',
-  'Using Orca CLI, grant camera permission, scan a test QR code or inject a camera fixture, finish the account-linking flow, and report whether the app reaches the success state.'
-] as const
+function getExamplePrompts(): string[] {
+  return [
+    translate(
+      'forflow.examples.MobileEmulatorExamples.4aeea86bc1',
+      'Using Orca CLI, attach to the active iPhone simulator, sign in with the test account, complete onboarding, and tell me where the flow feels confusing.'
+    ),
+    translate(
+      'forflow.examples.MobileEmulatorExamples.250d1af6bc',
+      'With Orca CLI, run through the mobile checkout flow from product search to confirmation, capture any broken screens, and summarize the exact step that fails.'
+    ),
+    translate(
+      'forflow.examples.MobileEmulatorExamples.c5c8970a52',
+      'Using Orca CLI, grant camera permission, scan a test QR code or inject a camera fixture, finish the account-linking flow, and report whether the app reaches the success state.'
+    )
+  ]
+}
 
 async function copyPrompt(prompt: string): Promise<void> {
   try {
@@ -58,7 +69,7 @@ export function MobileEmulatorExamples({
         )}
       </p>
       <ul className="mt-3 space-y-2">
-        {EMULATOR_EXAMPLE_PROMPTS.map((prompt) => (
+        {getExamplePrompts().map((prompt) => (
           <li
             key={prompt}
             className="flex items-start gap-2 rounded-lg border border-border bg-background px-3 py-2"

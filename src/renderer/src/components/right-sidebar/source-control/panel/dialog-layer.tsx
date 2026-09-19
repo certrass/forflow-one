@@ -224,7 +224,7 @@ export function SourceControlDialogLayer({
           'auto.components.right.sidebar.SourceControl.f4c766f1ca',
           'Choose the agent and command template for this run.'
         )}
-        generateLabel="Generate"
+        generateLabel={translate('forflow.jsxCopy.49e49bb440', 'Generate')}
         settings={settings}
         repo={repo}
         discoveryHostKey={discoveryHostKey}
@@ -244,7 +244,7 @@ export function SourceControlDialogLayer({
           'auto.components.right.sidebar.SourceControl.f4c766f1ca',
           'Choose the agent and command template for this run.'
         )}
-        generateLabel="Generate"
+        generateLabel={translate('forflow.jsxCopy.49e49bb440', 'Generate')}
         settings={settings}
         repo={repo}
         discoveryHostKey={discoveryHostKey}

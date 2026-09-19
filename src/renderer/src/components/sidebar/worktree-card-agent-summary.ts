@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { AgentDotState } from '@/components/AgentStateDot'
 import type { DashboardAgentRow as DashboardAgentRowData } from '@/components/dashboard/useDashboardData'
 import { formatAgentTypeLabel } from '@/lib/agent-status'
@@ -30,25 +31,25 @@ export function getAgentDotState(agent: DashboardAgentRowData): AgentDotState {
 export function formatSummaryStateLabel(state: AgentDotState): string {
   switch (state) {
     case 'waiting':
-      return 'waiting'
+      return translate('forflow.finalCopy.80cfa3e7f2', 'waiting')
     case 'blocked':
-      return 'blocked'
+      return translate('forflow.finalCopy.6973dddd3e', 'blocked')
     case 'interrupted':
-      return 'interrupted'
+      return translate('forflow.finalCopy.d512d96ea3', 'interrupted')
     case 'failed':
-      return 'failed'
+      return translate('forflow.finalCopy.5d28a90f44', 'failed')
     case 'working':
-      return 'working'
+      return translate('forflow.finalCopy.dd5ace9e01', 'working')
     case 'monitoring':
-      return 'monitoring'
+      return translate('forflow.finalCopy.14a2326b6b', 'monitoring')
     case 'done':
-      return 'done'
+      return translate('forflow.finalCopy.a4c3ed04a9', 'done')
     case 'idle':
-      return 'idle'
+      return translate('forflow.finalCopy.4fb6234885', 'idle')
     case 'unverifiable':
-      return 'not reporting'
+      return translate('forflow.desktopCopy.b949b6c663', 'not reporting')
     case 'permission':
-      return 'needs attention'
+      return translate('forflow.desktopCopy.ca25baf7eb', 'needs attention')
   }
 }
 
@@ -87,7 +88,10 @@ export function summarizeAgents(agents: DashboardAgentRowData[], subjectLabel: s
     const onlyStatusLabel = parts[0].replace(/^\d+\s+/, '')
     return agents.length === 1
       ? `${subjectLabel} ${onlyStatusLabel}`
-      : `All ${subjectLabel} ${onlyStatusLabel}`
+      : translate('forflow.finalCopy.0ab5c44a9a', 'All {{subject}} {{status}}', {
+          subject: subjectLabel,
+          status: onlyStatusLabel
+        })
   }
   return `${subjectLabel}: ${parts.join(', ')}`
 }

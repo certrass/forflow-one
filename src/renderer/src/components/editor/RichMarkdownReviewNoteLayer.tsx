@@ -142,7 +142,7 @@ export function RichMarkdownReviewNoteLayer({
                   ]}
                   targetModeLabel="This note"
                   triggerClassName="rich-markdown-review-note-action"
-                  disabledTooltip="Note already sent"
+                  disabledTooltip={translate('forflow.finalCopy.a1e08a81d8', 'Note already sent')}
                   onDelivered={onDelivered}
                 />
               </>

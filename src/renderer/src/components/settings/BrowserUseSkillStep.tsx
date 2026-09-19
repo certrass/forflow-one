@@ -46,8 +46,11 @@ export function BrowserUseSkillStep({
       )}
       command={command}
       installedCommand={installedCommand}
-      terminalTitle="Browser Use setup"
-      terminalAriaLabel="Browser Use skill install terminal"
+      terminalTitle={translate('forflow.jsxCopy.8762c5cfbc', 'Browser Use setup')}
+      terminalAriaLabel={translate(
+        'forflow.jsxCopy.a18f87f1e5',
+        'Browser Use skill install terminal'
+      )}
       terminalWorktreeId="settings-browser-use-skill-terminal"
       terminalShellOverride={terminalShellOverride}
       terminalRuntime={terminalRuntime}

@@ -63,7 +63,11 @@ export function shouldShowLaunchWatchdogTimeout({ hasPty }: { hasPty: boolean })
 }
 
 function getLaunchWatchdogTimeoutMessage(label: string): string {
-  return `Couldn't launch ${label} — the terminal did not start.`
+  return translate(
+    'forflow.dynamicCopy.281fddc318',
+    "Couldn't launch {{value0}} — the terminal did not start.",
+    { value0: label }
+  )
 }
 
 function getTerminalLaunchState(tabId: string): { stillOpen: boolean; hasPty: boolean } {

@@ -267,7 +267,7 @@ export function useCommentsListState({
                 'Add a PR comment'
               )
         }
-        submitLabel="Send"
+        submitLabel={translate('forflow.jsxCopy.f6f4688ff2', 'Send')}
         autoFocus
         disabled={commentsDisabled}
         disabledReason={commentsDisabledReason}

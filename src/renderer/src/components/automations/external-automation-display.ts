@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import type { Badge } from '@/components/ui/badge'
 import type {
@@ -9,7 +10,7 @@ import { formatAutomationDateTimeWithRelative } from './automation-page-parts'
 
 export function formatExternalDate(value: string | null, now: number): string {
   if (!value) {
-    return 'Never'
+    return translate('forflow.desktopCopy.6300ef800b', 'Never')
   }
   const parsed = Date.parse(value)
   if (!Number.isFinite(parsed)) {
@@ -31,7 +32,7 @@ export function getExternalRunStatusLabel(run: ExternalAutomationRun): string {
     case 'completed':
       return 'Completed'
     case 'failed':
-      return 'Failed'
+      return translate('forflow.desktopCopy.031a8f0f65', 'Failed')
     case 'unknown':
       return 'Unknown'
   }

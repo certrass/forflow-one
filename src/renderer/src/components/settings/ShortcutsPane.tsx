@@ -164,7 +164,9 @@ export function ShortcutsPane(): React.JSX.Element {
     if (!Array.isArray(normalizedResult)) {
       setErrors((prev) => ({
         ...prev,
-        [actionId]: normalizedResult.ok ? 'Unable to parse shortcut.' : normalizedResult.error
+        [actionId]: normalizedResult.ok
+          ? translate('forflow.shortcuts.072e2b64f5', 'Unable to parse shortcut.')
+          : normalizedResult.error
       }))
       return false
     }
@@ -196,7 +198,11 @@ export function ShortcutsPane(): React.JSX.Element {
         .join(', ')
       setErrors((prev) => ({
         ...prev,
-        [actionId]: `${formatKeybindingList([blockingConflict.binding], platform)} conflicts with ${labels}.`
+        [actionId]: translate(
+          'forflow.shortcuts.conflict',
+          '{{shortcut}} conflicts with {{actions}}.',
+          { shortcut: formatKeybindingList([blockingConflict.binding], platform), actions: labels }
+        )
       }))
       return false
     }

@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 export type SimulatorDeviceRow = {
   name: string
   udid: string
@@ -25,10 +26,12 @@ export function deviceLabel(
   device: SimulatorDeviceRow | EmulatorStreamInfo | string | undefined
 ): string {
   if (!device) {
-    return 'Mobile Emulator'
+    return translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator')
   }
   if (typeof device === 'string') {
-    return device.length > 20 && device.includes('-') ? 'Mobile Emulator' : device
+    return device.length > 20 && device.includes('-')
+      ? translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator')
+      : device
   }
   if ('displayName' in device && device.displayName) {
     return device.displayName
@@ -39,7 +42,7 @@ export function deviceLabel(
   if ('device' in device && device.device && !device.device.includes('-')) {
     return device.device
   }
-  return 'Mobile Emulator'
+  return translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator')
 }
 
 /** Resolve the MJPEG endpoint serve-sim exposes for the live phone preview. */

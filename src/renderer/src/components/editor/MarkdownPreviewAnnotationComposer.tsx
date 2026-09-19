@@ -37,7 +37,7 @@ export function MarkdownPreviewSingleNoteSendMenu({
       ]}
       targetModeLabel="This note"
       triggerClassName="orca-diff-comment-pill-btn"
-      disabledTooltip="Note already sent"
+      disabledTooltip={translate('forflow.finalCopy.a1e08a81d8', 'Note already sent')}
       onDelivered={onDelivered}
     />
   )

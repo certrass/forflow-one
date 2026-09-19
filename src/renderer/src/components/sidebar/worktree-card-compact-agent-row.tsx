@@ -29,7 +29,7 @@ export function getCompactAgentSecondary(
   lastAssistantMessageOverride?: string
 ): string {
   if (agent.entry.interrupted === true) {
-    return 'Interrupted by user'
+    return translate('forflow.desktopCopy.1fe252d536', 'Interrupted by user')
   }
   // Why: the only honest thing to say about a pane Orca still holds but no longer hears
   // from is how long the silence has run; the user supplies the meaning.

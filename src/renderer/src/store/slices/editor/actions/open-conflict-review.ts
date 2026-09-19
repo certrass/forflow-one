@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { EditorGet, EditorSet } from '../types/editor-set-get'
 import type { EditorSlice } from '../types/editor-slice'
 import { joinPath } from '@/lib/path'
@@ -130,7 +131,7 @@ export function createOpenConflictReview(
                 ? {
                     ...f,
                     mode: 'conflict-review' as const,
-                    relativePath: 'Conflict Review',
+                    relativePath: translate('forflow.desktopCopy.d4985f0994', 'Conflict Review'),
                     filePath: worktreePath,
                     language: 'plaintext',
                     conflictReview,
@@ -149,7 +150,7 @@ export function createOpenConflictReview(
         const newFile: OpenFile = {
           id,
           filePath: worktreePath,
-          relativePath: 'Conflict Review',
+          relativePath: translate('forflow.desktopCopy.d4985f0994', 'Conflict Review'),
           worktreeId,
           language: 'plaintext',
           isDirty: false,
@@ -165,7 +166,13 @@ export function createOpenConflictReview(
           activeTabTypeByWorktree: { ...s.activeTabTypeByWorktree, [worktreeId]: 'editor' }
         }
       })
-      void openWorkspaceEditorItem(get(), id, worktreeId, 'Conflict Review', 'conflict-review')
+      void openWorkspaceEditorItem(
+        get(),
+        id,
+        worktreeId,
+        translate('forflow.desktopCopy.d4985f0994', 'Conflict Review'),
+        'conflict-review'
+      )
     }
   }
 }

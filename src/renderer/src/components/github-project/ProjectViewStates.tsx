@@ -89,7 +89,11 @@ function ProjectViewTab({
   if (supported) {
     return tab
   }
-  const message = `Orca doesn't support ${layoutLabel} project views yet.`
+  const message = translate(
+    'forflow.dynamicCopy.bf32dd9365',
+    "Orca doesn't support {{value0}} project views yet.",
+    { value0: layoutLabel }
+  )
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>

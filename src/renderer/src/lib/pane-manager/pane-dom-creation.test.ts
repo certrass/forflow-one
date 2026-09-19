@@ -41,13 +41,16 @@ vi.mock('@xterm/addon-web-links', () => ({
 }))
 
 vi.mock('@xterm/xterm', () => ({
-  Terminal: vi.fn().mockImplementation(function Terminal() {
-    return {
-      options: {},
-      loadAddon: vi.fn(),
-      open: vi.fn()
-    }
-  })
+  Terminal: Object.assign(
+    vi.fn().mockImplementation(function Terminal() {
+      return {
+        options: {},
+        loadAddon: vi.fn(),
+        open: vi.fn()
+      }
+    }),
+    { strings: { promptLabel: 'Terminal input', tooMuchOutput: 'Too much output' } }
+  )
 }))
 
 describe('createPaneDOM link tooltips', () => {

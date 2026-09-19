@@ -37,6 +37,7 @@ module.exports = {
     'package.json',
     'LICENSE',
     '!node_modules/**',
+    '!**/* [0-9].*',
     '!out/**/*.{test,spec}.{js,mjs,cjs}',
     '!out/**/*.map',
     '!out/electron-dev/**',
@@ -44,7 +45,14 @@ module.exports = {
     '!resources/speech/**',
     '!resources/speech-samples/**',
     '!resources/win32/node-modules/**',
-    '!resources/forflow/model.env*'
+    '!resources/forflow/model.env*',
+    '!resources/logo.svg',
+    '!resources/icon.png',
+    '!resources/icon-dev.png',
+    '!resources/app-icons/**',
+    '!resources/icon-source/**',
+    '!resources/build/icon.*',
+    '!resources/tray/orca-menu-bar*'
   ],
   mac: {
     ...base.mac,

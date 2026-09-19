@@ -168,8 +168,8 @@ export function SshTargetDestructiveActions({
           'This will remove the target and end any active remote terminals.'
         )}
         targetLabel={pendingRemove?.label}
-        actionLabel="Remove"
-        busyLabel="Removing"
+        actionLabel={translate('forflow.jsxCopy.c3812fc4ac', 'Remove')}
+        busyLabel={translate('forflow.jsxCopy.9f2c59a113', 'Removing')}
         isBusy={pendingRemoveIsBusy}
         onOpenChange={(open) => {
           if (pendingRemoveIsBusy) {
@@ -195,8 +195,8 @@ export function SshTargetDestructiveActions({
           'This force-stops the remote relay for this SSH target. Active remote terminals and port forwards for this target will end.'
         )}
         targetLabel={dialogPendingReset?.label}
-        actionLabel="Reset Relay"
-        busyLabel="Resetting"
+        actionLabel={translate('forflow.jsxCopy.3dd039ea9d', 'Reset Relay')}
+        busyLabel={translate('forflow.jsxCopy.2740f15dd7', 'Resetting')}
         isBusy={pendingResetIsBusy}
         onOpenChange={(open) => {
           if (pendingResetIsBusy) {
@@ -220,8 +220,8 @@ export function SshTargetDestructiveActions({
           'This will stop active terminal sessions on this SSH target. Reconnecting will not restore them.'
         )}
         targetLabel={pendingTerminate?.label}
-        actionLabel="End Terminals"
-        busyLabel="Ending"
+        actionLabel={translate('forflow.jsxCopy.9f36c7e95b', 'End Terminals')}
+        busyLabel={translate('forflow.jsxCopy.a17bfde380', 'Ending')}
         isBusy={pendingTerminateIsBusy}
         onOpenChange={(open) => {
           if (pendingTerminateIsBusy) {

@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import {
   getExecutionHostLabel,
   isRuntimeOwnedSshTargetId,
@@ -256,11 +257,11 @@ function getHostHealthUnavailableDetail(
 ): string | null {
   switch (health) {
     case 'connecting':
-      return 'Connecting to host'
+      return translate('forflow.desktopCopy.e2bdd408b3', 'Connecting to host')
     case 'disconnected':
-      return 'Connect this host to set up projects'
+      return translate('forflow.desktopCopy.28183c1c70', 'Connect this host to set up projects')
     case 'error':
-      return 'Host connection needs attention'
+      return translate('forflow.desktopCopy.dba2fc5fba', 'Host connection needs attention')
     case 'available':
     case 'blocked':
     case 'local':
@@ -304,13 +305,16 @@ function getHostConnectAction(
 function getPendingSetupDetail(setup: ProjectHostSetup): string {
   switch (setup.setupState) {
     case 'not-set-up':
-      return 'Project tracked on this host but not set up'
+      return translate(
+        'forflow.desktopCopy.9c40dd9bfb',
+        'Project tracked on this host but not set up'
+      )
     case 'setting-up':
-      return 'Project setup is in progress'
+      return translate('forflow.desktopCopy.4919551845', 'Project setup is in progress')
     case 'error':
-      return 'Project setup needs attention'
+      return translate('forflow.desktopCopy.7e9727e4aa', 'Project setup needs attention')
     case 'unsupported':
-      return 'Project is unsupported on this host'
+      return translate('forflow.desktopCopy.e379e914c5', 'Project is unsupported on this host')
     case 'ready':
       return setup.path
   }

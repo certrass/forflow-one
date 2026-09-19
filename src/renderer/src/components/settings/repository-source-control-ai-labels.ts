@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import {
   DEFAULT_SOURCE_CONTROL_ACTION_COMMAND_TEMPLATES,
@@ -79,7 +80,7 @@ export function commandTemplateStateLabel(args: {
   actionId: SourceControlActionId
 }): string {
   if (args.hasOverride) {
-    return 'Repository custom prompt'
+    return translate('forflow.desktopCopy.64d21335b4', 'Repository custom prompt')
   }
   return args.inheritedTemplate === DEFAULT_SOURCE_CONTROL_ACTION_COMMAND_TEMPLATES[args.actionId]
     ? 'Orca default prompt'

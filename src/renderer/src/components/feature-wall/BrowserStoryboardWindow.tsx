@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import type { JSX, ReactNode } from 'react'
 import { ClaudeIcon } from '@/components/status-bar/icons'
 import { translate } from '@/i18n/i18n'
@@ -203,7 +204,13 @@ export function BrowserStoryboardWindow(props: {
             <div className="min-h-[28px] flex-1 break-words font-sans text-[10px] leading-[1.35] text-popover-foreground">
               {state.typedChars > 0 ? (
                 <>
-                  {BROWSER_PROMPT_TEXT.slice(0, state.typedChars)}
+                  {localizedDemoCopy(BROWSER_PROMPT_TEXT).slice(
+                    0,
+                    Math.ceil(
+                      (state.typedChars * localizedDemoCopy(BROWSER_PROMPT_TEXT).length) /
+                        BROWSER_PROMPT_TEXT.length
+                    )
+                  )}
                   <span className="ml-px inline-block h-2 w-px translate-y-[1px] bg-popover-foreground align-baseline" />
                 </>
               ) : (

@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { BrowserWindow, dialog } from 'electron'
 import { mkdir, readFile, rename, rm, stat } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
@@ -18,7 +19,7 @@ export async function importPetBundle(
     BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow()
   // Why: the bundle is a folder, but Finder may let users pick `pet.json` inside it — post-pick logic walks up to the parent.
   const options: Electron.OpenDialogOptions = {
-    title: 'Pick a .codex-pet bundle',
+    title: translateMain('forflow.nativeCopy.ad1e394464', 'Pick a .codex-pet bundle'),
     properties: ['openFile', 'openDirectory', 'treatPackageAsDirectory']
   }
   const result = senderWindow
@@ -33,7 +34,9 @@ export async function importPetBundle(
     const pickedStat = await stat(picked)
     bundleDir = pickedStat.isDirectory() ? picked : dirname(picked)
   } catch {
-    throw new Error('Could not read the selected path.')
+    throw new Error(
+      translateMain('forflow.nativeCopy.ef6acb3726', 'Could not read the selected path.')
+    )
   }
 
   const manifestPath = join(bundleDir, 'pet.json')
@@ -41,13 +44,15 @@ export async function importPetBundle(
   try {
     manifestStat = await stat(manifestPath)
   } catch {
-    throw new Error('Bundle is missing pet.json.')
+    throw new Error(translateMain('forflow.nativeCopy.0d9448f266', 'Bundle is missing pet.json.'))
   }
   if (!manifestStat.isFile() || manifestStat.size > MAX_MANIFEST_BYTES) {
-    throw new Error('pet.json is invalid.')
+    throw new Error(translateMain('forflow.nativeCopy.7c90ccca17', 'pet.json is invalid.'))
   }
   if (await isSymlink(manifestPath)) {
-    throw new Error('pet.json must not be a symlink.')
+    throw new Error(
+      translateMain('forflow.nativeCopy.14bdbd8fc5', 'pet.json must not be a symlink.')
+    )
   }
 
   let manifest: ResolvedPetManifest<PetManifest>
@@ -55,7 +60,9 @@ export async function importPetBundle(
     const raw = await readFile(manifestPath, 'utf8')
     // Why: defend against TOCTOU — the file may have grown between the stat check and this read.
     if (Buffer.byteLength(raw, 'utf8') > MAX_MANIFEST_BYTES) {
-      throw new Error('pet.json exceeded the manifest size limit.')
+      throw new Error(
+        translateMain('forflow.nativeCopy.9b6c092f5f', 'pet.json exceeded the manifest size limit.')
+      )
     }
     manifest = applyCodexPetDefaults(PetManifestSchema.parse(JSON.parse(raw)))
   } catch (error) {

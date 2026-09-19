@@ -89,13 +89,26 @@ export function buildSourceControlAgentStatusCopy(args: {
     detecting
   } = args
   if (selectedAgentUnavailable) {
-    return `${getAgentCatalog().find((entry) => entry.id === selectedAgent)?.label ?? selectedAgent} is not enabled or was not detected on this workspace host.`
+    return translate(
+      'forflow.dynamicCopy.0f0dd9f8c2',
+      '{{value0}} is not enabled or was not detected on this workspace host.',
+      {
+        value0:
+          getAgentCatalog().find((entry) => entry.id === selectedAgent)?.label ?? selectedAgent
+      }
+    )
   }
   if (connectionUnavailable) {
-    return 'Unable to resolve the workspace connection.'
+    return translate(
+      'forflow.desktopCopy.757ee97a64',
+      'Unable to resolve the workspace connection.'
+    )
   }
   if (!hasEnabledAgents && !detecting) {
-    return 'No enabled agents were detected on this workspace host.'
+    return translate(
+      'forflow.desktopCopy.5635e0e197',
+      'No enabled agents were detected on this workspace host.'
+    )
   }
   return null
 }

@@ -51,7 +51,10 @@ function getDialogTitle(report: CrashReportRecord | null): string {
 
 function getDialogDescription(report: CrashReportRecord | null): string {
   if (!report) {
-    return 'Send a privacy-safe crash report. Recent redacted diagnostic logs are included when available.'
+    return translate(
+      'forflow.desktopCopy.d821eeda74',
+      'Send a privacy-safe crash report. Recent redacted diagnostic logs are included when available.'
+    )
   }
   return report && isReactErrorBoundaryReport(report)
     ? 'Send a privacy-safe diagnostic report to help us understand the failed UI surface.'
@@ -60,7 +63,7 @@ function getDialogDescription(report: CrashReportRecord | null): string {
 
 function getNotesPlaceholder(report: CrashReportRecord | null): string {
   if (!report) {
-    return 'Optional: what happened?'
+    return translate('forflow.desktopCopy.12eaf46359', 'Optional: what happened?')
   }
   return report && isReactErrorBoundaryReport(report)
     ? 'Optional: what were you doing before this UI error?'

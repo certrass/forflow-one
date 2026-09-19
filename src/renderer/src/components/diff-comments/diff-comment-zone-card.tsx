@@ -109,7 +109,7 @@ export function renderDiffCommentZoneCard(
               scopes={getSingleCommentSendScopes(comment, formatCommentPrompt)}
               targetModeLabel="This note"
               triggerClassName="orca-diff-comment-edit"
-              disabledTooltip="Note already sent"
+              disabledTooltip={translate('forflow.finalCopy.a1e08a81d8', 'Note already sent')}
               onDelivered={(notes) => void clearDeliveredDiffComments(worktreeId, notes)}
             />
           ) : null

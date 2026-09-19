@@ -142,8 +142,11 @@ export function FloatingTerminalOrchestrationDialog({
           )}
           command={installCommand}
           installedCommand={updateCommand}
-          terminalTitle="Orchestration setup"
-          terminalAriaLabel="Orchestration skill install terminal"
+          terminalTitle={translate('forflow.jsxCopy.9f95b259da', 'Orchestration setup')}
+          terminalAriaLabel={translate(
+            'forflow.jsxCopy.04fad60494',
+            'Orchestration skill install terminal'
+          )}
           terminalWorktreeId="floating-terminal-orchestration-skill-terminal"
           terminalShellOverride={activeSkillRuntime.terminalShellOverride}
           terminalRuntime={activeSkillRuntime.agentRuntime}
@@ -153,7 +156,7 @@ export function FloatingTerminalOrchestrationDialog({
           installDisabled={Boolean(activeSkillRuntime.installDisabledReason)}
           variant="inline"
           hideHeader
-          installLabel="Install CLI & skill"
+          installLabel={translate('forflow.jsxCopy.aecee6ca40', 'Install CLI & skill')}
           preInstallNotice={AGENT_SKILL_CLI_PREREQUISITE_NOTICE}
           getPrerequisiteStatus={() =>
             activeSkillRuntime.agentRuntime?.runtime === 'wsl'

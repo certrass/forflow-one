@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import type { GitConflictOperation } from '../../../../shared/git-status-types'
 import type { CheckStatus } from '../../../../shared/github/pull-request-types'
@@ -16,7 +17,7 @@ export function checksLabel(status: CheckStatus): string {
     case 'failure':
       return 'Failing'
     case 'pending':
-      return 'Pending'
+      return translate('forflow.desktopCopy.331551b0de', 'Pending')
     case 'neutral':
       return ''
   }

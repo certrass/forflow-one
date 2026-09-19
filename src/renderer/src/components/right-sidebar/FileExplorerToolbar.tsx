@@ -173,7 +173,7 @@ export function FileExplorerToolbar({
           <WorktreeOpenInMenuItems
             worktreePath={worktreePath}
             connectionId={connectionId}
-            labelPrefix="Open in "
+            labelPrefix={translate('forflow.jsxCopy.f1d2860ac7', 'Open in ')}
           />
         </DropdownMenuContent>
       </DropdownMenu>

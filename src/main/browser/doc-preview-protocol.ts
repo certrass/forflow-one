@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { protocol, session } from 'electron'
 import {
   DOC_PREVIEW_PARTITION,
@@ -133,7 +134,7 @@ export function installDocPreviewProtocolHandler(): void {
       id: DOC_PREVIEW_PARTITION,
       scope: 'isolated',
       partition: DOC_PREVIEW_PARTITION,
-      label: 'Document preview',
+      label: translateMain('forflow.nativeCopy.7009e4afe3', 'Document preview'),
       source: null,
       userAgentMode: 'clean'
     },

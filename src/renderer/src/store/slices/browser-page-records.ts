@@ -44,7 +44,7 @@ export function normalizeBrowserTitle(
     !title
   ) {
     // Why: don't surface the internal blank-guest URL as a title (leaks an impl detail, looks broken); show "New Tab" instead.
-    return 'New Tab'
+    return translate('forflow.desktopCopy.b2f8fd6392', 'New Tab')
   }
   return title
 }

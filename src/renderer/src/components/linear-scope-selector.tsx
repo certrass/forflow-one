@@ -106,7 +106,7 @@ function summarizeTeamKeys(
 ): string {
   const selectedTeams = teams.filter((team) => selectedTeamIds.has(team.id))
   if (selectedTeams.length === 0) {
-    return 'All teams'
+    return translate('forflow.desktopCopy.bf65fc89ca', 'All teams')
   }
 
   if (options.activeAllWorkspaces && options.multipleWorkspaces) {
@@ -140,7 +140,7 @@ export function getLinearScopeTriggerLabel({
     teams.length > 0 && teams.every((team) => selectedTeamIds.has(team.id))
   const teamLabel =
     teamSelectionIsStickyAll || selectedTeamIds.size === 0 || allVisibleTeamsSelected
-      ? 'All teams'
+      ? translate('forflow.desktopCopy.bf65fc89ca', 'All teams')
       : summarizeTeamKeys(teams, selectedTeamIds, {
           activeAllWorkspaces,
           multipleWorkspaces

@@ -14,16 +14,18 @@ const RECENT_DAY_COUNT = 42
 
 function formatPercent(value: number | null): string {
   if (value === null) {
-    return 'n/a'
+    return translate('forflow.usage.67a926f700', 'Not available')
   }
   return `${Math.round(value * 100)}%`
 }
 
 function formatUpdatedAt(timestamp: number | null): string {
   if (!timestamp) {
-    return 'Not scanned yet'
+    return translate('forflow.usage.50e631f628', 'Not scanned yet')
   }
-  return `Updated ${new Date(timestamp).toLocaleString()}`
+  return translate('forflow.usage.updated', 'Updated {{time}}', {
+    time: new Date(timestamp).toLocaleString()
+  })
 }
 
 export function UsageOverviewPane(): React.JSX.Element {

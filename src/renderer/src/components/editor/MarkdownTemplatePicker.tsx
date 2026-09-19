@@ -73,7 +73,7 @@ export function MarkdownTemplatePicker(): JSX.Element {
             'No matching templates.'
           )}
         </CommandEmpty>
-        <CommandGroup heading="New Document">
+        <CommandGroup heading={translate('forflow.jsxCopy.21a8775d2b', 'New Document')}>
           <CommandItem
             value="blank markdown document"
             className="items-start gap-3"
@@ -97,7 +97,7 @@ export function MarkdownTemplatePicker(): JSX.Element {
           </CommandItem>
         </CommandGroup>
         {activeRequest && (
-          <CommandGroup heading="Templates">
+          <CommandGroup heading={translate('forflow.jsxCopy.56b564b75c', 'Templates')}>
             {activeRequest.templates.map((template) => (
               <CommandItem
                 key={template.id}

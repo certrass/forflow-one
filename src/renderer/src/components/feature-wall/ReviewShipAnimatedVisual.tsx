@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import { useEffect, useRef } from 'react'
 import type { JSX } from 'react'
 import { GitBranch, Sparkles } from 'lucide-react'
@@ -161,7 +162,7 @@ export function ReviewShipAnimatedVisual(props: { reducedMotion: boolean }): JSX
           return
         }
 
-        for (const ch of COMMIT_MSG) {
+        for (const ch of localizedDemoCopy(COMMIT_MSG)) {
           if (cancelled) {
             return
           }
@@ -208,7 +209,7 @@ export function ReviewShipAnimatedVisual(props: { reducedMotion: boolean }): JSX
         if (prTitlePh) {
           prTitlePh.style.display = 'none'
         }
-        for (const ch of PR_TITLE) {
+        for (const ch of localizedDemoCopy(PR_TITLE)) {
           if (cancelled) {
             return
           }
@@ -218,7 +219,7 @@ export function ReviewShipAnimatedVisual(props: { reducedMotion: boolean }): JSX
         if (prBodyPh) {
           prBodyPh.style.display = 'none'
         }
-        for (const ch of PR_BODY) {
+        for (const ch of localizedDemoCopy(PR_BODY)) {
           if (cancelled) {
             return
           }

@@ -245,15 +245,15 @@ function getAvailabilityStatusLabel(availability: TaskSourceHostAvailability): s
     case undefined:
       break
     case 'checking-task-source-capability':
-      return 'checking server capabilities'
+      return translate('forflow.desktopCopy.4333fe4883', 'checking server capabilities')
     case 'missing-task-source-capability':
-      return 'server update needed for task sources'
+      return translate('forflow.desktopCopy.49df339286', 'server update needed for task sources')
     case 'missing-provider-auth':
-      return 'provider auth needed'
+      return translate('forflow.desktopCopy.41f120a87e', 'provider auth needed')
     case 'unavailable-source-tool':
-      return 'source tool unavailable'
+      return translate('forflow.desktopCopy.6893d5d847', 'source tool unavailable')
     case 'unsupported-provider':
-      return 'provider unsupported on this host'
+      return translate('forflow.desktopCopy.81d288812f', 'provider unsupported on this host')
   }
   if (availability.status) {
     return availability.status === 'connected' ? null : getSshStatusLabel(availability.status)
@@ -266,11 +266,11 @@ function getAvailabilityStatusLabel(availability: TaskSourceHostAvailability): s
     case 'connecting':
       return 'connecting'
     case 'blocked':
-      return 'server update needed'
+      return translate('forflow.desktopCopy.99934392e5', 'server update needed')
     case 'disconnected':
       return 'disconnected'
     case 'error':
-      return 'connection issue'
+      return translate('forflow.desktopCopy.b5592324b2', 'connection issue')
   }
 }
 
@@ -295,10 +295,10 @@ function getSshStatusLabel(status: SshConnectionStatus): string {
     case 'reconnecting':
       return 'connecting'
     case 'auth-failed':
-      return 'auth needed'
+      return translate('forflow.desktopCopy.b02d64c97f', 'auth needed')
     case 'reconnection-failed':
     case 'error':
-      return 'connection issue'
+      return translate('forflow.desktopCopy.b5592324b2', 'connection issue')
     case 'disconnected':
       return 'disconnected'
   }

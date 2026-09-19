@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { app, dialog, type BrowserWindow } from 'electron'
 import { SCHEMA_VERSION } from '../../shared/constants'
 import { compareAppVersions } from '../../shared/app-version'
@@ -8,10 +9,15 @@ export async function chooseLocalBuild(
   window: BrowserWindow | null
 ): Promise<LocalBuildCandidate | null> {
   const openDialogOptions: Electron.OpenDialogOptions = {
-    title: 'Choose a Local Orca Build',
-    buttonLabel: 'Choose Build',
+    title: translateMain('forflow.nativeCopy.a3a7de2710', 'Choose a Local Orca Build'),
+    buttonLabel: translateMain('forflow.nativeCopy.a33a966000', 'Choose Build'),
     properties: ['openFile'],
-    filters: [{ name: 'Orca update manifest', extensions: ['yml'] }]
+    filters: [
+      {
+        name: translateMain('forflow.nativeCopy.0ddb8877d3', 'Orca update manifest'),
+        extensions: ['yml']
+      }
+    ]
   }
   const selection = await (window
     ? dialog.showOpenDialog(window, openDialogOptions)
@@ -24,22 +30,34 @@ export async function chooseLocalBuild(
   try {
     if (compareAppVersions(candidate.version, app.getVersion()) === 0) {
       throw new Error(
-        'This build has the same version as the running app. Run pn build:mac again to create a uniquely versioned build.'
+        translateMain(
+          'forflow.nativeCopy.12f73fb9bf',
+          'This build has the same version as the running app. Run pn build:mac again to create a uniquely versioned build.'
+        )
       )
     }
     const compatibility = await assertLocalBuildCompatibility(candidate.compatibility)
     const terminalSummary =
       compatibility.liveTerminalCount === 0
-        ? 'No live terminals need to reconnect.'
-        : `${compatibility.liveTerminalCount} live terminal${
-            compatibility.liveTerminalCount === 1 ? '' : 's'
-          } will reconnect after restart.`
+        ? translateMain('forflow.nativeCopy.62dd771e0d', 'No live terminals need to reconnect.')
+        : translateMain(
+            'forflow.finalCopy.590eb8108b',
+            '{{count}} live terminals will reconnect after restart.',
+            { count: compatibility.liveTerminalCount }
+          )
     const messageBoxOptions: Electron.MessageBoxOptions = {
       type: 'question',
-      title: 'Use Local Orca Build?',
+      title: translateMain('forflow.nativeCopy.2214c55485', 'Use Local Orca Build?'),
       message: `${app.getVersion()} → ${candidate.version}`,
-      detail: `${terminalSummary}\nWorkspace cards and settings are compatible with state schema ${SCHEMA_VERSION}.\n\nThe build must have the same valid code signature as Orca or installation will stop.`,
-      buttons: ['Use Local Build', 'Cancel'],
+      detail: translateMain(
+        'forflow.finalCopy.9668ef7136',
+        '{{terminals}}\nWorkspace cards and settings are compatible with state schema {{schema}}.\n\nThe build must have the same valid code signature as Orca or installation will stop.',
+        { terminals: terminalSummary, schema: SCHEMA_VERSION }
+      ),
+      buttons: [
+        translateMain('forflow.nativeCopy.90d351376e', 'Use Local Build'),
+        translateMain('forflow.nativeCopy.19766ed6cc', 'Cancel')
+      ],
       defaultId: 0,
       cancelId: 1,
       noLink: true

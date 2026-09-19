@@ -67,7 +67,10 @@ function getInstallDescription(platform: string): string {
   if (platform === 'win32') {
     return 'Register `orca` in your user PATH.'
   }
-  return 'CLI registration is not yet available on this platform.'
+  return translate(
+    'forflow.desktopCopy.78478f2375',
+    'CLI registration is not yet available on this platform.'
+  )
 }
 
 function getFallbackCommandName(platform: string): string {
@@ -348,8 +351,11 @@ export function CliSection({
               )}
               command={cliSkillInstallCommand}
               installedCommand={cliSkillUpdateCommand}
-              terminalTitle="CLI skill setup"
-              terminalAriaLabel="CLI skill install terminal"
+              terminalTitle={translate('forflow.jsxCopy.b342c9ad52', 'CLI skill setup')}
+              terminalAriaLabel={translate(
+                'forflow.jsxCopy.ab42975f7d',
+                'CLI skill install terminal'
+              )}
               terminalWorktreeId={`settings-cli-skill-terminal-${agentRuntime.runtime}`}
               terminalShellOverride={cliSkillTerminalShellOverride}
               terminalRuntime={agentRuntime}

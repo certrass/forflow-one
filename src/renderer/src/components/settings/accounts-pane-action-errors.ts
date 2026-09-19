@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 export function getCodexAccountErrorDescription(error: unknown): string {
   const message = String((error as Error)?.message ?? error)
     .replace(/^Error occurred in handler for 'codexAccounts:[^']+':\s*/i, '')
@@ -12,17 +13,26 @@ export function getCodexAccountErrorDescription(error: unknown): string {
   // failures here so users see actionable sign-in guidance instead of IPC
   // internals or raw upstream wording.
   if (normalizedMessage.includes('timed out waiting for codex login to finish')) {
-    return 'Codex sign-in took too long to finish. Please try again.'
+    return translate(
+      'forflow.desktopCopy.9faab6925c',
+      'Codex sign-in took too long to finish. Please try again.'
+    )
   }
   if (normalizedMessage.includes('codex sign-in took too long to finish')) {
-    return 'Codex sign-in took too long to finish. Please try again.'
+    return translate(
+      'forflow.desktopCopy.9faab6925c',
+      'Codex sign-in took too long to finish. Please try again.'
+    )
   }
   if (
     normalizedMessage.includes('auth error 502') ||
     normalizedMessage.includes('gateway') ||
     normalizedMessage.includes('bad gateway')
   ) {
-    return 'Codex sign-in is temporarily unavailable. Please try again in a minute.'
+    return translate(
+      'forflow.desktopCopy.6b035b7531',
+      'Codex sign-in is temporarily unavailable. Please try again in a minute.'
+    )
   }
   if (normalizedMessage.startsWith('codex login failed:')) {
     const loginMessage = message.slice('Codex login failed:'.length).trim()

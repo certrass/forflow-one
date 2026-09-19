@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { BrowserPage as BrowserPageState } from '../../../../../shared/browser-workspace-types'
 import { ORCA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
 import {
@@ -30,7 +31,7 @@ export function getBrowserDisplayTitle(title: string | null | undefined, url: st
     title === ORCA_BROWSER_BLANK_URL ||
     !title
   ) {
-    return 'New Tab'
+    return translate('forflow.desktopCopy.b2f8fd6392', 'New Tab')
   }
   return title
 }

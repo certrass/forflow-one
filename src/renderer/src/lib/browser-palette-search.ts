@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { ORCA_BROWSER_BLANK_URL } from '../../../shared/constants'
 import type { BrowserPage, BrowserWorkspace } from '../../../shared/browser-workspace-types'
 import type { Worktree } from '../../../shared/worktree/types'
@@ -96,7 +97,7 @@ export function isBlankBrowserUrl(url: string): boolean {
 
 export function formatBrowserPaletteUrl(url: string): string {
   if (isBlankBrowserUrl(url)) {
-    return 'New Tab'
+    return translate('forflow.desktopCopy.b2f8fd6392', 'New Tab')
   }
   try {
     const parsed = new URL(url)

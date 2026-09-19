@@ -35,7 +35,7 @@ export {
 export function formatTimeAgo(ts: number): string {
   const diff = Date.now() - ts
   if (diff < 60_000) {
-    return 'just now'
+    return translate('forflow.desktopCopy.7ddb44d8a5', 'just now')
   }
   const mins = Math.floor(diff / 60_000)
   if (mins < 60) {

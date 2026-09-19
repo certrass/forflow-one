@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 export type WorktreeGitIdentityDisplay =
   | {
       kind: 'branch'
@@ -16,7 +17,11 @@ export function shortGitHead(head: string | null | undefined): string {
 }
 
 export function getDetachedHeadTooltip(shortHead: string): string {
-  return `Detached HEAD at ${shortHead}. You are viewing a commit, not a branch.`
+  return translate(
+    'forflow.dynamicCopy.32a7a26fae',
+    'Detached HEAD at {{value0}}. You are viewing a commit, not a branch.',
+    { value0: shortHead }
+  )
 }
 
 export function getWorktreeGitIdentityDisplay(input: {

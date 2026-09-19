@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { translate } from '@/i18n/i18n'
 // SGR escape helpers — keep tiny and local; xterm interprets these as ANSI.
 const RESET = '\x1b[0m'
 const DIM = '\x1b[2m'
@@ -43,3 +45,13 @@ const lines: string[] = [
 // to column 0; otherwise each subsequent line starts where the previous one
 // ended.
 export const PREVIEW_BUFFER = lines.join('\r\n')
+
+export function localizedPreviewBuffer(): string {
+  const branded = isForflowBuild()
+    ? PREVIEW_BUFFER.replaceAll('~/orca', '~/forflow')
+    : PREVIEW_BUFFER
+  return branded
+    .replace('renders sample output', translate('forflow.preview.output', 'renders sample output'))
+    .replace('ligatures:', translate('forflow.preview.ligatures', 'ligatures:'))
+    .replace('Sum the values.', translate('forflow.preview.sum', 'Sum the values.'))
+}

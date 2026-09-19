@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -15,6 +16,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps['theme']}
       position="bottom-right"
+      containerAriaLabel={translate('forflow.accessibility.788011833a', 'Notifications')}
+      toastOptions={{
+        closeButtonAriaLabel: translate('forflow.accessibility.345ebd3930', 'Close notification')
+      }}
       // Why: Orca has persistent bottom chrome, so bottom-right toasts need
       // breathing room above the status bar instead of sitting on its edge.
       // mobileOffset keeps that clearance below Sonner's 600px breakpoint

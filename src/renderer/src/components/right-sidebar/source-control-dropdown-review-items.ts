@@ -40,30 +40,36 @@ export function buildHostedReviewDropdownItems(
   const createBlockedHint = ((): string => {
     switch (hostedReviewCreation?.blockedReason) {
       case 'dirty':
-        return 'Commit changes first'
+        return translate('forflow.desktopCopy.1951a2eb97', 'Commit changes first')
       case 'detached_head':
-        return 'Check out a branch first'
+        return translate('forflow.desktopCopy.76a2896df9', 'Check out a branch first')
       case 'default_branch':
-        return 'Switch to a feature branch'
+        return translate('forflow.desktopCopy.5fc9297158', 'Switch to a feature branch')
       case 'no_upstream':
-        return 'Publish Branch'
+        return translate('forflow.desktopCopy.fe4e7d8ab1', 'Publish Branch')
       case 'needs_push':
-        return 'Push first'
+        return translate('forflow.desktopCopy.5a632dc6db', 'Push first')
       case 'needs_sync':
         return shouldForcePushWithLease ? 'Force Push first' : 'Sync first'
       case 'auth_required':
-        return `${createReviewCopy.authInstruction} in this environment`
+        return translate('forflow.dynamicCopy.cbaa0b8a6f', '{{value0}} in this environment', {
+          value0: createReviewCopy.authInstruction
+        })
       case 'unsupported_provider':
-        return 'Unsupported provider'
+        return translate('forflow.desktopCopy.1609d5fba4', 'Unsupported provider')
       case 'existing_review':
-        return `A ${createReviewCopy.reviewLabel} already exists`
+        return translate('forflow.dynamicCopy.fd9f0aa0cd', 'A {{value0}} already exists', {
+          value0: createReviewCopy.reviewLabel
+        })
       case 'fork_head_unsupported':
-        return 'Fork head unsupported'
+        return translate('forflow.desktopCopy.8a620d5d99', 'Fork head unsupported')
       case 'base_not_on_remote':
-        return 'Base branch is not on the remote'
+        return translate('forflow.desktopCopy.769d9432b5', 'Base branch is not on the remote')
       case null:
       case undefined:
-        return upstreamLoading ? 'Checking branch status…' : 'Branch is not ready'
+        return upstreamLoading
+          ? translate('forflow.desktopCopy.1358e0f32b', 'Checking branch status…')
+          : 'Branch is not ready'
     }
   })()
 

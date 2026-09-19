@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import type { AppState } from '@/store/types'
 import { findWorktreeById } from '@/store/slices/worktree-helpers'
 import type { Worktree } from '../../../../shared/worktree/types'
@@ -207,16 +208,40 @@ export function getUnavailableQuickActionMessage(
 ): string {
   switch (reason) {
     case 'loading':
-      return `Can't ${actionTitle.toLowerCase()} — workspace is still loading.`
+      return translate(
+        'forflow.dynamicCopy.9006f1f1b7',
+        "Can't {{value0}} — workspace is still loading.",
+        { value0: actionTitle.toLowerCase() }
+      )
     case 'no-active-workspace':
-      return `Can't ${actionTitle.toLowerCase()} — no workspace is active.`
+      return translate(
+        'forflow.dynamicCopy.2f833e0fa1',
+        "Can't {{value0}} — no workspace is active.",
+        { value0: actionTitle.toLowerCase() }
+      )
     case 'ssh-disconnected':
-      return `Can't ${actionTitle.toLowerCase()} — workspace is disconnected.`
+      return translate(
+        'forflow.dynamicCopy.327fccd24f',
+        "Can't {{value0}} — workspace is disconnected.",
+        { value0: actionTitle.toLowerCase() }
+      )
     case 'no-active-group':
-      return `Can't ${actionTitle.toLowerCase()} — no tab group is available.`
+      return translate(
+        'forflow.dynamicCopy.2c620f4fd3',
+        "Can't {{value0}} — no tab group is available.",
+        { value0: actionTitle.toLowerCase() }
+      )
     case 'no-active-chat':
-      return `Can't ${actionTitle.toLowerCase()} — no movable chat is active.`
+      return translate(
+        'forflow.dynamicCopy.7040e0cc51',
+        "Can't {{value0}} — no movable chat is active.",
+        { value0: actionTitle.toLowerCase() }
+      )
     case 'client-action-unsupported':
-      return `Can't ${actionTitle.toLowerCase()} — this client and runtime do not support it.`
+      return translate(
+        'forflow.dynamicCopy.1ed955b821',
+        "Can't {{value0}} — this client and runtime do not support it.",
+        { value0: actionTitle.toLowerCase() }
+      )
   }
 }

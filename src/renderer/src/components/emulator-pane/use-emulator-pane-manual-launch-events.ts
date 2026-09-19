@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { useEffect } from 'react'
 import { useAppStore } from '@/store'
 import type { EmulatorPaneSession } from './emulator-pane-types'
@@ -54,7 +55,9 @@ export function useEmulatorPaneManualLaunchEvents({
       setLoading(false)
       setError(detail?.message ?? 'Could not start the emulator.')
       if (tabId) {
-        useAppStore.getState().setTabLabel(tabId, 'Mobile Emulator')
+        useAppStore
+          .getState()
+          .setTabLabel(tabId, translate('forflow.desktopCopy.2644924b6a', 'Mobile Emulator'))
       }
     }
     window.addEventListener(EMULATOR_MANUAL_LAUNCH_FAILED_EVENT, onFailed)

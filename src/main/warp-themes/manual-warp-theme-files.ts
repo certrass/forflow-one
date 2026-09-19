@@ -1,3 +1,4 @@
+import { translateMain } from '../i18n/main-i18n'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { BrowserWindow, dialog, type OpenDialogOptions, type WebContents } from 'electron'
@@ -41,9 +42,14 @@ export async function chooseManualWarpThemeFiles(webContents?: WebContents): Pro
 > {
   const ownerWindow = webContents ? BrowserWindow.fromWebContents(webContents) : null
   const options: OpenDialogOptions = {
-    title: 'Import Warp Theme',
+    title: translateMain('forflow.nativeCopy.78ba2cdb14', 'Import Warp Theme'),
     properties: ['openFile', 'multiSelections'],
-    filters: [{ name: 'Warp theme YAML', extensions: ['yaml', 'yml'] }]
+    filters: [
+      {
+        name: translateMain('forflow.nativeCopy.5c087ce6b8', 'Warp theme YAML'),
+        extensions: ['yaml', 'yml']
+      }
+    ]
   }
   const result = ownerWindow
     ? await dialog.showOpenDialog(ownerWindow, options)
@@ -57,14 +63,17 @@ export async function chooseManualWarpThemeFiles(webContents?: WebContents): Pro
     selectedYamlFiles.length > MAX_THEME_FILES
       ? [
           {
-            label: 'Selected Warp themes',
+            label: translateMain('forflow.nativeCopy.3852d46a3b', 'Selected Warp themes'),
             reason: `Only the first ${MAX_THEME_FILES} theme files were scanned.`
           }
         ]
       : []
   return {
     canceled: false,
-    sourceLabel: files.length === 1 ? (files[0]?.label ?? 'Warp theme') : 'Selected Warp themes',
+    sourceLabel:
+      files.length === 1
+        ? (files[0]?.label ?? translateMain('forflow.nativeCopy.033a9391d5', 'Warp theme'))
+        : translateMain('forflow.nativeCopy.3852d46a3b', 'Selected Warp themes'),
     files,
     skippedFiles
   }
@@ -75,7 +84,7 @@ export async function chooseManualWarpThemeFolderPath(
 ): Promise<string | null> {
   const ownerWindow = webContents ? BrowserWindow.fromWebContents(webContents) : null
   const options: OpenDialogOptions = {
-    title: 'Import Warp Theme Folder',
+    title: translateMain('forflow.nativeCopy.cd8a06d8e1', 'Import Warp Theme Folder'),
     properties: ['openDirectory']
   }
   const result = ownerWindow

@@ -1,3 +1,5 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
+import { translate } from '@/i18n/i18n'
 import { NOTE_TARGETS } from './review-animated-visual-shared'
 
 // Why: terminal-phase logic for the Notes panel lives here so the imperative
@@ -61,7 +63,7 @@ export async function runTerminalPhase(ctx: TerminalPhaseContext): Promise<void>
   }
   const startEl = term.querySelector<HTMLDivElement>('[data-term-line-start]')
   if (startEl) {
-    startEl.innerHTML = '<span class="ravs-term-muted">● Claude Code session started</span>'
+    startEl.innerHTML = `<span class="ravs-term-muted">${localizedDemoCopy('● Claude Code session started')}</span>`
   }
   await wait(520)
   if (isCancelled()) {
@@ -69,7 +71,7 @@ export async function runTerminalPhase(ctx: TerminalPhaseContext): Promise<void>
   }
   const loadedEl = term.querySelector<HTMLDivElement>('[data-term-line-loaded]')
   if (loadedEl) {
-    loadedEl.innerHTML = `<span class="ravs-term-check">✓</span><span class="ravs-term-muted">Loaded ${NOTE_TARGETS.length} review notes from Orca</span>`
+    loadedEl.innerHTML = `<span class="ravs-term-check">✓</span><span class="ravs-term-muted">${translate('forflow.demoCopy.loaded', 'Loaded {{count}} review notes from Orca', { count: NOTE_TARGETS.length })}</span>`
   }
   await wait(520)
   if (isCancelled()) {
@@ -81,7 +83,7 @@ export async function runTerminalPhase(ctx: TerminalPhaseContext): Promise<void>
     const ackSelector = i === 0 ? '[data-term-line-ack-0]' : '[data-term-line-ack-1]'
     const ackEl = term.querySelector<HTMLDivElement>(ackSelector)
     if (ackEl) {
-      ackEl.innerHTML = `  <span class="ravs-term-glyph">•</span><span class="ravs-term-muted">line ${lineNo}</span> ${target.summary}`
+      ackEl.innerHTML = `  <span class="ravs-term-glyph">•</span><span class="ravs-term-muted">${translate('forflow.demoCopy.line', 'line {{line}}', { line: lineNo })}</span> ${localizedDemoCopy(target.summary)}`
       await wait(360)
       if (isCancelled()) {
         return
@@ -93,7 +95,7 @@ export async function runTerminalPhase(ctx: TerminalPhaseContext): Promise<void>
     tail.innerHTML =
       '<span class="ravs-term-spinner" aria-hidden="true"></span><span class="ravs-term-muted" data-term-tail-text></span>'
   }
-  await typeInto(ctx, '[data-term-tail-text]', 'Fixing both issues...', 14)
+  await typeInto(ctx, '[data-term-tail-text]', localizedDemoCopy('Fixing both issues...'), 14)
   if (isCancelled()) {
     return
   }

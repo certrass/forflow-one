@@ -1,3 +1,4 @@
+import { localizedDemoCopy } from './feature-wall-demo-copy'
 import type { JSX, ReactNode } from 'react'
 import { ClaudeIcon } from '@/components/status-bar/icons'
 import { translate } from '@/i18n/i18n'
@@ -118,7 +119,7 @@ function TerminalEntryView(props: { entry: TerminalEntry }): JSX.Element {
         <span className="text-muted-foreground">
           {translate('auto.components.feature.wall.BrowserAnimatedVisual.f2034c4930', '>')}
         </span>{' '}
-        {entry.text}
+        {localizedDemoCopy(entry.text)}
       </span>
     )
   }
@@ -144,7 +145,7 @@ function TerminalEntryView(props: { entry: TerminalEntry }): JSX.Element {
   return (
     <span>
       <span className="text-violet-600 dark:text-violet-400">{entry.tool}</span>{' '}
-      <span className="text-muted-foreground">{entry.muted}</span>
+      <span className="text-muted-foreground">{localizedDemoCopy(entry.muted)}</span>
     </span>
   )
 }

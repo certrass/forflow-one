@@ -45,7 +45,7 @@ export function getClaudeAccountLabel(
   accountId: string | null | undefined
 ): string {
   if (accountId == null) {
-    return 'System default'
+    return translate('forflow.desktopCopy.b0459211f9', 'System default')
   }
   return state.accounts.find((account) => account.id === accountId)?.email ?? 'Claude account'
 }

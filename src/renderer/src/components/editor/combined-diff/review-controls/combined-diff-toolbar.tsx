@@ -139,7 +139,7 @@ export function CombinedDiffToolbar({
               worktreeId={file.worktreeId}
               groupId={activeGroupId ?? file.worktreeId}
               comments={diffCommentsForWorktree}
-              actionLabel="Send"
+              actionLabel={translate('forflow.jsxCopy.f6f4688ff2', 'Send')}
               triggerClassName="h-6 gap-1 rounded-none border-l border-border/70 px-2 text-[11px] font-medium leading-none text-foreground/80 hover:bg-accent hover:text-foreground"
               iconClassName="size-3"
             />

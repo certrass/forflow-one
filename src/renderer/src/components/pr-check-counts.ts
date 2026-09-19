@@ -99,20 +99,41 @@ export function getCheckCountChips(counts: PRCheckCounts): PRCheckCountChip[] {
 export function getChecksSummaryLabel(checks: readonly PRCheckDetail[]): string {
   const counts = getCheckCounts(checks)
   if (checks.length === 0) {
-    return 'No checks found'
+    return translate('forflow.desktopCopy.e7c36cafa7', 'No checks found')
   }
   if (counts.failing > 0) {
-    return `${counts.failing} ${counts.failing === 1 ? 'check' : 'checks'} failing`
+    return counts.failing === 1
+      ? translate('forflow.finalCopy.b175ea4906', '{{count}} check failing', {
+          count: counts.failing
+        })
+      : translate('forflow.finalCopy.715178c003', '{{count}} checks failing', {
+          count: counts.failing
+        })
   }
   // Why: action_required (e.g. workflow awaiting approval) blocks merge but isn't a failure, so surface it distinctly.
   if (counts.needsAction > 0) {
-    return `${counts.needsAction} ${counts.needsAction === 1 ? 'check needs' : 'checks need'} action`
+    return counts.needsAction === 1
+      ? translate('forflow.finalCopy.bf14e0ce17', '{{count}} check needs action', {
+          count: counts.needsAction
+        })
+      : translate('forflow.finalCopy.e50a6acd39', '{{count}} checks need action', {
+          count: counts.needsAction
+        })
   }
   if (counts.pending > 0) {
-    return `${counts.pending} ${counts.pending === 1 ? 'check' : 'checks'} pending`
+    return counts.pending === 1
+      ? translate('forflow.finalCopy.460a094a05', '{{count}} check pending', {
+          count: counts.pending
+        })
+      : translate('forflow.finalCopy.0390d67128', '{{count}} checks pending', {
+          count: counts.pending
+        })
   }
   if (counts.passing === checks.length) {
-    return 'All checks passing'
+    return translate('forflow.desktopCopy.bcb57271d6', 'All checks passing')
   }
-  return `${counts.passing} of ${checks.length} checks passing`
+  return translate('forflow.dynamicCopy.3aaf2d56ac', '{{value0}} of {{value1}} checks passing', {
+    value0: counts.passing,
+    value1: checks.length
+  })
 }

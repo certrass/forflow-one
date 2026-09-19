@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import React from 'react'
 import type { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -5,7 +6,7 @@ import type { AutomationRun } from '../../../../shared/automations-types'
 
 export function formatAutomationDateTime(value: number | null | undefined): string {
   if (!value) {
-    return 'Never'
+    return translate('forflow.desktopCopy.6300ef800b', 'Never')
   }
   return new Intl.DateTimeFormat(undefined, {
     month: 'short',
@@ -30,18 +31,20 @@ export function formatAutomationRelativeTime(
   const format = (amount: number, unit: string): string => `${amount}${unit}`
   let text: string
   if (absMs < minuteMs) {
-    text = 'now'
+    text = translate('forflow.finalCopy.ed5eb9a37e', 'now')
   } else if (absMs < hourMs) {
-    text = format(Math.round(absMs / minuteMs), 'm')
+    text = format(Math.round(absMs / minuteMs), translate('forflow.finalCopy.62c66a7a5d', 'm'))
   } else if (absMs < dayMs) {
-    text = format(Math.round(absMs / hourMs), 'h')
+    text = format(Math.round(absMs / hourMs), translate('forflow.finalCopy.aaa9402664', 'h'))
   } else {
-    text = format(Math.round(absMs / dayMs), 'd')
+    text = format(Math.round(absMs / dayMs), translate('forflow.finalCopy.18ac3e7343', 'd'))
   }
-  if (text === 'now') {
+  if (absMs < minuteMs) {
     return text
   }
-  return diffMs >= 0 ? `in ${text}` : `${text} ago`
+  return diffMs >= 0
+    ? translate('forflow.finalCopy.c93c357fc8', 'in {{time}}', { time: text })
+    : translate('forflow.finalCopy.8d32021fd6', '{{time}} ago', { time: text })
 }
 
 export function formatAutomationDateTimeWithRelative(
@@ -71,23 +74,23 @@ export function getAutomationRunStatusVariant(
 export function getAutomationRunStatusLabel(status: AutomationRun['status']): string {
   switch (status) {
     case 'pending':
-      return 'Queued'
+      return translate('forflow.desktopCopy.661ff40a07', 'Queued')
     case 'dispatching':
-      return 'Starting'
+      return translate('forflow.desktopCopy.aeed4d26bb', 'Starting')
     case 'dispatched':
-      return 'Launched'
+      return translate('forflow.desktopCopy.cf55727a95', 'Launched')
     case 'completed':
-      return 'Done'
+      return translate('forflow.desktopCopy.11a6767d56', 'Done')
     case 'skipped_precheck':
-      return 'Precheck skipped'
+      return translate('forflow.desktopCopy.2fa901e83e', 'Precheck skipped')
     case 'skipped_missed':
-      return 'Skipped'
+      return translate('forflow.desktopCopy.12698ce1ea', 'Skipped')
     case 'skipped_unavailable':
-      return 'Unavailable'
+      return translate('forflow.desktopCopy.ca18449697', 'Unavailable')
     case 'skipped_needs_interactive_auth':
-      return 'Needs credentials'
+      return translate('forflow.desktopCopy.5e2c387258', 'Needs credentials')
     case 'dispatch_failed':
-      return 'Failed'
+      return translate('forflow.desktopCopy.031a8f0f65', 'Failed')
   }
 }
 

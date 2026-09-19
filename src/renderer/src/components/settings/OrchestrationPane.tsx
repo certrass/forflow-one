@@ -122,8 +122,11 @@ export function OrchestrationPane({
         )}
         command={orchestrationInstallCommand}
         installedCommand={orchestrationUpdateCommand}
-        terminalTitle="Orchestration setup"
-        terminalAriaLabel="Orchestration skill install terminal"
+        terminalTitle={translate('forflow.jsxCopy.9f95b259da', 'Orchestration setup')}
+        terminalAriaLabel={translate(
+          'forflow.jsxCopy.04fad60494',
+          'Orchestration skill install terminal'
+        )}
         terminalWorktreeId="settings-orchestration-skill-terminal"
         terminalShellOverride={activeSkillRuntime.terminalShellOverride}
         terminalRuntime={activeSkillRuntime.agentRuntime}
