@@ -14,6 +14,11 @@ test('the actual parallel-task tour renders in Chinese after splitting a termina
   const { app, page, errors } = await launch(profile)
   try {
     await addPrivateProject(page, profile)
+    const firstStep = page.getByRole('dialog', { name: '拆分终端窗格', exact: true })
+    await expect(firstStep).toBeVisible()
+    await expect(firstStep).toContainText('打开第二个终端窗格，也可以右键选择拆分方式。')
+    await expect(firstStep).not.toContainText('Split a terminal pane')
+    await expect(firstStep).not.toContainText('Open a second terminal pane')
     await page.getByRole('button', { name: '拆分终端', exact: true }).click()
     await expect(page.getByText('并行开始另一项任务', { exact: true })).toBeVisible()
     await expect(
@@ -22,6 +27,10 @@ test('the actual parallel-task tour renders in Chinese after splitting a termina
     await expect(page.locator('body')).not.toContainText('Start another task in parallel')
     await expect(page.locator('body')).not.toContainText('Each worktree gets its own branch')
     await page.screenshot({ path: path.join(evidence, 'parallel-task-tour-chinese.png') })
+    await page.getByRole('button', { name: '返回', exact: true }).click()
+    await expect(firstStep).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('[data-contextual-tour-panel]')).toHaveCount(0)
     expect(errors).toEqual([])
   } finally {
     writeFileSync(

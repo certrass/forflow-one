@@ -57,6 +57,7 @@
   "src/shared/contextual-tours.test.ts",
   "src/renderer/src/components/contextual-tours/contextual-tour-overlay-measurement.test.ts",
   "src/renderer/src/components/contextual-tours/contextual-tour-zh-regression.test.tsx",
+  "src/renderer/src/components/contextual-tours/ContextualTourOverlay.language-change.test.tsx",
   "src/renderer/src/components/contextual-tours/ContextualTourOverlaySurface.localization.test.tsx",
   "src/renderer/src/components/feature-wall/feature-wall-setup-checklist-localized-copy.test.ts",
   "src/renderer/src/components/feature-wall/feature-wall-setup-progress.test.ts",

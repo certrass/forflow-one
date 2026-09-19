@@ -29,7 +29,7 @@ import { translate } from '@/i18n/i18n'
 
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-const SKIP_BUTTON_SELECTOR = 'button[aria-label^="Skip"], button[aria-label="Dismiss tour"]'
+const SKIP_BUTTON_SELECTOR = 'button[data-contextual-tour-dismiss]'
 
 export type ActiveTourRenderState = {
   rect: DOMRect
@@ -172,6 +172,7 @@ export function ContextualTourOverlaySurface({
       <div key={stepKey} className="animate-in fade-in-0 duration-150 ease-out p-4">
         <Button
           type="button"
+          data-contextual-tour-dismiss=""
           variant="ghost"
           size="icon-xs"
           aria-label={
