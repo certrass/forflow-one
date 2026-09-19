@@ -32,7 +32,7 @@ const steps = [
   [
     'browser',
     '使用 Forflow One 浏览器',
-    '无需离开 Forflow One 即可浏览 Web 应用。选中任意元素，即可一键将其准确源码与样式发送给智能体。'
+    '无需离开 Forflow One 即可浏览网页应用。选中页面元素，可将其页面结构和样式作为上下文发送给智能体。'
   ]
 ] as const
 
@@ -46,6 +46,9 @@ async function verifySteps(surface: Locator): Promise<void> {
     await expect(surface.getByText(title, { exact: true })).toHaveCount(2)
     await expect(surface.getByText(title, { exact: true }).last()).toBeVisible()
     await expect(surface.getByText(description, { exact: true })).toBeVisible()
+    if (id === 'notifications') {
+      await expect(surface).toContainText('此项按应用内通知开关计入完成。')
+    }
     await expect(surface).not.toContainText(
       /Turn on notifications|Choose your default agent|Enable Forflow One CLI|Connect integrations|Automate workspace setup|Start work in multiple repos|Multi-task|Use Forflow One's browser|Register the Forflow One shell command|\bOrca\b|手机光标/
     )
