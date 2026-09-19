@@ -44,6 +44,9 @@
 - ZIP SHA256：`a5a115b7ef3f33144b4959dc404d3e2786c86f73fc79eb1fbd1cbb93dc182447`
 - `app.asar` SHA256：`0b59d3fa191ac1f4c4b018c15a0e58fb9530534cb90deb1a95a381c80a70f1e0`
 - 严格签名、ZIP 解压回读和源码哈希核对通过。本机 ad-hoc 签名，未做 Apple 公证。
-- 当前状态：候选包已验证，本机 `.15` 仍在运行，未覆盖安装。已准备退出检查、旧版回退及安装后 smoke 流程，未修改用户数据。
+- 当前状态：用户确认“继续，先安装”后，检查旧版已退出，于北京时间 2026-09-20 07:17 安装到 `/Applications/Forflow One.app`，安装过程未修改用户数据。
+- 安装后 12 个 smoke 场景全部通过，无跳过或重试；9 份场景回执的制品指纹均与候选包一致。实际系统 `forflow --version` 返回 `1.4.205-forflow.19`，安装版严格签名及 `app.asar` 哈希复核通过。
+- `.15` 回退位置：`/Users/zezhou/Library/Caches/Forflow One/rollback/1.4.205-forflow.15-before-forflow.19/Forflow One.app`。
+- 安装回执：随包 `qa/forflow19-installation.json`；安装后测试与截图：`qa/installed/`，日志：`qa/forflow19-installed.log`。测试使用隔离数据目录、模拟接口及隐藏窗口；未打开用户工作会话。
 
 使用见 [接续预检说明](context-handoff-beta.md)，功能顺序见 [系统规划](governance-memory-beta-plan.md)。

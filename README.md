@@ -1,6 +1,6 @@
 # Forflow One
 
-本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；最新已验证测试包为 [1.4.205-forflow.19](docs/forflow/release-1.4.205-forflow.19.md)，本机仍运行 `.15`，待退出后安装。
+本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.19](docs/forflow/release-1.4.205-forflow.19.md) 已安装到本机，安装后 12 个 smoke 场景通过，`.15` 回退副本已保留。
 
 使用请先看 [Forflow One 操作手册](docs/forflow/user-manual.md)；账号服务、权限和内部交付见 [管理员手册](docs/forflow/admin-manual.md)。
 
