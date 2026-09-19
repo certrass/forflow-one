@@ -7,7 +7,6 @@ import type { NativeChatLiveSession } from './use-native-chat-live-session'
 import { Button } from '@/components/ui/button'
 import { NativeChatApprovalCard } from './NativeChatApprovalCard'
 import { NativeChatComposer, type NativeChatComposerHandle } from './NativeChatComposer'
-import { NativeChatEmptyState } from './NativeChatEmptyState'
 import { NativeChatMessageList } from './NativeChatMessageList'
 import { NativeChatQuestionCard } from './NativeChatQuestionCard'
 import { selectNativeChatViewState } from './native-chat-view-state'
@@ -23,6 +22,7 @@ import { useStructuredNativeChatPaneCommands } from './use-structured-native-cha
 import type { NativeChatStructuredViewProps } from './native-chat-view-types'
 import { NativeChatBackgroundTasksStatus } from './NativeChatBackgroundTasksStatus'
 import { useNativeChatLaunchDraftSignal } from './use-native-chat-launch-draft-adoption'
+import { NativeChatConversationBody } from './NativeChatConversationBody'
 
 type StoppingBackgroundTasks = {
   sessionId: string
@@ -218,31 +218,30 @@ export function NativeChatStructuredSession(
       onContextMenuCapture={paneCommands.onContextMenuCapture}
       className="flex h-full min-h-0 w-full flex-col bg-background focus:outline-none"
     >
-      <div className="flex min-h-0 flex-1 flex-col">
-        {viewState.kind === 'loading' ? (
-          <NativeChatEmptyState kind="loading" />
-        ) : viewState.kind === 'error' ? (
-          <NativeChatEmptyState kind="error" message={viewState.message} />
-        ) : viewState.kind === 'empty' ? (
-          <NativeChatEmptyState kind="empty" agent={props.agent} />
-        ) : (
-          <NativeChatMessageList
-            session={session}
-            journalItems={controller.journalItems}
-            isWorking={controller.isWorking}
-            expandSignal={false}
-            fontScale={fontScale.scale}
-            workingStartedAt={controller.workingStartedAt}
-            settledTurns={controller.settledTurns}
-            showTurnStatus
-            showLiveTurnActivity={prompt === null}
-            turnActivity={controller.turnActivity}
-            onLinkClick={onLinkClick}
-            allowFileUriLinks={onLinkClick !== undefined}
-            runtimeContext={imageRuntimeContext}
-          />
-        )}
-      </div>
+      <NativeChatConversationBody
+        session={session}
+        viewState={viewState}
+        paneKey={paneKey}
+        worktreeId={fileLinkContext?.worktreeId}
+        isVisible={props.isVisible}
+        initializing={controller.status === 'idle'}
+      >
+        <NativeChatMessageList
+          session={session}
+          journalItems={controller.journalItems}
+          isWorking={controller.isWorking}
+          expandSignal={false}
+          fontScale={fontScale.scale}
+          workingStartedAt={controller.workingStartedAt}
+          settledTurns={controller.settledTurns}
+          showTurnStatus
+          showLiveTurnActivity={prompt === null}
+          turnActivity={controller.turnActivity}
+          onLinkClick={onLinkClick}
+          allowFileUriLinks={onLinkClick !== undefined}
+          runtimeContext={imageRuntimeContext}
+        />
+      </NativeChatConversationBody>
       {prompt?.body.kind === 'approval' ? (
         <NativeChatApprovalCard
           approval={{

@@ -10,7 +10,6 @@ import { NativeChatComposer, type NativeChatComposerHandle } from './NativeChatC
 import { useNativeChatFontScale } from './use-native-chat-font-scale'
 import { useNativeChatCanSend } from './use-native-chat-can-send'
 import { NativeChatInteractiveCard } from './NativeChatInteractiveCard'
-import { NativeChatEmptyState } from './NativeChatEmptyState'
 import { useNativeChatInteractiveSend } from './use-native-chat-interactive-send'
 import {
   shouldClearNativeChatWorkingSuppression,
@@ -56,6 +55,7 @@ import { useNativeChatFileLinkContext } from './use-native-chat-file-link-contex
 import { matchNativeChatSplitShortcut } from './native-chat-split-shortcut'
 import { getShortcutPlatform } from '@/lib/shortcut-platform'
 import { formatShortcutLabel } from '@/hooks/useShortcutLabel'
+import { NativeChatConversationBody } from './NativeChatConversationBody'
 
 /** Renders the bridge UI after NativeChatSessionGate resolves its agent session. */
 export function NativeChatResolvedView({
@@ -390,27 +390,25 @@ export function NativeChatResolvedView({
       onContextMenuCapture={contextMenu.onContextMenuCapture}
       className="flex h-full min-h-0 w-full flex-col bg-background focus:outline-none"
     >
-      <div className="flex min-h-0 flex-1 flex-col">
-        {viewState.kind === 'loading' ? (
-          <NativeChatEmptyState kind="loading" />
-        ) : viewState.kind === 'error' ? (
-          <NativeChatEmptyState kind="error" message={viewState.message} />
-        ) : viewState.kind === 'empty' ? (
-          <NativeChatEmptyState kind="empty" agent={agent} />
-        ) : (
-          <NativeChatMessageList
-            session={sessionWithPending}
-            isWorking={isWorking}
-            expandSignal={false}
-            fontScale={fontScale.scale}
-            workingStartedAt={hookWorkingEpoch}
-            showTurnStatus={false}
-            onLinkClick={onLinkClick}
-            allowFileUriLinks={fileLinkContext !== null}
-            failedDeliveryMessageIds={failedLaunchPromptMessageIds}
-          />
-        )}
-      </div>
+      <NativeChatConversationBody
+        session={session}
+        viewState={viewState}
+        paneKey={paneKey}
+        worktreeId={fileLinkContext?.worktreeId}
+        isVisible={isVisible}
+      >
+        <NativeChatMessageList
+          session={sessionWithPending}
+          isWorking={isWorking}
+          expandSignal={false}
+          fontScale={fontScale.scale}
+          workingStartedAt={hookWorkingEpoch}
+          showTurnStatus={false}
+          onLinkClick={onLinkClick}
+          allowFileUriLinks={fileLinkContext !== null}
+          failedDeliveryMessageIds={failedLaunchPromptMessageIds}
+        />
+      </NativeChatConversationBody>
       {/* Live interactive prompt (question / approval) is the bottom input region
           (mobile parity). A question card supplies its own answer input, so it
           fully replaces the composer while active — no stray "Send a message". */}

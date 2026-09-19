@@ -19176,5 +19176,23 @@
       "done": "已完成",
       "inactive": "未运行"
     }
-  }
+  },
+  "forflow.contextBeta.title": "接续预检 · Beta",
+  "forflow.contextBeta.description": "从当前 Codex 对话准备有限长度的交接材料。不调用模型，不自动发送或写入长期记忆。",
+  "forflow.contextBeta.location": "开启后，在 Codex 对话上方显示“接续预检”。默认关闭，原有会话和任务状态不变。",
+  "forflow.contextBeta.copied": "交接材料已复制。发给其他智能体前请先核对。",
+  "forflow.contextBeta.copyFailed": "复制失败，请重试。",
+  "forflow.contextBeta.open": "接续预检 · Beta",
+  "forflow.contextBeta.intro": "提取整条用户原文与最多三条近期智能体答复。这是原文摘录，不是语义摘要或已确认记忆。",
+  "forflow.contextBeta.scope": "当前会话",
+  "forflow.contextBeta.size": "所选正文与元数据（UTF-8 字节，不是 Token）",
+  "forflow.contextBeta.omitted": "省略的用户／智能体／工具或系统消息",
+  "forflow.contextBeta.unsupported": "未包含的附件或工具块／未持久化消息",
+  "forflow.contextBeta.changed": "会话已变化或仍在执行。请等当前操作结束，再刷新预览。",
+  "forflow.contextBeta.incomplete": "暂不能准备可靠交接：历史尚未加载完整、用户原文缺失或超出预算。请先加载较早消息，或缩小任务范围。",
+  "forflow.contextBeta.user": "用户原文",
+  "forflow.contextBeta.assistant": "智能体陈述 · 未核实",
+  "forflow.contextBeta.boundary": "仅包含当前加载的会话记录；工具结果、附件、隐藏提示词和其他智能体的上下文不在其中。复制前核对敏感内容，不自动发送、持久化或转移权限。",
+  "forflow.contextBeta.refresh": "刷新预览",
+  "forflow.contextBeta.copy": "复制交接材料与来源回执"
 }

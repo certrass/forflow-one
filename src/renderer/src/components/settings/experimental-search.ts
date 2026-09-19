@@ -5,9 +5,11 @@ import { translateSearchKeyword } from './settings-search-keywords'
 import { getNewWorktreeCardStyleSearchEntry } from './new-worktree-card-style-search-entry'
 import { getNativeChatExperimentalSearchEntry } from './native-chat-experimental-search-entry'
 import { getEphemeralVmsSearchEntry } from './ephemeral-vms-search'
+import { getForflowContextBetaSearchEntry } from './ForflowContextBetaSetting'
 
 export const getExperimentalPaneSearchEntries = createLocalizedCatalog(
   (): SettingsSearchEntry[] => [
+    getForflowContextBetaSearchEntry(),
     {
       title: translate('auto.components.settings.experimental.search.87d99e634b', 'Pet'),
       description: translate(

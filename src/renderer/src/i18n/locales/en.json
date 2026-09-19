@@ -19176,5 +19176,23 @@
       "done": "Done",
       "inactive": "Inactive"
     }
-  }
+  },
+  "forflow.contextBeta.copied": "Handoff copied. Review it before sending to another agent.",
+  "forflow.contextBeta.copyFailed": "Could not copy the handoff. Please try again.",
+  "forflow.contextBeta.open": "Handoff preview · Beta",
+  "forflow.contextBeta.title": "Context handoff preview · Beta",
+  "forflow.contextBeta.intro": "Extracts whole user messages and up to three recent assistant replies from this conversation. This is an excerpt, not a semantic summary or approved memory.",
+  "forflow.contextBeta.scope": "Current session",
+  "forflow.contextBeta.size": "Selected text and metadata (UTF-8 bytes, not tokens)",
+  "forflow.contextBeta.omitted": "Omitted user / assistant / tool or system messages",
+  "forflow.contextBeta.unsupported": "Unincluded attachment or tool blocks / unpersisted messages",
+  "forflow.contextBeta.changed": "Conversation changed or is still running. Wait for it to settle, then refresh the preview.",
+  "forflow.contextBeta.incomplete": "Cannot prepare a reliable handoff yet: history is not fully loaded, user text is missing or exceeds the budget. Load earlier messages or narrow the task first.",
+  "forflow.contextBeta.user": "User original text",
+  "forflow.contextBeta.assistant": "Agent statement · unverified",
+  "forflow.contextBeta.boundary": "Only the loaded transcript is included. Tool results, attachments, hidden prompts and other agents are not carried over. Check sensitive content before copying. No automatic sending, persistence or authorization transfer.",
+  "forflow.contextBeta.refresh": "Refresh preview",
+  "forflow.contextBeta.copy": "Copy handoff with source receipt",
+  "forflow.contextBeta.description": "Preview a bounded handoff from the current Codex conversation. No model calls, automatic sending or long-term memory writes.",
+  "forflow.contextBeta.location": "Enable to show “Handoff preview” above Codex chat. Off by default; existing sessions and task states stay unchanged."
 }

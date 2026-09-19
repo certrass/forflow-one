@@ -208,5 +208,10 @@
   "src/renderer/src/components/automations/automation-target-availability.test.ts",
   "src/renderer/src/components/automations/automation-source-display.test.ts",
   "src/renderer/src/components/new-workspace/ForflowTaskPrompt.test.tsx",
-  "src/renderer/src/store/slices/ui-contextual-tours.test.ts"
+  "src/renderer/src/store/slices/ui-contextual-tours.test.ts",
+  "src/shared/forflow-context-packet.test.ts",
+  "src/renderer/src/components/native-chat/ForflowContextPreview.test.tsx",
+  "src/renderer/src/components/settings/ExperimentalPane.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatStructuredSession.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatView.test.tsx"
 ]
