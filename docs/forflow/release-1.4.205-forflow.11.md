@@ -8,4 +8,6 @@
 
 应用签名及包内图标检查通过。安装与 ZIP 校验结果见随包 `release.json`；源证据位于 `.forflow/evidence/forflow11-*`。
 
+已安装至 `/Applications/Forflow One.app`，原 `.9` 保留为回退副本，用户数据未改写。安装前后 `app.asar` 哈希一致，版本及签名回读通过。安装后另行通过首页／系统品牌与首次启动 smoke 共两项复验。
+
 `app.asar` SHA-256：`f59a9de7ed18b276ec3827ffc7de30062d8e19361812d3cb0672f86f328e00f7`。
