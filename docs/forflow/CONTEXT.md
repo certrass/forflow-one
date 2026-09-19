@@ -113,3 +113,9 @@
 用户确认旧版已退出后，已将 `.7` 安装到 `/Applications/Forflow One.app`；旧 `.6` 保存在 `~/Library/Caches/Forflow One/rollback/1.4.205-forflow.6-before-forflow.7/Forflow One.app`。安装器未修改用户数据；详细 smoke／回归与图标资产核对结果在交付回执中记录，原 Orca 保留。
 
 安装后图标回读发现 macOS 26 会为预合成 ICNS 再套底板，已将包内 ICNS 改回原始满幅字标，保留运行时圆角 PNG。最终验证分别检查系统解析的图标和 `app.dock.setIcon` 输入，不再假定两者应使用同一个文件。
+
+## 2026-09-19 Computer Use 实测纠正
+
+用户指定 GPT-6 Astra medium 子代理实际点击，后明确“代理继续，我先暂停操作”。本轮 Codex Computer Use 可用，已实测介绍连续 11 页、完成和重开、八项清单、关于、Finder 及三个国内配置入口，纠正之前只有隐藏 Electron／接口验收的边界。发现动态英文与语义误译、CLI 状态 EACCES 后永久加载，修复见 [`.8` 说明](release-1.4.205-forflow.8.md)。原通知进度只代表应用内开关，新增说明；国内菜单仍只提供配置导航，不代表历史解析或模型实调。
+
+Finder 和关于图标确认为单层圆角；Dock 专用访问仍超时。Forflow 自带电脑控制权限仍未授予，本轮实际操作来自 Codex Computer Use。原工作区存在活动会话，测试代理未擅自退出或更改已有智能体命令参数。新版本安装与最后复测以本次发布回执记录为准。
