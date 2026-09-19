@@ -18,6 +18,11 @@ import { getAgentCacheTimerSearchEntries } from './agent-cache-timer-search'
 import { translate } from '@/i18n/i18n'
 import { searchKeywords, translateSearchKeyword, uniqueKeywords } from './settings-search-keywords'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import {
+  FORFLOW_DOMESTIC_CONNECTIONS_SECTION,
+  getForflowDomesticConnections
+} from '@/lib/forflow-domestic-connections'
 
 function buildAgentSettingsKeywords(): string[] {
   const keywords = searchKeywords([
@@ -45,6 +50,9 @@ function buildAgentSettingsKeywords(): string[] {
   for (const agent of getAgentCatalog()) {
     keywords.push(...expandAgentSearchText(agent.id), ...expandAgentSearchText(agent.label))
     keywords.push(...expandAgentSearchText(agent.cmd))
+    for (const alias of agent.searchAliases ?? []) {
+      keywords.push(...expandAgentSearchText(alias))
+    }
   }
 
   return uniqueKeywords(keywords)
@@ -68,6 +76,23 @@ const AGENT_AWAKE_SEARCH_ENTRY_ID = 'agent-awake'
 const AGENT_RUNTIME_SEARCH_ENTRY_ID = 'agent-runtime'
 
 const getAllAgentsPaneSearchEntries = createLocalizedCatalog(() => [
+  ...(isForflowBuild()
+    ? [
+        {
+          id: FORFLOW_DOMESTIC_CONNECTIONS_SECTION,
+          title: translate('forflow.domestic.title', 'Domestic models and agents'),
+          description: translate(
+            'forflow.domestic.searchDescription',
+            'Connect Doubao, WorkBuddy / CodeBuddy, and QoderWork / Qoder CN.'
+          ),
+          keywords: getForflowDomesticConnections().flatMap((connection) => [
+            connection.id,
+            connection.title,
+            connection.command
+          ])
+        }
+      ]
+    : []),
   {
     title: translate('auto.components.settings.agents.search.bb9ad95777', 'Agents'),
     description: translate(

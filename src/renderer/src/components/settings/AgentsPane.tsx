@@ -46,6 +46,8 @@ import {
 import { AgentAvailabilityControl, type AgentCatalogRowProps } from './AgentCatalogRow'
 import { AgentDefaultSetting } from './AgentDefaultSetting'
 import { AgentDetectionCatalog } from './AgentDetectionCatalog'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { ForflowDomesticConnections } from './ForflowDomesticConnections'
 
 export {
   buildAgentAvailabilitySettingsUpdate,
@@ -237,6 +239,13 @@ export function AgentsPane({
 
   return (
     <div className="space-y-8">
+      {isForflowBuild() ? (
+        <ForflowDomesticConnections
+          detectedIds={detectedIds}
+          detectionFailed={detectionFailed}
+          hostName={activeServerName ?? activeServerEnvironmentId}
+        />
+      ) : null}
       <AgentDefaultSetting
         defaultAgent={defaultAgent}
         detectedIds={detectedIds}

@@ -18599,6 +18599,29 @@
     "copy": {
       "worktreePath": "已复制工作树路径",
       "filePath": "已复制文件路径"
+    },
+    "domestic": {
+      "description": "选择下方接入方式，在实际执行主机上安装并登录，然后刷新智能体列表、选择已检测到的 CLI。命令行启动与会话历史读取分别适配。",
+      "detected": "已检测到 CLI；登录状态由 CLI 确认",
+      "detecting": "正在检测 CLI…",
+      "detectionFailed": "主机检测失败",
+      "docs": "官方接入指南",
+      "docsFor": "{{name}} 接入指南",
+      "doubao": "豆包／火山方舟",
+      "doubaoDescription": "通过火山方舟接入豆包模型。Ark CLI 提供模型调用与工具命令；请在所选智能体中配置批准的地址、模型和凭据。",
+      "historySources": "已接入的会话历史来源",
+      "historyUnavailable": "历史暂未接入",
+      "host": "CLI 检测主机：{{host}}",
+      "local": "本地执行环境",
+      "modelConfiguration": "请在智能体中配置；此处尚未检测模型连通性",
+      "modelTool": "模型／工具接入",
+      "qoderwork": "QoderWork／Qoder CN",
+      "qoderworkDescription": "Forflow 通过 qodercn 启动 Qoder 国内版 CLI。QoderWork 是独立桌面应用，其会话尚未导入；请在实际执行主机上配置并登录国内版 CLI。",
+      "searchDescription": "接入豆包、WorkBuddy／CodeBuddy、QoderWork／Qoder CN。",
+      "title": "国内模型与智能体",
+      "undetected": "此主机尚未检测到 CLI",
+      "workbuddy": "WorkBuddy／CodeBuddy",
+      "workbuddyDescription": "Forflow 启动的是腾讯 CodeBuddy CLI。WorkBuddy 是独立桌面应用，安装桌面版不代表已安装独立 CLI，也不会导入其账号与会话。"
     }
   },
   "githubChecks": {

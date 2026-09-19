@@ -18599,6 +18599,29 @@
     "copy": {
       "worktreePath": "Worktree path copied",
       "filePath": "File path copied"
+    },
+    "domestic": {
+      "description": "Choose a connection below, install and sign in on the execution host, then refresh the agent list and select the detected CLI. CLI launch and conversation-history import have separate support.",
+      "detected": "CLI detected; sign-in is managed by the CLI",
+      "detecting": "Detecting CLI…",
+      "detectionFailed": "Host detection failed",
+      "docs": "Official setup guide",
+      "docsFor": "Setup guide for {{name}}",
+      "doubao": "Doubao / Volcengine Ark",
+      "doubaoDescription": "Connect Doubao models through Volcengine Ark. Ark CLI provides model and tool commands; configure the approved endpoint, model and credentials in your chosen agent.",
+      "historySources": "Connected conversation-history sources",
+      "historyUnavailable": "History not connected yet",
+      "host": "CLI detection host: {{host}}",
+      "local": "Local execution environment",
+      "modelConfiguration": "Configure in your agent; model connectivity has not been checked here",
+      "modelTool": "Model / tool connection",
+      "qoderwork": "QoderWork / Qoder CN",
+      "qoderworkDescription": "Forflow launches Qoder CN CLI using qodercn. QoderWork is a separate desktop app; its conversations are not imported. Configure and sign in to the domestic CLI on the execution host.",
+      "searchDescription": "Connect Doubao, WorkBuddy / CodeBuddy, and QoderWork / Qoder CN.",
+      "title": "Domestic models and agents",
+      "undetected": "CLI not detected on this host",
+      "workbuddy": "WorkBuddy / CodeBuddy",
+      "workbuddyDescription": "Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations."
     }
   },
   "githubChecks": {

@@ -143,5 +143,6 @@
   "src/renderer/src/lib/source-control-remote-error.test.ts",
   "src/renderer/src/lib/workspace-file-drag.test.ts",
   "src/renderer/src/lib/worktree-git-identity-display.test.ts",
-  "src/renderer/src/components/settings/terminal-preview-content.test.ts"
+  "src/renderer/src/components/settings/terminal-preview-content.test.ts",
+  "src/renderer/src/components/settings/ForflowDomesticConnections.test.tsx"
 ]

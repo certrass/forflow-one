@@ -1,6 +1,6 @@
 # Forflow One
 
-本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；当前本机测试版为 [1.4.205-forflow.5](docs/forflow/release-1.4.205-forflow.5.md)。
+本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；当前本机测试版为 [1.4.205-forflow.6](docs/forflow/release-1.4.205-forflow.6.md)。
 
 `origin` 指向本私有仓库。Orca 仅作为 `upstream` 上游源码来源，保留其历史、许可证及以下原始说明；其中的云服务、安装与发布流程不等同于 Forflow 私有版的交付流程。
 

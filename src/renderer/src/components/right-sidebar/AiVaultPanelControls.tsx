@@ -37,6 +37,8 @@ import { translate } from '@/i18n/i18n'
 import type { AiVaultHostScopeOption } from './ai-vault-host-scope'
 import { AiVaultSessionLimitMenu } from './AiVaultSessionLimitMenu'
 import type { AiVaultSessionLimit } from './ai-vault-session-limit'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { ForflowDomesticHistoryMenu } from './ForflowDomesticHistoryMenu'
 
 const VAULT_HEADER_CONTROL_CLASS = 'size-6 shrink-0'
 
@@ -269,6 +271,7 @@ export function VaultViewMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="w-56">
+        {isForflowBuild() ? <ForflowDomesticHistoryMenu /> : null}
         {/* Why: Select all / Clear lets users isolate one agent without unchecking 15 boxes. */}
         <div className="flex items-center justify-between px-2 py-1">
           <span className="text-[11px] font-semibold text-muted-foreground">
