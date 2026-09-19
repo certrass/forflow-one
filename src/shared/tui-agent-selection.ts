@@ -1,5 +1,6 @@
 import type { TuiAgent } from './tui-agent'
 import { isTuiAgent } from './tui-agent-config'
+import { isForflowBuild } from './product-branding'
 
 // Keep this order in sync with the desktop agent catalog. It defines the
 // automatic fallback priority when the user has not chosen a default agent.
@@ -36,11 +37,32 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'kimi',
   'mistral-vibe',
   'qwen-code',
+  'codebuddy',
+  'qoder-cn',
   'rovo',
   'hermes',
   'devin',
   'openclaw'
 ] as const satisfies readonly TuiAgent[]
+
+const FORFLOW_AGENT_PRIORITY: readonly TuiAgent[] = [
+  'codebuddy',
+  'qoder-cn',
+  'trae',
+  'qwen-code',
+  'kimi',
+  'mimo-code',
+  'opencode'
+]
+
+export function getTuiAgentAutoPickOrder(): readonly TuiAgent[] {
+  return isForflowBuild()
+    ? [
+        ...FORFLOW_AGENT_PRIORITY,
+        ...TUI_AGENT_AUTO_PICK_ORDER.filter((agent) => !FORFLOW_AGENT_PRIORITY.includes(agent))
+      ]
+    : TUI_AGENT_AUTO_PICK_ORDER
+}
 
 // Why: fresh installs should expose Claude Agent Teams in agent pickers; the
 // persistence migration separately preserves the old hidden default for legacy profiles.
@@ -59,7 +81,8 @@ export function pickTuiAgent(
   if (preferred && detectedSet.has(preferred) && !disabledSet.has(preferred)) {
     return preferred
   }
-  for (const agent of TUI_AGENT_AUTO_PICK_ORDER) {
+  const automaticCandidates = isForflowBuild() ? FORFLOW_AGENT_PRIORITY : TUI_AGENT_AUTO_PICK_ORDER
+  for (const agent of automaticCandidates) {
     if (detectedSet.has(agent) && !disabledSet.has(agent)) {
       return agent
     }

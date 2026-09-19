@@ -3,6 +3,7 @@ import { ShieldCheck } from 'lucide-react'
 import { useMountedRef } from '@/hooks/useMountedRef'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { TelemetryConsentState } from '../../../../shared/telemetry-consent-types'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
 import { PRIVACY_URL, getConsentState, setOptIn as telemetrySetOptIn } from '../../lib/telemetry'
@@ -10,7 +11,7 @@ import { useAppStore } from '../../store'
 import { PrivacyDiagnosticsSection } from './PrivacyDiagnosticsSection'
 import { translate } from '@/i18n/i18n'
 
-export type EnvBlockedReason = 'do_not_track' | 'orca_disabled' | 'ci'
+export type EnvBlockedReason = 'do_not_track' | 'orca_disabled' | 'ci' | 'deployment_policy'
 export type BlockedReason = { kind: 'env'; reason: EnvBlockedReason }
 
 type PrivacyPaneProps = {
@@ -27,11 +28,15 @@ export function isEnvBlocked(consent: TelemetryConsentState | null): consent is 
     consent?.effective === 'disabled' &&
     (consent.reason === 'do_not_track' ||
       consent.reason === 'orca_disabled' ||
+      consent.reason === 'deployment_policy' ||
       consent.reason === 'ci')
   )
 }
 
 export function envVarNameForReason(reason: EnvBlockedReason): string {
+  if (reason === 'deployment_policy') {
+    return 'FORFLOW_DEPLOYMENT_PROFILE'
+  }
   if (reason === 'do_not_track') {
     return 'DO_NOT_TRACK'
   }
@@ -67,7 +72,8 @@ export function PrivacyPane({ settings }: PrivacyPaneProps): React.JSX.Element {
   }, [settings.telemetry?.optedIn])
 
   const blocked = computeBlockedReason(consent)
-  const toggleChecked = settings.telemetry?.optedIn === true
+  const managed = isForflowBuild() || blocked?.reason === 'deployment_policy'
+  const toggleChecked = !managed && settings.telemetry?.optedIn === true
 
   const handleToggle = async (): Promise<void> => {
     if (blocked || inFlight) {
@@ -98,18 +104,27 @@ export function PrivacyPane({ settings }: PrivacyPaneProps): React.JSX.Element {
             </Label>
           </div>
           <p className="text-xs text-muted-foreground">
-            {translate(
-              'auto.components.settings.PrivacyPane.8bfdd23a88',
-              'Help us figure out what to build next. Orca sends anonymous counts of which features you use and where things break.'
-            )}{' '}
-            <button
-              type="button"
-              className="underline underline-offset-2 hover:text-foreground"
-              onClick={() => void window.api.shell.openUrl(PRIVACY_URL)}
-            >
-              {translate('auto.components.settings.PrivacyPane.77410e0566', 'Privacy policy')}
-            </button>
-            .
+            {managed ? (
+              translate(
+                'forflow.privacy.description',
+                '企业版本不发送产品使用遥测。诊断记录保存在本机，按企业制度单独管理。'
+              )
+            ) : (
+              <>
+                {translate(
+                  'auto.components.settings.PrivacyPane.8bfdd23a88',
+                  'Help us figure out what to build next. Orca sends anonymous counts of which features you use and where things break.'
+                )}{' '}
+                <button
+                  type="button"
+                  className="underline underline-offset-2 hover:text-foreground"
+                  onClick={() => void window.api.shell.openUrl(PRIVACY_URL)}
+                >
+                  {translate('auto.components.settings.PrivacyPane.77410e0566', 'Privacy policy')}
+                </button>
+                .
+              </>
+            )}
           </p>
         </div>
         <Switch
@@ -119,7 +134,7 @@ export function PrivacyPane({ settings }: PrivacyPaneProps): React.JSX.Element {
             'Share anonymous usage data'
           )}
           aria-describedby={blocked ? PRIVACY_PANE_BLOCKED_HELPER_ID : undefined}
-          disabled={blocked !== null || inFlight}
+          disabled={managed || blocked !== null || inFlight}
           onCheckedChange={() => void handleToggle()}
         />
       </div>
@@ -131,6 +146,13 @@ export function PrivacyPane({ settings }: PrivacyPaneProps): React.JSX.Element {
 }
 
 function BlockedHelper({ blocked, id }: { blocked: BlockedReason; id: string }): React.JSX.Element {
+  if (blocked.reason === 'deployment_policy') {
+    return (
+      <p id={id} className="pb-2 text-xs text-muted-foreground">
+        {translate('forflow.privacy.managed', '企业部署策略已关闭产品遥测；本地诊断记录单独管理。')}
+      </p>
+    )
+  }
   return (
     <div id={id} className="pb-2 text-xs text-muted-foreground">
       {blocked.reason === 'ci' ? (

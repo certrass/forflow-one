@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import { is } from '@electron-toolkit/utils'
 import { withUpdaterSpan } from '../observability/instrumentation'
 import {
@@ -15,6 +16,9 @@ export abstract class UpdaterScheduling extends UpdaterCheckFailure {
   }
 
   protected scheduleAutomaticUpdateCheck(delayMs: number): void {
+    if (isForflowPrivateDeployment()) {
+      return
+    }
     let effectiveDelayMs = delayMs
     // All retry-cadence callers pass exactly this constant, so keying backoff on it keeps one choke point instead of threading a flag through every schedule site.
     if (delayMs === AUTO_UPDATE_RETRY_INTERVAL_MS) {
@@ -45,6 +49,9 @@ export abstract class UpdaterScheduling extends UpdaterCheckFailure {
   protected runBackgroundUpdateCheck(
     nudgeId: string | null = this.getPersistedPendingUpdateNudgeId()
   ): boolean {
+    if (isForflowPrivateDeployment()) {
+      return false
+    }
     // Why: a pinned dev jump owns the feed until it settles; a background check would repoint it mid-flight and download the wrong build.
     if (
       this.activeUpdateSource !== 'release' ||

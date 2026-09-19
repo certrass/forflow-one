@@ -1,4 +1,5 @@
 import { getOrcaPushGatewayUrl } from '../orca-profiles/profile-cloud-auth-config'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import { DesktopPushService } from '../runtime/push/desktop-push-service'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import type { OrcaRuntimeRpcServer } from '../runtime/runtime-rpc'
@@ -10,6 +11,9 @@ import { mainProcessState as state } from './main-process-state'
 // modes have already stored it there; threading it as a parameter would push the
 // launch module past its line budget for no gain.
 export function startDesktopPushService(runtimeRpc: OrcaRuntimeRpcServer): void {
+  if (isForflowPrivateDeployment()) {
+    return
+  }
   const runtime: OrcaRuntimeService | null = state.runtime
   if (!runtime) {
     console.warn('[push] Background push startup skipped: runtime not started')

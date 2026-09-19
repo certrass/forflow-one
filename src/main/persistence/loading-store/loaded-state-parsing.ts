@@ -5,6 +5,7 @@ import { normalizeKagiSessionLink } from '../../../shared/browser-url'
 import type { PersistedState } from '../../../shared/persisted-state-types'
 import type { SshPtyConsumerRecovery } from '../../../shared/ssh-types'
 import { getDefaultPersistedState } from '../../../shared/constants'
+import { applyForflowFreshProfileDefaults } from '../../forflow/fresh-profile-defaults'
 import { pruneLocalTerminalScrollbackBuffers } from '../../../shared/workspace-session-terminal-buffers'
 import { pruneWorkspaceSessionBrowserHistory } from '../../../shared/workspace-session-browser-history'
 import { clearMissingProjectGroupMemberships } from '../../../shared/project-groups'
@@ -195,7 +196,7 @@ export class LoadedStateParsingOperations {
     }
 
     if (result === null) {
-      result = getDefaultPersistedState(homedir())
+      result = applyForflowFreshProfileDefaults(getDefaultPersistedState(homedir()), homedir())
     }
 
     const workspaceSession = pruneWorkspaceSessionBrowserHistory(

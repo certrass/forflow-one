@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { assertForflowCloudCapability } from '../forflow/deployment-policy'
 import { is } from '@electron-toolkit/utils'
 import {
   DEV_CHANNEL_PLATFORM_LABEL,
@@ -68,6 +69,7 @@ export abstract class UpdaterBuildSelection extends UpdaterMenuChecks {
   }
 
   protected async listAvailableReleaseBuilds(channel: ReleaseChannel): Promise<ReleaseBuild[]> {
+    assertForflowCloudCapability('updates')
     return listReleaseBuilds(channel)
   }
 

@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { createBootstrapFatalExitBanner } from './config/build-plugins/bootstrap-fatal-exit-banner'
 import { createPlainNodeEntryGuardPlugin } from './config/build-plugins/plain-node-entry-guard'
 import packageJson from './package.json' with { type: 'json' }
+import { forflowBrandingPlugin, forflowBuildEnabled } from './config/build-plugins/forflow-branding'
 
 const BUNDLED_MAIN_DEPENDENCIES = new Set([
   '@streamparser/json',
@@ -45,17 +46,19 @@ function isExternalMainModule(source: string): boolean {
 // for the two constants live in `src/types/build-constants.d.ts`.
 const orcaBuildIdentity = process.env.ORCA_BUILD_IDENTITY
 const ORCA_BUILD_IDENTITY_LITERAL =
-  orcaBuildIdentity === 'stable' || orcaBuildIdentity === 'rc'
+  !forflowBuildEnabled && (orcaBuildIdentity === 'stable' || orcaBuildIdentity === 'rc')
     ? JSON.stringify(orcaBuildIdentity)
     : 'null'
 const orcaPostHogWriteKey = process.env.ORCA_POSTHOG_WRITE_KEY
 const ORCA_POSTHOG_WRITE_KEY_LITERAL =
-  typeof orcaPostHogWriteKey === 'string' && orcaPostHogWriteKey.length > 0
+  !forflowBuildEnabled && typeof orcaPostHogWriteKey === 'string' && orcaPostHogWriteKey.length > 0
     ? JSON.stringify(orcaPostHogWriteKey)
     : 'null'
 const orcaDiagnosticsTokenUrl = process.env.ORCA_DIAGNOSTICS_TOKEN_URL
 const ORCA_DIAGNOSTICS_TOKEN_URL_LITERAL =
-  typeof orcaDiagnosticsTokenUrl === 'string' && orcaDiagnosticsTokenUrl.length > 0
+  !forflowBuildEnabled &&
+  typeof orcaDiagnosticsTokenUrl === 'string' &&
+  orcaDiagnosticsTokenUrl.length > 0
     ? JSON.stringify(orcaDiagnosticsTokenUrl)
     : 'null'
 
@@ -273,6 +276,7 @@ export const electronViteConfig: UserConfig = {
     // Why: compile-time substitution for the telemetry gate. See the block
     // above for the full rationale.
     define: {
+      FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
       ORCA_BUILD_IDENTITY: ORCA_BUILD_IDENTITY_LITERAL,
       ORCA_POSTHOG_WRITE_KEY: ORCA_POSTHOG_WRITE_KEY_LITERAL,
       ORCA_DIAGNOSTICS_TOKEN_URL: ORCA_DIAGNOSTICS_TOKEN_URL_LITERAL
@@ -297,13 +301,14 @@ export const electronViteConfig: UserConfig = {
     }
   },
   renderer: {
+    define: { FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled) },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
         '@': resolve('src/renderer/src')
       }
     },
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), forflowBrandingPlugin()],
     worker: {
       format: 'es'
     },

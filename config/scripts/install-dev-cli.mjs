@@ -5,6 +5,11 @@ import { existsSync, lstatSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 
+if (process.env.FORFLOW_BUILD === '1') {
+  console.log('[forflow] Keeping the development CLI inside this checkout.')
+  process.exit(0)
+}
+
 const scriptDir = import.meta.dirname
 const source = path.join(scriptDir, 'orca-dev.mjs')
 

@@ -4,10 +4,18 @@ import { isExternallyManagedLinuxInstall } from '../linux-update-package-type'
 import { LINUX_PACKAGE_EXTERNALLY_MANAGED_MESSAGE } from '../linux-package-downloaded-status'
 import { QUIT_AND_INSTALL_DELAY_MS } from './updater-state'
 import { UpdaterRemoteStatus } from './updater-remote-status'
+import {
+  isForflowPrivateDeployment,
+  FORFLOW_MANAGED_UPDATE_MESSAGE
+} from '../forflow/deployment-policy'
 
 /** Coordinates renderer-facing download/install actions and their duplicate guards. */
 export abstract class UpdaterDownloadInstall extends UpdaterRemoteStatus {
   protected quitAndInstall(): void {
+    if (isForflowPrivateDeployment()) {
+      this.sendErrorStatus(FORFLOW_MANAGED_UPDATE_MESSAGE, true)
+      return
+    }
     if (
       this.localBuildSelectionInProgress ||
       this.pinnedBuildSelectionInProgress ||
@@ -38,6 +46,10 @@ export abstract class UpdaterDownloadInstall extends UpdaterRemoteStatus {
   }
 
   protected downloadUpdate(): void {
+    if (isForflowPrivateDeployment()) {
+      this.sendErrorStatus(FORFLOW_MANAGED_UPDATE_MESSAGE, true)
+      return
+    }
     if (
       this.localBuildSelectionInProgress ||
       this.pinnedBuildSelectionInProgress ||

@@ -1,0 +1,16 @@
+{
+  "name": "Forflow One",
+  "packageName": "forflow-one",
+  "appId": "cn.forflow.one",
+  "command": "forflow",
+  "protocol": "forflow-one",
+  "dataDirectory": "Forflow One",
+  "deploymentProfile": "cn-private",
+  "upstream": {
+    "name": "Orca",
+    "repository": "https://github.com/stablyai/orca.git",
+    "tag": "v1.4.205",
+    "commit": "11aba8bdc5e492d3ba01fc7fe333495ace74128f",
+    "license": "MIT"
+  }
+}

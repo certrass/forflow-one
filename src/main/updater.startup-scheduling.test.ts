@@ -34,6 +34,29 @@ describe('updater', () => {
     vi.useFakeTimers()
   })
 
+  it('blocks private setup and manual actions without fetching or installing updates', async () => {
+    vi.stubEnv('FORFLOW_DEPLOYMENT_PROFILE', 'cn-private')
+    try {
+      const mainWindow = { webContents: { send: vi.fn() } }
+      const updater = await loadUpdaterModule()
+      updater.setupAutoUpdater(mainWindow as never)
+      updater.checkForUpdatesFromMenu()
+      updater.downloadUpdate()
+      updater.quitAndInstall()
+      await expect(updater.listAvailableReleaseBuilds('stable')).rejects.toThrow('已禁用')
+      expect(autoUpdaterMock.setFeedURL).not.toHaveBeenCalled()
+      expect(autoUpdaterMock.checkForUpdates).not.toHaveBeenCalled()
+      expect(autoUpdaterMock.downloadUpdate).not.toHaveBeenCalled()
+      expect(autoUpdaterMock.quitAndInstall).not.toHaveBeenCalled()
+      expect(fetchNudgeMock).not.toHaveBeenCalled()
+      expect(powerMonitorOnMock).not.toHaveBeenCalled()
+      expect(mainWindow.webContents.send).toHaveBeenCalled()
+      expect(updater.getUpdateStatus().state).toBe('error')
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
   it('does not load or configure electron-updater during dev setup', async () => {
     isMock.dev = true
     const mainWindow = { webContents: { send: vi.fn() } }

@@ -122,6 +122,17 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     // Trae subcommand or flag — `--` stops both in its Cobra parser.
     argvPromptSeparator: '--'
   },
+  codebuddy: {
+    detectCmd: 'codebuddy',
+    detectCmdAliases: ['cbc', 'codebuddy-code'],
+    promptInjectionMode: 'argv',
+    argvPromptSeparator: '--'
+  },
+  'qoder-cn': {
+    detectCmd: 'qodercn',
+    // A positional query exits after one response; this flag keeps the TUI open.
+    promptInjectionMode: 'flag-prompt-interactive'
+  },
   opencode: {
     detectCmd: 'opencode',
     promptInjectionMode: 'flag-prompt',

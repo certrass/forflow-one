@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import {
   cleanCloudServiceUrl as cleanUrl,
   cleanCloudServiceOrigin as cleanOrigin
@@ -43,6 +44,9 @@ export function getOrcaCloudAuthConfig(
   env: NodeJS.ProcessEnv = process.env,
   packaged: boolean = isPackagedOrcaBuild()
 ): { configured: true; config: OrcaCloudAuthConfig } | { configured: false; setupMessage: string } {
+  if (isForflowPrivateDeployment(env)) {
+    return { configured: false, setupMessage: 'Forflow One 企业配置已禁用上游云端登录与中继。' }
+  }
   // Why: loopback HTTP endpoints are a local-development convenience only;
   // packaged builds must not accept plain-HTTP token endpoints via env vars.
   const allowLoopbackHttp = !packaged

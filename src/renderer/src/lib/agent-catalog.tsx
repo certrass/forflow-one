@@ -15,6 +15,8 @@ import {
 import { translate } from '@/i18n/i18n'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import { AGENT_FAVICON_ASSETS } from './agent-favicon-assets'
+import { isForflowBuild } from '../../../shared/product-branding'
+import { getTuiAgentAutoPickOrder } from '../../../shared/tui-agent-selection'
 
 export type AgentCatalogEntry = {
   id: TuiAgent
@@ -44,7 +46,7 @@ function getCatalogPlatform(): NodeJS.Platform {
   return typeof process === 'undefined' ? 'linux' : process.platform
 }
 
-export const getAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] => [
+const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] => [
   {
     id: 'claude',
     label: translate('auto.lib.agent.catalog.0708ed89f1', 'Claude'),
@@ -281,6 +283,20 @@ export const getAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] =>
     homepageUrl: 'https://github.com/QwenLM/qwen-code'
   },
   {
+    id: 'codebuddy',
+    label: 'CodeBuddy',
+    cmd: 'codebuddy',
+    searchAliases: ['腾讯', 'WorkBuddy', 'codebuddy-code', 'cbc'],
+    homepageUrl: 'https://www.codebuddy.cn/docs/cli/installation'
+  },
+  {
+    id: 'qoder-cn',
+    label: 'Qoder CN',
+    cmd: 'qodercn',
+    searchAliases: ['阿里', 'QoderWork', 'Qoder 国内版'],
+    homepageUrl: 'https://docs.qoder.cn/cli/quickstart'
+  },
+  {
     id: 'rovo',
     label: translate('auto.lib.agent.catalog.4e63c7b956', 'Rovo Dev'),
     cmd: 'rovo',
@@ -310,6 +326,15 @@ export const getAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] =>
     homepageUrl: 'https://github.com/openclaw/openclaw'
   }
 ])
+
+export function getAgentCatalog(): AgentCatalogEntry[] {
+  const catalog = getUnorderedAgentCatalog()
+  if (!isForflowBuild()) {
+    return catalog
+  }
+  const order = getTuiAgentAutoPickOrder()
+  return catalog.toSorted((left, right) => order.indexOf(left.id) - order.indexOf(right.id))
+}
 
 // Why: tests and a few legacy call sites still import a catalog snapshot.
 export const AGENT_CATALOG: AgentCatalogEntry[] = getAgentCatalog()
@@ -379,7 +404,7 @@ export function AgentIcon({
       />
     )
   }
-  if (catalogEntry?.faviconDomain) {
+  if (catalogEntry?.faviconDomain && !isForflowBuild()) {
     // Why: agents without a published SVG icon or bundled favicon fall back to
     // their site favicon via Google's favicon service — same source the README
     // uses for the agent badge list.

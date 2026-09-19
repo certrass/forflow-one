@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "forflow/qwen-model-id",
+  "small_model": "forflow/qwen-model-id",
+  "enabled_providers": ["forflow"],
+  "share": "disabled",
+  "autoupdate": false,
+  "provider": {
+    "forflow": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Forflow One 企业模型网关",
+      "options": {
+        "baseURL": "https://model-gateway.example.internal/v1",
+        "apiKey": "{env:FORFLOW_MODEL_API_KEY}"
+      },
+      "models": {
+        "qwen-model-id": { "name": "企业模型（替换为实际模型标识）" }
+      }
+    }
+  }
+}

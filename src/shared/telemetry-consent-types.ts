@@ -12,6 +12,6 @@ export type TelemetryConsentState =
   | { effective: 'enabled' }
   | {
       effective: 'disabled'
-      reason: 'do_not_track' | 'orca_disabled' | 'ci' | 'user_opt_out'
+      reason: 'do_not_track' | 'orca_disabled' | 'ci' | 'user_opt_out' | 'deployment_policy'
     }
   | { effective: 'pending_banner' }

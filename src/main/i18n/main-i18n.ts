@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { brandProductText, brandTranslationCatalog } from '../../shared/product-branding'
 import i18next, {
   type BackendModule,
   type i18n as I18nInstance,
@@ -43,7 +44,7 @@ const lazyLocaleBackend: BackendModule = {
       return
     }
     loader().then(
-      (mod) => callback(null, mod.default),
+      (mod) => callback(null, brandTranslationCatalog(mod.default)),
       (error) => callback(error instanceof Error ? error : new Error(String(error)), false)
     )
   }
@@ -124,9 +125,12 @@ export function setMainPluginLanguagePacks(
 }
 
 export function translateMain(key: string, fallback: string, options?: TOptions): string {
+  const brandedFallback = brandProductText(fallback)
   // Why: menu registration can run before async init finishes in tests; fall back
   // to the English default instead of returning undefined from an uninitialized i18n.
-  const raw = initialized ? mainI18n.t(key, { defaultValue: fallback, ...options }) : fallback
-  const value = typeof raw === 'string' && raw.length > 0 ? raw : fallback
+  const raw = initialized
+    ? mainI18n.t(key, { defaultValue: brandedFallback, ...options })
+    : brandedFallback
+  const value = typeof raw === 'string' && raw.length > 0 ? raw : brandedFallback
   return isPseudoLocalizationLocale(mainI18n.language) ? pseudoLocalizeString(value) : value
 }

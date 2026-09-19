@@ -1,4 +1,8 @@
 import { app } from 'electron'
+import {
+  isForflowPrivateDeployment,
+  FORFLOW_MANAGED_UPDATE_MESSAGE
+} from '../forflow/deployment-policy'
 import { is } from '@electron-toolkit/utils'
 import type { UpdateCheckOptions } from '../../shared/update-status-types'
 import type { ReleaseChannel } from '../../shared/release-channel'
@@ -7,6 +11,10 @@ import { UpdaterScheduling } from './updater-scheduling'
 /** Handles checks initiated from the desktop menu and modifier-key variants. */
 export abstract class UpdaterMenuChecks extends UpdaterScheduling {
   protected checkForUpdatesFromMenu(options?: UpdateCheckOptions): void {
+    if (isForflowPrivateDeployment()) {
+      this.sendErrorStatus(FORFLOW_MANAGED_UPDATE_MESSAGE, true)
+      return
+    }
     if (!app.isPackaged || is.dev) {
       this.sendStatus({ state: 'not-available', userInitiated: true })
       return

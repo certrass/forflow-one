@@ -8,6 +8,7 @@
 
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import type { TelemetryConsentState } from '../../shared/telemetry-consent-types'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 
 // Discriminated union instead of a boolean: the Privacy pane (PR 3) needs the
 // `reason` to render the correct "disabled because X" helper text, and the
@@ -74,6 +75,9 @@ export function _resetMisconfigWarnCacheForTests(): void {
 }
 
 export function resolveConsent(settings: GlobalSettings): ConsentState {
+  if (isForflowPrivateDeployment()) {
+    return { effective: 'disabled', reason: 'deployment_policy' }
+  }
   // Precedence 1: community standard kill switch. Always wins.
   if (isEnvVarTruthy('DO_NOT_TRACK')) {
     return { effective: 'disabled', reason: 'do_not_track' }

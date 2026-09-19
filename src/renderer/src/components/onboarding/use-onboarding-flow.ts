@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { getAgentCatalog } from '@/lib/agent-catalog'
+import { pickTuiAgent } from '../../../../shared/tui-agent-selection'
 import { useAppStore } from '@/store'
 import { applyDocumentTheme } from '@/lib/document-theme'
 import { track } from '@/lib/telemetry'
@@ -264,7 +264,7 @@ export function useOnboardingFlow(
       if (selectedAgentRef.current !== null) {
         return
       }
-      const preferred = getAgentCatalog().find((agent) => ids.includes(agent.id))?.id ?? null
+      const preferred = pickTuiAgent(null, ids)
       setSelectedAgent(preferred)
     })
   }, [refreshDetectedAgents])
