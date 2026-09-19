@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path'
 if (process.platform !== 'darwin') {
   throw new Error('Export the macOS icon with sips and iconutil on macOS.')
 }
+// macOS masks bundle artwork; only the runtime Dock override needs a precomposed icon.
 const root = resolve(import.meta.dirname, '../..')
 const temporary = mkdtempSync(join(tmpdir(), 'forflow-icon-'))
 try {
@@ -21,7 +22,7 @@ try {
           '-z',
           pixels,
           pixels,
-          join(root, 'resources/forflow/forflow-app-icon.png'),
+          join(root, 'resources/forflow/forflow-mark.png'),
           '--out',
           join(iconset, name)
         ],

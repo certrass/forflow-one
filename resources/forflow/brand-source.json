@@ -9,8 +9,8 @@
     "file": "forflow-app-icon.png",
     "sha256": "f70dd2a4bdfbee3b8cecce09e6538cd8e424e8121de14ae7b50d9ca64f112319",
     "origin": "Read-only AppKit NSWorkspace.icon(forFile:) export of the Forflow One 1.4.205-forflow.6 bundle icon on macOS 26.1. Original wordmark and green line unchanged.",
-    "reason": "User clarified the problem is non-rounded corners. Runtime Dock overrides previously loaded the opaque square wordmark.",
-    "export": "node config/scripts/export-forflow-icon.mjs",
+    "reason": "User clarified the problem is non-rounded corners. Runtime Dock overrides previously loaded the opaque square wordmark. Do not put the precomposed PNG inside ICNS: macOS 26 adds a second inset plate.",
+    "export": "AppKit export retained as the runtime PNG. Bundle ICNS uses the original full-bleed wordmark via node config/scripts/export-forflow-icon.mjs; macOS applies its own mask.",
     "size": 1024
   }
 }
