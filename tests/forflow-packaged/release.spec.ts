@@ -7,6 +7,7 @@ import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electr
 import { getE2ECompletedOnboardingProfile } from '../e2e/helpers/e2e-completed-onboarding-profile'
 
 import { launch, evidence, packageFingerprint } from './harness'
+import releaseProfile from '../../resources/forflow/release-profile.json'
 
 test('smoke: production app starts in Chinese with independent identity and private defaults', async () => {
   const profile = realpathSync(mkdtempSync(path.join(tmpdir(), 'forflow-smoke-')))
@@ -21,7 +22,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
     }))
     expect(identity).toMatchObject({
       name: 'Forflow One',
-      version: '1.4.205-forflow.5',
+      version: releaseProfile.version,
       packaged: true,
       dataPath: profile,
       visibleWindows: 0

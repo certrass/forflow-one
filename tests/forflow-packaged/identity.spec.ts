@@ -7,6 +7,7 @@ import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electr
 import { getE2ECompletedOnboardingProfile } from '../e2e/helpers/e2e-completed-onboarding-profile'
 import { IdentityStore } from '../../services/identity/identity-store.mjs'
 import { createIdentityHttpServer } from '../../services/identity/http-server.mjs'
+import releaseProfile from '../../resources/forflow/release-profile.json'
 
 const password = 'Forflow-test-only-2026!'
 
@@ -121,7 +122,7 @@ test('identity regression: private server, Chinese account UI, revocation, persi
     const resumed = await launch(profile)
     running = resumed.app
     await expect(resumed.page.getByTestId('forflow-release')).toContainText(
-      '当前版本：1.4.205-forflow.5'
+      `当前版本：${releaseProfile.version}`
     )
     await expect(resumed.page.locator('body')).not.toContainText('Register /usr/local/bin')
     await expect(resumed.page.locator('body')).not.toContainText('Before opening setup')
