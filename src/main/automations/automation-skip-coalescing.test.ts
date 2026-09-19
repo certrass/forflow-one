@@ -64,7 +64,7 @@ async function seedUnresolvableAutomation(): Promise<{ store: Store; automation:
     workspaceMode: 'new_per_run',
     timezone: 'UTC',
     rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-    dtstart: new Date('2026-05-12T00:00:00').getTime()
+    dtstart: new Date('2026-05-12T00:00:00Z').getTime()
   })
   const file = join(testState.dir, 'orca-data.json')
   const state = JSON.parse(readFileSync(file, 'utf-8'))
@@ -91,7 +91,7 @@ function seedRunnableAutomation(store: Store): Automation {
     workspaceMode: 'new_per_run',
     timezone: 'UTC',
     rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-    dtstart: new Date('2026-05-12T00:00:00').getTime()
+    dtstart: new Date('2026-05-12T00:00:00Z').getTime()
   })
 }
 
@@ -138,13 +138,13 @@ describe('repeated skipped_unavailable coalescing', () => {
   })
 
   it('folds every later refusal into the first record instead of writing a row each', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const service = attachedService(store)
 
-    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00')
-    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00')
-    await evaluateAt(store, service, automation.id, '2026-05-15T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00Z')
+    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00Z')
+    await evaluateAt(store, service, automation.id, '2026-05-15T09:01:00Z')
 
     const runs = store.listAutomationRuns(automation.id)
     expect(runs).toHaveLength(1)
@@ -153,8 +153,8 @@ describe('repeated skipped_unavailable coalescing', () => {
       error: SETUP_GONE,
       occurrenceCount: 3,
       // The record keeps the first occurrence and names the latest it stands for.
-      scheduledFor: new Date('2026-05-13T09:00:00').getTime(),
-      lastOccurrenceAt: new Date('2026-05-15T09:00:00').getTime()
+      scheduledFor: new Date('2026-05-13T09:00:00Z').getTime(),
+      lastOccurrenceAt: new Date('2026-05-15T09:00:00Z').getTime()
     })
   })
 
@@ -164,38 +164,38 @@ describe('repeated skipped_unavailable coalescing', () => {
    * fold like any other, or a five-minute automation buries its history in ~8h.
    */
   it('folds the refusals a closed window produces instead of writing a row each', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const store = await createStore()
     const automation = seedRunnableAutomation(store)
     const service = attachedService(store)
 
-    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00Z')
     service.setWebContents(null)
-    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00')
-    await evaluateAt(store, service, automation.id, '2026-05-15T09:01:00')
-    await evaluateAt(store, service, automation.id, '2026-05-16T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00Z')
+    await evaluateAt(store, service, automation.id, '2026-05-15T09:01:00Z')
+    await evaluateAt(store, service, automation.id, '2026-05-16T09:01:00Z')
 
     const runs = store.listAutomationRuns(automation.id)
     expect(runs.map((run) => run.status)).toEqual(['skipped_unavailable', 'dispatching'])
     expect(runs[0]).toMatchObject({
       error: NO_WINDOW,
       occurrenceCount: 3,
-      lastOccurrenceAt: new Date('2026-05-16T09:00:00').getTime()
+      lastOccurrenceAt: new Date('2026-05-16T09:00:00Z').getTime()
     })
   })
 
   it('starts a new record when a real run intervened, so history is not rewritten', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const completed = store.createAutomationRun(
       automation,
-      new Date('2026-05-12T09:00:00').getTime()
+      new Date('2026-05-12T09:00:00Z').getTime()
     )
     store.updateAutomationRun({ runId: completed.id, status: 'completed', workspaceId: null })
     const service = attachedService(store)
 
-    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00')
-    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00Z')
+    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00Z')
 
     const runs = store.listAutomationRuns(automation.id)
     expect(runs.map((run) => run.status)).toEqual(['skipped_unavailable', 'completed'])
@@ -203,11 +203,11 @@ describe('repeated skipped_unavailable coalescing', () => {
   })
 
   it('gives a manual attempt its own answer rather than folding it into a scheduled skip', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const service = attachedService(store)
 
-    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00Z')
     const manual = await service.runNow(automation.id)
 
     expect(manual.status).toBe('skipped_unavailable')
@@ -216,7 +216,7 @@ describe('repeated skipped_unavailable coalescing', () => {
   })
 
   it('never folds a scheduled refusal into a manual one', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const manual = store.createAutomationRun(automation, Date.now(), 'manual')
     store.updateAutomationRun({
@@ -233,7 +233,7 @@ describe('repeated skipped_unavailable coalescing', () => {
 
   // Merging these would destroy the signal the record exists to carry.
   it('keeps distinct diagnoses in distinct records', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     seedSkip(store, automation, Date.now(), 'The SSH host is unreachable.')
 
@@ -243,7 +243,7 @@ describe('repeated skipped_unavailable coalescing', () => {
   })
 
   it('counts one occurrence once, however many times the scheduler revisits it', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const scheduledFor = Date.now()
     seedSkip(store, automation, scheduledFor, SETUP_GONE)
@@ -264,7 +264,7 @@ describe('repeated skipped_unavailable coalescing', () => {
   })
 
   it('announces the fold, so a client that is not polling still sees the repeat', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const published: unknown[] = []
     const service = new AutomationService(store, {
@@ -273,9 +273,9 @@ describe('repeated skipped_unavailable coalescing', () => {
     })
     service.setWebContents({ isDestroyed: () => false, send: vi.fn() } as never)
 
-    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-13T09:01:00Z')
     published.length = 0
-    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00')
+    await evaluateAt(store, service, automation.id, '2026-05-14T09:01:00Z')
 
     expect(published).toEqual([{ reason: 'run', selector: { kind: 'self' } }])
   })
@@ -283,7 +283,7 @@ describe('repeated skipped_unavailable coalescing', () => {
   // Rollback shape: a build that never heard of these fields writes plain rows and
   // preserves stamped ones, so an upgrade resumes counting instead of restarting.
   it('resumes counting a folded record across a reload', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const { store, automation } = await seedUnresolvableAutomation()
     const scheduledFor = Date.now()
     seedSkip(store, automation, scheduledFor, SETUP_GONE)

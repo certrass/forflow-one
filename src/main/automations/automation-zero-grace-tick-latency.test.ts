@@ -47,7 +47,7 @@ describe('AutomationService zero-grace tick latency', () => {
     rmSync(testState.dir, { recursive: true, force: true })
   })
 
-  const DUE = new Date('2026-05-13T09:00:00').getTime()
+  const DUE = new Date('2026-05-13T09:00:00Z').getTime()
 
   const makeZeroGrace = (store: Awaited<ReturnType<typeof createStore>>) =>
     store.createAutomation({
@@ -61,7 +61,7 @@ describe('AutomationService zero-grace tick latency', () => {
       workspaceId: 'r1::wt1',
       timezone: 'UTC',
       rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-      dtstart: new Date('2026-05-12T00:00:00').getTime(),
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime(),
       missedRunGraceMinutes: 0
     })
 
@@ -81,7 +81,7 @@ describe('AutomationService zero-grace tick latency', () => {
   }
 
   const statusAt = async (lateMs: number): Promise<string | undefined> => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = makeZeroGrace(store)
@@ -114,7 +114,7 @@ describe('AutomationService zero-grace tick latency', () => {
   // A restart that crosses the occurrence must behave like any other late tick, not like
   // downtime -- the elapsed lateness is what decides, so bookkeeping cannot drift.
   it('dispatches after a restart that crosses the occurrence within tolerance', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = makeZeroGrace(store)

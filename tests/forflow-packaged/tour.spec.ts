@@ -27,7 +27,10 @@ test('the actual parallel-task tour renders in Chinese after splitting a termina
     await expect(page.locator('body')).not.toContainText('Start another task in parallel')
     await expect(page.locator('body')).not.toContainText('Each worktree gets its own branch')
     await page.screenshot({ path: path.join(evidence, 'parallel-task-tour-chinese.png') })
-    await page.getByRole('button', { name: '返回', exact: true }).click()
+    await page
+      .locator('[data-contextual-tour-panel]')
+      .getByRole('button', { name: '返回', exact: true })
+      .click()
     await expect(firstStep).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(page.locator('[data-contextual-tour-panel]')).toHaveCount(0)

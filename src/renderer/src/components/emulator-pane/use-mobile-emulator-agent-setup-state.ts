@@ -13,6 +13,7 @@ import {
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { getMobileEmulatorCliPathNeedsAttention } from './mobile-emulator-agent-setup-cli-state'
 import { translate } from '@/i18n/i18n'
+import { cliStatusReadFailure } from '../settings/forflow-cli-copy'
 
 function getCliActionLabel(status: CliInstallStatus | null, busy: boolean): string {
   if (busy) {
@@ -83,14 +84,7 @@ export function useMobileEmulatorAgentSetupState(enabled = true): {
       }
     } catch (error) {
       if (mountedRef.current) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : translate(
-                'auto.components.emulator.pane.use.mobile.emulator.agent.setup.state.51074ccb05',
-                'Failed to load CLI status.'
-              )
-        )
+        toast.error(cliStatusReadFailure(error))
         setCliInstallStatus(null)
       }
     } finally {
@@ -181,14 +175,8 @@ export function useMobileEmulatorAgentSetupState(enabled = true): {
       )
     } catch (error) {
       if (mountedRef.current) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : translate(
-                'auto.components.emulator.pane.use.mobile.emulator.agent.setup.state.c94ff11e91',
-                'Could not re-check setup status.'
-              )
-        )
+        setCliInstallStatus(null)
+        toast.error(cliStatusReadFailure(error))
       }
     } finally {
       if (mountedRef.current) {
@@ -198,6 +186,16 @@ export function useMobileEmulatorAgentSetupState(enabled = true): {
   }, [mountedRef, refreshCliSkill, setupRechecking])
 
   const handleEnableCli = useCallback(async (): Promise<void> => {
+    if (
+      !cliInstallStatus ||
+      cliInstallStatus.pathConfigured === null ||
+      cliLoading ||
+      cliBusy ||
+      setupRechecking ||
+      !cliSupported
+    ) {
+      return
+    }
     setCliBusy(true)
     try {
       const next = await ensureOrcaCliAvailableForAgentSkillTerminal({
@@ -216,7 +214,7 @@ export function useMobileEmulatorAgentSetupState(enabled = true): {
         setCliBusy(false)
       }
     }
-  }, [mountedRef])
+  }, [cliBusy, cliInstallStatus, cliLoading, cliSupported, mountedRef, setupRechecking])
 
   return {
     cliActionLabel: getCliActionLabel(cliInstallStatus, cliBusy),

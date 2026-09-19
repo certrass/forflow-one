@@ -38,7 +38,6 @@ export async function saveOrcaAutomation(
     editingAutomationId,
     editingRowKey,
     editingDestination,
-    automations,
     setAutomations,
     setDraft,
     selectAutomationId,
@@ -67,7 +66,6 @@ export async function saveOrcaAutomation(
     return
   }
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const rrule =
     draft.preset === 'custom'
       ? draft.customSchedule.trim()
@@ -136,7 +134,9 @@ export async function saveOrcaAutomation(
   }
 
   let currentAutomation = editingAutomationId
-    ? (automations.find((automation) => automation.id === editingAutomationId) ?? null)
+    ? (context.list.visibleRows.find(
+        (row) => row.key === editingRowKey && row.automation.id === editingAutomationId
+      )?.automation ?? null)
     : null
   if (editingAutomationId !== null) {
     const reread = await dispatchAutomationReread(
@@ -154,6 +154,7 @@ export async function saveOrcaAutomation(
     currentAutomation = (reread.ok ? reread.value : null) ?? currentAutomation
   }
 
+  const timezone = currentAutomation?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
   const updates: AutomationUpdateInput = {
     name: draft.name,
     prompt: draft.prompt,

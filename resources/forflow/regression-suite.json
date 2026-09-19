@@ -151,5 +151,17 @@
   "src/renderer/src/components/landing-github-star-state.test.ts",
   "src/main/cli/cli-installer-unreadable-command.test.ts",
   "src/main/cli/cli-command-privileged-transaction.test.ts",
-  "src/main/cli/cli-command-installation-races.test.ts"
+  "src/main/cli/cli-command-installation-races.test.ts",
+  "src/renderer/src/components/emulator-pane/use-mobile-emulator-agent-setup-state.test.tsx",
+  "src/renderer/src/components/right-sidebar/SearchResultsPane.localization.test.tsx",
+  "src/renderer/src/i18n/workspace-status-label.test.ts",
+  "src/renderer/src/components/sidebar/worktree-list/grouping/build-rows.folder-workspace-lanes.test.ts",
+  "src/shared/automation-schedule-timezone.test.ts",
+  "src/shared/automation-cron-input-validation.test.ts",
+  "src/shared/automation-schedules.test.ts",
+  "src/main/persistence-automation-timezone.test.ts",
+  "src/main/automations/automation-skip-coalescing.test.ts",
+  "src/main/automations/automation-zero-grace-tick-latency.test.ts",
+  "src/main/automations/service.test.ts",
+  "src/renderer/src/components/automations/AutomationsPage.cross-authority-actions.test.tsx"
 ]

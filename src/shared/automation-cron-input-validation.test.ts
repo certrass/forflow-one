@@ -91,11 +91,8 @@ describe.skipIf(process.platform === 'win32')('cron occurrence local-time contro
     expect(new Date(second).getHours()).toBe(1)
     expect(second - first).toBe(60 * 60 * 1000)
 
-    // Pre-existing limit this change does not touch or fix (#20154): local 01:30 is ambiguous,
-    // so flooring it rebuilds the earlier EDT instant and the scan lands back on the EST repeat
-    // instead of tomorrow. Pinned so a later DST fix has to update it deliberately.
     expect(
       nextAutomationOccurrenceAfter('30 1 * * *', new Date(2026, 0, 1).getTime(), second)
-    ).toBe(second)
+    ).toBe(new Date('2026-11-02T06:30:00Z').getTime())
   })
 })

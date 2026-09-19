@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import { setRendererUiLanguage } from '@/i18n/i18n'
 import { buildRows } from './build-rows'
 import { getFolderWorkspaceLaneKey } from './folder-workspace-lanes'
 import { getPRGroupKey, getPRLaneKey } from './group-keys'
@@ -43,6 +44,10 @@ function makeFolderWorkspace(overrides: Partial<FolderWorkspace> = {}): FolderWo
 }
 
 const GROUPED_REPO: Repo = { ...repo, projectGroupId: GROUP.id }
+
+afterEach(async () => {
+  await setRendererUiLanguage('en')
+})
 
 function buildSidebarRows(options: {
   groupBy: WorktreeGroupBy
@@ -156,6 +161,17 @@ describe('ordering', () => {
 })
 
 describe('membership is decided once, not per mode', () => {
+  it('localizes status headers for worktree and folder-only lanes', async () => {
+    await setRendererUiLanguage('zh')
+    const rows = buildSidebarRows({
+      groupBy: 'workspace-status',
+      worktrees: [{ ...worktree, workspaceStatus: 'todo', isPinned: false }]
+    })
+    const labels = rows.filter((row) => row.type === 'header').map((row) => row.label)
+    expect(labels).toContain('待办')
+    expect(labels).toContain('进行中')
+    expect(labels).not.toContain('In progress')
+  })
   // Negative arm alone is vacuous (zero rows either way pre-fix), so it is
   // paired with an explicitly non-repo positive arm.
   it('renders nothing when the owning project group is not visible', () => {

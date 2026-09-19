@@ -17708,6 +17708,26 @@
     }
   },
   "forflow": {
+    "workspaceStatus": {
+      "todo": "Todo",
+      "inProgress": "In progress",
+      "inReview": "In review",
+      "completed": "Done"
+    },
+    "searchSummary": {
+      "matches_one": "{{count}} result",
+      "matches_other": "{{count}} results",
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files",
+      "summary": "{{matches}} in {{files}}"
+    },
+    "worktree": {
+      "markRead": "Mark as read",
+      "markUnread": "Mark as unread"
+    },
+    "sparse": {
+      "loadingPresets": "Loading presets..."
+    },
     "onboarding": {
       "setupTitle": "完成国内与企业环境设置",
       "setupBody": "按需连接企业账号、国内智能体和代码仓库，也可以先使用本地项目。"
@@ -18079,6 +18099,8 @@
       "67a926f700": "Not available"
     },
     "emulator": {
+      "starting": "Starting…",
+      "noDevices": "No emulator devices found. Add an iOS Simulator in Xcode, or an Android Virtual Device in Android Studio.",
       "dbb08b31e0": "Auto-select device"
     },
     "examples": {

@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ReactNode } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { setRendererUiLanguage } from '@/i18n/i18n'
 import { WorktreeCardStatusSlot } from './WorktreeCardStatusSlot'
 import type { WorktreeCardPrDisplay } from './worktree-card-pr-display'
 
@@ -21,6 +22,27 @@ vi.mock('./use-worktree-activity-status', () => ({
 }))
 
 describe('WorktreeCardStatusSlot', () => {
+  afterEach(() => setRendererUiLanguage('en'))
+
+  it('localizes both unread actions without changing their state', async () => {
+    await setRendererUiLanguage('zh')
+    for (const isUnread of [true, false]) {
+      const markup = renderToStaticMarkup(
+        <WorktreeCardStatusSlot
+          worktreeId="wt-1"
+          showStatus={false}
+          showUnreadAction
+          isUnread={isUnread}
+          unreadTooltip=""
+          onToggleUnread={() => {}}
+          onPointerDown={() => {}}
+        />
+      )
+      expect(markup).toContain(`aria-label="${isUnread ? '标为已读' : '标为未读'}"`)
+      expect(markup).not.toContain('Mark as')
+    }
+  })
+
   beforeEach(() => {
     mocks.status = 'active'
   })

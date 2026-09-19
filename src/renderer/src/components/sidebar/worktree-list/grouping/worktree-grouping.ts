@@ -1,4 +1,5 @@
 import type { Repo } from '../../../../../../shared/repo-types'
+import { workspaceStatusDisplayLabel } from '@/i18n/workspace-status-label'
 import type { ProjectOrderBy } from '../../../../../../shared/ui-chrome-types'
 import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shared/worktree/types'
 import type { AppState } from '../../../../store/types'
@@ -36,7 +37,8 @@ function getLaneLabelForKey(
 ): string {
   if (groupBy === 'workspace-status') {
     const status = getWorkspaceStatusFromGroupKey(key, workspaceStatuses)
-    return workspaceStatuses.find((entry) => entry.id === status)?.label ?? status ?? key
+    const definition = workspaceStatuses.find((entry) => entry.id === status)
+    return definition ? workspaceStatusDisplayLabel(definition) : (status ?? key)
   }
   if (groupBy === 'pr-status') {
     return PR_GROUP_META[key.replace(/^pr:/, '') as PRGroupKey].label
@@ -91,8 +93,8 @@ export function buildOrderedGroups(args: {
     } else if (groupBy === 'workspace-status') {
       const workspaceStatus = getWorkspaceStatus(w, workspaceStatuses)
       key = getWorkspaceStatusGroupKey(workspaceStatus)
-      label =
-        workspaceStatuses.find((status) => status.id === workspaceStatus)?.label ?? workspaceStatus
+      const definition = workspaceStatuses.find((status) => status.id === workspaceStatus)
+      label = definition ? workspaceStatusDisplayLabel(definition) : workspaceStatus
     } else {
       const prGroup = getPRGroupKey(w, repoMap, prCache, settings)
       key = getPRLaneKey(prGroup)

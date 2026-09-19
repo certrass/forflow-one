@@ -11,7 +11,7 @@
  */
 
 import { act } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   api,
   installAutomationsPageHarness,
@@ -26,6 +26,7 @@ import { listedRows } from './automations-page-listed-items'
 import { makeAutomation } from './automations-page-fixtures'
 
 installAutomationsPageHarness()
+afterEach(() => vi.unstubAllEnvs())
 
 /** Desktop and runtime both hold `a-1`; the runtime's row is committed last. */
 async function collidingHosts(): Promise<void> {
@@ -52,6 +53,49 @@ function runtimeAutomationCalls(): string[] {
 }
 
 describe('AutomationsPage row actions under a colliding automation id', () => {
+  it('keeps the edited row timezone when renaming colliding desktop and runtime records', async () => {
+    vi.stubEnv('TZ', 'Asia/Shanghai')
+    runtimeHost([makeAutomation({ id: 'a-1', name: 'Remote nightly', timezone: 'Asia/Tokyo' })], [])
+    const desktop = makeAutomation({ id: 'a-1', name: 'Desktop nightly', timezone: 'UTC' })
+    scopedList([desktop])
+    api.automations.list.mockResolvedValue([desktop])
+    api.automations.update.mockResolvedValue({ ...desktop, name: 'Renamed desktop' })
+    await renderPage()
+    await settleHostQueries()
+    const row = listedRows().find((candidate) => candidate.key === selectDesktopRow())
+    expect(row).toBeDefined()
+    if (!row) {
+      throw new Error('Missing desktop row')
+    }
+    await act(async () => {
+      mocks.listPanel?.openEditDialog(row)
+    })
+    await act(async () => {
+      mocks.editorDialog?.onDraftChange((current) => {
+        if (typeof current !== 'object' || current === null) {
+          throw new Error('Missing edit draft')
+        }
+        return { ...current, name: 'Renamed desktop', prompt: 'Updated local prompt' }
+      })
+    })
+    mocks.callRuntimeRpc.mockClear()
+    await act(async () => {
+      await mocks.editorDialog?.onSave()
+    })
+    expect(api.automations.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'a-1',
+        updates: expect.objectContaining({
+          name: 'Renamed desktop',
+          prompt: 'Updated local prompt',
+          timezone: 'UTC'
+        }),
+        expectedOwner: SELF_PRECONDITION
+      })
+    )
+    expect(runtimeAutomationCalls()).not.toContain('automation.update')
+  })
+
   it('names the selected row’s own host, not the desktop that listed it', async () => {
     await collidingHosts()
     await renderPage()

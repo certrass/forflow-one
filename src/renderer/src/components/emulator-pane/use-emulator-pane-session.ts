@@ -1,4 +1,4 @@
-import { defaultEmulatorTitle } from '@/i18n/emulator-copy'
+import * as emulatorCopy from '@/i18n/emulator-copy'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { callRuntimeRpc } from '@/runtime/runtime-rpc-client'
 import { useAppStore } from '@/store'
@@ -152,7 +152,7 @@ export function useEmulatorPaneSession({
       setError(null)
       if (tabId) {
         const row = devices.find((device) => device.udid === target || device.name === target)
-        useAppStore.getState().setTabLabel(tabId, row?.name || defaultEmulatorTitle())
+        useAppStore.getState().setTabLabel(tabId, row?.name || emulatorCopy.defaultEmulatorTitle())
       }
     },
     [devices, resetVisualOrientation, selectedUdid, session, tabId]
@@ -167,7 +167,7 @@ export function useEmulatorPaneSession({
       setLoading(true)
       setError(null)
       if (tabId) {
-        useAppStore.getState().setTabLabel(tabId, 'Starting…')
+        useAppStore.getState().setTabLabel(tabId, emulatorCopy.emulatorStartingLabel())
       }
       let requestedTarget: string | undefined
       try {
@@ -185,9 +185,7 @@ export function useEmulatorPaneSession({
           selectedUdid
         })
         if (!target) {
-          throw new Error(
-            'No emulator devices found. Add an iOS Simulator in Xcode, or an Android Virtual Device in Android Studio.'
-          )
+          throw new Error(emulatorCopy.noEmulatorDevicesMessage())
         }
         requestedTarget = target
         setSelectedUdid(target)
@@ -233,7 +231,7 @@ export function useEmulatorPaneSession({
         )
         setError(msg)
         if (tabId) {
-          useAppStore.getState().setTabLabel(tabId, defaultEmulatorTitle())
+          useAppStore.getState().setTabLabel(tabId, emulatorCopy.defaultEmulatorTitle())
         }
       } finally {
         if (mountedRef.current) {

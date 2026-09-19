@@ -8,6 +8,8 @@ import {
 import { Kanban } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
+import { workspaceStatusDisplayLabel } from '@/i18n/workspace-status-label'
+import { useTranslation } from 'react-i18next'
 import { getWorkspaceStatusVisualMeta } from './workspace-status'
 import type { WorkspaceStatusDefinition } from '../../../../shared/worktree/types'
 
@@ -18,6 +20,7 @@ export function WorktreeStatusMenuItems(props: {
   onAssignWorkspaceStatus: (status: string) => void
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
 }) {
+  useTranslation()
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger disabled={props.deletingContext}>
@@ -37,7 +40,7 @@ export function WorktreeStatusMenuItems(props: {
                 onSelect={() => props.onAssignWorkspaceStatus(status.id)}
               >
                 <meta.icon className={cn('size-3.5', meta.tone)} />
-                {status.label}
+                {workspaceStatusDisplayLabel(status)}
               </DropdownMenuRadioItem>
             )
           })}

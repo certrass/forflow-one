@@ -70,13 +70,14 @@ export function SearchResultsPane({
          pinned at the top while the user scrolls through results. */}
       {results && rows.length > 0 && (
         <div className="px-2 py-1 text-[10px] text-muted-foreground border-b border-border">
-          {results.totalMatches}{' '}
-          {translate('auto.components.right.sidebar.Search.6aeda362ed', 'result')}
-          {results.totalMatches !== 1 ? 's' : ''}{' '}
-          {translate('auto.components.right.sidebar.Search.4107975b3a', 'in')}{' '}
-          {results.files.length}{' '}
-          {translate('auto.components.right.sidebar.Search.0b8104eaf2', 'file')}
-          {results.files.length !== 1 ? 's' : ''}
+          {translate('forflow.searchSummary.summary', '{{matches}} in {{files}}', {
+            matches: translate('forflow.searchSummary.matches', '{{count}} results', {
+              count: results.totalMatches
+            }),
+            files: translate('forflow.searchSummary.files', '{{count}} files', {
+              count: results.files.length
+            })
+          })}
           {results.truncated &&
             translate('auto.components.right.sidebar.Search.dcc294f28d', '(results truncated)')}
         </div>

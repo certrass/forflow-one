@@ -194,14 +194,17 @@ export default function SparseCheckoutPresetSelect({
   )
 
   const triggerLabel = isLoadingPresets
-    ? 'Loading presets...'
+    ? translate('forflow.sparse.loadingPresets', 'Loading presets...')
     : hasPresetLoadError
-      ? 'Retry loading presets'
+      ? translate(
+          'auto.components.sparse.SparseCheckoutPresetSelect.a683a4bc8e',
+          'Retry loading presets'
+        )
       : !presetsLoaded
-        ? 'Load presets'
+        ? translate('auto.components.sparse.SparseCheckoutPresetSelect.16223dde6a', 'Load presets')
         : selectedPreset
           ? selectedPreset.name
-          : 'Off'
+          : translate('auto.components.sparse.SparseCheckoutPresetSelect.c7f9b3f0c1', 'Off')
 
   return (
     <Popover

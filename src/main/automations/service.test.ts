@@ -58,7 +58,7 @@ describe('AutomationService', () => {
   })
 
   it('dispatches an enabled automation when its next run is due', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:59:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:59:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -70,10 +70,10 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
 
-    vi.setSystemTime(new Date('2026-05-13T09:01:00'))
+    vi.setSystemTime(new Date('2026-05-13T09:01:00Z'))
     const send = vi.fn()
     const service = new AutomationService(store, { tickMs: 60_000 })
     service.setWebContents({
@@ -90,10 +90,10 @@ describe('AutomationService', () => {
 
     const [, payload] = send.mock.calls[0]
     expect(payload.automation.id).toBe(automation.id)
-    expect(payload.run.scheduledFor).toBe(new Date('2026-05-13T09:00:00').getTime())
+    expect(payload.run.scheduledFor).toBe(new Date('2026-05-13T09:00:00Z').getTime())
     expect(store.listAutomationRuns(automation.id)[0]?.status).toBe('dispatching')
     expect(store.listAutomations().find((entry) => entry.id === automation.id)?.nextRunAt).toBe(
-      new Date('2026-05-14T09:00:00').getTime()
+      new Date('2026-05-14T09:00:00Z').getTime()
     )
   })
 
@@ -430,7 +430,7 @@ describe('AutomationService', () => {
   })
 
   it('attaches provider usage when a completed run can be attributed', async () => {
-    vi.setSystemTime(new Date('2026-05-13T10:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T10:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -494,7 +494,7 @@ describe('AutomationService', () => {
   })
 
   it('does not recollect usage for an already-finalized run', async () => {
-    vi.setSystemTime(new Date('2026-05-13T10:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T10:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -556,7 +556,7 @@ describe('AutomationService', () => {
   })
 
   it('does not throw when retention evicts the run during usage collection', async () => {
-    vi.setSystemTime(new Date('2026-05-13T10:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T10:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -612,7 +612,7 @@ describe('AutomationService', () => {
   })
 
   it('records unsupported usage cleanly for completed agents without local usage stores', async () => {
-    vi.setSystemTime(new Date('2026-05-13T10:00:00'))
+    vi.setSystemTime(new Date('2026-05-13T10:00:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -650,7 +650,7 @@ describe('AutomationService', () => {
 
   // #16303: listAutomations sorts by name, so 'A ...' is evaluated before 'B ...'.
   it('keeps evaluating later due automations after an unreadable schedule throws', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:59:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:59:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const poison = store.createAutomation({
@@ -662,7 +662,7 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
     const healthy = store.createAutomation({
       name: 'B healthy schedule',
@@ -673,7 +673,7 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
     // Persisted by an older build, or hand-edited: WEEKLY with no BYDAY cannot resolve a day.
     mutateDataFile((state) => {
@@ -683,7 +683,7 @@ describe('AutomationService', () => {
     const reloaded = await createStore()
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    vi.setSystemTime(new Date('2026-05-13T09:01:00'))
+    vi.setSystemTime(new Date('2026-05-13T09:01:00Z'))
     const send = vi.fn()
     const service = new AutomationService(reloaded, { tickMs: 60_000 })
     service.setWebContents({ isDestroyed: () => false, send })
@@ -709,7 +709,7 @@ describe('AutomationService', () => {
   // Same isolation, reached through the cron parser rather than the RRULE one, because that
   // is the path all four cron repairs run on.
   it('keeps evaluating later due automations after an unreadable cron schedule throws', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:59:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:59:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const poison = store.createAutomation({
@@ -721,7 +721,7 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: '0 9 * * *',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
     const healthy = store.createAutomation({
       name: 'B healthy cron',
@@ -732,7 +732,7 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: '0 9 * * *',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
     // Day of month 32 never validates at input; only a hand-edited or older-build row has it.
     mutateDataFile((state) => {
@@ -742,7 +742,7 @@ describe('AutomationService', () => {
     const reloaded = await createStore()
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    vi.setSystemTime(new Date('2026-05-13T09:01:00'))
+    vi.setSystemTime(new Date('2026-05-13T09:01:00Z'))
     const send = vi.fn()
     const service = new AutomationService(reloaded, { tickMs: 60_000 })
     service.setWebContents({ isDestroyed: () => false, send })
@@ -766,7 +766,7 @@ describe('AutomationService', () => {
   // A send that throws is a dispatch failure, not an unreadable schedule: the run must land on
   // dispatch_failed rather than being left 'dispatching' beside a bogus skipped_unavailable row.
   it('marks the run dispatch_failed when the renderer send throws', async () => {
-    vi.setSystemTime(new Date('2026-05-13T08:59:00'))
+    vi.setSystemTime(new Date('2026-05-13T08:59:00Z'))
     const store = await createStore()
     store.addRepo(makeRepo())
     const automation = store.createAutomation({
@@ -778,12 +778,12 @@ describe('AutomationService', () => {
       workspaceId: 'wt1',
       timezone: 'UTC',
       rrule: '0 9 * * *',
-      dtstart: new Date('2026-05-12T00:00:00').getTime()
+      dtstart: new Date('2026-05-12T00:00:00Z').getTime()
     })
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
     logged.mockClear()
 
-    vi.setSystemTime(new Date('2026-05-13T09:01:00'))
+    vi.setSystemTime(new Date('2026-05-13T09:01:00Z'))
     const send = vi.fn(() => {
       throw new Error('renderer is gone')
     })

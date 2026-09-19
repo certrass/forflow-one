@@ -17708,6 +17708,24 @@
     }
   },
   "forflow": {
+    "workspaceStatus": {
+      "todo": "待办",
+      "inProgress": "进行中",
+      "inReview": "待审核",
+      "completed": "已完成"
+    },
+    "searchSummary": {
+      "matches": "{{count}} 个结果",
+      "files": "{{count}} 个文件",
+      "summary": "在 {{files}}中找到 {{matches}}"
+    },
+    "worktree": {
+      "markRead": "标为已读",
+      "markUnread": "标为未读"
+    },
+    "sparse": {
+      "loadingPresets": "正在加载预设…"
+    },
     "onboarding": {
       "setupTitle": "完成国内与企业环境设置",
       "setupBody": "按需连接企业账号、国内智能体和代码仓库，也可以先使用本地项目。"
@@ -18079,6 +18097,8 @@
       "67a926f700": "暂无数据"
     },
     "emulator": {
+      "starting": "正在启动…",
+      "noDevices": "未找到模拟器设备。请先在 Xcode 中添加 iOS 模拟器，或在 Android Studio 中创建 Android 虚拟设备。",
       "dbb08b31e0": "自动选择设备"
     },
     "examples": {
