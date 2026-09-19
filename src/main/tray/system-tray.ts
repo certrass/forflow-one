@@ -6,6 +6,8 @@ import { createAppIconImage } from '../app-icon'
 import { translateMain } from '../i18n/main-i18n'
 import { composeTrayAttentionIcon, tintTrayTemplateForAttention } from './tray-attention-icon'
 import { stampTrayDevBadge } from './tray-dev-badge'
+import { getProductIdentity, isForflowBuild } from '../../shared/product-branding'
+import forflowTrayIcon from '../../../resources/forflow/forflow-lockup-transparent.png?asset&asarUnpack'
 
 export type SystemTrayOptions = {
   /** App icon id from settings; the tray reuses the app icon image. */
@@ -46,10 +48,11 @@ let nativeThemeUpdatedListener: (() => void) | null = null
 // Why: multiple dev instances can run side by side (one per worktree); the
 // tooltip carries the worktree/branch label so hovering tells them apart.
 function baseTooltip(): string {
+  const { name } = getProductIdentity()
   if (!devIndicator) {
-    return 'Orca'
+    return name
   }
-  return devIndicator.label ? `Orca DEV (${devIndicator.label})` : 'Orca DEV'
+  return devIndicator.label ? `${name} DEV (${devIndicator.label})` : `${name} DEV`
 }
 
 // Why: on Windows the notification area expects a 16px icon; the app icon PNG
@@ -126,6 +129,19 @@ function scheduleTrayImage(): void {
 }
 
 function createMacMenuBarImage(): NativeImage | null {
+  if (isForflowBuild()) {
+    const source = nativeImage.createFromPath(forflowTrayIcon)
+    if (source.isEmpty()) {
+      return null
+    }
+    const image = source.resize({ width: 48, height: 18 })
+    image.addRepresentation({
+      scaleFactor: 2,
+      dataURL: source.resize({ width: 96, height: 36 }).toDataURL()
+    })
+    image.setTemplateImage(true)
+    return image
+  }
   const image = nativeImage.createFromPath(menuBarIconPath)
   const { width, height } = image.getSize()
   if (width <= 0 || height <= 0) {

@@ -97,6 +97,10 @@ vi.mock('../../../resources/tray/orca-menu-barTemplate@2x.png?asset&asarUnpack',
   default: '/assets/orca-menu-barTemplate@2x.png'
 }))
 
+vi.mock('../../../resources/forflow/forflow-lockup-transparent.png?asset&asarUnpack', () => ({
+  default: '/assets/forflow-lockup-transparent.png'
+}))
+
 vi.mock('../app-icon', () => ({
   createAppIconImage: createAppIconImageMock
 }))
@@ -192,6 +196,24 @@ afterEach(() => {
 })
 
 describe('createSystemTray', () => {
+  it('uses the Forflow template at both display scales and brands the tooltip', async () => {
+    vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
+    try {
+      setPlatform('darwin')
+      const tray = await loadModule()
+      const resize = vi.fn(({ width }) => (width === 48 ? baseMacImage : retinaMacImage))
+      createFromPathMock.mockReturnValue({ isEmpty: () => false, resize })
+      tray.createSystemTray(createOptions())
+      expect(createFromPathMock).toHaveBeenCalledWith('/assets/forflow-lockup-transparent.png')
+      expect(resize).toHaveBeenCalledWith({ width: 48, height: 18 })
+      expect(resize).toHaveBeenCalledWith({ width: 96, height: 36 })
+      expect(baseMacImage.setTemplateImage).toHaveBeenCalledWith(true)
+      expect(trayInstances[0].setToolTip).toHaveBeenCalledWith('Forflow One')
+      tray.destroySystemTray()
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
   it('keeps the Windows icon, Open/Quit menu, and left-click behavior', async () => {
     setPlatform('win32')
     const { createSystemTray } = await loadModule()

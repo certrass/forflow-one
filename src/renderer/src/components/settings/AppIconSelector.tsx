@@ -7,6 +7,8 @@ import { APP_ICON_OPTIONS, normalizeAppIconId, type AppIconId } from '../../../.
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { translate } from '@/i18n/i18n'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import forflowIconUrl from '../../../../../resources/forflow/forflow-mark.png?url'
 
 const APP_ICON_URLS = {
   classic: classicIconUrl,
@@ -53,6 +55,16 @@ function IconCycleButton({ label, onClick, children }: IconCycleButtonProps): Re
 
 export function AppIconSelector({ value, onChange }: AppIconSelectorProps): React.JSX.Element {
   const selected = normalizeAppIconId(value)
+
+  if (isForflowBuild()) {
+    return (
+      <img
+        src={forflowIconUrl}
+        alt="Forflow One"
+        className="mx-auto size-24 rounded-2xl object-contain"
+      />
+    )
+  }
 
   return (
     <div className="flex items-center justify-center gap-2">

@@ -13,6 +13,8 @@ import watercolorMacDockIcon from '../../resources/app-icons/orca-watercolor.png
 import blueIcon from '../../resources/app-icons/orca-blue.png?asset'
 import blueMacDockIcon from '../../resources/app-icons/orca-blue.png?asset&asarUnpack'
 import { normalizeAppIconId, type AppIconId } from '../shared/app-icon'
+import { isForflowBuild } from '../shared/product-branding'
+import forflowIcon from '../../resources/forflow/forflow-mark.png?asset'
 
 const APP_ICON_PATHS = {
   classic: is.dev ? classicDevIcon : classicIcon,
@@ -74,6 +76,9 @@ let macDockIconPersistenceGeneration = 0
 let macDockIconPersistenceQueue = Promise.resolve()
 
 export function getAppIconPath(value: unknown): string {
+  if (isForflowBuild()) {
+    return forflowIcon
+  }
   return APP_ICON_PATHS[normalizeAppIconId(value)]
 }
 
@@ -270,7 +275,7 @@ export function persistMacDockIcon(value: unknown, options: PersistMacDockIconOp
     return
   }
   const execFile = options.execFile ?? defaultExecFile
-  const iconId = normalizeAppIconId(value)
+  const iconId = isForflowBuild() ? 'classic' : normalizeAppIconId(value)
   const generation = ++macDockIconPersistenceGeneration
   enqueueMacDockIconPersistence(async () => {
     // Why: stale queued writes must not reapply an older Dock pin icon.

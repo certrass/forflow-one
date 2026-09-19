@@ -227,7 +227,9 @@ export default function Landing(): React.JSX.Element {
   const openModal = useAppStore((s) => s.openModal)
 
   const createTargetLabel =
-    repos.length > 0 && repos.every((repo) => isGitRepoKind(repo)) ? 'Worktree' : 'Workspace'
+    repos.length > 0 && repos.every((repo) => isGitRepoKind(repo))
+      ? translate('forflow.landing.createWorktree', 'Create worktree')
+      : translate('forflow.landing.createWorkspace', 'Create workspace')
   const hasProjects = repos.length > 0
   const hasGitHubProject = useMemo(() => hasGitHubBackedProject(repos), [repos])
   const showGitHubSupportFooter = repos.length === 0 || hasGitHubProject
@@ -239,17 +241,23 @@ export default function Landing(): React.JSX.Element {
   const createWorktreeShortcut = useShortcutKeyDetails('workspace.create')
   const previousWorktreeShortcut = useShortcutKeyDetails('worktree.navigateUp')
   const nextWorktreeShortcut = useShortcutKeyDetails('worktree.navigateDown')
-  const shortcuts = useMemo<ShortcutItem[]>(() => {
-    return [
-      {
-        id: 'create',
-        shortcut: createWorktreeShortcut,
-        action: `Create ${createTargetLabel.toLowerCase()}`
-      },
-      { id: 'up', shortcut: previousWorktreeShortcut, action: 'Move up workspace' },
-      { id: 'down', shortcut: nextWorktreeShortcut, action: 'Move down workspace' }
-    ]
-  }, [createTargetLabel, createWorktreeShortcut, nextWorktreeShortcut, previousWorktreeShortcut])
+  const shortcuts: ShortcutItem[] = [
+    {
+      id: 'create',
+      shortcut: createWorktreeShortcut,
+      action: createTargetLabel
+    },
+    {
+      id: 'up',
+      shortcut: previousWorktreeShortcut,
+      action: translate('forflow.landing.previousWorkspace', 'Previous workspace')
+    },
+    {
+      id: 'down',
+      shortcut: nextWorktreeShortcut,
+      action: translate('forflow.landing.nextWorkspace', 'Next workspace')
+    }
+  ]
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-background">
@@ -294,8 +302,7 @@ export default function Landing(): React.JSX.Element {
               onClick={() => openModal('new-workspace-composer', { telemetrySource: 'unknown' })}
             >
               <GitBranchPlus className="size-3.5" />
-              {translate('auto.components.Landing.76a95f7f47', 'Create')}{' '}
-              {createTargetLabel.toLowerCase()}
+              {createTargetLabel}
             </button>
           </div>
 

@@ -17831,6 +17831,12 @@
       "failed": "Could not submit the decision. Retry or cancel.",
       "permission": "Confirm website permission",
       "upload": "Confirm data transfer"
+    },
+    "landing": {
+      "createWorktree": "Create worktree",
+      "createWorkspace": "Create workspace",
+      "previousWorkspace": "Previous workspace",
+      "nextWorkspace": "Next workspace"
     }
   },
   "githubChecks": {

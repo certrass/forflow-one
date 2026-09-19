@@ -21,7 +21,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
     }))
     expect(identity).toMatchObject({
       name: 'Forflow One',
-      version: '1.4.205-forflow.3',
+      version: '1.4.205-forflow.4',
       packaged: true,
       dataPath: profile,
       visibleWindows: 0

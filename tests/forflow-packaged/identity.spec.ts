@@ -121,7 +121,7 @@ test('identity regression: private server, Chinese account UI, revocation, persi
     const resumed = await launch(profile)
     running = resumed.app
     await expect(resumed.page.getByTestId('forflow-release')).toContainText(
-      '当前版本：1.4.205-forflow.3'
+      '当前版本：1.4.205-forflow.4'
     )
     await expect(resumed.page.locator('body')).not.toContainText('Register /usr/local/bin')
     await expect(resumed.page.locator('body')).not.toContainText('Before opening setup')

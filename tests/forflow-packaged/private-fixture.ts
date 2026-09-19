@@ -20,6 +20,7 @@ export function privateProfile(label: string): string {
       ui: {
         ...seed.ui,
         featureInteractions: {},
+        setupGuideSidebarDismissed: false,
         // Model current profiles, not the pre-browser-milestone compatibility migration.
         setupGuideBrowserMilestoneMigrated: true,
         setupGuideBrowserMilestoneLegacyComplete: false

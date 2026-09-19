@@ -29,6 +29,10 @@ vi.mock('../../resources/icon.png?asset', () => ({
   default: 'classic-icon'
 }))
 
+vi.mock('../../resources/forflow/forflow-mark.png?asset', () => ({
+  default: 'forflow-icon'
+}))
+
 vi.mock('../../resources/icon-dev.png?asset', () => ({
   default: 'classic-dev-icon'
 }))
@@ -80,6 +84,30 @@ describe('app icon selection', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('uses the Forflow icon even when an old Orca icon preference is saved', () => {
+    vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
+    for (const icon of ['classic', 'blue', 'watercolor', 'missing']) {
+      expect(getAppIconPath(icon)).toBe('forflow-icon')
+    }
+  })
+
+  it('clears old custom Dock artwork so Finder uses the Forflow bundle icon', async () => {
+    vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
+    const execFile = vi.fn((_file, _args, _options, callback) => callback?.(null))
+    persistMacDockIcon('blue', {
+      platform: 'darwin',
+      isDevApp: false,
+      appBundlePath: '/tmp/Forflow One.app',
+      execFile
+    })
+    await waitForQueuedPersistence()
+    expect(execFile.mock.calls[0][1]).toContain(
+      "set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0"
+    )
+    expect(execFile.mock.calls.flatMap((call) => call[1])).not.toContain('blue-icon-unpacked')
   })
 
   it('resolves classic, watercolor, blue, and invalid icon ids', () => {

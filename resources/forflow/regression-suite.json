@@ -63,5 +63,7 @@
   "src/main/skills/skill-install-service.test.ts",
   "src/renderer/src/components/settings/SettingsSidebar.test.tsx",
   "src/renderer/src/components/setup-guide/use-setup-guide-progress.test.ts",
-  "src/renderer/src/lib/default-terminal-title.test.ts"
+  "src/renderer/src/lib/default-terminal-title.test.ts",
+  "src/main/app-icon.test.ts",
+  "src/main/tray/system-tray.test.ts"
 ]
