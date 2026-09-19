@@ -1,3 +1,4 @@
+import { cliMessage } from './cli-product'
 import { brandCliDocumentation } from './cli-product'
 import type { RuntimeClient } from './runtime-client'
 
@@ -89,12 +90,12 @@ export function crossKindNextSteps(
   const environment = findEnvironmentByName(alternatives.environments, name)
   if (requested !== 'ssh' && ssh) {
     steps.push(
-      `"${name}" is an SSH target on this Orca host, not a paired server. Use --host ssh:${ssh.id}.`
+      cliMessage`"${name}" is an SSH target on this Orca host, not a paired server. Use --host ssh:${ssh.id}.`
     )
   }
   if (requested !== 'environment' && environment) {
     steps.push(
-      `"${name}" is a paired Orca server, not an SSH target. Use --environment ${environment.name}.`
+      cliMessage`"${name}" is a paired Orca server, not an SSH target. Use --environment ${environment.name}.`
     )
   }
   return steps
@@ -179,7 +180,7 @@ export async function resolveSshHostTargetId(
   }
   throw new RuntimeClientError(
     'invalid_argument',
-    `Unknown SSH target in --host ssh:${targetId}: this Orca host has no SSH target named or with id ${targetId}.`,
+    cliMessage`Unknown SSH target in --host ssh:${targetId}: this Orca host has no SSH target named or with id ${targetId}.`,
     {
       knownSshTargets: targets,
       knownEnvironments: environments,

@@ -9,7 +9,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { verifyPackageCliBin } from './verify-cli-bin.mjs'
 
 /** Builds a temporary Orca-style project fixture with a compiled CLI entrypoint. */
@@ -37,6 +37,19 @@ function makeProjectWithCli(
 }
 
 describe('verifyPackageCliBin', () => {
+  beforeEach(() => vi.stubEnv('FORFLOW_BUILD', undefined))
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('stamps the Forflow CLI identity into standalone compiled metadata', () => {
+    vi.stubEnv('FORFLOW_BUILD', '1')
+    const { projectDir, outPackageJsonPath } = makeProjectWithCli(
+      '#!/usr/bin/env node\nexports.ok = true\n'
+    )
+    verifyPackageCliBin({ projectDir, fixPackageJson: true })
+    expect(JSON.parse(readFileSync(outPackageJsonPath, 'utf8')).name).toBe(
+      'forflow-one-compiled-output'
+    )
+  })
   it('accepts a non-empty Node entrypoint and can run help through Node', () => {
     const { projectDir, cliPath } = makeProjectWithCli(
       '#!/usr/bin/env node\nif (process.argv.includes("--help")) process.exit(0)\n'

@@ -1,8 +1,8 @@
 # Forflow One 操作手册
 
-适用版本：**1.4.205-forflow.11 · cn-private · macOS Apple Silicon 本机测试版**。更新日期：2026-09-20。面向团队及客户的 AI／研发人员。其他系统、真实国内模型调用和客户部署需分别验收。
+适用版本：**1.4.205-forflow.12 · cn-private · macOS Apple Silicon 本机测试版**。更新日期：2026-09-20。面向团队及客户的 AI／研发人员。其他系统、真实国内模型调用和客户部署需分别验收。
 
-本手册按当前 Forflow 界面、源码和本版安装验证编写，参考 [Orca 官方文档](https://www.onorca.dev/docs) 的工作流结构。上游网页可能随版本变化；遇到差异，以本版说明和管理员配置为准。部署人员请看 [管理员手册](admin-manual.md)，开发人员请看 [工程文档索引](README.md)。
+本手册按当前 Forflow 界面、源码和本版安装包验证编写，参考 [Orca 官方文档](https://www.onorca.dev/docs) 的工作流结构。上游网页可能随版本变化；遇到差异，以本版说明和管理员配置为准。部署人员请看 [管理员手册](admin-manual.md)，开发人员请看 [工程文档索引](README.md)。
 
 ## 1. 先知道三个区别
 
@@ -158,7 +158,22 @@ forflow terminal --help
 
 如果找不到命令，查看安装结果显示的位置，重新打开终端并检查该位置是否在 PATH 中。不要自行注册成 `orca`，以免调用原应用。
 
-**本版已知问题：**安装包中的 `forflow --help` 仍含英文及上游 `orca` 名称。上述帮助入口已实测可运行；帮助列出命令不代表其中云分享、在线安装等功能在私有版可用。完整 CLI 帮助的中文和品牌修复仍待完成。
+**从 `.12` 起：**命令入口、帮助示例、错误恢复建议和技能指令使用 `forflow`；根帮助和 234 条命令简介为中文。`forflow skills get forflow-cli` 读取当前安装包的指南，旧 `orca-cli` 主题仍作为兼容别名。详细选项说明和长篇技术参考仍有英文，不能据此宣称整个 CLI 已全量汉化。
+
+技能安装也可离线执行：
+
+```sh
+forflow skills install --all --dry-run --json
+forflow skills install --skill forflow-cli --skill orchestration --json
+forflow skills install --skill forflow-cli --agent claude-code,codex --json
+forflow skills update --all --json
+```
+
+默认使用共享的 `~/.agents/skills`，`--local` 使用当前项目目录。现有 `orca-cli` 等技能目录保留，以保护已安装内容和本地修改；对外指南名称映射为 `forflow-cli` 等。更新只处理已安装技能，冲突时保留原文件并返回失败状态。SSH 转发入口不能在错误的主机上执行技能安装，应在目标机器直接运行。
+
+`FORFLOW_USER_DATA_PATH`、`FORFLOW_ENVIRONMENT`、`FORFLOW_PAIRING_CODE`、`FORFLOW_APP_EXECUTABLE` 可配置数据目录、远程环境、配对码和应用程序；与对应的 `ORCA_*` 兼容变量同时存在时，前者优先。机器字段、远程配对协议及执行主机的权限语义保持兼容。云分享仍默认关闭。
+
+`forflow account` 管理 Claude/Codex 托管登录；Kimi、智谱、DeepSeek 的 API Key 在应用“AI 提供商账户”中配置，两者不是同一账号接口。
 
 技能优先从清单安装随包版本。不要直接照抄官网依赖公共注册表的安装命令。编排属于进阶能力，先在测试仓库验证工具调用、等待、取消和恢复；它的决策阻塞点不是企业业务审批。
 

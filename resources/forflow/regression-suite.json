@@ -173,5 +173,9 @@
   "src/main/forflow/model-account-storage.test.ts",
   "src/main/forflow/model-account-client.test.ts",
   "src/main/forflow/model-account-ipc.test.ts",
-  "src/renderer/src/components/settings/ForflowModelAccountsSection.test.tsx"
+  "src/renderer/src/components/settings/ForflowModelAccountsSection.test.tsx",
+  "src/cli/forflow-cli-branding.test.ts",
+  "src/cli/forflow-skill-install.test.ts",
+  "src/cli/main-module-bundle-parity.test.ts",
+  "config/scripts/verify-cli-bin.test.mjs"
 ]

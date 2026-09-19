@@ -1,5 +1,5 @@
-import { brandCliDocumentation } from './cli-product'
 #!/usr/bin/env node
+import { brandCliDocumentation } from './cli-product'
 import {
   findCommandSpec,
   isCommandGroup,
@@ -72,7 +72,11 @@ export async function main(
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
     const version = readOrcaCliVersion()
     if (!version) {
-      process.stderr.write(isForflowCli() ? '无法读取此 Forflow One 构建的版本。\n' : brandCliDocumentation('Could not determine the Orca version for this build.\n'))
+      process.stderr.write(
+        isForflowCli()
+          ? '无法读取此 Forflow One 构建的版本。\n'
+          : brandCliDocumentation('Could not determine the Orca version for this build.\n')
+      )
       process.exitCode = 1
       return
     }

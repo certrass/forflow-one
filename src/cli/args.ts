@@ -256,7 +256,9 @@ export function validateCommandAndFlags(specs: CommandSpec[], parsed: ParsedArgs
     if (!isGlobalFlag && !spec.allowedFlags.includes(flag) && !(flag === 'page' && pageAllowed)) {
       throw new RuntimeClientError(
         'invalid_argument',
-        isForflowCli() ? `命令 ${spec.path.join(' ')} 不支持参数 --${flag}` : `Unknown flag --${flag} for command: ${spec.path.join(' ')}`,
+        isForflowCli()
+          ? `命令 ${spec.path.join(' ')} 不支持参数 --${flag}`
+          : `Unknown flag --${flag} for command: ${spec.path.join(' ')}`,
         unknownFlagData(flag, effectiveAllowedFlags(spec))
       )
     }

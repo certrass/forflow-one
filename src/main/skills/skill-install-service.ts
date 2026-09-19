@@ -31,6 +31,7 @@ export type SkillInstallServiceInput = Omit<
   filesystem?: SkillInstallFilesystem
   wslDistro?: string
   discover?: () => Promise<SkillDiscoveryResult>
+  discoveryLog?: (message: string) => void
   signal?: AbortSignal
 }
 
@@ -138,7 +139,8 @@ async function completeSharedSkillInstall(
     workspaceDirectory: input.workspaceDirectory,
     wslDistro: input.wslDistro,
     providerRootOverrides: input.providerRootOverrides,
-    discover: input.discover
+    discover: input.discover,
+    log: input.discoveryLog
   })
 }
 

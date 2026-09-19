@@ -1,8 +1,8 @@
 # Forflow One 文档
 
-2026-09-20。最新 macOS arm64 本机测试包为 **1.4.205-forflow.11**，移除首页 Logo，并包含 Kimi、智谱 GLM、DeepSeek 官方 API 账户。见 [当前版本记录](release-1.4.205-forflow.11.md) 和随包 `release.json`。完整治理平台仍按工作包逐步建设。
+2026-09-20。最新 macOS arm64 本机测试包为 **1.4.205-forflow.12**，修复 CLI 身份、命令示例、技能指南与离线安装，并继续包含首页 Logo 移除和国内官方 API 账户。见 [当前版本记录](release-1.4.205-forflow.12.md) 和随包 `release.json`。完整治理平台仍按工作包逐步建设。
 
-`.11` 已通过 1,648 项回归、11 项身份服务测试及 4 个相关安装包场景，并安装到 `/Applications/Forflow One.app`；原 `.9` 留作回退。`.10` 的 13 项历史安装包验证见[前版记录](release-1.4.205-forflow.10.md)。[官网120项核验矩阵](official-feature-results-20260919.md)保留之前逐功能验证状态。
+`.12` 通过 1,679 项项目回归、1,278 项 CLI／技能专项、11 项身份服务测试及 5 个真实安装包场景。当前 `.11` 仍在运行，待正常退出后安装；不将包验证写成已替换本机应用。历史功能状态见 [官网 120 项核验矩阵](official-feature-results-20260919.md)。
 
 ## 使用与管理
 

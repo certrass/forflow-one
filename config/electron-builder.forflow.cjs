@@ -21,6 +21,8 @@ module.exports = {
   forceCodeSigning: false,
   extraMetadata: {
     name: product.packageName,
+    // Desktop CLI registration uses Resources/bin/forflow, not npm development shims.
+    bin: null,
     productName: product.name,
     version,
     description: 'Forflow One 中文私有化 AI 工作台测试版'

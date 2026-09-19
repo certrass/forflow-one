@@ -3,7 +3,9 @@ import { brandCliDocumentation, isForflowCli } from './cli-product'
 import { FORFLOW_COMMAND_SUMMARIES } from './forflow-command-summaries'
 
 export function cliSpecPresentation(spec: CommandSpec): CommandSpec {
-  if (!isForflowCli()) return spec
+  if (!isForflowCli()) {
+    return spec
+  }
   const offlineSkills = ['skills install', 'skills update'].includes(spec.path.join(' '))
   return {
     ...spec,
@@ -13,7 +15,8 @@ export function cliSpecPresentation(spec: CommandSpec): CommandSpec {
       ? [
           '直接使用当前安装包内的技能，不调用 npx，不下载第三方代码。',
           '默认安装到用户的 .agents/skills 共享目录；--local 安装到当前项目。',
-          '--agent 仅支持 universal；旧技能名称作为兼容别名保留。',
+          '使用 --agent claude-code,codex 等为已支持的智能体创建入口；默认只安装共享目录。',
+          '旧技能名称与安装目录作为兼容入口保留，forflow-cli 等新名称用于查阅指南。',
           '--dry-run 只预览，不写文件；实际安装也支持 --json。',
           'update 只更新已安装的技能；本地修改或外部符号链接存在冲突时保留原内容。',
           'SSH 转发入口不执行本机安装；请在目标机器直接运行该命令。',

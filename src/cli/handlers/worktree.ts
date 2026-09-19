@@ -147,7 +147,9 @@ async function getCreateRepoSelector(
   }
   throw new RuntimeClientError(
     'invalid_argument',
-    brandCliDocumentation('Missing repo selector. Pass --repo or run from inside an Orca-managed worktree.')
+    brandCliDocumentation(
+      'Missing repo selector. Pass --repo or run from inside an Orca-managed worktree.'
+    )
   )
 }
 
@@ -280,7 +282,9 @@ export const WORKTREE_HANDLERS: Record<string, CommandHandler> = {
     if (!hostId) {
       throw new RuntimeClientError(
         'worktree_host_unresolved',
-        brandCliDocumentation('Orca cannot tell which host owns this workspace. Refresh projects and try again.')
+        brandCliDocumentation(
+          'Orca cannot tell which host owns this workspace. Refresh projects and try again.'
+        )
       )
     }
     // Why (#19334): the waiver only ever applies to a hook that ran, so without --run-hooks it

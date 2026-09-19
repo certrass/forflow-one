@@ -20,9 +20,7 @@ function isPackagedForflowCli(): boolean {
 const packagedForflow = isPackagedForflowCli()
 
 export function isForflowCli(env: NodeJS.ProcessEnv = process.env): boolean {
-  return (
-    packagedForflow || env.FORFLOW_DEPLOYMENT_PROFILE === 'cn-private' || env.FORFLOW_BUILD === '1'
-  )
+  return packagedForflow || env.FORFLOW_DEPLOYMENT_PROFILE === 'cn-private'
 }
 
 export function cliCommandName(): string {
@@ -35,11 +33,22 @@ export function cliProductName(): string {
 
 // Only authored documentation may pass here; never terminal output, paths or RPC payloads.
 export function brandCliDocumentation(text: string): string {
-  if (!isForflowCli()) return text
+  if (!isForflowCli()) {
+    return text
+  }
   return text
     .replace(/\bOrca\b/g, 'Forflow One')
     .replace(/\borca(?=\s|`|$)/g, 'forflow')
     .replace(/\bORCA(?=\s|`|$)/g, 'FORFLOW')
+}
+
+export function cliMessage(parts: TemplateStringsArray, ...values: unknown[]): string {
+  return parts
+    .map(
+      (part, index) =>
+        brandCliDocumentation(part) + (index < values.length ? String(values[index]) : '')
+    )
+    .join('')
 }
 
 export const FORFLOW_CLI_ENV_ALIASES = [
@@ -53,10 +62,14 @@ export const FORFLOW_CLI_ENV_ALIASES = [
 ] as const
 
 export function applyForflowCliEnvironment(env: NodeJS.ProcessEnv = process.env): void {
-  if (!isForflowCli(env)) return
+  if (!isForflowCli(env)) {
+    return
+  }
   for (const suffix of FORFLOW_CLI_ENV_ALIASES) {
     const value = env[`FORFLOW_${suffix}`]
-    if (value !== undefined) env[`ORCA_${suffix}`] = value
+    if (value !== undefined) {
+      env[`ORCA_${suffix}`] = value
+    }
   }
   env.ORCA_CLI_COMMAND ??= 'forflow'
 }

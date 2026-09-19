@@ -74,7 +74,9 @@ export async function sendRequest<TResult>(
         ok: false,
         error: new RuntimeClientError(
           'runtime_unavailable',
-          brandCliDocumentation('Could not connect to the running Orca app. Restart Orca and try again.')
+          brandCliDocumentation(
+            'Could not connect to the running Orca app. Restart Orca and try again.'
+          )
         )
       })
     })
@@ -87,7 +89,9 @@ export async function sendRequest<TResult>(
         ok: false,
         error: new RuntimeClientError(
           'runtime_unavailable',
-          brandCliDocumentation('The Orca runtime closed the connection before responding. Restart Orca and try again.')
+          brandCliDocumentation(
+            'The Orca runtime closed the connection before responding. Restart Orca and try again.'
+          )
         )
       })
     })
@@ -180,7 +184,9 @@ export async function sendRequest<TResult>(
             ok: false,
             error: new RuntimeClientError(
               'runtime_unavailable',
-              brandCliDocumentation('The Orca runtime changed while the request was in flight. Retry the command.')
+              brandCliDocumentation(
+                'The Orca runtime changed while the request was in flight. Retry the command.'
+              )
             )
           })
           return

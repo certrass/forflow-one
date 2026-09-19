@@ -26,6 +26,8 @@ export async function installForflowBundledSkills(input: {
   stateDirectory: string
   version: string
   launcherPath: string
+  providers?: string[]
+  discoveryLog?: (message: string) => void
   workspaceDirectory?: string
 }): Promise<ForflowBundledSkillResult[]> {
   const names = [...new Set(namesSchema.parse(input.names))]
@@ -73,7 +75,8 @@ export async function installForflowBundledSkills(input: {
         workspaceDirectory: input.workspaceDirectory,
         homeDirectory: input.homeDirectory,
         orcaStateDirectory: input.stateDirectory,
-        detectedProviders: [],
+        detectedProviders: input.providers ?? [],
+        discoveryLog: input.discoveryLog,
         destinationIdentity: 'forflow-local-shared-skills',
         hostIdentity: 'local',
         conflictResolution: 'replace-unmodified'

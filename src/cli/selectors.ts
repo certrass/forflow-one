@@ -1,3 +1,4 @@
+import { cliMessage } from './cli-product'
 import { resolve as resolvePath } from 'node:path'
 import type {
   ComputerAppQuery,
@@ -128,7 +129,7 @@ export async function resolveCurrentWorktreeSelector(
   if (!enclosingWorktree) {
     throw new RuntimeClientError(
       'selector_not_found',
-      `No Orca-managed worktree contains the current directory: ${currentPath}`
+      cliMessage`No Orca-managed worktree contains the current directory: ${currentPath}`
     )
   }
 

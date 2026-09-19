@@ -25,7 +25,9 @@ export const ORCHESTRATION_WORKER_LAUNCH_HANDLER: Record<string, CommandHandler>
       ) {
         throw new RuntimeClientError(
           'incompatible_runtime',
-          brandCliDocumentation('The connected Orca runtime does not support worker model or effort overrides. Update or restart Orca and try again.')
+          brandCliDocumentation(
+            'The connected Orca runtime does not support worker model or effort overrides. Update or restart Orca and try again.'
+          )
         )
       }
     }

@@ -155,3 +155,9 @@
 用户报告 `cli:getInstallStatus` 读取 `/usr/local/bin/forflow` 时 EACCES。本轮确认是此前保留的 root 所有、0700 权限的系统链接；此前修复新链接创建和错误提示，并未修复这个既存链接。经 macOS 管理员授权，先校验设备／inode 和准确目标 `/Applications/Forflow One.app/Contents/Resources/bin/forflow`，仅对符号链接执行 `chmod -h 755`。目标、inode、所有者及应用二进制未改变。
 
 真实 `forflow --version` 返回 `.11`；已安装应用 IPC 返回 `installed`、`pathConfigured: true`，设置刷新无错误。17 项 CLI 事务／权限回归和已安装应用 smoke 通过。常规 smoke 现要求状态可读取；仅显式权限恢复夹具允许设置 `FORFLOW_QA_ALLOW_CLI_PERMISSION_DENIED=1` 来验证中文失败提示，不能再把真实 CLI 不可用当作正常 smoke 通过。没有重建应用或更换版本。证据位于 `.forflow/evidence/cli-system-link-*`。
+
+## 2026-09-20 CLI 名称纠正
+
+用户原话：“cli是不是名字还是不对，cli部分你也得修改一下吧”。实际读取 `.11` 的 `forflow --help`、`worktree --help` 和 `terminal --help`，均仍显示 `orca`；命令入口注册为 Forflow 并不等于 CLI 自身身份已改造。根因是 CLI 单独经 tsc 编译，未使用桌面端编译宏。
+
+`.12` 增加独立编译产物身份和运行时映射；帮助、示例、重试建议及技能指南使用 Forflow。234 条命令简介改中文，保留命令路径、参数名、JSON 结构和远程协议。新技能主题兼容旧别名，安装复用现有本地事务服务，不调用外部 npx；保留旧目录以避免覆盖或重复安装。长篇参考和部分选项仍为英文，不能把此次品牌修复扩大为全部 CLI 汉化完成。验证、安装与未完事项以 [本版记录](release-1.4.205-forflow.12.md) 为准。

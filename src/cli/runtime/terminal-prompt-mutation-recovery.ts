@@ -37,7 +37,9 @@ export function attachLegacyTerminalPromptRecovery(error: unknown): unknown {
     'The legacy host cannot prove whether the prompt was delivered',
     [
       INSPECT_STEP,
-      brandCliDocumentation('Update Orca on the execution host before future prompt sends that need durable retry.')
+      brandCliDocumentation(
+        'Update Orca on the execution host before future prompt sends that need durable retry.'
+      )
     ]
   )
 }
@@ -52,10 +54,14 @@ export function attachUnverifiedTerminalPromptRecovery(error: unknown): RuntimeC
         )
   return attachUnknownTerminalPromptRecovery(
     normalized,
-    brandCliDocumentation('Orca cannot prove whether the prompt was delivered by the prompt-delivery-capable runtime from the preflight'),
+    brandCliDocumentation(
+      'Orca cannot prove whether the prompt was delivered by the prompt-delivery-capable runtime from the preflight'
+    ),
     [
       INSPECT_STEP,
-      brandCliDocumentation('A different Orca runtime answered than the one whose prompt-delivery support was verified; confirm which runtime serves this host before sending again.')
+      brandCliDocumentation(
+        'A different Orca runtime answered than the one whose prompt-delivery support was verified; confirm which runtime serves this host before sending again.'
+      )
     ]
   )
 }

@@ -179,7 +179,9 @@ function verifySkillsCliRuntime(outDir, artifactRoot = dirname(outDir), options 
   }
   const list = parseJson('skills list', runCli(absoluteOutDir, ['skills', 'list', '--json']))
   const topicNames = new Set(list.topics?.map((topic) => topic.name))
-  for (const topic of ['orca-cli', 'computer-use']) {
+  const metadata = JSON.parse(readFileSync(join(absoluteOutDir, 'package.json'), 'utf8'))
+  const forflow = metadata.name === 'forflow-one-compiled-output'
+  for (const topic of [forflow ? 'forflow-cli' : 'orca-cli', 'computer-use']) {
     if (!topicNames.has(topic)) {
       throw new Error(`[verify-skills-cli-runtime] skills list omitted ${topic}`)
     }
@@ -210,7 +212,20 @@ function verifySkillsCliRuntime(outDir, artifactRoot = dirname(outDir), options 
     throw new Error('[verify-skills-cli-runtime] a dry-run reported execution')
   }
 
-  return { closureFiles: closure.length, commands: 5 }
+  if (forflow) {
+    const current = runCli(absoluteOutDir, ['skills', 'get', 'forflow-cli', '--json'])
+    const legacy = runCli(absoluteOutDir, ['skills', 'get', 'orca-cli', '--json'])
+    if (
+      current !== legacy ||
+      install.mode !== 'bundled-offline' ||
+      update.mode !== 'bundled-offline'
+    ) {
+      throw new Error(
+        '[verify-skills-cli-runtime] Forflow aliases or offline installation contract do not match'
+      )
+    }
+  }
+  return { closureFiles: closure.length, commands: forflow ? 7 : 5 }
 }
 
 if (require.main === module) {

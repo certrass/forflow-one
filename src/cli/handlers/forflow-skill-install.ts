@@ -1,3 +1,5 @@
+import { SKILL_INSTALL_PROVIDERS } from '../../shared/skill-install-providers'
+import { SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT } from '../../shared/skills-cli-agent-keys'
 import { lstat } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -15,12 +17,31 @@ export async function installForflowCliSkills(
   names: string[],
   { flags, cwd, json }: Parameters<CommandHandler>[0]
 ): Promise<void> {
-  const agent = flags.get('agent')
-  if (agent !== undefined && agent !== 'universal') {
-    throw new RuntimeClientError(
-      'invalid_argument',
-      'Forflow One 离线安装使用共享的 .agents/skills 目录；--agent 仅支持 universal。'
+  const rawAgent = flags.get('agent')
+  const keys =
+    rawAgent === undefined
+      ? ['universal']
+      : typeof rawAgent === 'string'
+        ? rawAgent.split(',').map((key) => key.trim())
+        : []
+  const providers: string[] = []
+  for (const key of keys) {
+    if (key === 'universal') {
+      continue
+    }
+    const provider = SKILL_INSTALL_PROVIDERS.find(
+      (provider) => provider.id === key || SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT[provider.id] === key
     )
+    if (!provider) {
+      throw new RuntimeClientError(
+        'invalid_argument',
+        `离线安装不支持目标 ${key}。可用目标：universal、${SKILL_INSTALL_PROVIDERS.map((provider) => provider.id).join('、')}。`
+      )
+    }
+    providers.push(provider.id)
+  }
+  if (!keys.length) {
+    throw new RuntimeClientError('invalid_argument', '--agent 缺少目标。')
   }
   const global = flags.get('local') !== true
   const directory = global ? homedir() : cwd
@@ -31,7 +52,9 @@ export async function installForflowCliSkills(
       try {
         await lstat(join(directory, '.agents', 'skills', name))
       } catch (error) {
-        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') continue
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+          continue
+        }
         throw error
       }
     }
@@ -39,6 +62,7 @@ export async function installForflowCliSkills(
   }
   const plan = {
     mode: 'bundled-offline',
+    providers,
     global,
     executed: false,
     skills: selected.map(forflowSkillName),
@@ -55,11 +79,16 @@ export async function installForflowCliSkills(
     return
   }
   const version = readOrcaCliVersion()
-  if (!version)
+  if (!version) {
     throw new RuntimeClientError('invalid_environment', '无法读取 Forflow One 版本，未安装技能。')
+  }
   const bundle = process.platform === 'darwin' ? getMacAppBundlePath(process.execPath) : null
   const results = await installForflowBundledSkills({
     names: selected,
+    discoveryLog: (message) => {
+      process.stderr.write(`${message}\n`)
+    },
+    providers,
     homeDirectory: homedir(),
     stateDirectory: getDefaultUserDataPath(),
     workspaceDirectory: global ? undefined : cwd,
@@ -84,6 +113,7 @@ export async function installForflowCliSkills(
           )
           .join('\n')
   )
-  if (results.some((result) => !['installed', 'updated', 'unchanged'].includes(result.status)))
+  if (results.some((result) => !['installed', 'updated', 'unchanged'].includes(result.status))) {
     process.exitCode = 1
+  }
 }

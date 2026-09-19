@@ -1,3 +1,4 @@
+import { cliMessage } from '../cli-product'
 import { brandCliDocumentation } from '../cli-product'
 import { cliProductName, isForflowCli } from '../cli-product'
 import { homedir } from 'node:os'
@@ -27,7 +28,9 @@ export function readMetadata(userDataPath: string): RuntimeMetadata {
     }
     throw new RuntimeClientError(
       'runtime_unavailable',
-      isForflowCli() ? `无法读取 Forflow One 运行时信息：${metadataPath}。请先启动应用。` : `Could not read Orca runtime metadata at ${metadataPath}. Start the Orca app first.`
+      isForflowCli()
+        ? `无法读取 Forflow One 运行时信息：${metadataPath}。请先启动应用。`
+        : cliMessage`Could not read Orca runtime metadata at ${metadataPath}. Start the Orca app first.`
     )
   }
 }
@@ -49,7 +52,9 @@ export function getDefaultUserDataPath(
   // runtime metadata to a separate userData directory (e.g. `orca-dev`) to avoid
   // clobbering the production app's metadata. The CLI needs to find the same
   // metadata file, so this env var lets the CLI target a specific instance.
-  if (isForflowCli() && process.env.FORFLOW_USER_DATA_PATH) return process.env.FORFLOW_USER_DATA_PATH
+  if (isForflowCli() && process.env.FORFLOW_USER_DATA_PATH) {
+    return process.env.FORFLOW_USER_DATA_PATH
+  }
   const directory = isForflowCli() ? 'Forflow One' : 'orca'
   if (process.env.ORCA_USER_DATA_PATH) {
     return process.env.ORCA_USER_DATA_PATH
@@ -62,7 +67,9 @@ export function getDefaultUserDataPath(
     if (!appData) {
       throw new RuntimeClientError(
         'runtime_unavailable',
-        brandCliDocumentation('APPDATA is not set, so the Orca runtime metadata path cannot be resolved.')
+        brandCliDocumentation(
+          'APPDATA is not set, so the Orca runtime metadata path cannot be resolved.'
+        )
       )
     }
     return join(appData, directory)

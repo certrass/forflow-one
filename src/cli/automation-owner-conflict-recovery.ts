@@ -37,5 +37,7 @@ const RECOVERY: Record<string, readonly string[]> = {
 export function automationOwnerConflictRecovery(
   code: string | null | undefined
 ): AutomationOwnerConflictRecovery | undefined {
-  return isAutomationOwnerConflictCode(code) ? { nextSteps: RECOVERY[code].map(brandCliDocumentation) } : undefined
+  return isAutomationOwnerConflictCode(code)
+    ? { nextSteps: RECOVERY[code].map(brandCliDocumentation) }
+    : undefined
 }
