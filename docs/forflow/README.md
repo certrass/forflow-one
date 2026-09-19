@@ -1,8 +1,8 @@
 # Forflow One 文档
 
-2026-09-20。最新 macOS arm64 本机测试版为 **1.4.205-forflow.14**，已安装至 `/Applications/Forflow One.app`。改进文件引用标签和更改审阅，包含 `.12` 的 CLI 修复与 `.13` 的同会话 GUI 工作台。见 [当前版本记录](release-1.4.205-forflow.14.md) 和随包 `release.json`。完整治理平台仍按工作包逐步建设。
+2026-09-20。最新 macOS arm64 本机测试版为 **1.4.205-forflow.15**，已安装至 `/Applications/Forflow One.app`。新增 Codex GUI 执行中补充消息和中文中断提示，包含此前 CLI、同会话 GUI、文件引用及更改审阅功能。见 [当前版本记录](release-1.4.205-forflow.15.md) 和随包 `release.json`。近期 GUI 适配先集中于 Codex，国内 CLI 新适配与联调暂缓；完整治理平台仍按工作包逐步建设。
 
-`.14` 通过 1,720 项项目回归、11 项身份服务测试及 6 个真实安装包场景；安装后结果见版本记录。原 `.11` 保留回退，`.12`／`.13` 无需分别安装。历史功能状态见 [官网 120 项核验矩阵](official-feature-results-20260919.md)。
+`.15` 通过 1,822 项项目回归、11 项身份服务测试，候选包和安装后各 7 个场景通过。Codex 专项使用本地转录与 hook/PTY 夹具，尚未进行真实模型联调。原 `.14` 保留回退，旧中间版本无需分别安装。历史功能状态见 [官网 120 项核验矩阵](official-feature-results-20260919.md)。
 
 ## 使用与管理
 
