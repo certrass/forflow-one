@@ -4,9 +4,10 @@ import CommentMarkdown, {
 } from '@/components/sidebar/CommentMarkdown'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
-import type {
-  NativeChatMessage,
-  NativeChatToolCallBlock
+import {
+  NATIVE_CHAT_INTERRUPTED_STATUS_TEXT,
+  type NativeChatMessage,
+  type NativeChatToolCallBlock
 } from '../../../../shared/native-chat-types'
 import { deriveNativeChatRowContent } from './native-chat-row-content'
 import { NativeChatToolRun } from './NativeChatToolRun'
@@ -65,6 +66,10 @@ export const MessageRow = memo(function MessageRow({
   const isUser = message.role === 'user'
   const isReasoning = message.role === 'reasoning'
   const isSystem = message.role === 'system'
+  const displayMarkdown =
+    isSystem && markdown === NATIVE_CHAT_INTERRUPTED_STATUS_TEXT
+      ? translate('components.native-chat.interrupted', 'Conversation interrupted')
+      : markdown
   const providerFrame = message.blocks.find((block) => block.type === 'text' && block.providerFrame)
 
   const scrollToTop = useCallback(() => {
@@ -174,7 +179,7 @@ export const MessageRow = memo(function MessageRow({
       />
       {markdown ? (
         <CommentMarkdown
-          content={markdown}
+          content={displayMarkdown}
           variant="document"
           className="text-sm"
           renderCodeBlock={NativeChatCodeBlock}

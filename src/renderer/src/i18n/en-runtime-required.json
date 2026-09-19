@@ -2834,6 +2834,31 @@
     "guide": {
       "addProjectFirst": "First add a project you'd like to work on."
     },
+    "modelAccounts": {
+      "accountsDescription": "Manage domestic model API settings and agent logins. API credit and CLI subscription quotas are managed separately.",
+      "actionFailed": "The operation could not finish. Check that the keychain is unlocked and the model and credentials are correct, then retry.",
+      "busy": "Working…",
+      "configured": "API configuration saved",
+      "description": "Configure official Kimi, Zhipu GLM and DeepSeek APIs. Website memberships, Kimi Code and Coding Plan use separate logins and quotas.",
+      "docs": "Official setup guide",
+      "enterKey": "Enter your platform API key",
+      "keepKey": "Leave blank to keep the saved key",
+      "loadFailed": "Could not read account settings. Please retry.",
+      "loading": "Reading API settings…",
+      "localOnly": "A remote host or WSL is selected. Switch to the local host to manage local API keys. Remote accounts are not read or changed here.",
+      "locked": "Keychain locked or configuration unreadable",
+      "missing": "Not configured",
+      "model": "Model name",
+      "remove": "Remove configuration",
+      "removed": "API configuration removed.",
+      "retry": "Retry",
+      "save": "Save configuration",
+      "saved": "Saved. Connection has not been verified.",
+      "scope": "Keys are encrypted on this device. Saving sends no request. Connection tests send only fixed test text and may use a small amount of API credit. These settings do not automatically change agent CLI logins or model configuration.",
+      "test": "Test connection",
+      "title": "Domestic model API accounts",
+      "unavailable": "This client does not support these settings. Update the desktop client."
+    },
     "searchSummary": {
       "files_one": "{{count}} file",
       "files_other": "{{count}} files",
@@ -3005,7 +3030,7 @@
     "skills": {
       "installed": "Installed",
       "missing": "Not detected yet",
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "Install bundled skills into ~/.agents/skills for agents to read according to their configuration. Existing changes are preserved. Administrators distribute skills to remote environments offline.",
       "recheck": "Check local skills again",
       "recheckFailed": "Could not check local skills. Check the local skill folders.",
       "registerCli": "Orca needs to register its CLI on PATH.",
@@ -3186,6 +3211,9 @@
           "title": "Workspaces"
         }
       }
+    },
+    "workbench": {
+      "files": "Files and results"
     }
   },
   "runtimeRpc": {

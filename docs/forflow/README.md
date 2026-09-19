@@ -78,4 +78,5 @@ pnpm probe:model:forflow
 - [历史版：入门清单恢复、中文浮层和权限上传](release-1.4.205-forflow.3.md)
 - [历史版：自有账号与中文目录](release-1.4.205-forflow.2.md)
 - [构建、本地化与验证流程](build-and-localization.md)
+- [合入 Orca 上游更新](upstream-updates.md)：独立分支试合并、保护 Forflow 改造、回归与客户更新渠道。
 - [身份服务部署说明](../../services/identity/README.md)

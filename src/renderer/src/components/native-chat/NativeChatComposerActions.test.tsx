@@ -36,6 +36,72 @@ import { NativeChatComposerActions } from './NativeChatComposerActions'
 afterEach(() => cleanup())
 
 describe('NativeChatComposerActions', () => {
+  it('sends a follow-up without stopping the active turn and ignores double-clicks', () => {
+    const onSend = vi.fn()
+    const onStop = vi.fn()
+    render(
+      <NativeChatComposerActions
+        attachDisabled={false}
+        dictationDisabled
+        sendDisabled={false}
+        followUpDisabled={false}
+        isWorking
+        isDictating={false}
+        isDictationHoldMode={false}
+        onAttach={vi.fn()}
+        onDictationToggle={vi.fn()}
+        onDictationHoldStart={vi.fn()}
+        onDictationHoldEnd={vi.fn()}
+        onSend={onSend}
+        onStop={onStop}
+        sessionOptionsSurface={null}
+        sessionOptionsSnapshot={[]}
+      />
+    )
+    const send = screen.getByRole('button', { name: 'Send follow-up' })
+    fireEvent.click(send, { detail: 1 })
+    fireEvent.click(send, { detail: 2 })
+    expect(onSend).toHaveBeenCalledTimes(1)
+    expect(onStop).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Stop the agent' }), { detail: 1 })
+    expect(onStop).toHaveBeenCalledTimes(1)
+    expect(onSend).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    { isWorking: true, followUpDisabled: true, visible: true },
+    { isWorking: true, followUpDisabled: undefined, visible: false },
+    { isWorking: false, followUpDisabled: false, visible: false }
+  ])('respects follow-up availability: %j', ({ isWorking, followUpDisabled, visible }) => {
+    const onSend = vi.fn()
+    render(
+      <NativeChatComposerActions
+        attachDisabled={false}
+        dictationDisabled
+        sendDisabled={false}
+        followUpDisabled={followUpDisabled}
+        isWorking={isWorking}
+        isDictating={false}
+        isDictationHoldMode={false}
+        onAttach={vi.fn()}
+        onDictationToggle={vi.fn()}
+        onDictationHoldStart={vi.fn()}
+        onDictationHoldEnd={vi.fn()}
+        onSend={onSend}
+        sessionOptionsSurface={null}
+        sessionOptionsSnapshot={[]}
+      />
+    )
+    const button = screen.queryByRole('button', { name: 'Send follow-up' })
+    if (visible) {
+      expect(button?.hasAttribute('disabled')).toBe(true)
+      fireEvent.click(button!)
+      expect(onSend).not.toHaveBeenCalled()
+    } else {
+      expect(button).toBeNull()
+    }
+  })
+
   it('places session option pickers immediately beside dictation', () => {
     render(
       <NativeChatComposerActions

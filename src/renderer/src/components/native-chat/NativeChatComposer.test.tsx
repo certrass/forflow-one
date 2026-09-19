@@ -2,6 +2,7 @@
 
 import { act, cleanup, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as ProductBranding from '../../../../shared/product-branding'
 import type {
   SessionOptionDescriptor,
   SessionOptionsSurface
@@ -10,11 +11,12 @@ import { clearNativeChatSessionOptionCacheForTests } from './native-chat-session
 import { clearNativeChatModelEnrichmentForTests } from './native-chat-session-option-enrichment'
 
 const mocks = vi.hoisted(() => ({
+  forflowBuild: false,
   cancelPendingSends: vi.fn(),
   composerIsComposing: null as (() => boolean) | null,
   attachmentIsComposing: null as (() => boolean) | null,
   flushPendingAttachments: vi.fn(),
-  fieldProps: null as {
+  fieldProps: ((): {
     onSend?: () => void
     onStop?: () => void
     imeEnterGesture?: {
@@ -26,8 +28,9 @@ const mocks = vi.hoisted(() => ({
     sessionOptionsSnapshot?: SessionOptionDescriptor[]
     attachDisabled?: boolean
     sendButtonDisabled?: boolean
+    followUpDisabled?: boolean
     autocomplete?: { mode: string; items?: { kind: string; name: string }[] }
-  } | null,
+  } | null => null)(),
   modelSwitchOutcome: 'applied' as 'applied' | 'rejected' | 'unknown',
   confirmationObserver: null as {
     ready: Promise<void>
@@ -53,6 +56,11 @@ const mocks = vi.hoisted(() => ({
   clearNativeChatLaunchDraft: vi.fn(),
   markNativeChatLaunchDraftAdopted: vi.fn()
 }))
+
+vi.mock('../../../../shared/product-branding', async (importOriginal) => {
+  const actual = await importOriginal<typeof ProductBranding>()
+  return { ...actual, isForflowBuild: () => mocks.forflowBuild }
+})
 
 vi.mock('../../store', () => {
   const state = {
@@ -162,6 +170,7 @@ describe('NativeChatComposer', () => {
     clearNativeChatSessionOptionCacheForTests()
     clearNativeChatModelEnrichmentForTests()
     mocks.fieldProps = null
+    mocks.forflowBuild = false
     mocks.modelSwitchOutcome = 'applied'
     mocks.draft = 'hello'
     mocks.imageAttachments = []
@@ -221,6 +230,28 @@ describe('NativeChatComposer', () => {
   })
 
   afterEach(() => cleanup())
+
+  it.each([
+    { agent: 'codex', draft: '补充要求', canSend: true, pty: 'pty-1', expected: false },
+    { agent: 'codex', draft: '', canSend: true, pty: 'pty-1', expected: true },
+    { agent: 'codex', draft: '补充要求', canSend: false, pty: 'pty-1', expected: true },
+    { agent: 'codex', draft: '补充要求', canSend: true, pty: null, expected: true },
+    { agent: 'claude', draft: '补充要求', canSend: true, pty: 'pty-1', expected: undefined }
+  ] as const)('scopes follow-up to a writable Codex draft: %j', (row) => {
+    mocks.forflowBuild = true
+    mocks.draft = row.draft
+    render(
+      <NativeChatComposer
+        terminalTabId="tab-1"
+        paneKey="tab-1:leaf-1"
+        targetPtyId={row.pty}
+        agent={row.agent}
+        canSend={row.canSend}
+        isWorking
+      />
+    )
+    expect(mocks.fieldProps?.followUpDisabled).toBe(row.expected)
+  })
 
   it('cancels delayed composer writes before the Stop button interrupts the agent', () => {
     const onStop = vi.fn()

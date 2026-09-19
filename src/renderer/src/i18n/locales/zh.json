@@ -16992,6 +16992,7 @@
         }
       },
       "stop": "停止智能体",
+      "interrupted": "本轮已中断",
       "copyMessage": {
         "copied": "已复制",
         "copy": "复制消息"
@@ -17833,7 +17834,7 @@
       "statusReadFailed": "无法读取命令注册状态，请刷新重试。"
     },
     "skills": {
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他代理按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
       "complete": "内置技能已安装到本机共享目录。",
       "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
       "settingUp": "正在配置能力…",
@@ -18809,6 +18810,7 @@
     },
     "composer": {
       "removeFile": "移除引用：{{name}}",
+      "followUp": "补充消息",
       "inputHint": "拖入文件添加引用 · Enter 发送，Shift+Enter 换行"
     }
   },

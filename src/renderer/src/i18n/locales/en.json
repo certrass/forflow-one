@@ -17108,6 +17108,7 @@
         }
       },
       "stop": "Stop the agent",
+      "interrupted": "Conversation interrupted",
       "copyMessage": {
         "copied": "Copied",
         "copy": "Copy message"
@@ -17715,8 +17716,10 @@
       "completed": "Done"
     },
     "searchSummary": {
+      "matches": "{{count}} results",
       "matches_one": "{{count}} result",
       "matches_other": "{{count}} results",
+      "files": "{{count}} files",
       "files_one": "{{count}} file",
       "files_other": "{{count}} files",
       "summary": "{{matches}} in {{files}}"
@@ -17817,7 +17820,7 @@
       "managed": "企业部署策略已关闭产品遥测；本地诊断记录单独管理。"
     },
     "skills": {
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "Install bundled skills into ~/.agents/skills for agents to read according to their configuration. Existing changes are preserved. Administrators distribute skills to remote environments offline.",
       "complete": "内置技能已安装到本机共享目录。",
       "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
       "settingUp": "正在配置能力…",
@@ -18807,6 +18810,7 @@
     },
     "composer": {
       "removeFile": "Remove reference: {{name}}",
+      "followUp": "Send follow-up",
       "inputHint": "Drop files to reference them · Enter to send, Shift+Enter for a new line"
     }
   },

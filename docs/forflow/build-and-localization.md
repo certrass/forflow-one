@@ -1,6 +1,6 @@
 # 中文私有版构建与验证
 
-本轮版本 `1.4.205-forflow.3`。品牌和兼容协议分开处理：用户界面、应用 ID、配置目录、CLI 入口和图标使用 Forflow；上游 MIT 许可、依赖来源、已有远程协议及持久化字段保留真实含义。
+当前发行版本以 `resources/forflow/release-profile.json` 和 [文档索引](README.md) 为准。品牌和兼容协议分开处理：用户界面、应用 ID、配置目录、CLI 入口和图标使用 Forflow；上游 MIT 许可、依赖来源、已有远程协议及持久化字段保留真实含义。更新 Orca 基线时按 [上游合入流程](upstream-updates.md) 在独立工作树验证。
 
 ## 固定输入
 

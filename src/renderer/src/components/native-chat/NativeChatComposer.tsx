@@ -34,6 +34,7 @@ import { useNativeChatStructuredComposerSend } from './use-native-chat-structure
 import { useImeEnterGestureOwnership } from '@/lib/ime-composition-keyboard-event'
 import { useNativeChatComposerAppMenuSelection } from './use-native-chat-composer-app-menu-selection'
 import { useNativeChatWorkspaceFileDrop } from './use-native-chat-workspace-file-drop'
+import { isForflowBuild } from '../../../../shared/product-branding'
 
 export type {
   NativeChatComposerHandle,
@@ -386,6 +387,14 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         notice={notice}
         imageAttachments={imageAttachments}
         sendButtonDisabled={sendButtonDisabled}
+        followUpDisabled={
+          isForflowBuild() && agent === 'codex' && !structuredTransport
+            ? disabled ||
+              hasPendingAttachment ||
+              isDispatchingSessionOption ||
+              (draft.trim() === '' && imageAttachments.length === 0)
+            : undefined
+        }
         isWorking={isWorking}
         attachDisabled={disabled}
         dictationDisabled={dictationDisabled}

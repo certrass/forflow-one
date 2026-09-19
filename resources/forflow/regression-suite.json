@@ -181,5 +181,12 @@
   "src/renderer/src/components/terminal-pane/ForflowSessionToolbar.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatPromptEditor.file-references.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatPromptEditor.test.tsx",
-  "src/renderer/src/components/native-chat/use-native-chat-composer-attachments.test.tsx"
+  "src/renderer/src/components/native-chat/use-native-chat-composer-attachments.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatComposer.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatComposerActions.test.tsx",
+  "src/main/native-chat/transcript-reader-codex-history-mode.test.ts",
+  "src/main/native-chat/transcript-line-decoders-codex-skill-context.test.ts",
+  "src/renderer/src/components/native-chat/native-chat-runtime-send.test.ts",
+  "src/renderer/src/components/native-chat/use-native-chat-interactive-send.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatMessageRow.test.tsx"
 ]
