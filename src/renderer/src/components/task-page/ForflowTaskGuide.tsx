@@ -6,9 +6,15 @@ export function ForflowTaskGuide(): React.JSX.Element {
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
   const openModal = useAppStore((s) => s.openModal)
   return (
-    <details className="mt-3 rounded-md border border-border p-3">
+    <details
+      className="mt-3 max-h-[45vh] shrink-0 overflow-y-auto scrollbar-sleek rounded-md border border-border p-3"
+      data-forflow-task-guide=""
+    >
       <summary className="cursor-pointer text-sm font-medium">从任务到结果：使用指引</summary>
       <div className="mt-3 space-y-3 text-sm">
+        <p className="text-xs text-muted-foreground">
+          第一次使用可以直接创建任务，不必先连接外部系统。已有飞书任务时，再连接账号并读取任务清单。
+        </p>
         <ol className="list-decimal space-y-2 pl-5">
           <li>
             选择来源：可连接飞书任务、Jira、Linear，或使用 GitHub／GitLab
@@ -45,6 +51,28 @@ export function ForflowTaskGuide(): React.JSX.Element {
             连接任务来源
           </Button>
         </div>
+        <details>
+          <summary className="cursor-pointer text-xs font-medium">
+            项目、工作区和分屏有什么区别？
+          </summary>
+          <dl className="mt-2 space-y-2 text-xs text-muted-foreground">
+            <div>
+              <dt className="font-medium text-foreground">项目</dt>
+              <dd>长期使用的一组代码或资料，可来自 Git 仓库，也可来自普通文件夹。</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground">工作区</dt>
+              <dd>
+                这次任务使用的目录和会话。Git
+                工作树可分开保存不同任务的分支；普通文件夹不会自动隔离改动。
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground">分屏</dt>
+              <dd>在同一个工作区并排查看多个窗格，它们仍访问同一组文件。</dd>
+            </div>
+          </dl>
+        </details>
       </div>
     </details>
   )

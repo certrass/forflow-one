@@ -16,13 +16,15 @@ test('the actual parallel-task tour renders in Chinese after splitting a termina
     await addPrivateProject(page, profile)
     const firstStep = page.getByRole('dialog', { name: '拆分终端窗格', exact: true })
     await expect(firstStep).toBeVisible()
-    await expect(firstStep).toContainText('打开第二个终端窗格，也可以右键选择拆分方式。')
+    await expect(firstStep).toContainText('两个窗格共用当前工作区的文件。')
     await expect(firstStep).not.toContainText('Split a terminal pane')
     await expect(firstStep).not.toContainText('Open a second terminal pane')
     await page.getByRole('button', { name: '拆分终端', exact: true }).click()
     await expect(page.getByText('并行开始另一项任务', { exact: true })).toBeVisible()
     await expect(
-      page.getByText('每个工作树都有独立分支，让并行任务的改动分别保存。', { exact: true })
+      page.getByText('Git 工作树让另一项任务拥有独立分支；普通文件夹工作区不会自动隔离文件改动。', {
+        exact: true
+      })
     ).toBeVisible()
     await expect(page.locator('body')).not.toContainText('Start another task in parallel')
     await expect(page.locator('body')).not.toContainText('Each worktree gets its own branch')

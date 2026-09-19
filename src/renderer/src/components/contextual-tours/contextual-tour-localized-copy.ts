@@ -23,7 +23,7 @@ const COPY: Record<string, () => Pick<ContextualTourStep, 'title' | 'body'>> = {
     title: translate('contextualTour.steps.session-split.title', 'Split a terminal pane'),
     body: translate(
       'contextualTour.steps.session-split.body',
-      'Open a second terminal pane with {terminal.splitRight}, or right-click the pane for split options.'
+      'Open a second pane with {terminal.splitRight}, or right-click for split options. Both panes share this workspace’s files.'
     )
   }),
   'session-parallel': () => ({
@@ -33,7 +33,7 @@ const COPY: Record<string, () => Pick<ContextualTourStep, 'title' | 'body'>> = {
     ),
     body: translate(
       'contextualTour.steps.session-parallel.body',
-      'Each worktree gets its own branch, so parallel work stays separate.'
+      'A Git worktree gives another task its own branch. Ordinary folder workspaces do not isolate file changes.'
     )
   }),
   'browser-context': () => ({
@@ -129,7 +129,7 @@ const COPY: Record<string, () => Pick<ContextualTourStep, 'title' | 'body'>> = {
     title: translate('contextualTour.steps.creation-project.title', 'Pick a project'),
     body: translate(
       'contextualTour.steps.creation-project.body',
-      'Orca isolates each task in its own worktree, branched off your base.'
+      'Choose a Git repository or an ordinary folder. Git worktrees isolate branches; folder workspaces use the selected directory.'
     )
   }),
   'creation-name': () => ({

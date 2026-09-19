@@ -18812,6 +18812,61 @@
       "removeFile": "Remove reference: {{name}}",
       "followUp": "Send follow-up",
       "inputHint": "Drop files to reference them · Enter to send, Shift+Enter for a new line"
+    },
+    "sessionGuide": {
+      "label": "How to use this workspace",
+      "title": "Complete your first task",
+      "intro": "Choose a topic below. You can close this guide and reopen it here at any time.",
+      "showControls": "Show split and parallel controls",
+      "close": "Close guide",
+      "chatTitle": "1. Write a goal in Chat",
+      "chatBody": "Start Codex in this pane, then choose Chat. Describe the result you need, relevant files and how to check success. Review the draft before sending.",
+      "chatNext": "Chat and Terminal share the same supported session. If Chat is unavailable, read the status beside the controls. Structured conversations do not have a terminal view.",
+      "filesTitle": "2. Add reference files",
+      "filesBody": "Open Files and drag a file into the Chat input. Check the reference chip, then add what the agent should do with it. Remove an incorrect reference before sending.",
+      "filesNext": "A reference is a file path, not an uploaded copy. The file must be readable on the execution host; sending lets the configured agent and model process the referenced material.",
+      "parallelTitle": "3. Split a view or start parallel work",
+      "parallelBody": "Split view opens another terminal in this workspace, sharing its files. For an independent Git task, use Parallel task to create a new worktree and branch.",
+      "parallelNext": "Ordinary folder workspaces do not isolate branches. Check the project and execution location before starting another task.",
+      "reviewTitle": "4. Check the result",
+      "reviewGit": "Open Review changes to inspect the workspace diff, then check output files and test results. This view includes all workspace changes; opening it does not commit or publish them.",
+      "reviewFolder": "Open Files to inspect generated documents or code, then check the agent’s test results. This ordinary folder has no Git diff view; check the actual files before using the result.",
+      "reviewNext": "If something is wrong, state the expected result in the same conversation. For a running Codex bridge session, use Add message to supplement the task or Stop to interrupt it.",
+      "browserTitle": "5. Preview a page and give design feedback",
+      "browserBody": "Open a Browser tab and enter the page or preview address. Use the element grabber for page context, or annotate the page with a specific change request.",
+      "browserNext": "Send the selected context to the intended agent and check its response. A preview needs a running web service; opening a browser does not start your project’s server."
+    },
+    "taskPrompt": {
+      "explore": "Understand this project",
+      "explorePrompt": "Read the project README and key files. Explain its purpose, directory structure and how to run it, with file references. Suggest one small first task. Do not modify files yet.",
+      "change": "Make a small change",
+      "changePrompt": "Goal: [describe one small change].\nReferences: [files or requirements].\nFirst explain the approach, then implement and test it. Report changed files and test results.\nConstraints: preserve unrelated changes; do not commit or publish automatically.",
+      "review": "Review existing work",
+      "reviewPrompt": "Review the existing project changes without modifying files. Prioritize correctness, regressions and missing checks. Cite file locations and explain how to reproduce each issue. Distinguish verified results from suggestions.",
+      "label": "What do you want to accomplish?",
+      "placeholder": "Describe the goal, reference material, expected result and constraints.",
+      "hint": "Choose an agent after writing the task. Codex is recommended for Chat. Creating the workspace prepares an editable draft; send it when ready to start.",
+      "examples": "Not sure what to write? Start with an example",
+      "keepDraft": "Your text is preserved. Clear the input first if you want to insert an example.",
+      "exampleHint": "An example only fills this input. Replace bracketed placeholders with your own requirements before sending."
+    },
+    "firstTask": {
+      "projectTitle": "1. Choose the project and location",
+      "projectBody": "Add a Git repository or an ordinary folder. Start with a small local project. The selected execution location determines where files are read and commands run.",
+      "agentTitle": "2. Prepare Codex",
+      "agentBody": "Install and sign in to Codex, then open Settings → Agents to detect it. This release prioritizes Codex Chat. A Forflow account or saved model API key does not sign you in to the agent.",
+      "goalTitle": "3. Write one clear task",
+      "goalBody": "Choose Create task or Parallel task. Fill in the goal, reference material, expected result and constraints. Use an example if needed. Review the prepared Chat draft and send it when ready.",
+      "materialTitle": "4. Add material and follow progress",
+      "materialBody": "Open Files and drag a file into the Chat input as a reference. Check the execution location and material before sending. Chat and Terminal can show the same supported session; use the workspace guide whenever you need help.",
+      "resultTitle": "5. Inspect the result before using it",
+      "resultBody": "Read output files and test results. Git projects also offer Review changes. Preview web pages in Browser, or annotate an element with feedback. Ask for corrections in the same conversation.",
+      "parallelTitle": "6. Try parallel work and task sources",
+      "parallelBody": "Split view shares this workspace’s files. Create a separate Git worktree for independent changes. To import existing work, connect Feishu tasks in Settings → Integrations, then read and preview a task before preparing a conversation.",
+      "intro": "Start by completing one small task. Team accounts and external task sources can be configured when you need them; the eight-item Getting Started checklist remains available.",
+      "teamTitle": "Team deployment, model accounts and upgrades",
+      "teamBody": "Use the identity service address provided by your administrator for team accounts. Model service credentials are configured separately; saved API accounts are not automatically passed to every agent.",
+      "upgradeBody": "Use a verified Forflow installation package for upgrades, keep a rollback copy and exit the app before replacing it. Enterprise runtime policy and full business auditing require their own deployment and validation."
     }
   },
   "githubChecks": {
@@ -19075,7 +19130,7 @@
         "title": "Name it, or start from existing work"
       },
       "creation-project": {
-        "body": "Orca isolates each task in its own worktree, branched off your base.",
+        "body": "Choose a Git repository or an ordinary folder. Git worktrees isolate branches; folder workspaces use the selected directory.",
         "title": "Pick a project"
       },
       "floating-repos": {
@@ -19087,11 +19142,11 @@
         "title": "Or use it as a scratchpad"
       },
       "session-parallel": {
-        "body": "Each worktree gets its own branch, so parallel work stays separate.",
+        "body": "A Git worktree gives another task its own branch. Ordinary folder workspaces do not isolate file changes.",
         "title": "Start another task in parallel"
       },
       "session-split": {
-        "body": "Open a second terminal pane with {terminal.splitRight}, or right-click the pane for split options.",
+        "body": "Open a second pane with {terminal.splitRight}, or right-click for split options. Both panes share this workspace’s files.",
         "title": "Split a terminal pane"
       },
       "tasks-filter": {

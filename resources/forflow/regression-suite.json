@@ -206,5 +206,7 @@
   "src/renderer/src/components/settings/task-source-setup-state.test.ts",
   "src/renderer/src/components/task-page-list-chrome-visibility.test.ts",
   "src/renderer/src/components/automations/automation-target-availability.test.ts",
-  "src/renderer/src/components/automations/automation-source-display.test.ts"
+  "src/renderer/src/components/automations/automation-source-display.test.ts",
+  "src/renderer/src/components/new-workspace/ForflowTaskPrompt.test.tsx",
+  "src/renderer/src/store/slices/ui-contextual-tours.test.ts"
 ]

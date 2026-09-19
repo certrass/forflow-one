@@ -40,7 +40,10 @@ export function FeishuTasks(): React.JSX.Element {
       <ForflowFeishuConnection onChange={model.setStatus} />
       {model.connected ? (
         <>
-          <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="flex flex-wrap items-center gap-2"
+            data-contextual-tour-target="tasks-search-presets"
+          >
             <Select
               value={model.tasklistId}
               onValueChange={model.setTasklistId}
@@ -89,7 +92,11 @@ export function FeishuTasks(): React.JSX.Element {
                 <SelectItem value="done">已完成</SelectItem>
               </SelectContent>
             </Select>
-            <Button disabled={model.busy} onClick={() => void model.load()}>
+            <Button
+              disabled={model.busy}
+              onClick={() => void model.load()}
+              data-contextual-tour-target="tasks-actions"
+            >
               {model.busy ? '读取中…' : '读取任务'}
             </Button>
           </div>
@@ -176,6 +183,7 @@ export function FeishuTasks(): React.JSX.Element {
               <div className="flex flex-wrap gap-2">
                 <Button
                   disabled={model.busy}
+                  data-contextual-tour-target="tasks-start-workspace"
                   onClick={() => {
                     if (!model.selected) {
                       return

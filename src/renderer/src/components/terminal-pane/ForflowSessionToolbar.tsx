@@ -22,6 +22,7 @@ import { useAppStore } from '@/store'
 import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
+import { ForflowSessionGuide } from './ForflowSessionGuide'
 
 export function ForflowSessionToolbar({
   controller
@@ -217,6 +218,7 @@ export function ForflowSessionToolbar({
             {translate('forflow.workbench.changes', 'Review changes')}
           </Button>
         ) : null}
+        <ForflowSessionGuide canReview={canReview} />
       </div>
     </div>
   )
