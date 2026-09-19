@@ -38,6 +38,7 @@ import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
 import type { ForflowIdentityApi } from '../shared/forflow-identity'
+import type { ForflowModelAccountsApi } from '../shared/forflow-model-accounts'
 import type { ForflowApprovalApi } from '../shared/forflow-approval'
 import type { ForflowSkillsApi } from '../shared/forflow-bundled-skills'
 import type {
@@ -70,6 +71,7 @@ type Merged<T> = { [K in keyof T]: T[K] }
 
 export type PreloadApi = {
   forflowIdentity?: ForflowIdentityApi
+  forflowModelAccounts?: ForflowModelAccountsApi
   forflowApproval?: ForflowApprovalApi
   forflowSkills?: ForflowSkillsApi
   app: AppApi

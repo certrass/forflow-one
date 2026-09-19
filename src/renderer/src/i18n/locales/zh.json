@@ -18762,6 +18762,31 @@
     },
     "setup": {
       "notificationsCompletion": "此项按应用内通知开关计入完成。系统是否允许通知、通知能否送达，请在下方检查并发送测试通知。"
+    },
+    "modelAccounts": {
+      "saved": "已保存，尚未验证连接。",
+      "removed": "已移除此 API 配置。",
+      "actionFailed": "操作未完成。请检查密钥库是否解锁、模型名称及配置后重试。",
+      "configured": "已保存 API 配置",
+      "locked": "密钥库锁定或配置无法读取",
+      "missing": "尚未配置",
+      "model": "模型名称",
+      "keepKey": "留空保留已保存的密钥",
+      "enterKey": "填写开放平台 API Key",
+      "save": "保存配置",
+      "test": "测试连接",
+      "remove": "移除配置",
+      "docs": "官方接入文档",
+      "busy": "处理中…",
+      "title": "国内模型 API 账户",
+      "description": "配置 Kimi、智谱 GLM 与 DeepSeek 的官方 API。网页会员、Kimi Code 和 Coding Plan 的登录及额度另行配置。",
+      "localOnly": "当前选择了远程主机或 WSL。请切回本机以管理本机 API 密钥；此处不会读取或修改远程账户。",
+      "unavailable": "当前客户端尚不支持此配置，请更新桌面客户端。",
+      "loadFailed": "账户配置读取失败，请重试。",
+      "retry": "重试",
+      "scope": "密钥仅在本机加密保存。保存不发起请求；测试连接只发送固定测试文本，可能消耗少量 API 额度。此配置暂不自动改写智能体 CLI 的登录与模型配置。",
+      "loading": "正在读取 API 配置…",
+      "accountsDescription": "管理国内模型 API 配置及智能体登录账户。API 充值余额与 CLI 订阅额度分别管理。"
     }
   },
   "githubChecks": {

@@ -18760,6 +18760,31 @@
     },
     "setup": {
       "notificationsCompletion": "This step tracks the in-app notification switches. Check system permission and delivery below."
+    },
+    "modelAccounts": {
+      "title": "Domestic model API accounts",
+      "description": "Configure official Kimi, Zhipu GLM and DeepSeek APIs. Website memberships, Kimi Code and Coding Plan use separate logins and quotas.",
+      "saved": "Saved. Connection has not been verified.",
+      "removed": "API configuration removed.",
+      "actionFailed": "The operation could not finish. Check that the keychain is unlocked and the model and credentials are correct, then retry.",
+      "configured": "API configuration saved",
+      "locked": "Keychain locked or configuration unreadable",
+      "missing": "Not configured",
+      "model": "Model name",
+      "keepKey": "Leave blank to keep the saved key",
+      "enterKey": "Enter your platform API key",
+      "save": "Save configuration",
+      "test": "Test connection",
+      "remove": "Remove configuration",
+      "docs": "Official setup guide",
+      "busy": "Working…",
+      "localOnly": "A remote host or WSL is selected. Switch to the local host to manage local API keys. Remote accounts are not read or changed here.",
+      "unavailable": "This client does not support these settings. Update the desktop client.",
+      "loadFailed": "Could not read account settings. Please retry.",
+      "retry": "Retry",
+      "scope": "Keys are encrypted on this device. Saving sends no request. Connection tests send only fixed test text and may use a small amount of API credit. These settings do not automatically change agent CLI logins or model configuration.",
+      "loading": "Reading API settings…",
+      "accountsDescription": "Manage domestic model API settings and agent logins. API credit and CLI subscription quotas are managed separately."
     }
   },
   "githubChecks": {

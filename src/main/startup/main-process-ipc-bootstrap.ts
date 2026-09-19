@@ -1,3 +1,4 @@
+import { registerForflowModelAccountHandlers } from '../forflow/model-account-ipc'
 import { ipcMain } from 'electron'
 import { registerForflowIdentityHandlers } from '../forflow/identity-ipc'
 import { registerForflowApprovalHandlers } from '../forflow/approval-broker'
@@ -9,6 +10,7 @@ import { resolveOpenedMarkdownDocuments } from './os-opened-markdown-files'
 
 export function registerMainProcessIpcHandlers(): void {
   registerForflowIdentityHandlers()
+  registerForflowModelAccountHandlers()
   registerForflowApprovalHandlers()
   registerForflowBundledSkillHandlers()
   ipcMain.handle('app:awaitFirstWindowStartupServices', async () => {
