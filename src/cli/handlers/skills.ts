@@ -1,3 +1,5 @@
+import { brandCliDocumentation } from '../cli-product'
+import { cliCommandName, isForflowCli } from '../cli-product'
 import { spawn } from 'node:child_process'
 import type { CommandHandler } from '../dispatch'
 import { RuntimeClientError } from '../runtime-client'
@@ -173,7 +175,7 @@ function resolveInstallAgentKeys(flags: Map<string, string | boolean>): string[]
     'invalid_environment',
     'No coding agent detected on this host, so there is no install target. Pass ' +
       '--agent <name>[,<name>...] to choose targets explicitly — --agent universal ' +
-      'writes only the shared .agents/skills directory that Orca reads.'
+      brandCliDocumentation('writes only the shared .agents/skills directory that Orca reads.')
   )
 }
 
@@ -199,16 +201,17 @@ function formatNpxCommand(args: string[]): string {
 
 function formatSkillSelectionHelp(verb: SkillMutationVerb, skillNames: string[]): string {
   return [
-    `Choose one or more skills to ${verb}:`,
+    isForflowCli() ? '选择要安装或更新的技能：' : `Choose one or more skills to ${verb}:`,
     ...skillNames.map((name) => `  ${name}`),
     '',
-    `Usage: orca skills ${verb} --skill <name> [--skill <name> ...]`,
-    `   or: orca skills ${verb} --all`
+    `${isForflowCli() ? '用法：' : 'Usage:'} ${cliCommandName()} skills ${verb} --skill <name> [--skill <name> ...]`,
+    `${isForflowCli() ? '或者：' : '   or:'} ${cliCommandName()} skills ${verb} --all`
   ].join('\n')
 }
 
 function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
-  return async ({ flags, json }) => {
+  return async (context) => {
+    const { flags, json } = context
     const guides = await loadCanonicalGuides()
     const skillNames = resolveSelectedSkillNames(flags, guides)
 
@@ -232,6 +235,12 @@ function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
           `orca to the Orca host. Run the same orca skills ${verb} command on the machine ` +
           "you want it on, where it can detect that host's agents."
       )
+    }
+
+    if (isForflowCli()) {
+      const { installForflowCliSkills } = await import('./forflow-skill-install.js')
+      await installForflowCliSkills(verb, skillNames, context)
+      return
     }
 
     const global = flags.get('local') !== true

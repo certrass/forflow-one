@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import { spawn as spawnProcess, type SpawnOptions } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -61,7 +62,7 @@ export function launchOrcaApp(): void {
 
   throw new RuntimeClientError(
     'runtime_open_failed',
-    'Could not determine how to launch Orca. Start Orca manually and try again.'
+    brandCliDocumentation('Could not determine how to launch Orca. Start Orca manually and try again.')
   )
 }
 
@@ -306,7 +307,7 @@ function resolveForegroundOrcaExecutable(): string {
   }
   throw new RuntimeClientError(
     'runtime_serve_failed',
-    'Could not determine how to start Orca server. Set ORCA_APP_EXECUTABLE to the Orca executable.'
+    brandCliDocumentation('Could not determine how to start Orca server. Set ORCA_APP_EXECUTABLE to the Orca executable.')
   )
 }
 

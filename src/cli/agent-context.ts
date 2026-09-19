@@ -1,3 +1,5 @@
+import { cliSpecPresentation } from './forflow-help'
+import { isForflowCli } from './cli-product'
 import type { CommandSpec } from './args'
 import { effectiveAllowedFlags } from './args'
 
@@ -27,6 +29,7 @@ export type AgentContextSchema = {
 
 export function buildAgentContext(specs: CommandSpec[]): AgentContextSchema {
   const commands = specs
+    .map(cliSpecPresentation)
     .map((spec) => ({
       command: spec.path.join(' '),
       path: spec.path,
@@ -53,6 +56,9 @@ export function buildAgentContext(specs: CommandSpec[]): AgentContextSchema {
 export function formatAgentContextSummary(schema: AgentContextSchema): string {
   // Why: keep the default (human) output bounded — the full surface is large, so
   // point the reader at --json rather than dumping every command.
+  if (isForflowCli()) {
+    return `${schema.commandCount} 个命令（结构版本 v${schema.schemaVersion}）。\n执行 \`forflow agent-context --json\` 查看完整的命令定义。`
+  }
   return [
     `${schema.commandCount} commands (schema v${schema.schemaVersion}).`,
     'Run `orca agent-context --json` for the full machine-readable command schema.'

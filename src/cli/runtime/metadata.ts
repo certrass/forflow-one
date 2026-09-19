@@ -1,3 +1,5 @@
+import { brandCliDocumentation } from '../cli-product'
+import { cliProductName, isForflowCli } from '../cli-product'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
@@ -15,7 +17,7 @@ export function readMetadata(userDataPath: string): RuntimeMetadata {
     if (!metadata || !findTransport(metadata, 'unix', 'named-pipe') || !metadata.authToken) {
       throw new RuntimeClientError(
         'runtime_unavailable',
-        `Orca runtime metadata is incomplete at ${metadataPath}`
+        `${cliProductName()} runtime metadata is incomplete at ${metadataPath}`
       )
     }
     return metadata
@@ -25,7 +27,7 @@ export function readMetadata(userDataPath: string): RuntimeMetadata {
     }
     throw new RuntimeClientError(
       'runtime_unavailable',
-      `Could not read Orca runtime metadata at ${metadataPath}. Start the Orca app first.`
+      isForflowCli() ? `无法读取 Forflow One 运行时信息：${metadataPath}。请先启动应用。` : `Could not read Orca runtime metadata at ${metadataPath}. Start the Orca app first.`
     )
   }
 }
@@ -47,24 +49,26 @@ export function getDefaultUserDataPath(
   // runtime metadata to a separate userData directory (e.g. `orca-dev`) to avoid
   // clobbering the production app's metadata. The CLI needs to find the same
   // metadata file, so this env var lets the CLI target a specific instance.
+  if (isForflowCli() && process.env.FORFLOW_USER_DATA_PATH) return process.env.FORFLOW_USER_DATA_PATH
+  const directory = isForflowCli() ? 'Forflow One' : 'orca'
   if (process.env.ORCA_USER_DATA_PATH) {
     return process.env.ORCA_USER_DATA_PATH
   }
   if (platform === 'darwin') {
-    return join(homeDir, 'Library', 'Application Support', 'orca')
+    return join(homeDir, 'Library', 'Application Support', directory)
   }
   if (platform === 'win32') {
     const appData = process.env.APPDATA
     if (!appData) {
       throw new RuntimeClientError(
         'runtime_unavailable',
-        'APPDATA is not set, so the Orca runtime metadata path cannot be resolved.'
+        brandCliDocumentation('APPDATA is not set, so the Orca runtime metadata path cannot be resolved.')
       )
     }
-    return join(appData, 'orca')
+    return join(appData, directory)
   }
   // Why: the CLI must find the same metadata file Electron writes in packaged
   // runs, so this mirrors Electron's default userData base instead of inventing
   // a CLI-specific config path.
-  return join(process.env.XDG_CONFIG_HOME || join(homeDir, '.config'), 'orca')
+  return join(process.env.XDG_CONFIG_HOME || join(homeDir, '.config'), directory)
 }

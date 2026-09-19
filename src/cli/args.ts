@@ -1,3 +1,4 @@
+import { isForflowCli } from './cli-product'
 import { RuntimeClientError } from './runtime/types'
 import { unknownCommandData, unknownFlagData } from './command-suggestion'
 import { specPaths, type CommandSpec } from './command-spec'
@@ -232,7 +233,7 @@ export function validateCommandAndFlags(specs: CommandSpec[], parsed: ParsedArgs
   if (!spec) {
     throw new RuntimeClientError(
       'invalid_argument',
-      `Unknown command: ${parsed.commandPath.join(' ')}`,
+      `${isForflowCli() ? '未知命令：' : 'Unknown command:'} ${parsed.commandPath.join(' ')}`,
       unknownCommandData(specs, parsed.commandPath)
     )
   }
@@ -255,7 +256,7 @@ export function validateCommandAndFlags(specs: CommandSpec[], parsed: ParsedArgs
     if (!isGlobalFlag && !spec.allowedFlags.includes(flag) && !(flag === 'page' && pageAllowed)) {
       throw new RuntimeClientError(
         'invalid_argument',
-        `Unknown flag --${flag} for command: ${spec.path.join(' ')}`,
+        isForflowCli() ? `命令 ${spec.path.join(' ')} 不支持参数 --${flag}` : `Unknown flag --${flag} for command: ${spec.path.join(' ')}`,
         unknownFlagData(flag, effectiveAllowedFlags(spec))
       )
     }

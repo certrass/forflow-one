@@ -1,11 +1,13 @@
+import { isForflowCli } from '../cli-product'
 export function resolveOrchestrationCliExecutable(
   env: NodeJS.ProcessEnv = process.env,
   platform: NodeJS.Platform = process.platform
 ): string {
-  const configured = env.ORCA_CLI_COMMAND?.trim()
+  const configured = (isForflowCli(env) ? env.FORFLOW_CLI_COMMAND?.trim() : undefined) || env.ORCA_CLI_COMMAND?.trim()
   if (configured) {
     return configured
   }
+  if (isForflowCli(env)) return 'forflow'
   if (env.ORCA_DEV_REPO_ROOT) {
     return 'orca-dev'
   }

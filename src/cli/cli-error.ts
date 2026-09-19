@@ -1,3 +1,5 @@
+import { brandCliDocumentation } from './cli-product'
+import { isForflowCli } from './cli-product'
 import { computerUseErrorRecoveryData } from '../shared/computer-use-error-recovery'
 import {
   matchAutomationOwnerConflict,
@@ -47,7 +49,7 @@ export function formatCliError(error: unknown, context: CliErrorContext = {}): s
     if (hasOrchestrationRequestId(error.data)) {
       return message
     }
-    return `${message}\nOrca is not running. Run 'orca open' first.`
+    return `${message}\n${isForflowCli() ? 'Forflow One 尚未就绪，请先执行 forflow open。' : brandCliDocumentation("Orca is not running. Run 'orca open' first.")}`
   }
   // Why: error-specific recovery must win over the generic computer fallback.
   // Classified from the whole error, not just `.code`: a hop that flattens the class leaves only the token.
@@ -71,7 +73,7 @@ export function formatCliError(error: unknown, context: CliErrorContext = {}): s
     error instanceof RuntimeRpcFailureError &&
     error.response.error.code === 'runtime_unavailable'
   ) {
-    return `${message}\nOrca is not running. Run 'orca open' first.`
+    return `${message}\n${isForflowCli() ? 'Forflow One 尚未就绪，请先执行 forflow open。' : brandCliDocumentation("Orca is not running. Run 'orca open' first.")}`
   }
   if (error instanceof RuntimeRpcFailureError) {
     return formatMessageWithNextSteps(message, nextStepsFromData(error.response.error.data))
@@ -154,7 +156,7 @@ function formatMessageWithNextSteps(message: string, nextSteps: readonly string[
   if (nextSteps.length === 0) {
     return message
   }
-  return `${message}\n${nextSteps.map((step) => `Next step: ${step}`).join('\n')}`
+  return `${message}\n${nextSteps.map((step) => `${isForflowCli() ? '下一步：' : 'Next step:'} ${step}`).join('\n')}`
 }
 
 /** Why merge: a mutation error already carries its request id, and `??` dropped the selector grammar. */

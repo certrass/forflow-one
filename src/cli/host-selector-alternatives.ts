@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from './cli-product'
 import type { RuntimeClient } from './runtime-client'
 
 export type SshTargetSummary = {
@@ -186,7 +187,7 @@ export async function resolveSshHostTargetId(
         ...crossKindNextSteps(targetId, { sshTargets: targets, environments }, 'ssh'),
         ...(targets.length > 0
           ? [`Known SSH targets: ${targets.map((target) => target.label).join(', ')}.`]
-          : ['This Orca host has no SSH targets registered.'])
+          : [brandCliDocumentation('This Orca host has no SSH targets registered.')])
       ]
     }
   )

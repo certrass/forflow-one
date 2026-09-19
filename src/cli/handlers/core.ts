@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import { spawn } from 'node:child_process'
 import type { CommandHandler } from '../dispatch'
 import { formatCliStatus, formatStatus, printResult } from '../format'
@@ -70,7 +71,7 @@ export const CORE_HANDLERS: Record<string, CommandHandler> = {
     if (!paneKey) {
       throw new RuntimeClientError(
         'invalid_environment',
-        'orca claude-teams must be run inside an Orca terminal.'
+        brandCliDocumentation('orca claude-teams must be run inside an Orca terminal.')
       )
     }
     const response = await client.call<{ launch: { env: Record<string, string> } }>(

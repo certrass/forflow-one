@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { CommandHandler } from '../dispatch'
@@ -65,7 +66,7 @@ function doctorRecipe(repoPath: string, recipeId: string): DoctorResult {
   const parseCheck: EphemeralVmRecipeDoctorCheck = {
     id: 'orca_yaml.parse',
     status: hooks ? 'pass' : 'fail',
-    message: hooks ? 'orca.yaml parsed successfully.' : 'orca.yaml has no supported Orca config.',
+    message: hooks ? 'orca.yaml parsed successfully.' : brandCliDocumentation('orca.yaml has no supported Orca config.'),
     ...(hooks ? {} : { remediation: 'Add an environmentRecipes entry to orca.yaml.' })
   }
   const result = doctorEphemeralVmRecipe({

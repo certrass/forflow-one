@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import { RuntimeClientError } from './types'
 
 export const MAC_CRASH_REPORT_GLOB = '~/Library/Logs/DiagnosticReports/Orca-*.ips'
@@ -9,7 +10,7 @@ export function serveSignalExitError(
   if (!signal) {
     return new RuntimeClientError(
       'runtime_serve_failed',
-      'Orca serve exited without reporting an exit code or signal.'
+      brandCliDocumentation('Orca serve exited without reporting an exit code or signal.')
     )
   }
   if (platform !== 'darwin' || signal !== 'SIGABRT') {
@@ -20,7 +21,7 @@ export function serveSignalExitError(
   // phase, so the cause is offered as the likely one rather than asserted.
   return new RuntimeClientError(
     'runtime_serve_failed',
-    'Orca serve aborted with SIGABRT on macOS. This most often happens at application startup, when the process cannot register with the macOS window server, which is common in restricted or sandboxed environments, SSH sessions without a GUI login, and CI.',
+    brandCliDocumentation('Orca serve aborted with SIGABRT on macOS. This most often happens at application startup, when the process cannot register with the macOS window server, which is common in restricted or sandboxed environments, SSH sessions without a GUI login, and CI.'),
     {
       nextSteps: [
         'Re-run `orca serve` outside a sandboxed or restricted environment, with a macOS desktop login active.',

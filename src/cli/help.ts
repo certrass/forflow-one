@@ -1,3 +1,5 @@
+import { brandCliDocumentation, cliCommandName, isForflowCli } from './cli-product'
+import { cliSpecPresentation, formatForflowRootHelp } from './forflow-help'
 import type { CommandSpec } from './args'
 import { findCommandSpec, isCommandGroup, supportsBrowserPageFlag } from './args'
 import { unknownCommandData } from './command-suggestion'
@@ -21,15 +23,16 @@ export function printHelp(specs: CommandSpec[], commandPath: string[] = []): voi
 
   if (commandPath.length > 0) {
     const { nextSteps } = unknownCommandData(specs, commandPath)
-    const recovery = nextSteps.map((step) => `Next step: ${step}`).join('\n')
-    console.log(`Unknown command: ${commandPath.join(' ')}${recovery ? `\n${recovery}` : ''}\n`)
+    const recovery = nextSteps.map((step) => `${isForflowCli() ? '下一步：' : 'Next step:'} ${step}`).join('\n')
+    console.log(`${isForflowCli() ? '未知命令：' : 'Unknown command:'} ${commandPath.join(' ')}${recovery ? `\n${recovery}` : ''}\n`)
   }
 
-  console.log(ROOT_HELP_TEXT)
+  console.log(isForflowCli() ? formatForflowRootHelp(specs) : ROOT_HELP_TEXT)
 }
 
-export function formatCommandHelp(spec: CommandSpec): string {
-  const lines = [`orca ${spec.path.join(' ')}`, '', `Usage: ${spec.usage}`, '', spec.summary]
+export function formatCommandHelp(input: CommandSpec): string {
+  const spec = cliSpecPresentation(input)
+  const lines = [`${cliCommandName()} ${spec.path.join(' ')}`, '', `${isForflowCli() ? '用法：' : 'Usage:'} ${spec.usage}`, '', spec.summary]
   const displayedFlags =
     spec.argumentMode === 'passthrough'
       ? []
@@ -38,21 +41,21 @@ export function formatCommandHelp(spec: CommandSpec): string {
         : spec.allowedFlags
 
   if (displayedFlags.length > 0) {
-    lines.push('', 'Options:')
+    lines.push('', isForflowCli() ? '选项：' : 'Options:')
     for (const flag of displayedFlags) {
-      lines.push(`  ${formatCommandFlagHelp(flag, spec.path)}`)
+      lines.push(`  ${brandCliDocumentation(formatCommandFlagHelp(flag, spec.path))}`)
     }
   }
 
   if (spec.notes && spec.notes.length > 0) {
-    lines.push('', 'Notes:')
+    lines.push('', isForflowCli() ? '说明：' : 'Notes:')
     for (const note of spec.notes) {
       lines.push(`  ${note}`)
     }
   }
 
   if (spec.examples && spec.examples.length > 0) {
-    lines.push('', 'Examples:')
+    lines.push('', isForflowCli() ? '示例：' : 'Examples:')
     for (const example of spec.examples) {
       lines.push(`  $ ${example}`)
     }
@@ -63,11 +66,13 @@ export function formatCommandHelp(spec: CommandSpec): string {
 
 export function formatGroupHelp(specs: CommandSpec[], group: string): string {
   const groupSpecs = specs.filter((spec) => spec.path[0] === group && spec.hidden !== true)
-  const lines = [`orca ${group}`, '', `Usage: orca ${group} <command> [options]`, '', 'Commands:']
+  const lines = [`${cliCommandName()} ${group}`, '', `${isForflowCli() ? '用法：' : 'Usage:'} ${cliCommandName()} ${group} <command> [options]`, '', isForflowCli() ? '命令：' : 'Commands:']
   for (const spec of groupSpecs) {
-    lines.push(`  ${spec.path.slice(1).join(' ').padEnd(18)} ${spec.summary}`)
+    lines.push(`  ${spec.path.slice(1).join(' ').padEnd(18)} ${cliSpecPresentation(spec).summary}`)
   }
-  lines.push('', `Run \`orca ${group} <command> --help\` for command-specific usage.`)
+  lines.push('', isForflowCli()
+    ? `执行 \`forflow ${group} <command> --help\` 查看具体用法。`
+    : `Run \`orca ${group} <command> --help\` for command-specific usage.`)
   return lines.join('\n')
 }
 

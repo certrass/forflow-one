@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import type {
   AgentSkillShareOperation,
   AgentSkillShareResult
@@ -74,7 +75,7 @@ function requireCloudOperation<T>(operation: SkillCloudOperation<T>): T {
     return operation.value
   }
   if (operation.status === 'reconnect-required') {
-    throw new RuntimeClientError('authentication_required', 'Sign in to Orca and try again.')
+    throw new RuntimeClientError('authentication_required', brandCliDocumentation('Sign in to Orca and try again.'))
   }
   throw new RuntimeClientError('authentication_unconfigured', operation.message)
 }
@@ -134,7 +135,7 @@ async function callShare(
     if (error instanceof RuntimeRpcFailureError && error.code === 'method_not_found') {
       throw new RuntimeClientError(
         'update_required',
-        'The connected Orca runtime does not support agent skill sharing yet. Update Orca on that machine and try again.'
+        brandCliDocumentation('The connected Orca runtime does not support agent skill sharing yet. Update Orca on that machine and try again.')
       )
     }
     throw error

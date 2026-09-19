@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from './cli-product'
 import { RuntimeClientError, RuntimeRpcFailureError } from './runtime-client'
 import {
   recoverableOrchestrationArgs,
@@ -213,7 +214,7 @@ function shellQuote(value: string): string {
 
 function stripUnsafeRetryAdvice(message: string, requestId: string): string {
   return message
-    .replace(' Restart Orca and try again.', '')
+    .replace(brandCliDocumentation(' Restart Orca and try again.'), '')
     .replace(' Retry the command.', '')
     .replace(` Orchestration mutation request ID: ${requestId}.`, '')
 }

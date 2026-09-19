@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from './cli-product'
 #!/usr/bin/env node
 import {
   findCommandSpec,
@@ -8,6 +9,7 @@ import {
   specPaths,
   validateCommandAndFlags
 } from './args'
+import { applyForflowCliEnvironment, isForflowCli } from './cli-product'
 import { readOrcaCliVersion } from './cli-version'
 import { dispatch } from './dispatch'
 import {
@@ -23,6 +25,8 @@ import { resolveOrchestrationCliExecutable } from './runtime/orchestration-recov
 
 export { COMMAND_SPECS } from './specs'
 export { buildCurrentWorktreeSelector, normalizeWorktreeSelector } from './selectors'
+
+applyForflowCliEnvironment()
 
 const COMMAND_PATHS = COMMAND_SPECS.flatMap((spec) => specPaths(spec))
 
@@ -68,7 +72,7 @@ export async function main(
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
     const version = readOrcaCliVersion()
     if (!version) {
-      process.stderr.write('Could not determine the Orca version for this build.\n')
+      process.stderr.write(isForflowCli() ? '无法读取此 Forflow One 构建的版本。\n' : brandCliDocumentation('Could not determine the Orca version for this build.\n'))
       process.exitCode = 1
       return
     }

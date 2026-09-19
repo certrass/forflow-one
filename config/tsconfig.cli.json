@@ -1,6 +1,7 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
+
     "../src/cli/**/*",
     "../src/shared/**/*",
     "../src/main/agent-state-file-reader.ts",

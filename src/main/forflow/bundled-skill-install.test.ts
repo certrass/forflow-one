@@ -33,7 +33,7 @@ describe('Forflow bundled offline installation', () => {
     expect((await installForflowBundledSkills(input))[0].status).toBe('unchanged')
     const file = join(input.homeDirectory, '.agents/skills/orca-cli/SKILL.md')
     const original = await readFile(file, 'utf8')
-    expect(original).toContain('skills get orca-cli')
+    expect(original).toContain('skills get forflow-cli')
     expect(original).not.toContain('npx')
     await writeFile(file, `${original}\n用户的本地修改\n`)
     expect((await installForflowBundledSkills({ ...input, version: 'test.2' }))[0].status).toBe(

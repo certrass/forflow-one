@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from './cli-product'
 import {
   LOCAL_EXECUTION_HOST_ID,
   normalizeExecutionHostId,
@@ -85,7 +86,7 @@ export async function resolveHostFlagEnvironmentId(
         knownSshTargets: sshTargets,
         nextSteps: [
           ...crossKindNextSteps(host.environmentId, { environments, sshTargets }, 'environment'),
-          'Run `orca environment list` to see paired Orca servers.',
+          brandCliDocumentation('Run `orca environment list` to see paired Orca servers.'),
           'Use --host local to target this machine.'
         ]
       }
