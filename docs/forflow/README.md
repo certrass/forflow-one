@@ -1,8 +1,8 @@
 # Forflow One 文档
 
-2026-09-20。最新 macOS arm64 本机测试版为 **1.4.205-forflow.15**，已安装至 `/Applications/Forflow One.app`。新增 Codex GUI 执行中补充消息和中文中断提示，包含此前 CLI、同会话 GUI、文件引用及更改审阅功能。见 [当前版本记录](release-1.4.205-forflow.15.md) 和随包 `release.json`。近期 GUI 适配先集中于 Codex，国内 CLI 新适配与联调暂缓；完整治理平台仍按工作包逐步建设。
+2026-09-20。最新 macOS arm64 测试包为 **1.4.205-forflow.16**，已完成验证，等待旧版退出后安装；本机 `/Applications/Forflow One.app` 仍为 `.15`。本版新增飞书任务／任务清单、可编辑任务说明和三步操作指引。见 [当前版本记录](release-1.4.205-forflow.16.md) 和随包 `release.json`。近期 GUI 适配先集中于 Codex，国内 CLI 新适配与联调暂缓；完整治理平台仍按工作包逐步建设。
 
-`.15` 通过 1,822 项项目回归、11 项身份服务测试，候选包和安装后各 7 个场景通过。Codex 专项使用本地转录与 hook/PTY 夹具，尚未进行真实模型联调。原 `.14` 保留回退，旧中间版本无需分别安装。历史功能状态见 [官网 120 项核验矩阵](official-feature-results-20260919.md)。
+`.16` 通过 2,001 项项目回归、11 项身份服务测试和 8 个候选安装包场景。飞书与 Codex 专项使用隔离 CLI 合同、转录与 hook/PTY 夹具，真实飞书租户授权及模型调用仍待联调。`.16` 尚未安装；已安装 `.15` 的结果见 [上一版记录](release-1.4.205-forflow.15.md)。历史功能状态见 [官网 120 项核验矩阵](official-feature-results-20260919.md)。
 
 ## 使用与管理
 
