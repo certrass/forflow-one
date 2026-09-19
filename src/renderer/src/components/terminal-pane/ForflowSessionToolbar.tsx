@@ -1,5 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Columns2, FolderOpen, GitBranch, MessageSquare, SquareTerminal } from 'lucide-react'
+import {
+  Columns2,
+  FileDiff,
+  FolderOpen,
+  GitBranch,
+  MessageSquare,
+  SquareTerminal
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -12,6 +19,8 @@ import {
 import { translate } from '@/i18n/i18n'
 import { formatAgentTypeLabel } from '@/lib/agent-status'
 import { useAppStore } from '@/store'
+import { isFolderRepo } from '../../../../shared/repo-kind'
+import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 
 export function ForflowSessionToolbar({
@@ -20,6 +29,14 @@ export function ForflowSessionToolbar({
   controller: TerminalPaneController
 }): React.JSX.Element {
   const latest = useRef<TerminalPaneController | null>(controller)
+  const canReview = useAppStore((state) => {
+    if (parseWorkspaceKey(controller.worktreeId)?.type === 'folder') {
+      return false
+    }
+    const worktree = state.getKnownWorktreeById(controller.worktreeId)
+    const repo = state.repos.find((item) => item.id === worktree?.repoId)
+    return Boolean(repo && !isFolderRepo(repo))
+  })
   const [enabling, setEnabling] = useState(false)
   useLayoutEffect(() => {
     latest.current = controller
@@ -166,6 +183,10 @@ export function ForflowSessionToolbar({
               .getState()
               .openModal('new-workspace-composer', { telemetrySource: 'unknown' })
           }
+          title={translate(
+            'forflow.workbench.parallelHint',
+            'Create a separate workspace for another task'
+          )}
         >
           <GitBranch />
           {translate('forflow.workbench.parallel', 'Parallel task')}
@@ -176,8 +197,26 @@ export function ForflowSessionToolbar({
           onClick={() => useAppStore.getState().showRightSidebarFiles()}
         >
           <FolderOpen />
-          {translate('forflow.workbench.files', 'Files and results')}
+          {translate('forflow.workbench.browseFiles', 'Files')}
         </Button>
+        {canReview ? (
+          <Button
+            size="xs"
+            variant="ghost"
+            title={translate(
+              'forflow.workbench.changesHint',
+              'Review all workspace changes; this does not commit or publish them'
+            )}
+            onClick={() => {
+              const state = useAppStore.getState()
+              state.setRightSidebarTab('source-control')
+              state.setRightSidebarOpen(true)
+            }}
+          >
+            <FileDiff />
+            {translate('forflow.workbench.changes', 'Review changes')}
+          </Button>
+        ) : null}
       </div>
     </div>
   )

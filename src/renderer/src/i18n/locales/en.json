@@ -18799,7 +18799,15 @@
       "shell": "Start a supported agent to use chat",
       "terminalOnly": "Chat is unavailable for this agent or host",
       "enableHint": "Choose Chat to enable the conversation view",
-      "enableError": "Could not enable chat. Please try again."
+      "enableError": "Could not enable chat. Please try again.",
+      "parallelHint": "Create a separate workspace for another task",
+      "browseFiles": "Files",
+      "changes": "Review changes",
+      "changesHint": "Review all workspace changes; this does not commit or publish them"
+    },
+    "composer": {
+      "removeFile": "Remove reference: {{name}}",
+      "inputHint": "Drop files to reference them · Enter to send, Shift+Enter for a new line"
     }
   },
   "githubChecks": {

@@ -1,6 +1,23 @@
 import { NativeChatSkillPill } from './NativeChatSkillPill'
+import { NativeChatFileReferencePill } from './NativeChatFileReferencePill'
 import { ReactNodeViewRenderer, Node, type JSONContent } from '@tiptap/react'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+
+export const NativeChatFileReference = Node.create({
+  name: 'nativeChatFileReference',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  selectable: true,
+  addNodeView: () => ReactNodeViewRenderer(NativeChatFileReferencePill),
+  addAttributes: () => ({ token: { default: '' }, path: { default: '' } }),
+  renderText: ({ node }) => String(node.attrs.token),
+  renderHTML: ({ node }) => [
+    'span',
+    { 'data-native-chat-file-reference': node.attrs.path },
+    String(node.attrs.token)
+  ]
+})
 
 export const NativeChatSkill = Node.create({
   name: 'nativeChatSkill',

@@ -8,9 +8,17 @@ const mocks = vi.hoisted(() => ({
   updateSettingsOrThrow: vi.fn(),
   openModal: vi.fn(),
   showRightSidebarFiles: vi.fn(),
+  setRightSidebarTab: vi.fn(),
+  setRightSidebarOpen: vi.fn(),
+  getKnownWorktreeById: vi.fn(() => ({ repoId: 'repo-1' })),
+  repos: [{ id: 'repo-1', kind: 'git' }],
   error: vi.fn()
 }))
-vi.mock('@/store', () => ({ useAppStore: { getState: () => mocks } }))
+vi.mock('@/store', () => ({
+  useAppStore: Object.assign((selector: (state: typeof mocks) => unknown) => selector(mocks), {
+    getState: () => mocks
+  })
+}))
 vi.mock('sonner', () => ({ toast: { error: mocks.error } }))
 vi.mock('@/i18n/i18n', () => ({ translate: (_key: string, fallback: string) => fallback }))
 
@@ -37,6 +45,7 @@ function fixture(overrides: Partial<TerminalPaneController> = {}): TerminalPaneC
 beforeEach(() => {
   vi.clearAllMocks()
   mocks.updateSettingsOrThrow.mockResolvedValue(undefined)
+  mocks.repos[0].kind = 'git'
 })
 afterEach(cleanup)
 
@@ -134,7 +143,17 @@ describe('Forflow session toolbar', () => {
     expect(mocks.openModal).toHaveBeenCalledExactlyOnceWith('new-workspace-composer', {
       telemetrySource: 'unknown'
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Files and results' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Files' }))
     expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
+    fireEvent.click(screen.getByRole('button', { name: 'Review changes' }))
+    expect(mocks.setRightSidebarTab).toHaveBeenCalledExactlyOnceWith('source-control')
+    expect(mocks.setRightSidebarOpen).toHaveBeenCalledExactlyOnceWith(true)
+  })
+
+  it('keeps files available without offering Git review for a folder project', () => {
+    mocks.repos[0].kind = 'folder'
+    render(<ForflowSessionToolbar controller={fixture()} />)
+    expect(screen.queryByRole('button', { name: 'Review changes' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Files' })).toBeTruthy()
   })
 })

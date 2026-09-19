@@ -44,14 +44,29 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     await expect(composer).toContainText('中文草稿，不要丢失')
     await composer.fill('请检查这份资料')
 
-    await toolbar.getByRole('button', { name: '文件与成果', exact: true }).click()
+    await toolbar.getByRole('button', { name: '文件', exact: true }).click()
     const file = page.locator('[data-file-explorer-row]').filter({ hasText: 'README.md' }).first()
     await expect(file).toBeVisible()
     await file.dragTo(composer)
-    await expect(composer).toContainText('README.md')
+    const reference = composer.locator('[data-native-chat-file-reference]')
+    await expect(reference).toHaveCount(1)
+    await expect(reference).toHaveAttribute('title', path.join(profile, '测试项目', 'README.md'))
+    await expect(composer).not.toContainText(profile)
+    await composer
+      .getByRole('button', {
+        name: `移除引用：${path.join(profile, '测试项目', 'README.md')}`,
+        exact: true
+      })
+      .press('Enter')
+    await expect(reference).toHaveCount(0)
+    await expect(composer).toContainText('请检查这份资料')
+    expect(readFileSync(fixture.ledger, 'utf8')).not.toContain('"type":"input"')
+    await file.dragTo(composer)
+    await expect(reference).toHaveCount(1)
     await toolbar.getByRole('button', { name: '终端', exact: true }).click()
     await toolbar.getByRole('button', { name: '对话', exact: true }).click()
-    await expect(composer).toContainText('README.md')
+    await expect(reference).toHaveCount(1)
+    await page.screenshot({ path: path.join(evidence, 'workbench-attachment.png') })
     await page
       .locator('.native-chat-pane-shell')
       .getByRole('button', { name: '发送', exact: true })
@@ -66,8 +81,17 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
       entries.filter((e) => e.type === 'input' && e.text.includes('请检查这份资料'))
     ).toHaveLength(1)
     expect(entries.find((e) => e.type === 'input').text).toContain('README.md')
+    expect(entries.find((e) => e.type === 'input').text).toMatch(/请检查这份资料\s+@/)
     expect(await pane.getAttribute('data-pty-id')).toBe(ptyId)
     await page.screenshot({ path: path.join(evidence, 'workbench-chat.png') })
+
+    writeFileSync(path.join(profile, '测试项目', 'README.md'), '# 待审阅的更改\n')
+    await toolbar.getByRole('button', { name: '查看更改', exact: true }).click()
+    const changedFile = page
+      .locator('[data-testid="source-control-entry"]')
+      .filter({ hasText: 'README.md' })
+    await expect(changedFile).toBeVisible()
+    await page.screenshot({ path: path.join(evidence, 'workbench-review.png') })
 
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '外观', exact: true }).click()
@@ -92,6 +116,8 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     )
     await toolbar.getByRole('button', { name: '并行任务', exact: true }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
+    await expect(page.getByRole('dialog')).toContainText('测试项目')
+    await page.screenshot({ path: path.join(evidence, 'workbench-new-task.png') })
     await page.keyboard.press('Escape')
     await page.screenshot({ path: path.join(evidence, 'workbench-split.png') })
     expect(errors).toEqual([])

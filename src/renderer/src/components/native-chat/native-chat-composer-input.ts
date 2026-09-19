@@ -11,4 +11,5 @@ export type NativeChatComposerInput = Pick<
 > & {
   contains?: (node: Node | null) => boolean
   insertSkill?: (from: number, to: number, token: string) => void
+  insertFileReferences?: (paths: string[]) => void
 }

@@ -17,11 +17,13 @@ import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import {
   NativeChatSkill,
+  NativeChatFileReference,
   promptTextContent,
   promptTextMap,
   promptTextOffset
 } from './native-chat-prompt-document'
 import type { NativeChatComposerInput } from './native-chat-composer-input'
+import { formatNativeChatFileReference } from './native-chat-composer-target'
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'onSelect'> & {
   scopeKey?: string
@@ -68,6 +70,7 @@ export function NativeChatPromptEditor({
           trailingNode: false
         }),
         NativeChatSkill,
+        NativeChatFileReference,
         Placeholder.configure({ placeholder: () => placeholderRef.current })
       ],
       content:
@@ -221,6 +224,26 @@ export function NativeChatPromptEditor({
                   { type: 'text', text: ' ' }
                 ])
                 .run()
+              editor.view.dispatch(closeHistory(editor.state.tr))
+            },
+            insertFileReferences: (paths) => {
+              if (paths.length === 0 || !editor.isEditable) {
+                return
+              }
+              const text = promptTextMap(editor.state.doc).text
+              const caret = promptTextOffset(editor.state.doc, editor.state.selection.from)
+              const needsSpace = caret > 0 && !/\s/.test(text[caret - 1])
+              editor.view.dispatch(closeHistory(editor.state.tr))
+              editor.commands.insertContent([
+                ...(needsSpace ? [{ type: 'text', text: ' ' }] : []),
+                ...paths.flatMap((path) => [
+                  {
+                    type: 'nativeChatFileReference',
+                    attrs: { path, token: formatNativeChatFileReference(path) }
+                  },
+                  { type: 'text', text: ' ' }
+                ])
+              ])
               editor.view.dispatch(closeHistory(editor.state.tr))
             }
           }

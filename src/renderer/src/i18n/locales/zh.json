@@ -18801,7 +18801,15 @@
       "shell": "启动受支持的智能体后可用对话视图",
       "terminalOnly": "此智能体或执行环境暂不支持对话视图",
       "enableHint": "点击“对话”即可启用聊天界面",
-      "enableError": "未能启用对话视图，请重试。"
+      "enableError": "未能启用对话视图，请重试。",
+      "parallelHint": "为另一项任务创建独立工作区",
+      "browseFiles": "文件",
+      "changes": "查看更改",
+      "changesHint": "查看工作区的全部更改；此操作不会提交或发布"
+    },
+    "composer": {
+      "removeFile": "移除引用：{{name}}",
+      "inputHint": "拖入文件添加引用 · Enter 发送，Shift+Enter 换行"
     }
   },
   "githubChecks": {
