@@ -14,7 +14,7 @@ import blueIcon from '../../resources/app-icons/orca-blue.png?asset'
 import blueMacDockIcon from '../../resources/app-icons/orca-blue.png?asset&asarUnpack'
 import { normalizeAppIconId, type AppIconId } from '../shared/app-icon'
 import { isForflowBuild } from '../shared/product-branding'
-import forflowIcon from '../../resources/forflow/forflow-mark.png?asset'
+import forflowIcon from '../../resources/forflow/forflow-app-icon.png?asset'
 
 const APP_ICON_PATHS = {
   classic: is.dev ? classicDevIcon : classicIcon,

@@ -8,7 +8,7 @@ import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { translate } from '@/i18n/i18n'
 import { isForflowBuild } from '../../../../shared/product-branding'
-import forflowIconUrl from '../../../../../resources/forflow/forflow-mark.png?url'
+import forflowIconUrl from '../../../../../resources/forflow/forflow-app-icon.png?url'
 
 const APP_ICON_URLS = {
   classic: classicIconUrl,

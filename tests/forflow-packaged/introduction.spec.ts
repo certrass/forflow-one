@@ -1,7 +1,7 @@
 import { test, expect } from '@stablyai/playwright-test'
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { launch, evidence } from './harness'
+import { launch, evidence, packageFingerprint } from './harness'
 import { privateProfile } from './private-fixture'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 
@@ -34,13 +34,21 @@ test('product introduction renders the workflow tour in the installed applicatio
         expect(text).not.toMatch(
           /\bOrca\b|\bWorkspaces\b|Code Review|Reopen any time|Resets in|% used|pnpm 迁移/
         )
-        await expect(dialog.getByRole('button', { name: /^(继续|完成)/ })).toBeVisible()
+        const lastPage = id === 'review' && step === '提交准备'
+        await expect(
+          dialog.getByRole('button', {
+            name: new RegExp(lastPage ? '^已完成(?:\\s+[⌘⌃]|$)' : '^继续(?:\\s+[⌘⌃]|$)')
+          })
+        ).toBeVisible()
         await page.screenshot({
           path: path.join(evidence, `introduction-${id}-${step || 'main'}.png`)
         })
       }
     }
-    writeFileSync(path.join(evidence, 'introduction-pages.json'), JSON.stringify(pages, null, 2))
+    writeFileSync(
+      path.join(evidence, 'introduction-pages.json'),
+      JSON.stringify({ packageFingerprint, pages }, null, 2)
+    )
     expect(errors).toEqual([])
   } finally {
     await closeElectronAppForE2E(app)

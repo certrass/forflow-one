@@ -32,7 +32,18 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
     const captures = await app.evaluateHandle(
       ({ app, BrowserWindow, nativeImage }, source) => {
         const hash = (image: Electron.NativeImage) => image.toDataURL()
-        const expected = hash(nativeImage.createFromBuffer(Buffer.from(source, 'base64')))
+        const sourceImage = nativeImage.createFromBuffer(Buffer.from(source, 'base64'))
+        const expected = hash(sourceImage)
+        const bitmap = sourceImage.toBitmap()
+        const { width, height } = sourceImage.getSize()
+        const alphaAt = (x: number, y: number) => bitmap[(y * width + x) * 4 + 3]
+        const cornerAlpha = [
+          [0, 0],
+          [width - 1, 0],
+          [0, height - 1],
+          [width - 1, height - 1]
+        ].map(([x, y]) => alphaAt(x, y))
+        const centerAlpha = alphaAt(Math.floor(width / 2), Math.floor(height / 2))
         const dock: string[] = []
         const windows: string[] = []
         const originalDock = app.dock!.setIcon
@@ -49,6 +60,8 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
         }
         return {
           expected,
+          cornerAlpha,
+          centerAlpha,
           dock,
           windows,
           restore: () => {
@@ -57,17 +70,23 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
           }
         }
       },
-      readFileSync(path.resolve('resources/forflow/forflow-mark.png')).toString('base64')
+      readFileSync(path.resolve('resources/forflow/forflow-app-icon.png')).toString('base64')
     )
     try {
       for (const appIcon of ['classic', 'watercolor', 'blue'] as const) {
         await page.evaluate((appIcon) => window.api.settings.set({ appIcon }), appIcon)
       }
-      const actual = await captures.evaluate(({ expected, dock, windows }) => ({
-        expected,
-        dock,
-        windows
-      }))
+      const actual = await captures.evaluate(
+        ({ expected, cornerAlpha, centerAlpha, dock, windows }) => ({
+          expected,
+          cornerAlpha,
+          centerAlpha,
+          dock,
+          windows
+        })
+      )
+      expect(actual.cornerAlpha).toEqual([0, 0, 0, 0])
+      expect(actual.centerAlpha).toBe(255)
       expect(actual.dock).toHaveLength(3)
       expect(actual.windows.length).toBeGreaterThanOrEqual(3)
       expect([...actual.dock, ...actual.windows].every((hash) => hash === actual.expected)).toBe(
@@ -78,6 +97,8 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
         JSON.stringify(
           {
             packageFingerprint,
+            cornerAlpha: actual.cornerAlpha,
+            centerAlpha: actual.centerAlpha,
             expected: createHash('sha256').update(actual.expected).digest('hex'),
             dock: actual.dock.map((value) => createHash('sha256').update(value).digest('hex')),
             windows: actual.windows.map((value) => createHash('sha256').update(value).digest('hex'))

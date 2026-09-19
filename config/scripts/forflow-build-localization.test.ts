@@ -50,6 +50,7 @@ describe('Forflow build asset and editor localization', () => {
     expect(seen).toEqual(
       expect.arrayContaining([
         `${resolve('resources/forflow/forflow-mark.png')}?asset&asarUnpack`,
+        `${resolve('resources/forflow/forflow-app-icon.png')}?asset&asarUnpack`,
         `${resolve('resources/forflow/forflow-lockup-transparent.png')}?asset&asarUnpack`
       ])
     )

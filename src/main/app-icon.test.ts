@@ -29,7 +29,7 @@ vi.mock('../../resources/icon.png?asset', () => ({
   default: 'classic-icon'
 }))
 
-vi.mock('../../resources/forflow/forflow-mark.png?asset', () => ({
+vi.mock('../../resources/forflow/forflow-app-icon.png?asset', () => ({
   default: 'forflow-icon'
 }))
 
