@@ -41,7 +41,8 @@ test('product introduction renders the workflow tour in the installed applicatio
           })
         ).toBeVisible()
         await page.screenshot({
-          path: path.join(evidence, `introduction-${id}-${step || 'main'}.png`)
+          path: path.join(evidence, `introduction-${id}-${step || 'main'}.png`),
+          animations: 'disabled'
         })
       }
     }
@@ -49,6 +50,8 @@ test('product introduction renders the workflow tour in the installed applicatio
       path.join(evidence, 'introduction-pages.json'),
       JSON.stringify({ packageFingerprint, pages }, null, 2)
     )
+    await dialog.getByRole('button', { name: /^已完成(?:\s+[⌘⌃]|$)/ }).click()
+    await expect(dialog).toBeHidden()
     expect(errors).toEqual([])
   } finally {
     await closeElectronAppForE2E(app)

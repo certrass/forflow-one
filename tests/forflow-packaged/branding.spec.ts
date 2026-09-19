@@ -116,6 +116,29 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
     await expect(page.locator('img[src*="orca-blue"], img[src*="orca-watercolor"]')).toHaveCount(0)
     await page.getByRole('img', { name: 'Forflow One', exact: true }).scrollIntoViewIfNeeded()
     await page.screenshot({ path: path.join(evidence, 'brand-appearance.png') })
+    const about = await app.evaluate(({ app }) => {
+      const calls: Electron.AboutPanelOptionsOptions[] = []
+      const original = app.setAboutPanelOptions
+      app.setAboutPanelOptions = (options) => {
+        calls.push(options)
+        original.call(app, options)
+      }
+      try {
+        app.emit('gpu-info-update')
+      } finally {
+        app.setAboutPanelOptions = original
+      }
+      return calls
+    })
+    expect(about).toHaveLength(1)
+    expect(about[0].applicationName).toBe('Forflow One')
+    expect(about[0].credits).toContain('面向 AI 与研发团队的私有化智能体工作台。')
+    expect(about[0].credits).toContain('图形加速')
+    expect(about[0].credits).not.toMatch(/Orca|GPU acceleration|Status unavailable/)
+    writeFileSync(
+      path.join(evidence, 'about-panel-options.json'),
+      JSON.stringify({ packageFingerprint, about }, null, 2)
+    )
     expect(errors).toEqual([])
   } finally {
     writeFileSync(
