@@ -14,6 +14,8 @@ type Props = {
   worktreeId?: string
   isVisible: boolean
   initializing?: boolean
+  deliveryPending?: boolean
+  runtimeEnvironmentId?: string | null
   children: ReactNode
 }
 
@@ -27,15 +29,19 @@ export function NativeChatConversationBody(props: Props): React.JSX.Element {
           scope={{
             sessionId: session.sessionId ?? '',
             paneKey: props.paneKey,
-            workspaceId: props.worktreeId ?? null
+            workspaceId: props.worktreeId ?? null,
+            runtimeEnvironmentId: props.runtimeEnvironmentId ?? null
           }}
           messages={session.messages}
           historyIncomplete={
             session.hasMore ||
+            session.loadingEarlier ||
             isNativeChatTranscriptUnsettled(session.readPhase) ||
             props.initializing === true
           }
-          busy={session.status === 'working' || session.status === 'error'}
+          sourceUnavailable={session.readPhase === 'error' || session.status === 'error'}
+          deliveryPending={props.deliveryPending}
+          busy={session.status === 'working'}
         />
       ) : null}
       <div className="flex min-h-0 flex-1 flex-col">

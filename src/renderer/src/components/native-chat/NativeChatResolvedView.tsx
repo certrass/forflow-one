@@ -396,6 +396,8 @@ export function NativeChatResolvedView({
         paneKey={paneKey}
         worktreeId={fileLinkContext?.worktreeId}
         isVisible={isVisible}
+        deliveryPending={pending.length > 0}
+        runtimeEnvironmentId={runtimeEnvironmentId}
       >
         <NativeChatMessageList
           session={sessionWithPending}

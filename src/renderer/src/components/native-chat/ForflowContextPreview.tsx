@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, ScanText } from 'lucide-react'
 import { toast } from 'sonner'
 import type { AgentType, NativeChatMessage } from '../../../../shared/native-chat-types'
@@ -9,6 +9,7 @@ import {
 } from '../../../../shared/forflow-context-packet'
 import { useAppStore } from '@/store'
 import { translate } from '@/i18n/i18n'
+import { forflowContextBlockingCopy } from './forflow-context-blocking-copy'
 import { Button } from '../ui/button'
 import {
   Dialog,
@@ -25,6 +26,8 @@ type Props = {
   messages: readonly NativeChatMessage[]
   historyIncomplete: boolean
   busy: boolean
+  sourceUnavailable?: boolean
+  deliveryPending?: boolean
 }
 
 export function ForflowContextPreview(props: Props): React.JSX.Element | null {
@@ -36,13 +39,29 @@ export function ForflowContextPreview(props: Props): React.JSX.Element | null {
 
 function ContextPreview(props: Props): React.JSX.Element {
   const [open, setOpen] = useState(false)
+  const revision = useMemo(
+    () => ({
+      messages: props.messages,
+      busy: props.busy,
+      historyIncomplete: props.historyIncomplete,
+      sourceUnavailable: props.sourceUnavailable,
+      deliveryPending: props.deliveryPending
+    }),
+    [
+      props.messages,
+      props.busy,
+      props.historyIncomplete,
+      props.sourceUnavailable,
+      props.deliveryPending
+    ]
+  )
   const [snapshot, setSnapshot] = useState<{
-    messages: Props['messages']
+    revision: typeof revision
     preview: ReturnType<typeof buildForflowContextPreview>
   } | null>(null)
   const [copying, setCopying] = useState(false)
-  const current = useRef(props)
-  current.current = props
+  const current = useRef(revision)
+  current.current = revision
   const generation = useRef(0)
   useEffect(
     () => () => {
@@ -53,13 +72,11 @@ function ContextPreview(props: Props): React.JSX.Element {
   const capture = (): void => {
     generation.current++
     setSnapshot({
-      messages: props.messages,
+      revision,
       preview: buildForflowContextPreview({ ...props, capturedAt: new Date().toISOString() })
     })
   }
-  const stale =
-    snapshot?.messages !== props.messages ||
-    snapshot?.preview.packet.historyIncomplete !== props.historyIncomplete
+  const stale = snapshot?.revision !== revision
   const preview = snapshot?.preview
   const copy = async (): Promise<void> => {
     if (!preview?.canCopy || stale || props.busy || copying) {
@@ -69,12 +86,7 @@ function ContextPreview(props: Props): React.JSX.Element {
     setCopying(true)
     try {
       const receipt = await encodeForflowContextReceipt(preview)
-      if (
-        expected !== generation.current ||
-        current.current.messages !== snapshot.messages ||
-        current.current.busy ||
-        current.current.historyIncomplete
-      ) {
+      if (expected !== generation.current || current.current !== snapshot.revision) {
         return
       }
       await navigator.clipboard.writeText(receipt)
@@ -170,14 +182,11 @@ function ContextPreview(props: Props): React.JSX.Element {
                   )}
                 </p>
               ) : null}
-              {!preview.canCopy ? (
-                <p role="status">
-                  {translate(
-                    'forflow.contextBeta.incomplete',
-                    'Cannot prepare a reliable handoff yet: history is not fully loaded, user text is missing or exceeds the budget. Load earlier messages or narrow the task first.'
-                  )}
+              {preview.blockingReasons.map((reason) => (
+                <p key={reason} role="status">
+                  {forflowContextBlockingCopy(reason)}
                 </p>
-              ) : null}
+              ))}
               <div className="max-h-64 space-y-3 overflow-y-auto rounded-md border border-border p-3 scrollbar-sleek">
                 {preview.packet.items.map((item) => (
                   <div key={item.messageId} className="space-y-1">

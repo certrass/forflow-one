@@ -24,6 +24,59 @@ function preview(messages: NativeChatMessage[], historyIncomplete = false) {
 }
 
 describe('Forflow context preview', () => {
+  it.each(['\n… (90000 bytes)', '\n[Orca: output truncated — 90000 bytes total, digest abc123]'])(
+    'blocks text already clipped before the preview: %s',
+    (suffix) => {
+      const result = preview([message('u', 'user', `Long requirement${suffix}`)])
+      expect(result.canCopy).toBe(false)
+      expect(result.blockingReasons).toContain('source_truncated')
+    }
+  )
+  it('does not hide an oversized journal history replacement among omitted system rows', () => {
+    const result = preview([
+      message('u', 'user', 'Continue'),
+      message(
+        'lost',
+        'system',
+        '[Orca: item truncated — 90000 bytes exceeds the history page budget]'
+      )
+    ])
+    expect(result.canCopy).toBe(false)
+    expect(result.blockingReasons).toContain('source_truncated')
+  })
+  it('does not treat an intentionally excluded tool diagnostic as missing conversation text', () => {
+    const result = preview([
+      message('u', 'user', 'Read only'),
+      {
+        ...message('s', 'system', 'Diagnostic'),
+        blocks: [
+          {
+            type: 'text',
+            text: 'Diagnostic',
+            providerFrame: {
+              provider: 'codex',
+              kind: 'diagnostic',
+              payload: {
+                head: 'head',
+                byteLength: 90000,
+                digest: 'abc',
+                truncated: true
+              }
+            }
+          }
+        ]
+      }
+    ])
+    expect(result.canCopy).toBe(true)
+    expect(result.packet.omitted.nonConversationMessages).toBe(1)
+  })
+  it('exports the exact packet hashed even if the caller changes the preview during hashing', async () => {
+    const result = preview([message('u', 'user', 'Original prohibition')])
+    const encoded = encodeForflowContextReceipt(result)
+    result.packet.items[0].text = 'Changed instruction'
+    const receipt = JSON.parse(await encoded)
+    expect(receipt.packet.items[0].text).toBe('Original prohibition')
+  })
   it('blocks ambiguous source identities instead of rendering misleading duplicate receipts', () => {
     expect(
       preview([message('same', 'user', '可以发布'), message('same', 'user', '禁止发布')])

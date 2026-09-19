@@ -19194,5 +19194,14 @@
   "forflow.contextBeta.assistant": "智能体陈述 · 未核实",
   "forflow.contextBeta.boundary": "仅包含当前加载的会话记录；工具结果、附件、隐藏提示词和其他智能体的上下文不在其中。复制前核对敏感内容，不自动发送、持久化或转移权限。",
   "forflow.contextBeta.refresh": "刷新预览",
-  "forflow.contextBeta.copy": "复制交接材料与来源回执"
+  "forflow.contextBeta.copy": "复制交接材料与来源回执",
+  "forflow.contextBeta.missingScope": "会话身份尚未就绪，请重新打开会话后重试。",
+  "forflow.contextBeta.noUserText": "没有可用于交接的已保存用户文字。",
+  "forflow.contextBeta.userOmitted": "部分用户原文缺失或超出预算，请缩小任务范围，并保留关键约束。",
+  "forflow.contextBeta.historyIncomplete": "较早历史缺失或仍在加载，请加载较早消息后刷新预览。",
+  "forflow.contextBeta.ambiguousSource": "来源消息标识缺失或重复，请重新加载会话后重试。",
+  "forflow.contextBeta.sourceTruncated": "源记录已被截断，请恢复完整原文后再准备交接。",
+  "forflow.contextBeta.sourceUnavailable": "最近一次读取失败，当前显示的可能是旧记录。请检查连接并重新加载。",
+  "forflow.contextBeta.deliveryPending": "有消息尚未确认送达或需要重试，请先处理发送状态，再准备交接。",
+  "forflow.contextBeta.budgetExceeded": "交接元数据已超出字节预算，请缩小任务范围。"
 }

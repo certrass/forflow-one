@@ -19194,5 +19194,14 @@
   "forflow.contextBeta.refresh": "Refresh preview",
   "forflow.contextBeta.copy": "Copy handoff with source receipt",
   "forflow.contextBeta.description": "Preview a bounded handoff from the current Codex conversation. No model calls, automatic sending or long-term memory writes.",
-  "forflow.contextBeta.location": "Enable to show “Handoff preview” above Codex chat. Off by default; existing sessions and task states stay unchanged."
+  "forflow.contextBeta.location": "Enable to show “Handoff preview” above Codex chat. Off by default; existing sessions and task states stay unchanged.",
+  "forflow.contextBeta.missingScope": "Session identity is not ready. Reopen the conversation before retrying.",
+  "forflow.contextBeta.noUserText": "No persisted user text is available to hand off.",
+  "forflow.contextBeta.userOmitted": "Some user text is missing or exceeds the budget. Narrow the task without dropping its constraints.",
+  "forflow.contextBeta.historyIncomplete": "Earlier history is missing or still loading. Load earlier messages, then refresh.",
+  "forflow.contextBeta.ambiguousSource": "Source message IDs are missing or duplicated. Reload the conversation before retrying.",
+  "forflow.contextBeta.sourceTruncated": "The source contains clipped records. Recover the complete original before preparing a handoff.",
+  "forflow.contextBeta.sourceUnavailable": "The latest source read failed. Check the connection and reload; visible history may be stale.",
+  "forflow.contextBeta.deliveryPending": "A message is awaiting confirmation or retry. Resolve its delivery before preparing a handoff.",
+  "forflow.contextBeta.budgetExceeded": "The handoff metadata exceeds the byte budget. Use a narrower task scope."
 }

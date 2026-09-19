@@ -213,5 +213,6 @@
   "src/renderer/src/components/native-chat/ForflowContextPreview.test.tsx",
   "src/renderer/src/components/settings/ExperimentalPane.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatStructuredSession.test.tsx",
-  "src/renderer/src/components/native-chat/NativeChatView.test.tsx"
+  "src/renderer/src/components/native-chat/NativeChatView.test.tsx",
+  "src/renderer/src/components/native-chat/NativeChatConversationBody.test.tsx"
 ]

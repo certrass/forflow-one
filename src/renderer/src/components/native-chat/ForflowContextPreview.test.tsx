@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { toast } from 'sonner'
 import { ForflowContextPreview } from './ForflowContextPreview'
 import type { NativeChatMessage } from '../../../../shared/native-chat-types'
 
@@ -20,7 +21,10 @@ beforeEach(() => {
     value: { writeText: mock.writeText }
   })
 })
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 const messages: NativeChatMessage[] = [
   {
@@ -94,3 +98,62 @@ it.each([{ historyIncomplete: true }, { busy: true }])(
     expect(mock.writeText).not.toHaveBeenCalled()
   }
 )
+
+it.each([
+  { busy: true },
+  { historyIncomplete: true },
+  { sourceUnavailable: true },
+  { deliveryPending: true }
+])('requires a refresh even after a temporary unsafe state clears: %j', (change) => {
+  const view = render(<ForflowContextPreview {...props} />)
+  open()
+  view.rerender(<ForflowContextPreview {...props} {...change} />)
+  view.rerender(<ForflowContextPreview {...props} />)
+  expect(copy().hasAttribute('disabled')).toBe(true)
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh preview' }))
+  expect(copy().hasAttribute('disabled')).toBe(false)
+})
+
+it.each(['close', 'scope', 'busy', 'disable'] as const)(
+  'does not copy if %s occurs while the receipt is hashing',
+  async (change) => {
+    const deferred = Promise.withResolvers<ArrayBuffer>()
+    vi.spyOn(crypto.subtle, 'digest').mockImplementationOnce(() => deferred.promise)
+    const view = render(<ForflowContextPreview {...props} />)
+    open()
+    fireEvent.click(copy())
+    if (change === 'close') {
+      fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    } else if (change === 'scope') {
+      view.rerender(
+        <ForflowContextPreview
+          {...props}
+          scope={{ ...props.scope, runtimeEnvironmentId: 'remote-b' }}
+        />
+      )
+    } else if (change === 'busy') {
+      view.rerender(<ForflowContextPreview {...props} busy />)
+      view.rerender(<ForflowContextPreview {...props} />)
+    } else {
+      mock.enabled = false
+      view.rerender(<ForflowContextPreview {...props} />)
+    }
+    await act(async () => deferred.resolve(new ArrayBuffer(32)))
+    expect(mock.writeText).not.toHaveBeenCalled()
+  }
+)
+
+it('explains a failed read and allows retry after clipboard failure', async () => {
+  const view = render(<ForflowContextPreview {...props} sourceUnavailable />)
+  open()
+  expect(screen.getByText(/latest source read failed/)).toBeTruthy()
+  expect(copy().hasAttribute('disabled')).toBe(true)
+  view.rerender(<ForflowContextPreview {...props} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh preview' }))
+  mock.writeText.mockRejectedValueOnce(new Error('Denied'))
+  fireEvent.click(copy())
+  await waitFor(() => expect(toast.error).toHaveBeenCalled())
+  expect(copy().hasAttribute('disabled')).toBe(false)
+  fireEvent.click(copy())
+  await waitFor(() => expect(mock.writeText).toHaveBeenCalledTimes(2))
+})

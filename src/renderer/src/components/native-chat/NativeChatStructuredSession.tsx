@@ -34,10 +34,6 @@ const NO_STOPPING_TASKS: ReadonlySet<string> = new Set()
 
 type ExpandedBackgroundTasks = { sessionId: string; expanded: boolean }
 
-function encodeQuestionAnswer(questionId: string, answer: string): string {
-  return `${encodeURIComponent(questionId)}:${encodeURIComponent(answer)}`
-}
-
 export function NativeChatStructuredSession(
   props: Omit<NativeChatStructuredViewProps, 'mode'>
 ): React.JSX.Element {
@@ -225,6 +221,8 @@ export function NativeChatStructuredSession(
         worktreeId={fileLinkContext?.worktreeId}
         isVisible={props.isVisible}
         initializing={controller.status === 'idle'}
+        deliveryPending={controller.outbox.length > 0}
+        runtimeEnvironmentId={props.target.kind === 'local' ? null : props.target.environmentId}
       >
         <NativeChatMessageList
           session={session}
@@ -297,7 +295,7 @@ export function NativeChatStructuredSession(
               typeof index === 'number'
                 ? questionBody.options[index]?.id
                 : questionBody.freeTextQuestionId && other
-                  ? encodeQuestionAnswer(questionBody.freeTextQuestionId, other)
+                  ? `${encodeURIComponent(questionBody.freeTextQuestionId)}:${encodeURIComponent(other)}`
                   : undefined
             if (optionId) {
               void controller.respond(prompt, optionId)

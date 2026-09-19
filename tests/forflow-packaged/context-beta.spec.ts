@@ -1,6 +1,6 @@
 import { test, expect } from '@stablyai/playwright-test'
 import { createHash } from 'node:crypto'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { launch, evidence, packageFingerprint } from './harness'
 import { privateProfile, addPrivateProject } from './private-fixture'
@@ -103,6 +103,48 @@ test('context Beta: opt-in, scoped source receipt, no automatic send, and disabl
       path: path.join(evidence, 'context-beta-dark.png'),
       animations: 'disabled'
     })
+    const clippedText = '新增要求\n[Orca: output truncated — 90000 bytes total, digest abc123]'
+    const timestamp = new Date().toISOString()
+    appendFileSync(
+      fixture.transcript,
+      `${[
+        {
+          timestamp,
+          type: 'response_item',
+          payload: {
+            type: 'message',
+            id: 'clipped-response',
+            role: 'user',
+            content: [{ type: 'input_text', text: clippedText }]
+          }
+        },
+        {
+          timestamp,
+          type: 'event_msg',
+          payload: {
+            type: 'item_completed',
+            item: {
+              type: 'UserMessage',
+              id: 'clipped-item',
+              content: [{ type: 'text', text: clippedText }]
+            }
+          }
+        }
+      ]
+        .map((record) => JSON.stringify(record))
+        .join('\n')}\n`
+    )
+    await expect(copy).toBeDisabled()
+    await dialog.getByRole('button', { name: '刷新预览', exact: true }).click()
+    await expect(dialog).toContainText('源记录已被截断')
+    await expect(copy).toBeDisabled()
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+      JSON.stringify(receipt, null, 2)
+    )
+    await page.screenshot({
+      path: path.join(evidence, 'context-beta-truncated.png'),
+      animations: 'disabled'
+    })
     await page.keyboard.press('Escape')
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '实验性', exact: true }).click()
@@ -119,7 +161,17 @@ test('context Beta: opt-in, scoped source receipt, no automatic send, and disabl
     ).toBe(false)
     writeFileSync(
       path.join(evidence, 'context-beta.json'),
-      JSON.stringify({ packageFingerprint, receipt, automaticInputCount: 0, errors }, null, 2)
+      JSON.stringify(
+        {
+          packageFingerprint,
+          receipt,
+          truncatedSourceCopyBlocked: true,
+          automaticInputCount: 0,
+          errors
+        },
+        null,
+        2
+      )
     )
   } finally {
     await closeElectronAppForE2E(app)
