@@ -18785,6 +18785,21 @@
       "scope": "Keys are encrypted on this device. Saving sends no request. Connection tests send only fixed test text and may use a small amount of API credit. These settings do not automatically change agent CLI logins or model configuration.",
       "loading": "Reading API settings…",
       "accountsDescription": "Manage domestic model API settings and agent logins. API credit and CLI subscription quotas are managed separately."
+    },
+    "workbench": {
+      "structured": "Structured conversation",
+      "view": "Session view",
+      "chat": "Chat",
+      "terminal": "Terminal",
+      "split": "Split view",
+      "splitRight": "Open a terminal on the right",
+      "splitDown": "Open a terminal below",
+      "parallel": "Parallel task",
+      "files": "Files and results",
+      "shell": "Start a supported agent to use chat",
+      "terminalOnly": "Chat is unavailable for this agent or host",
+      "enableHint": "Choose Chat to enable the conversation view",
+      "enableError": "Could not enable chat. Please try again."
     }
   },
   "githubChecks": {

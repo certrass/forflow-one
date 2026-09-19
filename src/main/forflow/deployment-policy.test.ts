@@ -34,6 +34,9 @@ describe('Forflow private deployment policy', () => {
       FORFLOW_DEPLOYMENT_PROFILE: 'cn-private'
     })
     expect(privateState.settings.uiLanguage).toBe('zh')
+    expect(privateState.settings.experimentalNativeChat).toBe(true)
+    expect(privateState.settings.openAgentTabsInChatByDefault).toBe(true)
+    expect(privateState.settings.experimentalStructuredNativeChat).toBe(false)
     expect(privateState.settings.workspaceDir).toBe(join('/test-home', 'Forflow One', 'workspaces'))
     expect(privateState.settings.artifactSharingEnabled).toBe(false)
     expect(privateState.settings.agentSkillSharingEnabled).toBe(false)

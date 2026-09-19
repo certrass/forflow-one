@@ -36,8 +36,7 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
     setTabCanExpandPane,
     setTabPaneExpanded,
     setTabViewMode,
-    suppressPtyExit,
-    toggleTabViewMode
+    suppressPtyExit
   } = useTerminalPaneStoreActions()
   const pendingCodexPaneRestartIds = useAppStore((store) => store.pendingCodexPaneRestartIds)
   // Why one selector: five separate subscriptions each re-read the same unified
@@ -126,7 +125,7 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
     ]
   )
   const isChatEligibleForLeaf = useCallback(
-    (leafId: string | null): boolean => {
+    (leafId: string | null, ignoreFeatureFlag = false): boolean => {
       const detectedAgent = leafId ? (tabAgentTypeByLeaf[leafId] ?? null) : null
       const launchAgent = nativeChatLaunchAgentForLeaf({
         launchAgent: terminalTab?.launchAgent,
@@ -135,7 +134,7 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
         leafIds: getNativeChatLeafIds()
       })
       return canToggleNativeChat({
-        experimentalNativeChatEnabled: nativeChatEnabled,
+        experimentalNativeChatEnabled: ignoreFeatureFlag || nativeChatEnabled,
         contentType: 'terminal',
         launchAgent: detectedAgent ? null : launchAgent,
         detectedAgent,
@@ -228,15 +227,15 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
       }
       if (effectiveChatViewMode && chatLeafId === leafId) {
         setChatLeafId(null)
-        toggleTabViewMode(unifiedTabId)
+        setTabViewMode(unifiedTabId, 'terminal')
         return
       }
       setChatLeafId(leafId)
       if (!effectiveChatViewMode) {
-        toggleTabViewMode(unifiedTabId)
+        setTabViewMode(unifiedTabId, 'chat')
       }
     },
-    [chatLeafId, effectiveChatViewMode, setChatLeafId, toggleTabViewMode, unifiedTabId]
+    [chatLeafId, effectiveChatViewMode, setChatLeafId, setTabViewMode, unifiedTabId]
   )
   const handleToggleNativeChat = useCallback(() => {
     const activeLeafId = managerRef.current?.getActivePane()?.leafId ?? null

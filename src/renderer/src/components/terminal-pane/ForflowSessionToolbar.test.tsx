@@ -1,0 +1,140 @@
+// @vitest-environment happy-dom
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { TerminalPaneController } from './use-terminal-pane-controller'
+import { ForflowSessionToolbar } from './ForflowSessionToolbar'
+
+const mocks = vi.hoisted(() => ({
+  updateSettingsOrThrow: vi.fn(),
+  openModal: vi.fn(),
+  showRightSidebarFiles: vi.fn(),
+  error: vi.fn()
+}))
+vi.mock('@/store', () => ({ useAppStore: { getState: () => mocks } }))
+vi.mock('sonner', () => ({ toast: { error: mocks.error } }))
+vi.mock('@/i18n/i18n', () => ({ translate: (_key: string, fallback: string) => fallback }))
+
+function fixture(overrides: Partial<TerminalPaneController> = {}): TerminalPaneController {
+  const value = {
+    tabId: 'terminal-1',
+    worktreeId: 'workspace-1',
+    activePane: { id: 1, leafId: 'leaf-1' },
+    activePaneCanToggleChat: true,
+    activePaneIsChatLeaf: false,
+    effectiveChatViewMode: false,
+    nativeChatEnabled: true,
+    structuredSessionId: null,
+    isActive: true,
+    resolveAgentForLeaf: vi.fn(() => 'codex'),
+    isChatEligibleForLeaf: vi.fn(() => true),
+    splitTerminalPaneFromHeader: vi.fn(),
+    handleToggleNativeChat: vi.fn(),
+    ...overrides
+  }
+  // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: This fixture supplies every controller field read by the toolbar; no terminal runtime is invoked.
+  return value as TerminalPaneController
+}
+beforeEach(() => {
+  vi.clearAllMocks()
+  mocks.updateSettingsOrThrow.mockResolvedValue(undefined)
+})
+afterEach(cleanup)
+
+describe('Forflow session toolbar', () => {
+  it('switches only through the existing pane controller and leaves selected views unchanged', async () => {
+    const controller = fixture()
+    const view = render(<ForflowSessionToolbar controller={controller} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Terminal' }))
+    expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
+    await waitFor(() => expect(controller.handleToggleNativeChat).toHaveBeenCalledTimes(1))
+    view.rerender(
+      <ForflowSessionToolbar
+        controller={{ ...controller, activePaneIsChatLeaf: true, effectiveChatViewMode: true }}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
+    expect(controller.handleToggleNativeChat).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Terminal' }))
+    expect(controller.handleToggleNativeChat).toHaveBeenCalledTimes(2)
+    expect(mocks.updateSettingsOrThrow).not.toHaveBeenCalled()
+  })
+
+  it('enables an existing profile without enabling structured sessions or changing its default view', async () => {
+    const controller = fixture({ nativeChatEnabled: false, activePaneCanToggleChat: false })
+    render(<ForflowSessionToolbar controller={controller} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
+    await waitFor(() => expect(controller.handleToggleNativeChat).toHaveBeenCalledOnce())
+    expect(mocks.updateSettingsOrThrow).toHaveBeenCalledExactlyOnceWith({
+      experimentalNativeChat: true
+    })
+  })
+
+  it.each(['changed-pane', 'closed', 'agent-exited', 'hidden'] as const)(
+    'does not misroute a delayed enable after %s',
+    async (change) => {
+      let settle: () => void = () => {}
+      mocks.updateSettingsOrThrow.mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            settle = resolve
+          })
+      )
+      const controller = fixture({ nativeChatEnabled: false, activePaneCanToggleChat: false })
+      const view = render(<ForflowSessionToolbar controller={controller} />)
+      fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
+      if (change === 'closed') {
+        view.unmount()
+      } else {
+        view.rerender(
+          <ForflowSessionToolbar
+            controller={{
+              ...controller,
+              tabId: change === 'changed-pane' ? 'terminal-2' : controller.tabId,
+              isActive: change !== 'hidden',
+              isChatEligibleForLeaf: () => change !== 'agent-exited'
+            }}
+          />
+        )
+      }
+      await act(async () => {
+        settle()
+      })
+      expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
+    }
+  )
+
+  it('retains the terminal if saving the feature setting fails', async () => {
+    mocks.updateSettingsOrThrow.mockRejectedValue(new Error('offline'))
+    const controller = fixture({ nativeChatEnabled: false })
+    render(<ForflowSessionToolbar controller={controller} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
+    await waitFor(() => expect(mocks.error).toHaveBeenCalledOnce())
+    expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
+  })
+
+  it('explains an unsupported agent and never offers a fake structured terminal', () => {
+    const controller = fixture({
+      activePaneCanToggleChat: false,
+      isChatEligibleForLeaf: () => false
+    })
+    const view = render(<ForflowSessionToolbar controller={controller} />)
+    expect(screen.getByText('Chat is unavailable for this agent or host')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Chat' }).hasAttribute('disabled')).toBe(true)
+    view.rerender(
+      <ForflowSessionToolbar controller={{ ...controller, structuredSessionId: 'session-1' }} />
+    )
+    expect(screen.queryByRole('button', { name: 'Terminal' })).toBeNull()
+    expect(screen.getByText('Structured conversation')).toBeTruthy()
+  })
+
+  it('opens the existing task composer and file preview without starting a task', () => {
+    render(<ForflowSessionToolbar controller={fixture()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Parallel task' }))
+    expect(mocks.openModal).toHaveBeenCalledExactlyOnceWith('new-workspace-composer', {
+      telemetrySource: 'unknown'
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Files and results' }))
+    expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
+  })
+})

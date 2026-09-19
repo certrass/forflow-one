@@ -18787,6 +18787,21 @@
       "scope": "密钥仅在本机加密保存。保存不发起请求；测试连接只发送固定测试文本，可能消耗少量 API 额度。此配置暂不自动改写智能体 CLI 的登录与模型配置。",
       "loading": "正在读取 API 配置…",
       "accountsDescription": "管理国内模型 API 配置及智能体登录账户。API 充值余额与 CLI 订阅额度分别管理。"
+    },
+    "workbench": {
+      "structured": "结构化对话",
+      "view": "会话视图",
+      "chat": "对话",
+      "terminal": "终端",
+      "split": "分屏",
+      "splitRight": "在右侧打开终端",
+      "splitDown": "在下方打开终端",
+      "parallel": "并行任务",
+      "files": "文件与成果",
+      "shell": "启动受支持的智能体后可用对话视图",
+      "terminalOnly": "此智能体或执行环境暂不支持对话视图",
+      "enableHint": "点击“对话”即可启用聊天界面",
+      "enableError": "未能启用对话视图，请重试。"
     }
   },
   "githubChecks": {
