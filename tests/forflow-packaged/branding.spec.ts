@@ -6,7 +6,7 @@ import { launch, evidence, packageFingerprint } from './harness'
 import { privateProfile } from './private-fixture'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 
-test('saved blue Orca preference uses Forflow artwork on the landing page, settings, Dock and windows', async () => {
+test('landing omits the logo while saved blue Orca preference uses Forflow artwork in settings, Dock and windows', async () => {
   const profile = privateProfile('brand-migration')
   const seedPath = path.join(profile, 'orca-data.json')
   const seed = JSON.parse(readFileSync(seedPath, 'utf8'))
@@ -15,8 +15,7 @@ test('saved blue Orca preference uses Forflow artwork on the landing page, setti
   const { app, page, errors } = await launch(profile)
   try {
     const logo = page.getByRole('img', { name: 'Forflow One 标志', exact: true })
-    await expect(logo).toBeVisible()
-    await expect(logo).toHaveAttribute('src', /forflow-mark/)
+    await expect(logo).toHaveCount(0)
     await expect(page.getByRole('heading', { name: 'Forflow One', exact: true })).toBeVisible()
     await expect(page.getByText('打开 GitHub', { exact: true })).toHaveCount(0)
     await expect(
