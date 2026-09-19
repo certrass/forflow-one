@@ -1,3 +1,4 @@
+import { getAutomationSourceProviderLabel } from './automation-source-provider-label'
 import type { Automation } from '../../../../shared/automations-types'
 import { getRepoExecutionHostId, parseExecutionHostId } from '../../../../shared/execution-host'
 import {
@@ -192,6 +193,12 @@ function getAutomationSourceAvailability(
   if (!sourceContext) {
     return null
   }
+  if (sourceContext.provider === 'feishu') {
+    return unavailable(
+      'source-provider-unsupported',
+      '飞书任务暂支持手动读取和导入，请在任务页操作。'
+    )
+  }
   const availability = sourceHostAvailability?.find(
     (entry) => entry.hostId === sourceContext.hostId
   )
@@ -250,19 +257,6 @@ function getAutomationSourceAvailability(
     )
   }
   return null
-}
-
-function getAutomationSourceProviderLabel(provider: TaskSourceContext['provider']): string {
-  switch (provider) {
-    case 'github':
-      return 'GitHub'
-    case 'gitlab':
-      return 'GitLab'
-    case 'linear':
-      return 'Linear'
-    case 'jira':
-      return 'Jira'
-  }
 }
 
 export function getRuntimeAutomationAvailability(

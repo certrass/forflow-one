@@ -17,6 +17,7 @@ function buildReadiness(
   overrides: Partial<Record<TaskProvider, Partial<TaskProviderReadiness>>> = {}
 ): Record<TaskProvider, TaskProviderReadiness> {
   const base: Record<TaskProvider, TaskProviderReadiness> = {
+    feishu: { connected: false, checking: false, visible: false },
     github: { connected: true, checking: false, visible: true },
     gitlab: { connected: true, checking: false, visible: true },
     linear: {

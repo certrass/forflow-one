@@ -1,3 +1,4 @@
+import type { ForflowFeishuApi } from '../shared/forflow-feishu'
 import type {
   ClaudeAccountsApi,
   CodexAccountsApi,
@@ -72,6 +73,7 @@ type Merged<T> = { [K in keyof T]: T[K] }
 export type PreloadApi = {
   forflowIdentity?: ForflowIdentityApi
   forflowModelAccounts?: ForflowModelAccountsApi
+  forflowFeishu?: ForflowFeishuApi
   forflowApproval?: ForflowApprovalApi
   forflowSkills?: ForflowSkillsApi
   app: AppApi

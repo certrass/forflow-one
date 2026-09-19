@@ -1,3 +1,4 @@
+import { FeishuTasks } from './feishu/FeishuTasks'
 import { translate } from '@/i18n/i18n'
 import type { TaskPageComposerActionsModel } from '../use-task-page-composer-actions'
 import PullRequestPage from '@/components/PullRequestPage'
@@ -26,7 +27,9 @@ export function TaskPageContent({
     closeTaskDetailPage,
     handleUseWorkItem
   } = model
-  return taskSource === 'github' && dialogWorkItem ? (
+  return taskSource === 'feishu' ? (
+    <FeishuTasks />
+  ) : taskSource === 'github' && dialogWorkItem ? (
     dialogWorkItem.type === 'pr' ? (
       <PullRequestPage
         workItem={dialogWorkItem}

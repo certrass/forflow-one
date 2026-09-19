@@ -7,6 +7,8 @@
 ## 使用与管理
 
 - [操作手册](user-manual.md)：安装、首个任务、完整八项入门、国内智能体、账号、权限与上传、常见故障。
+- [飞书任务与任务清单](feishu-tasks.md)：个人授权、任务获取、分页筛选、导入草稿与排错。
+- [任务体验升级依据](task-experience-upgrade.md)：WorkBuddy／Codex 官方资料如何落实到入口与教程。
 - [Codex 易用性参考与改进](codex-usability.md)：输入、执行反馈、审阅及后续任务入口的调整顺序。
 - [对话与终端工作台](gui-workbench.md)：GUI 切换、并行任务、分屏、文件拖入及网页设计。
 - [国内模型 API 账户](model-accounts.md)：Kimi、智谱 GLM、DeepSeek 的官方 API Key 配置与测试。

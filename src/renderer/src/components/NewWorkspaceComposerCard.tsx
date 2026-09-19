@@ -1,3 +1,4 @@
+import { Textarea } from '@/components/ui/textarea'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -314,6 +315,22 @@ export default function NewWorkspaceComposerCard(
           connectButtonLabel={connectButtonLabel}
           selectedProjectName={selectedProjectName}
         />
+        {props.taskPrompt !== undefined ? (
+          <label className="block space-y-2 text-sm font-medium">
+            这次要完成什么？
+            <Textarea
+              data-workspace-task-prompt="true"
+              value={props.taskPrompt}
+              onChange={(event) => props.onTaskPromptChange?.(event.target.value)}
+              rows={5}
+              placeholder="例如：依据项目资料完善登录流程，先说明方案，完成后给出修改文件和测试结果。"
+            />
+            <span className="block text-xs font-normal text-muted-foreground">
+              写清目标、参考资料、交付结果和约束。填入说明后需选择智能体，推荐
+              Codex；创建后核对对话草稿并发送，才开始执行。
+            </span>
+          </label>
+        ) : null}
         <NewWorkspaceComposerNameSection {...props} onNamePlainEnter={handleNamePlainEnter} />
         <NewWorkspaceComposerAgentSection
           {...props}

@@ -1,6 +1,13 @@
-export type TaskProvider = 'github' | 'gitlab' | 'linear' | 'jira'
+import { isForflowBuild } from './product-branding'
+export type TaskProvider = 'github' | 'gitlab' | 'linear' | 'jira' | 'feishu'
 
-export const TASK_PROVIDERS: readonly TaskProvider[] = ['github', 'gitlab', 'linear', 'jira']
+export const TASK_PROVIDERS: readonly TaskProvider[] = [
+  'github',
+  'gitlab',
+  'linear',
+  'jira',
+  'feishu'
+]
 
 const TASK_PROVIDER_SET = new Set<TaskProvider>(TASK_PROVIDERS)
 
@@ -34,7 +41,7 @@ export function normalizeTaskProviderSettings(value: {
 
 export function normalizeVisibleTaskProviders(value: unknown): TaskProvider[] {
   if (!Array.isArray(value)) {
-    return [...TASK_PROVIDERS]
+    return TASK_PROVIDERS.filter((provider) => provider !== 'feishu' || isForflowBuild())
   }
 
   const normalized: TaskProvider[] = []
@@ -49,7 +56,9 @@ export function normalizeVisibleTaskProviders(value: unknown): TaskProvider[] {
 
   // Why: at least one provider must remain visible so the Tasks surface always
   // has a valid source to select after settings hydration or manual edits.
-  return normalized.length > 0 ? normalized : [...TASK_PROVIDERS]
+  return normalized.length > 0
+    ? normalized
+    : TASK_PROVIDERS.filter((provider) => provider !== 'feishu' || isForflowBuild())
 }
 
 export type TaskProviderAvailability = {
@@ -102,7 +111,7 @@ function isTaskProviderAvailable(
   }
   // Why: Jira can be connected from the Tasks surface itself, so hiding it
   // when disconnected would remove the entry point for first-time setup.
-  if (provider === 'jira') {
+  if (provider === 'jira' || provider === 'feishu') {
     return true
   }
   return availability.linearConnected

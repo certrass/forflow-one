@@ -93,6 +93,8 @@ export type NewWorkspaceComposerCardProps = {
   projectError: string | null
   creating: boolean
   onCreate: () => void
+  taskPrompt?: string
+  onTaskPromptChange?: (value: string) => void
   note: string
   onNoteChange: (value: string) => void
   setupConfig: SetupConfig | null

@@ -1,3 +1,4 @@
+import { useForflowFeishuReadiness } from './use-forflow-feishu-readiness'
 import { useMemo } from 'react'
 import type { TaskProvider } from '../../../../shared/task-providers'
 import {
@@ -16,6 +17,7 @@ export function useTaskSourceProviderReadiness(
   visibleProviders: readonly TaskProvider[]
 ): Record<TaskProvider, TaskProviderReadiness> {
   const settings = useAppStore((s) => s.settings)
+  const feishuReadiness = useForflowFeishuReadiness(settings?.activeRuntimeEnvironmentId)
   const preflightStatus = useAppStore((s) => s.preflightStatus)
   const preflightStatusChecked = useAppStore((s) => s.preflightStatusChecked)
   const preflightStatusContextKey = useAppStore((s) => s.preflightStatusContextKey)
@@ -66,6 +68,7 @@ export function useTaskSourceProviderReadiness(
   return useMemo(() => {
     const visible = new Set(visibleProvidersKey.split(',') as TaskProvider[])
     return {
+      feishu: { ...feishuReadiness, visible: visible.has('feishu') },
       github: {
         connected: githubConnected,
         checking: reviewChecking,
@@ -92,6 +95,7 @@ export function useTaskSourceProviderReadiness(
       }
     }
   }, [
+    feishuReadiness,
     githubConnected,
     gitlabConnected,
     jiraChecking,

@@ -124,10 +124,10 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
     trustDecision === 'skip' ? 'skip' : setupResolution.decision
 
   const workspaceIntentName =
-    itemNumber !== null
+    itemNumber !== null && item.provider !== 'feishu'
       ? getWorkspaceIntentName({
           sourceText: item.pasteContent,
-          workItem: { ...item, type: itemType, number: itemNumber }
+          workItem: { ...item, provider: item.provider, type: itemType, number: itemNumber }
         })
       : null
   const workspaceName = getWorkspaceSeedName({
