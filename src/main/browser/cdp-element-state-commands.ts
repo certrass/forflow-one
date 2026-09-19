@@ -4,16 +4,19 @@ import type {
   BrowserUploadResult
 } from '../../shared/runtime-types'
 import { CdpBridgeCommandModule } from './cdp-bridge-command-module'
+import { confirmForflowBrowserUpload } from '../forflow/browser-permissions'
 
 export class CdpElementStateCommands extends CdpBridgeCommandModule {
   uploadFile(element: string, filePaths: string[]): Promise<BrowserUploadResult> {
     return this.enqueueCommand(async () => {
       const guest = this.getActiveGuest()
+      const validateDestination = await confirmForflowBrowserUpload(guest, filePaths)
       const sender = this.makeCdpSender(guest)
       await this.ensureDebuggerAttached(guest)
 
       const node = await this.resolveRef(guest, sender, element)
       const refSender = this.senderForRef(guest, node)
+      validateDestination()
       await refSender('DOM.setFileInputFiles', {
         files: filePaths,
         backendNodeId: node.backendDOMNodeId

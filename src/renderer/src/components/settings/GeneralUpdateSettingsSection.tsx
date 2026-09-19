@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { ForflowReleaseSettings } from './ForflowReleaseSettings'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Download, Loader2, RefreshCw } from 'lucide-react'
@@ -12,7 +14,7 @@ import { GeneralRemoteServerUpdates } from './GeneralRemoteServerUpdates'
 import { ReleaseChannelSection } from './ReleaseChannelSection'
 import { getReleaseNotesUrlForVersion } from '../../../../shared/release-channel'
 
-export function GeneralUpdateSettingsSection(): React.JSX.Element {
+function UpstreamUpdateSettingsSection(): React.JSX.Element {
   const updateStatus = useAppStore((s) => s.updateStatus)
   // Why: older hosts omit `version` from errors, so retain the last target for correct copy.
   const updateVersionRef = useRef<string | null>(null)
@@ -253,4 +255,8 @@ export function GeneralUpdateSettingsSection(): React.JSX.Element {
       <GeneralRemoteServerUpdates />
     </section>
   )
+}
+
+export function GeneralUpdateSettingsSection(): React.JSX.Element {
+  return isForflowBuild() ? <ForflowReleaseSettings /> : <UpstreamUpdateSettingsSection />
 }

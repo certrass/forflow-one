@@ -4,6 +4,9 @@ import { GeneralPane } from './GeneralPane'
 import { IntegrationsPane } from './IntegrationsPane'
 import { MobileSettingsPane } from './MobileSettingsPane'
 import { OrcaAccountSettingsPane } from './OrcaAccountSettingsPane'
+import { ForflowAccountSettingsPane } from './ForflowAccountSettingsPane'
+import { ForflowSetupGuide } from './ForflowSetupGuide'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { SettingsSetupGuidePane } from './SettingsSetupGuidePane'
 import { ShareSkillsSettingsPane } from './ShareSkillsSettingsPane'
 import { SettingsSection } from './SettingsSection'
@@ -17,14 +20,31 @@ export function renderOrcaAccountSettingsSection(
   return model.showDesktopOnlySettings ? (
     <SettingsSection
       id="orca-account"
-      title={translate('auto.components.settings.orcaAccount.title', 'Orca Account')}
-      description={translate(
-        'auto.components.settings.orcaAccount.description',
-        'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
-      )}
+      title={
+        isForflowBuild()
+          ? translate('forflow.identity.heading', 'Forflow 企业账号')
+          : translate('auto.components.settings.orcaAccount.title', 'Orca Account')
+      }
+      description={
+        isForflowBuild()
+          ? translate(
+              'forflow.identity.sectionDescription',
+              '连接部署方的身份服务，管理团队账号和登录记录。'
+            )
+          : translate(
+              'auto.components.settings.orcaAccount.description',
+              'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
+            )
+      }
       searchEntries={navigation.getSectionSearchEntries('orca-account')}
     >
-      {view.isSectionMounted('orca-account') ? <OrcaAccountSettingsPane /> : null}
+      {view.isSectionMounted('orca-account') ? (
+        isForflowBuild() ? (
+          <ForflowAccountSettingsPane />
+        ) : (
+          <OrcaAccountSettingsPane />
+        )
+      ) : null}
     </SettingsSection>
   ) : null
 }
@@ -42,7 +62,12 @@ export function renderSetupGuideSettingsSection(context: SettingsRenderContext):
       searchEntries={navigation.getSectionSearchEntries('setup-guide')}
       bodyClassName="overflow-hidden rounded-none border-0 bg-transparent p-0 shadow-none"
     >
-      {view.isSectionMounted('setup-guide') ? <SettingsSetupGuidePane /> : null}
+      {view.isSectionMounted('setup-guide') ? (
+        <>
+          <SettingsSetupGuidePane />
+          {isForflowBuild() ? <ForflowSetupGuide /> : null}
+        </>
+      ) : null}
     </SettingsSection>
   )
 }

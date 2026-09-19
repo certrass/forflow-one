@@ -8,12 +8,14 @@ import { AgentStep } from './AgentStep'
 import { ThemeStep } from './ThemeStep'
 import { NotificationStep } from './NotificationStep'
 import { IntegrationsStep } from './IntegrationsStep'
+import { ForflowSetupGuide } from '../settings/ForflowSetupGuide'
 import { WindowsTerminalStep } from './WindowsTerminalStep'
 import { useOnboardingFlow } from './use-onboarding-flow'
 import { OnboardingSkipConfirmationDialog } from './OnboardingSkipConfirmationDialog'
 import { OnboardingFooter } from './OnboardingFooter'
 import { shouldRequestOnboardingSkipConfirmation } from './onboarding-dismiss-target'
 import logo from '../../../../../resources/logo.svg'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { translate } from '@/i18n/i18n'
 
 const stepCopy = {
@@ -61,12 +63,21 @@ const stepCopy = {
   },
   integrations: {
     get title() {
+      if (isForflowBuild()) {
+        return translate('forflow.onboarding.setupTitle', '完成国内与企业环境设置')
+      }
       return translate(
         'auto.components.onboarding.OnboardingFlow.ae3b00ca82',
         'Set up GitHub tasks'
       )
     },
     get subtitle() {
+      if (isForflowBuild()) {
+        return translate(
+          'forflow.onboarding.setupBody',
+          '按需连接企业账号、国内智能体和代码仓库，也可以先使用本地项目。'
+        )
+      }
       return translate(
         'auto.components.onboarding.OnboardingFlow.97c42cda00',
         'Install the GitHub CLI to:'
@@ -230,7 +241,11 @@ export default function OnboardingFlow({
                 src={logo}
                 alt=""
                 aria-hidden="true"
-                className="h-7 w-auto shrink-0 invert dark:invert-0"
+                className={
+                  isForflowBuild()
+                    ? 'h-14 w-14 shrink-0 rounded-xl'
+                    : 'h-7 w-auto shrink-0 invert dark:invert-0'
+                }
               />
               <span>
                 {translate('auto.components.onboarding.OnboardingFlow.a249f81538', 'Orca')}
@@ -329,7 +344,8 @@ export default function OnboardingFlow({
               {currentStep.id === 'notifications' && (
                 <NotificationStep settings={flow.settings} updateSettings={flow.updateSettings} />
               )}
-              {currentStep.id === 'integrations' && <IntegrationsStep />}
+              {currentStep.id === 'integrations' &&
+                (isForflowBuild() ? <ForflowSetupGuide /> : <IntegrationsStep />)}
               {currentStep.id === 'windows_terminal' && (
                 <WindowsTerminalStep
                   settings={flow.settings}

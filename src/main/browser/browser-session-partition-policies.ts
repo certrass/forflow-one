@@ -17,6 +17,11 @@ import {
   installBrowserWebAuthnAccessHandlers
 } from './browser-webauthn-access'
 import { noticeDocPreviewDownloadBlocked } from './doc-preview-download-block-notice'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
+import {
+  checkForflowBrowserPermission,
+  requestForflowBrowserPermission
+} from '../forflow/browser-permissions'
 
 // Why: one shared installer keeps every partition's deny-by-default permission/download policies from drifting apart.
 const configuredPartitions = new Set<string>()
@@ -103,6 +108,12 @@ export function installBrowserSessionPartitionPolicies(
     clearBrowserWebAuthnAccessHandlers(sess)
   } else {
     sess.setPermissionRequestHandler((webContents, permission, callback, details) => {
+      if (isForflowPrivateDeployment()) {
+        void requestForflowBrowserPermission(webContents, permission, details).then(callback, () =>
+          callback(false)
+        )
+        return
+      }
       // Why: defer media to macOS TCC; denying at the session layer throws NotAllowedError even after the user granted Camera/Mic to the OS.
       if (permission === 'media') {
         // Capture before async handling; opaque frames cannot be attributed to a named site.
@@ -144,6 +155,12 @@ export function installBrowserSessionPartitionPolicies(
       callback(allowed)
     })
     sess.setPermissionCheckHandler((_webContents, permission, _origin, details) => {
+      if (allowsBrowserWebAuthnPermission(permission, details)) {
+        return true
+      }
+      if (isForflowPrivateDeployment()) {
+        return checkForflowBrowserPermission(_webContents, permission, _origin, details?.mediaType)
+      }
       if (permission === 'media') {
         return hasSystemMediaAccess(details?.mediaType)
       }

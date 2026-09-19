@@ -11,6 +11,8 @@ import type {
 } from '../../../shared/terminal-tab-types'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import type { LiveAgentWorktreeStatus } from './worktree-activity-state'
+import { translate } from '@/i18n/i18n'
+import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 
 export type WorktreeStatus =
   | 'active'
@@ -30,15 +32,15 @@ type WorktreeStatusHeuristicOptions = {
   terminalLayoutRootsByTabId?: Record<string, TerminalPaneLayoutNode | null | undefined>
 }
 
-const STATUS_LABELS: Record<WorktreeStatus, string> = {
-  active: 'Active',
-  working: 'Working',
-  monitoring: 'Monitoring background tasks',
-  permission: 'Needs permission',
-  interrupted: 'Interrupted',
-  done: 'Done',
-  inactive: 'Inactive'
-}
+const getStatusLabels = createLocalizedCatalog((): Record<WorktreeStatus, string> => ({
+  active: translate('worktree.status.active', 'Active'),
+  working: translate('worktree.status.working', 'Working'),
+  monitoring: translate('worktree.status.monitoring', 'Monitoring background tasks'),
+  permission: translate('worktree.status.permission', 'Needs permission'),
+  interrupted: translate('worktree.status.interrupted', 'Interrupted'),
+  done: translate('worktree.status.done', 'Done'),
+  inactive: translate('worktree.status.inactive', 'Inactive')
+}))
 
 export function getWorktreeStatus(
   tabs: readonly Pick<TerminalTab, 'id' | 'title' | 'launchAgent'>[],
@@ -158,7 +160,7 @@ function titleStatusIsAgentAttributable(title: string, launchAgent?: TuiAgent | 
 }
 
 export function getWorktreeStatusLabel(status: WorktreeStatus): string {
-  return STATUS_LABELS[status]
+  return getStatusLabels()[status]
 }
 
 /**

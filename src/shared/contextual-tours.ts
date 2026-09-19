@@ -59,6 +59,7 @@ export const CONTEXTUAL_TOURS = [
     id: 'workspace-board',
     steps: [
       {
+        id: 'board-plan',
         title: 'Plan work on the board',
         body: 'Use the board when you want to see workspaces by status instead of by project.',
         targetSelector: '[data-contextual-tour-target="workspace-board-center"]',
@@ -66,6 +67,7 @@ export const CONTEXTUAL_TOURS = [
         preferredPlacement: 'bottom'
       },
       {
+        id: 'board-lanes',
         title: 'Move work through lanes',
         body: 'Drag workspaces between lanes as their status changes.',
         targetSelector:
@@ -77,6 +79,7 @@ export const CONTEXTUAL_TOURS = [
     id: 'workspace-agent-sessions',
     steps: [
       {
+        id: 'session-split',
         title: 'Split a terminal pane',
         body: 'Open a second terminal pane with {terminal.splitRight}, or right-click the pane for split options.',
         targetSelector:
@@ -87,6 +90,7 @@ export const CONTEXTUAL_TOURS = [
         advanceOnFeatureInteraction: 'terminal-pane-split'
       },
       {
+        id: 'session-parallel',
         title: 'Start another task in parallel',
         body: 'Each worktree gets its own branch, so parallel work stays separate.',
         targetSelector: '[data-contextual-tour-target="workspace-create-control"]',
@@ -100,6 +104,7 @@ export const CONTEXTUAL_TOURS = [
     id: 'browser',
     steps: [
       {
+        id: 'browser-context',
         title: 'Grab page context for agents',
         body: "Use the grab tool to copy a page element's context for agents.",
         targetSelector: '[data-contextual-tour-target="browser-grab-control"]',
@@ -107,12 +112,14 @@ export const CONTEXTUAL_TOURS = [
         preferredPlacement: 'bottom'
       },
       {
+        id: 'browser-annotations',
         title: 'Mark design feedback in place',
         body: 'Annotate elements and send those notes to an agent.',
         targetSelector: '[data-contextual-tour-target="browser-annotation-control"]',
         preferredPlacement: 'bottom'
       },
       {
+        id: 'browser-logins',
         title: 'Stay logged in',
         body: 'Bring your existing logins into Orca to stay signed in immediately.',
         // Prefer the always-visible Import button; fall back to the overflow-menu
@@ -143,17 +150,20 @@ export const CONTEXTUAL_TOURS = [
     id: 'tasks',
     steps: [
       {
+        id: 'tasks-source',
         title: 'Choose the work source',
         body: 'Switch between connected providers and project filters without changing pages.',
         targetSelector: '[data-contextual-tour-target="tasks-source-filters"]',
         requiredForStart: true
       },
       {
+        id: 'tasks-filter',
         title: 'Filter to the work you need',
         body: 'Use presets and search to narrow issues, reviews, merge requests, or tasks.',
         targetSelector: '[data-contextual-tour-target="tasks-search-presets"]'
       },
       {
+        id: 'tasks-start',
         title: 'Start from work items',
         body: 'Use Start or Open on a task, issue, review, or merge request to bring its context into a workspace.',
         targetSelector:
@@ -183,6 +193,7 @@ export const CONTEXTUAL_TOURS = [
     id: 'floating-workspace',
     steps: [
       {
+        id: 'floating-repos',
         title: 'Run an agent across every repo',
         body: 'Agents here run in any folder you choose. Point one at the directory above your services to work across all your repos at once.',
         // Why: the per-action anchors only render in the empty state; fall back
@@ -193,6 +204,7 @@ export const CONTEXTUAL_TOURS = [
         preferredPlacement: 'left'
       },
       {
+        id: 'floating-scratch',
         title: 'Or use it as a scratchpad',
         body: 'Open agents, scratch terminals, notes, and browser tabs without cluttering the worktree you’re focused on.',
         targetSelector:
@@ -206,18 +218,21 @@ export const CONTEXTUAL_TOURS = [
     allowedActiveModals: ['new-workspace-composer'],
     steps: [
       {
+        id: 'creation-project',
         title: 'Pick a project',
         body: 'Orca isolates each task in its own worktree, branched off your base.',
         targetSelector: '[data-contextual-tour-target="workspace-creation-project"]',
         requiredForStart: true
       },
       {
+        id: 'creation-name',
         title: 'Name it, or start from existing work',
         body: 'Start from a linked task for a short issue or PR name. Or leave it blank to auto-name it from your first agent message.',
         targetSelector: '[data-contextual-tour-target="workspace-creation-name"]',
         control: { kind: 'auto-rename-branch-from-work' }
       },
       {
+        id: 'creation-agent',
         title: 'Choose what agent starts the work',
         body: 'Pick the agent that should be opened when this worktree is created.',
         targetSelector: '[data-contextual-tour-target="workspace-creation-agent"]'

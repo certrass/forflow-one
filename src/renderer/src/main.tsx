@@ -19,7 +19,8 @@ import { applyDocumentTheme } from './lib/document-theme'
 import { installTypingLatencyDiagnostic } from './lib/typing-latency/diagnostic'
 import { shouldEnableReactGrab } from './lib/react-grab-dev-gate'
 import { I18nProvider } from './i18n/I18nProvider'
-import { translate } from './i18n/i18n'
+import { translate, setRendererUiLanguage } from './i18n/i18n'
+import { isForflowBuild } from '../../shared/product-branding'
 import { getOrCreateRendererRoot } from './lib/react-renderer-root'
 import { primeTerminalWebglAddon } from './lib/pane-manager/pane-webgl-renderer'
 import { SkillWarningPreviewLauncher } from './components/skills/SkillWarningPreviewLauncher'
@@ -69,17 +70,25 @@ function RendererRoot(): React.JSX.Element {
   )
 }
 
-getOrCreateRendererRoot(rootElement, import.meta.hot?.data).render(
-  <StrictMode>
-    <I18nProvider>
-      <RendererRoot />
-    </I18nProvider>
-  </StrictMode>
-)
-recordRendererCrashBreadcrumb('renderer_bootstrap_rendered')
+async function renderApplication(): Promise<void> {
+  if (isForflowBuild()) {
+    await setRendererUiLanguage('zh')
+  }
+  if (!rootElement) {
+    return
+  }
+  getOrCreateRendererRoot(rootElement, import.meta.hot?.data).render(
+    <StrictMode>
+      <I18nProvider>
+        <RendererRoot />
+      </I18nProvider>
+    </StrictMode>
+  )
+  recordRendererCrashBreadcrumb('renderer_bootstrap_rendered')
+  void primeTerminalWebglAddon()
+}
 
-// Why here: the xterm WebGL addon is 243 KB, is only ever constructed once a
-// terminal attaches (many frames away), and is needed by nothing during boot.
-// Starting the load after the first render keeps it off the boot graph while
-// leaving it resolved long before any pane can attach.
-void primeTerminalWebglAddon()
+void renderApplication().catch((error) => {
+  rootElement.textContent = '无法加载界面，请重启 Forflow One。'
+  console.error('Renderer initialization failed', error)
+})

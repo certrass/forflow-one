@@ -1,4 +1,5 @@
 import { app, type BrowserWindow } from 'electron'
+import { installForflowFetchGuard } from './forflow/network-request-policy'
 import { parseSkillShareId } from '../shared/skill-share-link'
 import { createMacAppActivationHandler } from './window/macos-app-activation'
 import {
@@ -18,6 +19,7 @@ function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}): Brow
   return openMainWindowController(options)
 }
 
+installForflowFetchGuard()
 setMainWindowOpener(openMainWindow)
 
 function focusExistingWindow(): void {

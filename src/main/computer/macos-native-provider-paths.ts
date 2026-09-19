@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { isForflowBuild } from '../../shared/product-branding'
 
 export function resolveMacOSComputerUseAppPath(): string | null {
   const override = process.env.ORCA_COMPUTER_MACOS_HELPER_APP_PATH
@@ -7,10 +8,11 @@ export function resolveMacOSComputerUseAppPath(): string | null {
     return override
   }
 
-  const packaged = [join(process.resourcesPath ?? '', 'Orca Computer Use.app')]
+  const appName = isForflowBuild() ? 'Forflow One 电脑操作.app' : 'Orca Computer Use.app'
+  const packaged = [join(process.resourcesPath ?? '', appName)]
   const dev = [
-    join(process.cwd(), 'native/computer-use-macos/.build/release/Orca Computer Use.app'),
-    resolve(__dirname, '../../native/computer-use-macos/.build/release/Orca Computer Use.app')
+    join(process.cwd(), 'native/computer-use-macos/.build/release', appName),
+    resolve(__dirname, '../../native/computer-use-macos/.build/release', appName)
   ]
   const candidates = process.resourcesPath ? [...packaged, ...dev] : dev
 
@@ -22,6 +24,11 @@ export function resolveMacOSComputerUseExecutablePath(): string | null {
   if (!appPath) {
     return null
   }
-  const executablePath = join(appPath, 'Contents', 'MacOS', 'orca-computer-use-macos')
+  const executablePath = join(
+    appPath,
+    'Contents',
+    'MacOS',
+    isForflowBuild() ? 'forflow-computer-use-macos' : 'orca-computer-use-macos'
+  )
   return existsSync(executablePath) ? executablePath : null
 }

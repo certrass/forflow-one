@@ -129,5 +129,10 @@ export function isOrcaCloudDevAuthEnabled(
   env: NodeJS.ProcessEnv = process.env,
   packaged: boolean = isPackagedOrcaBuild()
 ): boolean {
-  return env.ORCA_CLOUD_DEV_AUTH === '1' && env.NODE_ENV !== 'production' && !packaged
+  return (
+    !isForflowPrivateDeployment(env) &&
+    env.ORCA_CLOUD_DEV_AUTH === '1' &&
+    env.NODE_ENV !== 'production' &&
+    !packaged
+  )
 }

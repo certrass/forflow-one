@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.e2e.json",
+  "include": [
+    "../tests/forflow-packaged/**/*.ts",
+    "../tests/playwright.forflow-packaged.config.ts",
+    "../src/renderer/src/env.d.ts",
+    "../src/types/**/*"
+  ]
+}

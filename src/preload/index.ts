@@ -6,6 +6,8 @@ import {
 } from './preload-runtime-support'
 import { appApi } from './api/app-bridge'
 import { orcaProfilesApi } from './api/orca-profiles-bridge'
+import { forflowIdentityApi } from './api/forflow-identity-bridge'
+import { forflowApprovalApi } from './api/forflow-approval-bridge'
 import { platformApi } from './api/platform-bridge'
 import { wslApi } from './api/wsl-bridge'
 import { pwshApi } from './api/pwsh-bridge'
@@ -98,6 +100,11 @@ const telemetryGetConsentStateApi: PreloadApi['telemetryGetConsentState'] = () =
   ipcRenderer.invoke('telemetry:getConsentState')
 
 const api = {
+  forflowIdentity: forflowIdentityApi,
+  forflowApproval: forflowApprovalApi,
+  forflowSkills: {
+    installBundled: (names) => ipcRenderer.invoke('forflow:skills:installBundled', names)
+  },
   app: appApi,
   orcaProfiles: orcaProfilesApi,
   platform: platformApi,

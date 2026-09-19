@@ -169,9 +169,13 @@
     "sync:anti-slop-plugin": "node config/scripts/sync-anti-slop-plugin.mjs",
     "dev:forflow": "node config/scripts/forflow-launch.mjs dev",
     "build:forflow": "node config/scripts/forflow-launch.mjs build",
+    "package:forflow:mac": "node config/scripts/forflow-package-macos.mjs",
     "dev:web:forflow": "node config/scripts/forflow-launch.mjs web",
     "audit:forflow": "node config/scripts/forflow-source-audit.mjs",
-    "probe:model:forflow": "node config/scripts/forflow-model-probe.mjs"
+    "probe:model:forflow": "node config/scripts/forflow-model-probe.mjs",
+    "verify:forflow:localization": "node config/scripts/verify-forflow-localization.mjs",
+    "test:forflow:identity": "node --test services/identity/identity.test.mjs",
+    "test:forflow:regression": "node config/scripts/test-forflow-regression.mjs"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.3.251",
@@ -331,7 +335,7 @@
   "engines": {
     "node": "24"
   },
-  "packageManager": "pnpm@12.0.0+sha512.9e2e3dc3911995868dc94b8175c217c27e95408fa03b4a22749778f2b34f773b77cdd3b39ede8171b22fcd53be6a35342e9fac9948a68ef58df6488ce89a7e67",
+  "packageManager": "pnpm@11.19.0",
   "reactDoctor": {
     "ignore": {
       "overrides": [

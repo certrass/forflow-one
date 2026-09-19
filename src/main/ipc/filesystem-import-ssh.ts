@@ -13,6 +13,7 @@ import {
   preScanSshImportDirectory,
   uploadSshImportDirectory
 } from './filesystem-import-ssh-directory'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 
 // Why: the SSH import path uses SshFilesystemProvider instead of direct SFTP so
 // system-SSH transports (ProxyCommand/ProxyJump/FIDO2) get the same workflows.
@@ -41,6 +42,24 @@ export async function importExternalPathsSsh(
   }
 
   const provider = requireSshFilesystemProvider(connectionId)
+  if (isForflowPrivateDeployment()) {
+    const { confirmForflowSshTransfer, describeForflowTransfer } =
+      await import('../forflow/transfer-approval')
+    const assertConfirmedTarget = await confirmForflowSshTransfer(
+      connectionId,
+      describeForflowTransfer(sourcePaths),
+      destDir
+    )
+    const assertCurrent = options?.assertCurrent
+    options = {
+      ...options,
+      assertCurrent: () => {
+        assertConfirmedTarget()
+        assertCurrent?.()
+      }
+    }
+    options.assertCurrent?.()
+  }
 
   if (options?.ensureDir) {
     // Why: terminal-drop staging needs `${worktree}/.orca/drops` to exist

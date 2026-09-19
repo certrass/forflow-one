@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import { appStarSourceSchema } from '../../shared/gh-star-source'
 import { diagnoseGhAuth } from '../github/auth-diagnose'
 import { checkOrcaStarred, getAuthenticatedViewer, starOrca } from '../github/client'
@@ -8,8 +9,13 @@ import { track } from '../telemetry/client'
 
 export function registerGitHubAccountHandlers(): void {
   ipcMain.handle('gh:viewer', () => getAuthenticatedViewer())
-  ipcMain.handle('gh:checkOrcaStarred', () => checkOrcaStarred())
+  ipcMain.handle('gh:checkOrcaStarred', () =>
+    isForflowPrivateDeployment() ? null : checkOrcaStarred()
+  )
   ipcMain.handle('gh:starOrca', async (_event, source: unknown) => {
+    if (isForflowPrivateDeployment()) {
+      return false
+    }
     const sourceParse = appStarSourceSchema.safeParse(source)
     const starred = await starOrca()
     if (starred && sourceParse.success) {

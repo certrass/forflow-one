@@ -1,4 +1,7 @@
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
+import { installElectronProxyRequestGuard } from '../network/electron-proxy-request-guard'
 import type { Session } from 'electron'
+import { isBlockedForflowRequest } from '../forflow/network-request-policy'
 
 import { toSecureCertificateEndpoint } from '../../shared/browser-url'
 import { getProxySessionApplicationReadiness } from '../network/proxy-settings'
@@ -47,6 +50,10 @@ export class BrowserCertificateRequestGuard {
     // Why: Chromium caches certificate continuations at session scope. This
     // request gate restores the narrower per-WebContents approval boundary.
     session.webRequest.onBeforeRequest((details, callback) => {
+      if (isBlockedForflowRequest(details.url)) {
+        callback({ cancel: true })
+        return
+      }
       const readiness = getProxySessionApplicationReadiness(session)
       const answer = (ready: boolean): void => {
         callback(!ready || this.shouldBlockRequest(session, details) ? { cancel: true } : {})
@@ -64,7 +71,11 @@ export class BrowserCertificateRequestGuard {
     if (!this.guardedSessions.delete(session)) {
       return
     }
-    session.webRequest.onBeforeRequest(null)
+    if (isForflowPrivateDeployment()) {
+      installElectronProxyRequestGuard(session)
+    } else {
+      session.webRequest.onBeforeRequest(null)
+    }
     this.acceptedIdentityBySession.delete(session)
     for (const [webContentsId, grantSession] of this.grantSessionByGuestId) {
       if (grantSession === session) {

@@ -1,6 +1,7 @@
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 import { RuntimeClientError } from './runtime-client-error'
+import { getProductIdentity, isForflowBuild } from '../../shared/product-branding'
 import { resolveMacOSComputerUseAppPath } from './macos-native-provider-paths'
 import { getComputerUsePermissionStatus } from './macos-computer-use-permission-status'
 import type {
@@ -10,7 +11,7 @@ import type {
   ComputerUsePermissionStatusResult
 } from '../../shared/computer-use-permissions-types'
 
-const DEFAULT_COMPUTER_USE_BUNDLE_ID = 'com.stablyai.orca.computer-use'
+const DEFAULT_COMPUTER_USE_BUNDLE_ID = `${getProductIdentity().appId}.computer-use`
 
 export { getComputerUsePermissionStatus } from './macos-computer-use-permission-status'
 
@@ -121,9 +122,10 @@ async function resetComputerUsePermissionsAsync(): Promise<ComputerUsePermission
 function closeExistingPermissionHelpers(): void {
   // Why: status probes use --permission-status-file and must not be killed
   // while setup helpers are being replaced.
+  const executableName = isForflowBuild() ? 'forflow-computer-use-macos' : 'orca-computer-use-macos'
   const setupHelperPatterns = [
-    'orca-computer-use-macos[[:space:]]+--permission([[:space:]]|$)',
-    'orca-computer-use-macos[[:space:]]+--permissions([[:space:]]|$)'
+    `${executableName}[[:space:]]+--permission([[:space:]]|$)`,
+    `${executableName}[[:space:]]+--permissions([[:space:]]|$)`
   ]
   for (const pattern of setupHelperPatterns) {
     spawnSync('/usr/bin/pkill', ['-f', pattern], {

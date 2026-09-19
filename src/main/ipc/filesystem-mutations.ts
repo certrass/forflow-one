@@ -27,6 +27,9 @@ import { abortWhenRendererGone } from './renderer-lifetime-abort'
 import { sweepAbandonedRuntimeUploadTempPath } from './runtime-upload-temp-sweep'
 import type { RuntimeUploadFileStreamRequest } from '../../shared/runtime-upload-staging-contract'
 import { resolveEnvironment } from '../../shared/runtime-environment-store'
+import { assertForflowTransferSender } from '../forflow/approval-broker'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
+import { resolve } from 'node:path'
 
 /**
  * IPC handlers for file/folder creation and renaming.
@@ -149,7 +152,7 @@ export function registerFilesystemMutationHandlers(store: Store): void {
   ipcMain.handle(
     'fs:importExternalPaths',
     async (
-      _event,
+      event,
       args: {
         sourcePaths: string[]
         destDir: string
@@ -157,6 +160,7 @@ export function registerFilesystemMutationHandlers(store: Store): void {
         ensureDir?: boolean
       } & SshMutationExpectation
     ): Promise<{ results: ImportItemResult[] }> => {
+      assertForflowTransferSender(event)
       assertSshMutationExpectation(
         args.connectionId,
         args.expectedSshTargetId,
@@ -200,9 +204,10 @@ export function registerFilesystemMutationHandlers(store: Store): void {
   ipcMain.handle(
     'fs:stageExternalPathsForRuntimeUpload',
     async (
-      _event,
+      event,
       args: { sourcePaths: string[] }
     ): Promise<{ sources: StagedExternalImportSource[] }> => {
+      assertForflowTransferSender(event)
       const sources: StagedExternalImportSource[] = []
       // Why: one budget for the whole drop — per-source counters would let five
       // 2 GB files through a ceiling meant to cap the drop.
@@ -222,6 +227,7 @@ export function registerFilesystemMutationHandlers(store: Store): void {
   ipcMain.handle(
     'fs:uploadExternalFileToRuntime',
     async (event, args: RuntimeUploadFileStreamRequest): Promise<{ byteLength: number }> => {
+      assertForflowTransferSender(event)
       const userDataPath = app.getPath('userData')
       // Why: the streamer's manual-disconnect check keys on the environment id,
       // and the renderer may pass any selector the store resolves.
@@ -234,6 +240,20 @@ export function registerFilesystemMutationHandlers(store: Store): void {
       // or a multi-GB upload outlives the window that asked for it.
       const lifetime = abortWhenRendererGone(event.sender)
       try {
+        if (isForflowPrivateDeployment()) {
+          const { confirmForflowRuntimeTransfer, describeForflowTransfer } =
+            await import('../forflow/transfer-approval')
+          Object.assign(
+            request,
+            await confirmForflowRuntimeTransfer(
+              userDataPath,
+              request.environmentId,
+              `${describeForflowTransfer([resolve(args.sourceRootPath, args.entryRelativePath)], args.expected.byteLength)}\n目标工作区：${JSON.stringify(args.worktree)}`,
+              request,
+              lifetime.signal
+            )
+          )
+        }
         return await streamExternalFileToRuntime({
           ...request,
           userDataPath,
@@ -261,13 +281,14 @@ export function registerFilesystemMutationHandlers(store: Store): void {
   ipcMain.handle(
     'fs:resolveDroppedPathsForAgent',
     async (
-      _event,
+      event,
       args: {
         paths: string[]
         worktreePath: string
         connectionId?: string
       } & SshMutationExpectation
     ): Promise<ResolveDroppedPathsResult> => {
+      assertForflowTransferSender(event)
       assertSshMutationExpectation(
         args.connectionId,
         args.expectedSshTargetId,

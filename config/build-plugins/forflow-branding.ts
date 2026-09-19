@@ -17,7 +17,7 @@ export function forflowBrandingPlugin(): Plugin {
         source.startsWith('.') &&
         resolve(dirname(importer), source) === resolve(resourceRoot, 'logo.svg')
       ) {
-        return resolve(resourceRoot, 'forflow/logo.svg')
+        return resolve(resourceRoot, 'forflow/forflow-mark.png')
       }
       return null
     },

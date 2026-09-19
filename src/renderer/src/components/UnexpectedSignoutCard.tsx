@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../shared/product-branding'
 import { useEffect, useState } from 'react'
 import { BookOpen, ChevronDown, CircleUserRound, Files, Smartphone, X } from 'lucide-react'
 import { useAppStore } from '../store'
@@ -42,7 +43,7 @@ function FeatureRow({
   )
 }
 
-export function UnexpectedSignoutCard(): React.JSX.Element | null {
+function UpstreamUnexpectedSignoutCard(): React.JSX.Element | null {
   const authStatus = useAppStore((s) => s.orcaProfileAuthStatus)
   const persistedUIReady = useAppStore((s) => s.persistedUIReady)
   const persistedDismissedVersion = useAppStore((s) => s.dismissedUnexpectedSignoutVersion)
@@ -248,4 +249,8 @@ export function UnexpectedSignoutCard(): React.JSX.Element | null {
       </Card>
     </div>
   )
+}
+
+export function UnexpectedSignoutCard(): React.JSX.Element | null {
+  return isForflowBuild() ? null : <UpstreamUnexpectedSignoutCard />
 }

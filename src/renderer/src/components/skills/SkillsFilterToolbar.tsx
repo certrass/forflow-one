@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { RefreshCw, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -119,22 +120,24 @@ export function SkillsFilterToolbar({
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           {/* Why: the view switch shares the chips' pill shape so the row reads
               as one control strip; the rule marks where filtering starts. */}
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            spacing={1}
-            value={view}
-            onValueChange={(value) => onViewChange((value || 'skills') as SkillsPageView)}
-            aria-label={translate('auto.components.skills.SkillsPage.viewSwitch', 'Show')}
-          >
-            <ToggleGroupItem value="skills" className="rounded-full px-2.5 text-xs">
-              {translate('auto.components.skills.SkillsPage.f43ad6edf3', 'Skills')}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="shared" className="rounded-full px-2.5 text-xs">
-              {translate('auto.components.skills.SkillsPage.sharedLinks', 'Shared links')}
-            </ToggleGroupItem>
-          </ToggleGroup>
+          {!isForflowBuild() ? (
+            <ToggleGroup
+              type="single"
+              variant="outline"
+              size="sm"
+              spacing={1}
+              value={view}
+              onValueChange={(value) => onViewChange((value || 'skills') as SkillsPageView)}
+              aria-label={translate('auto.components.skills.SkillsPage.viewSwitch', 'Show')}
+            >
+              <ToggleGroupItem value="skills" className="rounded-full px-2.5 text-xs">
+                {translate('auto.components.skills.SkillsPage.f43ad6edf3', 'Skills')}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="shared" className="rounded-full px-2.5 text-xs">
+                {translate('auto.components.skills.SkillsPage.sharedLinks', 'Shared links')}
+              </ToggleGroupItem>
+            </ToggleGroup>
+          ) : null}
           {sharedView ? null : (
             <>
               <div className="h-4 w-px shrink-0 bg-border" aria-hidden />

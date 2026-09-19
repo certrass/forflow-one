@@ -1,4 +1,5 @@
 import os from 'node:os'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import { app, ipcMain, net } from 'electron'
 import {
   appendFeedbackImagesToFormData,
@@ -282,6 +283,9 @@ async function submitFeedbackWithDiagnosticBundle(
 export async function submitFeedback(
   args: InternalFeedbackSubmitArgs
 ): Promise<FeedbackSubmitResult> {
+  if (isForflowPrivateDeployment()) {
+    return { ok: false, status: null, error: '此私有部署不上传反馈，请联系管理员。' }
+  }
   // Why: buildSubmitBody drops images on the crash lane, so validating them
   // there would abort a crash report over attachments it never meant to send.
   if (args.submissionType !== 'crash' && args.images !== undefined) {
@@ -353,9 +357,6 @@ export function registerFeedbackHandlers(): void {
     }
     // Why: crash submissions are main-only. A compromised renderer can invoke
     // this channel directly, so force the public feedback lane at the boundary.
-    return submitFeedback({
-      ...args,
-      submissionType: 'feedback'
-    })
+    return submitFeedback({ ...args, submissionType: 'feedback' })
   })
 }

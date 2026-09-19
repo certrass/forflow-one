@@ -55,6 +55,8 @@ function SetupStepRow(props: {
   return (
     <button
       type="button"
+      data-setup-step-id={step.id}
+      data-setup-step-complete={done}
       onClick={onSelect}
       aria-current={active ? 'step' : undefined}
       className={cn(

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { CircleX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { translate } from '@/i18n/i18n'
@@ -10,6 +11,9 @@ export function SidebarWorktreeListEmptyState({
   hasFilters: boolean
   onClearFilters: () => void
 }): React.JSX.Element {
+  // The memoized sidebar can mount before the lazy Chinese catalog resolves.
+  // Subscribe here so the first-launch empty state follows the selected language.
+  useTranslation()
   return (
     <div
       data-worktree-sidebar-container

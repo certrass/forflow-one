@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { RepoIconGlyph } from '../repo/repo-icon'
 import { RepoForkIndicator } from '../repo/repo-fork-indicator'
 import { Button } from '../ui/button'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { Input } from '../ui/input'
 import { SetupGuideProgressRing } from '../setup-guide/SetupGuideProgressRing'
 import { useSettingsSetupGuideProgress } from './settings-setup-guide-progress'
@@ -120,11 +121,15 @@ function SettingsSetupGuideNavRow({
     <button
       type="button"
       aria-current={setupActive ? 'page' : undefined}
-      aria-label={translate(
-        'auto.components.settings.SettingsSidebar.82db1b7de4',
-        'Onboarding checklist, {{value0}} of {{value1}} done. Show setup guide.',
-        { value0: progress.doneCount, value1: progress.total }
-      )}
+      aria-label={
+        !progress.ready
+          ? translate('forflow.guide.checkingLabel', '入门清单，正在检测完成状态。')
+          : translate(
+              'auto.components.settings.SettingsSidebar.82db1b7de4',
+              'Onboarding checklist, {{value0}} of {{value1}} done. Show setup guide.',
+              { value0: progress.doneCount, value1: progress.total }
+            )
+      }
       onClick={() => onSelect()}
       className={cn(
         'flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-worktree-sidebar-ring/50',
@@ -137,7 +142,14 @@ function SettingsSetupGuideNavRow({
         done={progress.doneCount}
         total={progress.total}
         sizeClassName="size-4"
-        tooltipLabel={`${progress.doneCount}/${progress.total} complete`}
+        tooltipLabel={
+          progress.ready
+            ? translate('forflow.guide.progress', '已完成 {{done}}/{{total}}', {
+                done: progress.doneCount,
+                total: progress.total
+              })
+            : translate('forflow.guide.checking', '正在检测完成状态')
+        }
       />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-[13px] font-medium leading-4">
@@ -169,7 +181,8 @@ export function SettingsSidebar({
   // Why: "Hide from sidebar" only hides the top-left app sidebar prompt;
   // Settings should remain a stable place to reopen the checklist.
   const showSetupGuideTopRow =
-    setupGuideProgress.ready && setupGuideProgress.doneCount < setupGuideProgress.total
+    isForflowBuild() ||
+    (setupGuideProgress.ready && setupGuideProgress.doneCount < setupGuideProgress.total)
   const navItemClassName = (isActive: boolean): string =>
     cn(
       'flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-[13px] outline-none transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-worktree-sidebar-ring/50',

@@ -1,3 +1,4 @@
+import { assertForflowRequestAllowed } from '../forflow/network-request-policy'
 import { validatePathExistenceBatch } from '../../shared/path-existence-batch'
 import { ipcMain, shell, dialog } from 'electron'
 import { constants, copyFile, readFile, stat } from 'node:fs/promises'
@@ -166,6 +167,7 @@ export function registerShellHandlers(store: Store): void {
       return
     }
 
+    assertForflowRequestAllowed(parsed.toString())
     return shell.openExternal(parsed.toString())
   })
 

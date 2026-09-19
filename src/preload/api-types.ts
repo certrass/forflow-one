@@ -37,6 +37,9 @@ import type { MobileApi } from './api/mobile-api'
 import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
+import type { ForflowIdentityApi } from '../shared/forflow-identity'
+import type { ForflowApprovalApi } from '../shared/forflow-approval'
+import type { ForflowSkillsApi } from '../shared/forflow-bundled-skills'
 import type {
   ComputerUsePermissionsApi,
   DeveloperPermissionsApi,
@@ -66,6 +69,9 @@ import type { FolderWorkspacesApi, SparsePresetsApi, WorktreeApi } from './api/w
 type Merged<T> = { [K in keyof T]: T[K] }
 
 export type PreloadApi = {
+  forflowIdentity?: ForflowIdentityApi
+  forflowApproval?: ForflowApprovalApi
+  forflowSkills?: ForflowSkillsApi
   app: AppApi
   orcaProfiles: OrcaProfileApi
   platform: PlatformApi

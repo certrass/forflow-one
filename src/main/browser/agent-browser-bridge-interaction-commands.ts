@@ -15,6 +15,8 @@ import { WAIT_PROCESS_TIMEOUT_GRACE_MS } from './agent-browser-bridge-types'
 import { acquireElectronDebugger } from './electron-debugger-lease'
 import { parseCdpKeyEvent, imeFallbackKeyEvent } from './cdp-keyboard-us-layout'
 import { AgentBrowserBridgeCaptureCommands } from './agent-browser-bridge-capture-commands'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
+import { confirmForflowBrowserUpload } from '../forflow/browser-permissions'
 
 export abstract class AgentBrowserBridgeInteractionCommands extends AgentBrowserBridgeCaptureCommands {
   async hover(
@@ -44,7 +46,15 @@ export abstract class AgentBrowserBridgeInteractionCommands extends AgentBrowser
     worktreeId?: string,
     browserPageId?: string
   ): Promise<BrowserUploadResult> {
-    return this.enqueueTargetedCommand(worktreeId, browserPageId, async (sessionName) => {
+    return this.enqueueTargetedCommand(worktreeId, browserPageId, async (sessionName, target) => {
+      if (isForflowPrivateDeployment()) {
+        const guest = this.getWebContents(target.webContentsId)
+        if (!guest) {
+          throw new Error('网页已关闭，无法确认上传。')
+        }
+        const validateDestination = await confirmForflowBrowserUpload(guest, filePaths)
+        validateDestination()
+      }
       return (await this.execAgentBrowser(sessionName, [
         'upload',
         element,

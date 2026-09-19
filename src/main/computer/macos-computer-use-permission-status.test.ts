@@ -178,6 +178,7 @@ describe('getComputerUsePermissionStatus', () => {
     expect(spawn).toHaveBeenCalledWith(
       '/usr/bin/open',
       [
+        '-g',
         '-n',
         '/Applications/Orca Computer Use.app',
         '--args',

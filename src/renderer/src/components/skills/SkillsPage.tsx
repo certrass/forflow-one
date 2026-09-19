@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Share2, Trash2 } from 'lucide-react'
 import { readIpcErrorDetail } from '@/lib/ipc-error'
@@ -157,7 +158,7 @@ export default function SkillsPage(): React.JSX.Element {
   }, [loadSkills])
 
   useEffect(() => {
-    if (pendingSkillsSharedView) {
+    if (pendingSkillsSharedView && !isForflowBuild()) {
       setView('shared')
       setFilters(NO_FILTERS)
       clearPendingSkillsSharedView()
@@ -165,7 +166,7 @@ export default function SkillsPage(): React.JSX.Element {
   }, [clearPendingSkillsSharedView, pendingSkillsSharedView])
 
   useEffect(() => {
-    if (!pendingSkillShareId) {
+    if (!pendingSkillShareId || isForflowBuild()) {
       return
     }
     setInstallLink(`https://app.orca.dev/skills/share/${pendingSkillShareId}`)
@@ -195,6 +196,9 @@ export default function SkillsPage(): React.JSX.Element {
   }, [])
 
   const openSharedLinks = useCallback((): void => {
+    if (isForflowBuild()) {
+      return
+    }
     setView('shared')
     setFilters(NO_FILTERS)
   }, [])

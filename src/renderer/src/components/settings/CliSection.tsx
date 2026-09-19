@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { forflowCliStatusDescription } from './forflow-cli-copy'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FolderOpen, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
@@ -47,12 +49,12 @@ type CliSectionProps = {
 
 function getRevealLabel(platform: string): string {
   if (platform === 'darwin') {
-    return 'Show in Finder'
+    return translate('forflow.cli.finder', 'Show in Finder')
   }
   if (platform === 'win32') {
-    return 'Show in Explorer'
+    return translate('forflow.cli.explorer', 'Show in Explorer')
   }
-  return 'Show in File Manager'
+  return translate('forflow.cli.fileManager', 'Show in File Manager')
 }
 
 function getInstallDescription(platform: string): string {
@@ -69,7 +71,7 @@ function getInstallDescription(platform: string): string {
 }
 
 function getFallbackCommandName(platform: string): string {
-  return platform === 'linux' ? 'orca-ide' : 'orca'
+  return isForflowBuild() ? 'forflow' : platform === 'linux' ? 'orca-ide' : 'orca'
 }
 
 export function CliSection({
@@ -205,7 +207,9 @@ export function CliSection({
                     'auto.components.settings.CliSection.d363e5929b',
                     'Checking CLI registration…'
                   )
-                : (status?.detail ?? getInstallDescription(currentPlatform))}
+                : isForflowBuild()
+                  ? forflowCliStatusDescription(status)
+                  : (status?.detail ?? getInstallDescription(currentPlatform))}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -275,7 +279,9 @@ export function CliSection({
         ) : null}
 
         {!loading && !isSupported && !isBrowserManaged && status?.detail ? (
-          <p className="text-xs text-muted-foreground">{status.detail}</p>
+          <p className="text-xs text-muted-foreground">
+            {isForflowBuild() ? forflowCliStatusDescription(status) : status.detail}
+          </p>
         ) : null}
 
         {installFailure ? (

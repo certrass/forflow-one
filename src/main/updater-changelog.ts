@@ -1,4 +1,5 @@
 import { net } from 'electron'
+import { isForflowPrivateDeployment } from './forflow/deployment-policy'
 import type { ChangelogData } from '../shared/update-status-types'
 import { compareVersions } from './updater-fallback'
 
@@ -42,6 +43,9 @@ export async function fetchChangelog(
   incomingVersion: string,
   localVersion: string
 ): Promise<ChangelogData | null> {
+  if (isForflowPrivateDeployment()) {
+    return null
+  }
   const res = await net.fetch('https://onorca.dev/whats-new/changelog.json', {
     signal: AbortSignal.timeout(5000)
   })

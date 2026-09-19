@@ -1,10 +1,24 @@
 {
-  "sidebar": {
-    "revealFiltered": {
-      "title": "Reveal hidden workspace?",
-      "description": "The active workspace is hidden in the sidebar. Revealing it will clear your sidebar filters.",
-      "confirm": "Clear filters and reveal",
-      "cancel": "Keep filters"
+  "agentsSidebarIntro": {
+    "migrated": {
+      "title": "Agents are easier to find",
+      "description": "Your Agents view is now a dedicated sidebar tab. Your activity and filters are preserved.",
+      "dismiss": "Got it",
+      "action": "Open Agents"
+    },
+    "new": {
+      "title": "Meet your Agents tab",
+      "description": "See what your agents are working on, what is done, and where you need to step in.",
+      "hide": "Hide Agents",
+      "action": "Try Agents",
+      "hiddenToast": "Agents tab hidden. Re-enable it in Settings → Experimental."
+    }
+  },
+  "aiVault": {
+    "subagents": {
+      "loading": "Loading subagents…",
+      "loadError": "Could not load all subagents.",
+      "empty": "No subagents found."
     }
   },
   "app": {
@@ -13,265 +27,6 @@
       "rootDescription": "The app shell could not finish rendering. Retry to remount it, or relaunch Orca if the error persists.",
       "webTitle": "Orca web hit a renderer error.",
       "webDescription": "Retry the web client or reconnect to the paired runtime."
-    }
-  },
-  "browser": {
-    "loadFailure": {
-      "connectionNotSecure": "Connection isn't secure",
-      "cantReachHost": "Can't reach {{value0}}",
-      "cantLoadPage": "Can't load this page",
-      "certificateNameMismatch": "The certificate doesn't match {{value0}}.",
-      "certificateDateInvalid": "The certificate for {{value0}} isn't valid at the current date and time.",
-      "certificateAuthorityInvalid": "Orca doesn't trust the authority that issued the certificate for {{value0}}.",
-      "certificateVerificationFailed": "Orca couldn't verify the certificate for {{value0}}.",
-      "trustedCertificateGuidance": "For local development, use a trusted local certificate when possible.",
-      "retry": "Retry",
-      "copyAddress": "Copy Address",
-      "addressCopied": "Copied the current page address.",
-      "openExternally": "Open Externally",
-      "tryHttps": "Try HTTPS",
-      "proceedUnsafe": "Proceed Anyway (Unsafe)",
-      "connecting": "Connecting…",
-      "certificateChallengeExpired": "This certificate approval expired. Retry the page to request a new one.",
-      "certificateChallengeChanged": "The certificate request changed. Retry the page and review the new warning.",
-      "certificateChallengeUnavailable": "This certificate request is no longer available. Retry the page to request a new one.",
-      "certificateProceedFailed": "Orca could not approve this certificate request. Retry the page and try again.",
-      "sshRoutedHint": "This page browses through the workspace's SSH host — the host may be disconnected or unable to reach this site.",
-      "recheckSshRoute": "Run connection check"
-    },
-    "guestRecovery": {
-      "title": "Browser page stopped",
-      "failed": "The browser page stopped unexpectedly. Retry to restore it."
-    },
-    "clientHosted": {
-      "preparationFailed": "Couldn't start the remote browser on this desktop. Check the paired connection and try again.",
-      "unavailableTitle": "Client-hosted browser unavailable",
-      "unavailableDescription": "This page is attached to a different desktop or is no longer available.",
-      "download": {
-        "started": "Downloading {{filename}}…",
-        "completed": "Downloaded {{filename}}",
-        "canceled": "Download canceled.",
-        "failed": "Couldn't finish the download."
-      },
-      "popupBlocked": "Popup blocked: {{origin}}",
-      "hostPaneOfflineTitle": "That device is no longer connected",
-      "hostPaneNamedTitle": "Showing on {{device}}",
-      "hostPaneTitle": "Showing on another device",
-      "hostPaneOfflineDescription": "This page stays listed so you can close it from here. It will come back when the device reconnects.",
-      "hostPaneDescription": "This page renders on the paired desktop that opened it.",
-      "hostRowClose": "Close hosted page",
-      "hostRowCloseFailed": "Couldn't close this page. The device hosting it may be busy — try again.",
-      "hostRowOfflineNamed": "Offline — was hosted on {{device}}",
-      "hostRowOffline": "Offline — the device hosting it quit",
-      "hostRowNamed": "Hosted on {{device}}",
-      "hostRow": "Hosted on another device"
-    },
-    "navigation": {
-      "back": "Back",
-      "forward": "Forward",
-      "reload": "Reload"
-    },
-    "reopenOnServer": {
-      "action": "Reopen on server",
-      "pending": "Reopening…",
-      "caveat": "This opens a new page on the remote host at this page’s last address. Signed-in and other transient page state may differ, and a page that came from a form submission opens blank.",
-      "failed": "Couldn't open this page on the remote host. Check the connection and try again."
-    },
-    "sshRoute": {
-      "preparingTitle": "Connecting through the SSH host",
-      "errorTitle": "SSH browser routing unavailable",
-      "errorDescription": "Pages in this workspace browse through its SSH host, and that connection is not available right now.",
-      "retry": "Retry",
-      "tryAnyway": "Try anyway",
-      "browseLocally": "Browse from this device instead",
-      "forwardingBlockedTitle": "The SSH server blocks browser traffic",
-      "sshUnavailableTitle": "SSH connection unavailable",
-      "forwardingBlockedDescription": "This server refuses TCP forwarding (often “AllowTcpForwarding no” in its sshd config), which browsing through it requires. Ask its administrator to allow forwarding, or browse from this device instead.",
-      "sshUnavailableDescription": "Pages in this workspace browse through its SSH host, and that connection isn't available right now. Reconnect the host, then retry.",
-      "showDetails": "Show details"
-    },
-    "sshEgress": {
-      "routedTooltip": "Browsing through {{value0}}",
-      "localTooltip": "Browsing from this device, not {{value0}}",
-      "localChip": "This device",
-      "routedDetail": "Network traffic and DNS go through the workspace's SSH host.",
-      "localDetail": "Pages load from this machine and its network.",
-      "settingsLink": "Routing settings"
-    },
-    "remoteEgress": {
-      "clientHostedTooltip": "Browsing through {{value0}}",
-      "streamedTooltip": "Browsing on {{value0}}",
-      "clientHostedDetail": "The page renders on this device. Network traffic and DNS go through the remote host.",
-      "streamedDetail": "The page runs on the remote host and streams to this device."
-    },
-    "remote": {
-      "findUnavailable": "Find in page is not available while this page streams from the remote host."
-    }
-  },
-  "editor": {
-    "richMarkdown": {
-      "tooLarge": "File is larger than the {{limit}} rich editing limit. Showing source mode instead.",
-      "openAnyway": "Open anyway"
-    }
-  },
-  "githubChecks": {
-    "retrying": "Retrying…"
-  },
-  "settings": {
-    "appearance": {
-      "language": {
-        "title": "Language",
-        "description": "Choose the language used by the Orca interface.",
-        "system": "System",
-        "english": "English",
-        "chinese": "中文（简体）",
-        "korean": "한국어",
-        "japanese": "日本語",
-        "spanish": "Español",
-        "french": "Français"
-      },
-      "statusBar": {
-        "claudeToggleDescription": "Show Claude token and cost usage for the active workspace.",
-        "codexToggleDescription": "Show Codex token and cost usage for the active workspace.",
-        "geminiToggleDescription": "Show Gemini token and cost usage for the active workspace.",
-        "opencodeGoToggleDescription": "Show OpenCode Go token and cost usage for the active workspace.",
-        "kimiToggleDescription": "Show Kimi subscription usage for the active workspace.",
-        "minimaxToggleDescription": "Show MiniMax subscription usage for the active workspace.",
-        "sshToggleDescription": "Show configured SSH and remote Orca hosts when any are available.",
-        "resourceUsageToggleDescription": "Show the Resource Manager. Click it for CPU, memory, sessions, daemon controls, and workspace disk scans.",
-        "portsToggleDescription": "Show live workspace ports. Click it for workspace-scoped ports and external listeners.",
-        "antigravityToggleDescription": "Show Antigravity subscription usage for the active workspace.",
-        "grokToggleDescription": "Show Grok subscription credit usage when signed in via Grok CLI."
-      },
-      "menuBarIcon": {
-        "title": "Show Menu Bar Icon",
-        "description": "Keep an Orca shortcut and activity indicator in the macOS menu bar.",
-        "keyword": {
-          "menuBar": "menu bar",
-          "statusItem": "status item",
-          "activity": "activity"
-        }
-      }
-    },
-    "browser": {
-      "clientHostedRemote": {
-        "title": "Host remote browser pages on this device",
-        "description": "Render remote workspace pages on this desktop; network traffic still goes through the remote host. Applies to new pages only.",
-        "optionDevice": "This device",
-        "optionDeviceTooltip": "Pages render on this desktop, so input and popups behave natively.",
-        "optionServer": "Server (streamed)",
-        "optionServerTooltip": "Pages render on the remote server and stream to this device.",
-        "rowTitle": "Remote server workspaces",
-        "rowDescription": "Where pages render. Traffic always goes through the remote server. Applies to new pages only."
-      },
-      "sshWorkspaceRouting": {
-        "title": "Browse through SSH workspace hosts",
-        "description": "Browser pages in SSH workspaces send their traffic through the workspace's SSH host, with DNS resolved there. Off means pages browse from this machine.",
-        "disabledHosts": "Hosts browsing from this device instead:",
-        "enableHost": "Route again",
-        "optionHost": "SSH host",
-        "optionHostTooltip": "Traffic and DNS go through the workspace's SSH host.",
-        "optionDevice": "This device",
-        "optionDeviceTooltip": "Pages browse from this machine's network.",
-        "rowTitle": "SSH workspaces",
-        "rowDescription": "Where browser traffic leaves from. Pages always render on this device.",
-        "useHost": "Use SSH host",
-        "probeSkippedHosts": "Hosts routed without the connection check (Try anyway):",
-        "probeAgain": "Check again"
-      },
-      "remoteBrowsing": {
-        "heading": "Remote browsing",
-        "headingDescription": "Where remote workspace pages render, and where their network traffic leaves from."
-      }
-    }
-  },
-  "menu": {
-    "checkForUpdates": "Check for Updates...",
-    "settings": "Settings",
-    "exploreOrca": "Explore Orca",
-    "gettingStarted": "Getting Started with Orca",
-    "reportCrash": "Report Crash...",
-    "file": "File",
-    "exit": "Exit",
-    "edit": "Edit",
-    "appearance": "Appearance",
-    "toggleLeftSidebar": "Toggle Left Sidebar",
-    "toggleRightSidebar": "Toggle Right Sidebar",
-    "showStatusBar": "Show Status Bar",
-    "showTasksButton": "Show Tasks Button",
-    "showAutomationsButton": "Show Automations Button",
-    "showMobileButton": "Show Orca Mobile Button",
-    "showTitlebarAppName": "Show Titlebar App Name",
-    "view": "View",
-    "reload": "Reload",
-    "forceReload": "Force Reload",
-    "resetSize": "Reset Size",
-    "zoomIn": "Zoom In",
-    "zoomOut": "Zoom Out",
-    "openWorktreePalette": "Open Worktree Palette",
-    "window": "Window",
-    "help": "Help",
-    "paste": "Paste",
-    "copy": "Copy",
-    "selectAll": "Select All"
-  },
-  "tray": {
-    "openOrca": "Open Orca",
-    "quit": "Quit",
-    "minimizeNotice": {
-      "body": "Orca is still running in the system tray"
-    },
-    "activityWaiting": "Orca - activity waiting",
-    "activityWaitingSuffix": "activity waiting"
-  },
-  "worktreeJumpPalette": {
-    "matchLabel": {
-      "comment": "Comment",
-      "issue": "Issue",
-      "mr": "MR",
-      "port": "Port",
-      "pr": "PR",
-      "task": "Task",
-      "automation": "Run"
-    },
-    "linearIssue": {
-      "createLabel": "Create worktree from Linear issue {{value0}}: {{value1}}",
-      "pendingLabel": "Create worktree from Linear issue {{value0}}",
-      "loadingLabel": "Loading Linear issue {{value0}}",
-      "createHint": "Create worktree from Linear issue",
-      "loadingHint": "Loading Linear issue…"
-    },
-    "renderCapOverflow": "{{value0}} more",
-    "seeMore": "See more",
-    "filter": {
-      "emptyTitle": "No results match the active filter",
-      "emptySubtitle": "Clear the filter above, or widen it to more hosts and projects.",
-      "tabKey": "Tab",
-      "label": "Filter",
-      "activeCount": "{{value0}} active",
-      "removeChip": "Remove filter {{value0}}",
-      "chipOverflow": "+{{value0}}",
-      "clearAll": "Clear all",
-      "hosts": "Hosts",
-      "projects": "Projects",
-      "trigger": "Filter results",
-      "search": "Filter by host or project...",
-      "searchHosts": "Filter hosts...",
-      "searchProjects": "Filter projects...",
-      "noOptions": "No matching hosts or projects",
-      "noHosts": "No matching hosts",
-      "noProjects": "No matching projects",
-      "moreOptions": "{{value0}} more - keep typing to narrow",
-      "selectAllMatching": "Select all matching ({{value0}})",
-      "selectedCollapsed": "{{value0}} selected — remove via chips or Clear",
-      "clearHosts": "Clear hosts",
-      "clearProjects": "Clear projects",
-      "back": "Back",
-      "ariaActive": "Filter: {{value0}} active."
-    },
-    "taskUrl": {
-      "loadingHint": "Loading {{value0}}…",
-      "createHint": "Create worktree from {{value0}}"
     }
   },
   "auto": {
@@ -17007,6 +16762,109 @@
       }
     }
   },
+  "browser": {
+    "loadFailure": {
+      "connectionNotSecure": "Connection isn't secure",
+      "cantReachHost": "Can't reach {{value0}}",
+      "cantLoadPage": "Can't load this page",
+      "certificateNameMismatch": "The certificate doesn't match {{value0}}.",
+      "certificateDateInvalid": "The certificate for {{value0}} isn't valid at the current date and time.",
+      "certificateAuthorityInvalid": "Orca doesn't trust the authority that issued the certificate for {{value0}}.",
+      "certificateVerificationFailed": "Orca couldn't verify the certificate for {{value0}}.",
+      "trustedCertificateGuidance": "For local development, use a trusted local certificate when possible.",
+      "retry": "Retry",
+      "copyAddress": "Copy Address",
+      "addressCopied": "Copied the current page address.",
+      "openExternally": "Open Externally",
+      "tryHttps": "Try HTTPS",
+      "proceedUnsafe": "Proceed Anyway (Unsafe)",
+      "connecting": "Connecting…",
+      "certificateChallengeExpired": "This certificate approval expired. Retry the page to request a new one.",
+      "certificateChallengeChanged": "The certificate request changed. Retry the page and review the new warning.",
+      "certificateChallengeUnavailable": "This certificate request is no longer available. Retry the page to request a new one.",
+      "certificateProceedFailed": "Orca could not approve this certificate request. Retry the page and try again.",
+      "sshRoutedHint": "This page browses through the workspace's SSH host — the host may be disconnected or unable to reach this site.",
+      "recheckSshRoute": "Run connection check"
+    },
+    "guestRecovery": {
+      "title": "Browser page stopped",
+      "failed": "The browser page stopped unexpectedly. Retry to restore it."
+    },
+    "clientHosted": {
+      "preparationFailed": "Couldn't start the remote browser on this desktop. Check the paired connection and try again.",
+      "unavailableTitle": "Client-hosted browser unavailable",
+      "unavailableDescription": "This page is attached to a different desktop or is no longer available.",
+      "download": {
+        "started": "Downloading {{filename}}…",
+        "completed": "Downloaded {{filename}}",
+        "canceled": "Download canceled.",
+        "failed": "Couldn't finish the download."
+      },
+      "popupBlocked": "Popup blocked: {{origin}}",
+      "hostPaneOfflineTitle": "That device is no longer connected",
+      "hostPaneNamedTitle": "Showing on {{device}}",
+      "hostPaneTitle": "Showing on another device",
+      "hostPaneOfflineDescription": "This page stays listed so you can close it from here. It will come back when the device reconnects.",
+      "hostPaneDescription": "This page renders on the paired desktop that opened it.",
+      "hostRowClose": "Close hosted page",
+      "hostRowCloseFailed": "Couldn't close this page. The device hosting it may be busy — try again.",
+      "hostRowOfflineNamed": "Offline — was hosted on {{device}}",
+      "hostRowOffline": "Offline — the device hosting it quit",
+      "hostRowNamed": "Hosted on {{device}}",
+      "hostRow": "Hosted on another device"
+    },
+    "navigation": {
+      "back": "Back",
+      "forward": "Forward",
+      "reload": "Reload"
+    },
+    "reopenOnServer": {
+      "action": "Reopen on server",
+      "pending": "Reopening…",
+      "caveat": "This opens a new page on the remote host at this page’s last address. Signed-in and other transient page state may differ, and a page that came from a form submission opens blank.",
+      "failed": "Couldn't open this page on the remote host. Check the connection and try again."
+    },
+    "sshRoute": {
+      "preparingTitle": "Connecting through the SSH host",
+      "errorTitle": "SSH browser routing unavailable",
+      "errorDescription": "Pages in this workspace browse through its SSH host, and that connection is not available right now.",
+      "retry": "Retry",
+      "tryAnyway": "Try anyway",
+      "browseLocally": "Browse from this device instead",
+      "forwardingBlockedTitle": "The SSH server blocks browser traffic",
+      "sshUnavailableTitle": "SSH connection unavailable",
+      "forwardingBlockedDescription": "This server refuses TCP forwarding (often “AllowTcpForwarding no” in its sshd config), which browsing through it requires. Ask its administrator to allow forwarding, or browse from this device instead.",
+      "sshUnavailableDescription": "Pages in this workspace browse through its SSH host, and that connection isn't available right now. Reconnect the host, then retry.",
+      "showDetails": "Show details"
+    },
+    "sshEgress": {
+      "routedTooltip": "Browsing through {{value0}}",
+      "localTooltip": "Browsing from this device, not {{value0}}",
+      "localChip": "This device",
+      "routedDetail": "Network traffic and DNS go through the workspace's SSH host.",
+      "localDetail": "Pages load from this machine and its network.",
+      "settingsLink": "Routing settings"
+    },
+    "remoteEgress": {
+      "clientHostedTooltip": "Browsing through {{value0}}",
+      "streamedTooltip": "Browsing on {{value0}}",
+      "clientHostedDetail": "The page renders on this device. Network traffic and DNS go through the remote host.",
+      "streamedDetail": "The page runs on the remote host and streams to this device."
+    },
+    "remote": {
+      "findUnavailable": "Find in page is not available while this page streams from the remote host."
+    }
+  },
+  "checksPanel": {
+    "unlinked": {
+      "title": "Pull request unlinked",
+      "description": "PR #{{number}} is hidden for this workspace. Link it again to restore checks and review details.",
+      "relink": "Link PR #{{number}}"
+    }
+  },
+  "common": {
+    "retry": "Retry"
+  },
   "components": {
     "onboarding": {
       "flow": {
@@ -17667,6 +17525,16 @@
       }
     }
   },
+  "dashboard": {
+    "sidebar": {
+      "label": "Agents",
+      "dashboardLabel": "Agent Dashboard",
+      "openActivity": "View activity",
+      "closeActivity": "Turn off activity view",
+      "projects": "Projects",
+      "workspaces": "Workspaces"
+    }
+  },
   "dashboardPopout": {
     "view": {
       "label": "Dashboard view",
@@ -17819,15 +17687,207 @@
       "remote": "Remote Orca host"
     }
   },
-  "dashboard": {
-    "sidebar": {
-      "label": "Agents",
-      "dashboardLabel": "Agent Dashboard",
-      "openActivity": "View activity",
-      "closeActivity": "Turn off activity view",
-      "projects": "Projects",
-      "workspaces": "Workspaces"
+  "editor": {
+    "richMarkdown": {
+      "tooLarge": "File is larger than the {{limit}} rich editing limit. Showing source mode instead.",
+      "openAnyway": "Open anyway"
     }
+  },
+  "featureTips": {
+    "voice": {
+      "demoPrompt": "Review this diff for edge cases and add tests for anything you find.",
+      "startDictation": "Start dictation",
+      "agentPromptTitle": "Agent prompt",
+      "listening": "Listening...",
+      "focusPaneInstruction": "Focus a terminal, editor, or agent prompt, then press",
+      "startInstruction": "to start voice dictation. Press",
+      "stopInstruction": "again to stop.",
+      "unassignedInstruction": "Assign a dictation shortcut before starting voice dictation in a focused pane.",
+      "settingsInstruction": "Change the model, dictation mode, or shortcut anytime in",
+      "settingsLink": "Settings → Voice"
+    }
+  },
+  "forflow": {
+    "onboarding": {
+      "setupTitle": "完成国内与企业环境设置",
+      "setupBody": "按需连接企业账号、国内智能体和代码仓库，也可以先使用本地项目。"
+    },
+    "admin": {
+      "loadError": "无法读取团队账号。",
+      "error": "账号管理操作失败。",
+      "heading": "团队账号管理",
+      "username": "新成员账号",
+      "displayName": "成员姓名",
+      "password": "初始密码（至少 12 个字符）",
+      "create": "创建成员账号",
+      "disabled": "已停用",
+      "administrator": "管理员",
+      "member": "成员",
+      "reset": "重置密码",
+      "enable": "启用",
+      "disable": "停用并撤销会话",
+      "resetFor": "为 {{name}} 设置新密码（至少 12 个字符）",
+      "resetHelp": "重置后，该账号的所有会话立即失效，需要重新登录。",
+      "resetConfirm": "保存新密码",
+      "cancel": "取消",
+      "audit": "核验并查看最近审计记录",
+      "auditCount": "已核验 {{count}} 条记录；下方显示最近 100 条。"
+    },
+    "identity": {
+      "statusError": "无法读取账号状态。",
+      "requestError": "操作失败，请重试。",
+      "heading": "Forflow 企业账号",
+      "boundary": "账号、会话和登录记录保存在部署方的身份服务中。项目文件不会随登录上传。",
+      "noUpstream": "当前版本已关闭 Orca 云账号、云分享和中继服务。模型及代码托管服务按各自配置连接。",
+      "server": "身份服务地址",
+      "serverHelp": "请填写管理员提供的 HTTPS 地址。本机调试可使用 http://127.0.0.1:43120。更换服务会退出当前账号。",
+      "configure": "保存并检测",
+      "localMode": "切换为本机使用",
+      "localDescription": "本机模式：无需平台账号即可管理本地项目。连接企业服务后可登录并管理团队账号。",
+      "refresh": "刷新登录状态",
+      "encrypted": "会话已由系统密钥存储加密保存。",
+      "memoryOnly": "会话仅在本次运行期间保存，重启后需重新登录。",
+      "signOut": "退出登录",
+      "username": "账号",
+      "password": "密码",
+      "processing": "处理中…",
+      "signIn": "登录 Forflow",
+      "sectionDescription": "连接部署方的身份服务，管理团队账号和登录记录。"
+    },
+    "audit": {
+      "create": "创建账号",
+      "disable": "停用账号",
+      "enable": "启用账号",
+      "password": "重置密码",
+      "login": "登录",
+      "logout": "退出登录",
+      "denied": "访问被拒绝",
+      "system": "本机管理员或未登录用户",
+      "success": "成功",
+      "rejected": "拒绝",
+      "details": "查看核验摘要和原始记录"
+    },
+    "release": {
+      "title": "版本与升级",
+      "current": "当前版本：{{version}}",
+      "manual": "请使用 Forflow 或企业管理员提供的安装包升级。安装前核对版本、校验值和测试记录，保留上一版安装包以便回退。",
+      "local": "此版本为 macOS 本机测试版；不会自动检查、下载或安装上游更新。"
+    },
+    "guide": {
+      "accountTitle": "1. 选择本机或企业使用",
+      "accountBody": "本机项目可直接使用。团队协作时，在「Forflow 企业账号」填写管理员提供的身份服务地址并登录。账号服务和模型服务分别配置。",
+      "agentTitle": "2. 安装并认证国内智能体",
+      "agentBody": "优先选择 CodeBuddy、Qoder CN、TRAE CN、Qwen Code 或 Kimi。按厂商的国内版本说明安装并完成登录，再在「智能体」中检测和选择。厂商账号不会自动转为 Forflow 账号。",
+      "projectTitle": "3. 打开项目并检查权限",
+      "projectBody": "添加本地文件夹或 Git 仓库。需要并行修改时创建独立工作区；执行远程任务时先配置 SSH。保留操作确认，先用测试项目验证读取、编辑和终端执行。",
+      "modelTitle": "4. 配置国内或内网模型",
+      "modelBody": "在所选智能体中设置企业批准的模型地址、模型名称和凭据。平台账号登录成功不代表模型已开通；先验证一条文本请求，再验证工具调用。不要把密钥提交到代码仓库。",
+      "reviewTitle": "5. 审阅结果和运行记录",
+      "reviewBody": "检查文件差异、命令输出和测试结果，再提交代码。管理员可在账号页面查看登录、账号变更与会话撤销记录；业务操作审计还需接入企业运行服务。",
+      "upgradeTitle": "6. 使用经过验证的安装包升级",
+      "upgradeBody": "本版采用管理员分发升级。核对版本、校验和与回归记录，备份配置后再安装；上游自动更新、匿名分享和云中继保持关闭。",
+      "checkingLabel": "入门清单，正在检测完成状态。",
+      "checking": "正在检测完成状态",
+      "progress": "已完成 {{done}}/{{total}}",
+      "checkingHint": "正在检测完成状态；可以先浏览各项设置。",
+      "addProjectFirst": "First add a project you'd like to work on."
+    },
+    "privacy": {
+      "description": "企业版本不发送产品使用遥测。诊断记录保存在本机，按企业制度单独管理。",
+      "managed": "企业部署策略已关闭产品遥测；本地诊断记录单独管理。"
+    },
+    "skills": {
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，共其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "complete": "内置技能已安装到本机共享目录。",
+      "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
+      "settingUp": "正在配置能力…",
+      "installBundled": "安装内置技能（本机）",
+      "installed": "Installed",
+      "missing": "Not detected yet",
+      "recheck": "Check local skills again",
+      "recheckFailed": "Could not check local skills. Check the local skill folders.",
+      "beforeInstall": "内置技能直接在本机安装。需要在终端输入 forflow 命令时，可在“通用”设置中注册命令行。",
+      "disable": "取消选择 {{name}}",
+      "enable": "选择 {{name}}",
+      "registerCli": "Orca needs to register its CLI on PATH.",
+      "registerCliDescription": "Approve the system prompt so skill setup can use the Orca CLI command."
+    },
+    "cli": {
+      "finder": "Show in Finder",
+      "explorer": "Show in Explorer",
+      "fileManager": "Show in File Manager",
+      "loading": "正在读取命令注册状态。",
+      "installed": "命令已注册，可在终端使用 forflow。",
+      "pathMissing": "命令已注册，但当前终端尚未识别 PATH；请重启终端或检查环境变量。",
+      "register": "注册 {{path}} 后，可从终端使用 Forflow One。",
+      "stale": "现有命令指向旧版本，请重新注册并核对目标路径。",
+      "conflict": "命令路径已被其他文件占用，请先检查冲突文件。",
+      "unsupported": "当前运行方式不支持注册命令，请使用完整安装包或联系管理员。"
+    },
+    "approval": {
+      "allow": "Allow this operation",
+      "cancel": "Cancel",
+      "expiry": "Cancels after two minutes without a decision. This does not grant permanent access.",
+      "failed": "Could not submit the decision. Retry or cancel.",
+      "permission": "Confirm website permission",
+      "upload": "Confirm data transfer"
+    }
+  },
+  "githubChecks": {
+    "retrying": "Retrying…"
+  },
+  "menu": {
+    "checkForUpdates": "Check for Updates...",
+    "settings": "Settings",
+    "exploreOrca": "Explore Orca",
+    "gettingStarted": "Getting Started with Orca",
+    "reportCrash": "Report Crash...",
+    "file": "File",
+    "exit": "Exit",
+    "edit": "Edit",
+    "appearance": "Appearance",
+    "toggleLeftSidebar": "Toggle Left Sidebar",
+    "toggleRightSidebar": "Toggle Right Sidebar",
+    "showStatusBar": "Show Status Bar",
+    "showTasksButton": "Show Tasks Button",
+    "showAutomationsButton": "Show Automations Button",
+    "showMobileButton": "Show Orca Mobile Button",
+    "showTitlebarAppName": "Show Titlebar App Name",
+    "view": "View",
+    "reload": "Reload",
+    "forceReload": "Force Reload",
+    "resetSize": "Reset Size",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "openWorktreePalette": "Open Worktree Palette",
+    "window": "Window",
+    "help": "Help",
+    "paste": "Paste",
+    "copy": "Copy",
+    "selectAll": "Select All"
+  },
+  "notifications": {
+    "agentStatus": {
+      "needsInput": "needs input",
+      "working": "working",
+      "stopped": "stopped",
+      "finished": "finished"
+    }
+  },
+  "quickOpen": {
+    "moreMatchesAvailable": "More matches may be available. Refine your search to narrow the results."
+  },
+  "rendererRecovery": {
+    "reload": "Reload",
+    "copyCommands": "Copy Commands",
+    "quit": "Quit",
+    "stalledDetail": "Orca reloaded the window after a crash, but it never finished loading.",
+    "crashLoopDetail": "Orca tried to recover {{recoveryCount}} times in a row without success.",
+    "driverFallback": "If that does not help, the cause is usually a graphics driver.",
+    "genericDetail": "This is often a graphics-driver or installation problem. Reload to try again, or quit and relaunch Orca.",
+    "title": "Orca keeps failing to load",
+    "stalledMessage": "The app window stopped responding while reloading after a crash.",
+    "crashLoopMessage": "The app window crashed repeatedly and stopped reloading automatically."
   },
   "runtimeRpc": {
     "startupFailure": {
@@ -17845,28 +17905,80 @@
       }
     }
   },
-  "featureTips": {
-    "voice": {
-      "demoPrompt": "Review this diff for edge cases and add tests for anything you find.",
-      "startDictation": "Start dictation",
-      "agentPromptTitle": "Agent prompt",
-      "listening": "Listening...",
-      "focusPaneInstruction": "Focus a terminal, editor, or agent prompt, then press",
-      "startInstruction": "to start voice dictation. Press",
-      "stopInstruction": "again to stop.",
-      "unassignedInstruction": "Assign a dictation shortcut before starting voice dictation in a focused pane.",
-      "settingsInstruction": "Change the model, dictation mode, or shortcut anytime in",
-      "settingsLink": "Settings → Voice"
+  "settings": {
+    "appearance": {
+      "language": {
+        "title": "Language",
+        "description": "Choose the language used by the Orca interface.",
+        "system": "System",
+        "english": "English",
+        "chinese": "中文（简体）",
+        "korean": "한국어",
+        "japanese": "日本語",
+        "spanish": "Español",
+        "french": "Français"
+      },
+      "statusBar": {
+        "claudeToggleDescription": "Show Claude token and cost usage for the active workspace.",
+        "codexToggleDescription": "Show Codex token and cost usage for the active workspace.",
+        "geminiToggleDescription": "Show Gemini token and cost usage for the active workspace.",
+        "opencodeGoToggleDescription": "Show OpenCode Go token and cost usage for the active workspace.",
+        "kimiToggleDescription": "Show Kimi subscription usage for the active workspace.",
+        "minimaxToggleDescription": "Show MiniMax subscription usage for the active workspace.",
+        "sshToggleDescription": "Show configured SSH and remote Orca hosts when any are available.",
+        "resourceUsageToggleDescription": "Show the Resource Manager. Click it for CPU, memory, sessions, daemon controls, and workspace disk scans.",
+        "portsToggleDescription": "Show live workspace ports. Click it for workspace-scoped ports and external listeners.",
+        "antigravityToggleDescription": "Show Antigravity subscription usage for the active workspace.",
+        "grokToggleDescription": "Show Grok subscription credit usage when signed in via Grok CLI."
+      },
+      "menuBarIcon": {
+        "title": "Show Menu Bar Icon",
+        "description": "Keep an Orca shortcut and activity indicator in the macOS menu bar.",
+        "keyword": {
+          "menuBar": "menu bar",
+          "statusItem": "status item",
+          "activity": "activity"
+        }
+      }
+    },
+    "browser": {
+      "clientHostedRemote": {
+        "title": "Host remote browser pages on this device",
+        "description": "Render remote workspace pages on this desktop; network traffic still goes through the remote host. Applies to new pages only.",
+        "optionDevice": "This device",
+        "optionDeviceTooltip": "Pages render on this desktop, so input and popups behave natively.",
+        "optionServer": "Server (streamed)",
+        "optionServerTooltip": "Pages render on the remote server and stream to this device.",
+        "rowTitle": "Remote server workspaces",
+        "rowDescription": "Where pages render. Traffic always goes through the remote server. Applies to new pages only."
+      },
+      "sshWorkspaceRouting": {
+        "title": "Browse through SSH workspace hosts",
+        "description": "Browser pages in SSH workspaces send their traffic through the workspace's SSH host, with DNS resolved there. Off means pages browse from this machine.",
+        "disabledHosts": "Hosts browsing from this device instead:",
+        "enableHost": "Route again",
+        "optionHost": "SSH host",
+        "optionHostTooltip": "Traffic and DNS go through the workspace's SSH host.",
+        "optionDevice": "This device",
+        "optionDeviceTooltip": "Pages browse from this machine's network.",
+        "rowTitle": "SSH workspaces",
+        "rowDescription": "Where browser traffic leaves from. Pages always render on this device.",
+        "useHost": "Use SSH host",
+        "probeSkippedHosts": "Hosts routed without the connection check (Try anyway):",
+        "probeAgain": "Check again"
+      },
+      "remoteBrowsing": {
+        "heading": "Remote browsing",
+        "headingDescription": "Where remote workspace pages render, and where their network traffic leaves from."
+      }
     }
   },
-  "quickOpen": {
-    "moreMatchesAvailable": "More matches may be available. Refine your search to narrow the results."
-  },
-  "checksPanel": {
-    "unlinked": {
-      "title": "Pull request unlinked",
-      "description": "PR #{{number}} is hidden for this workspace. Link it again to restore checks and review details.",
-      "relink": "Link PR #{{number}}"
+  "sidebar": {
+    "revealFiltered": {
+      "title": "Reveal hidden workspace?",
+      "description": "The active workspace is hidden in the sidebar. Revealing it will clear your sidebar filters.",
+      "confirm": "Clear filters and reveal",
+      "cancel": "Keep filters"
     }
   },
   "sourceControl": {
@@ -17874,49 +17986,146 @@
       "status": "PR #{{number}} unlinked"
     }
   },
-  "agentsSidebarIntro": {
-    "migrated": {
-      "title": "Agents are easier to find",
-      "description": "Your Agents view is now a dedicated sidebar tab. Your activity and filters are preserved.",
-      "dismiss": "Got it",
-      "action": "Open Agents"
-    },
-    "new": {
-      "title": "Meet your Agents tab",
-      "description": "See what your agents are working on, what is done, and where you need to step in.",
-      "hide": "Hide Agents",
-      "action": "Try Agents",
-      "hiddenToast": "Agents tab hidden. Re-enable it in Settings → Experimental."
-    }
-  },
-  "rendererRecovery": {
-    "reload": "Reload",
-    "copyCommands": "Copy Commands",
+  "tray": {
+    "openOrca": "Open Orca",
     "quit": "Quit",
-    "stalledDetail": "Orca reloaded the window after a crash, but it never finished loading.",
-    "crashLoopDetail": "Orca tried to recover {{recoveryCount}} times in a row without success.",
-    "driverFallback": "If that does not help, the cause is usually a graphics driver.",
-    "genericDetail": "This is often a graphics-driver or installation problem. Reload to try again, or quit and relaunch Orca.",
-    "title": "Orca keeps failing to load",
-    "stalledMessage": "The app window stopped responding while reloading after a crash.",
-    "crashLoopMessage": "The app window crashed repeatedly and stopped reloading automatically."
+    "minimizeNotice": {
+      "body": "Orca is still running in the system tray"
+    },
+    "activityWaiting": "Orca - activity waiting",
+    "activityWaitingSuffix": "activity waiting"
   },
-  "notifications": {
-    "agentStatus": {
-      "needsInput": "needs input",
-      "working": "working",
-      "stopped": "stopped",
-      "finished": "finished"
+  "worktreeJumpPalette": {
+    "matchLabel": {
+      "comment": "Comment",
+      "issue": "Issue",
+      "mr": "MR",
+      "port": "Port",
+      "pr": "PR",
+      "task": "Task",
+      "automation": "Run"
+    },
+    "linearIssue": {
+      "createLabel": "Create worktree from Linear issue {{value0}}: {{value1}}",
+      "pendingLabel": "Create worktree from Linear issue {{value0}}",
+      "loadingLabel": "Loading Linear issue {{value0}}",
+      "createHint": "Create worktree from Linear issue",
+      "loadingHint": "Loading Linear issue…"
+    },
+    "renderCapOverflow": "{{value0}} more",
+    "seeMore": "See more",
+    "filter": {
+      "emptyTitle": "No results match the active filter",
+      "emptySubtitle": "Clear the filter above, or widen it to more hosts and projects.",
+      "tabKey": "Tab",
+      "label": "Filter",
+      "activeCount": "{{value0}} active",
+      "removeChip": "Remove filter {{value0}}",
+      "chipOverflow": "+{{value0}}",
+      "clearAll": "Clear all",
+      "hosts": "Hosts",
+      "projects": "Projects",
+      "trigger": "Filter results",
+      "search": "Filter by host or project...",
+      "searchHosts": "Filter hosts...",
+      "searchProjects": "Filter projects...",
+      "noOptions": "No matching hosts or projects",
+      "noHosts": "No matching hosts",
+      "noProjects": "No matching projects",
+      "moreOptions": "{{value0}} more - keep typing to narrow",
+      "selectAllMatching": "Select all matching ({{value0}})",
+      "selectedCollapsed": "{{value0}} selected — remove via chips or Clear",
+      "clearHosts": "Clear hosts",
+      "clearProjects": "Clear projects",
+      "back": "Back",
+      "ariaActive": "Filter: {{value0}} active."
+    },
+    "taskUrl": {
+      "loadingHint": "Loading {{value0}}…",
+      "createHint": "Create worktree from {{value0}}"
     }
   },
-  "aiVault": {
-    "subagents": {
-      "loading": "Loading subagents…",
-      "loadError": "Could not load all subagents.",
-      "empty": "No subagents found."
+  "contextualTour": {
+    "actions": {
+      "complete": "Got it",
+      "open-client-hosted-browser-settings": "Browser settings",
+      "split-terminal-pane": "Split terminal"
+    },
+    "steps": {
+      "board-lanes": {
+        "body": "Drag workspaces between lanes as their status changes.",
+        "title": "Move work through lanes"
+      },
+      "board-plan": {
+        "body": "Use the board when you want to see workspaces by status instead of by project.",
+        "title": "Plan work on the board"
+      },
+      "browser-annotations": {
+        "body": "Annotate elements and send those notes to an agent.",
+        "title": "Mark design feedback in place"
+      },
+      "browser-context": {
+        "body": "Use the grab tool to copy a page element's context for agents.",
+        "title": "Grab page context for agents"
+      },
+      "browser-logins": {
+        "body": "Bring your existing logins into Orca to stay signed in immediately.",
+        "title": "Stay logged in"
+      },
+      "creation-agent": {
+        "body": "Pick the agent that should be opened when this worktree is created.",
+        "title": "Choose what agent starts the work"
+      },
+      "creation-name": {
+        "body": "Start from a linked task for a short issue or PR name. Or leave it blank to auto-name it from your first agent message.",
+        "title": "Name it, or start from existing work"
+      },
+      "creation-project": {
+        "body": "Orca isolates each task in its own worktree, branched off your base.",
+        "title": "Pick a project"
+      },
+      "floating-repos": {
+        "body": "Agents here run in any folder you choose. Point one at the directory above your services to work across all your repos at once.",
+        "title": "Run an agent across every repo"
+      },
+      "floating-scratch": {
+        "body": "Open agents, scratch terminals, notes, and browser tabs without cluttering the worktree you’re focused on.",
+        "title": "Or use it as a scratchpad"
+      },
+      "session-parallel": {
+        "body": "Each worktree gets its own branch, so parallel work stays separate.",
+        "title": "Start another task in parallel"
+      },
+      "session-split": {
+        "body": "Open a second terminal pane with {terminal.splitRight}, or right-click the pane for split options.",
+        "title": "Split a terminal pane"
+      },
+      "tasks-filter": {
+        "body": "Use presets and search to narrow issues, reviews, merge requests, or tasks.",
+        "title": "Filter to the work you need"
+      },
+      "tasks-source": {
+        "body": "Switch between connected providers and project filters without changing pages.",
+        "title": "Choose the work source"
+      },
+      "tasks-start": {
+        "body": "Use Start or Open on a task, issue, review, or merge request to bring its context into a workspace.",
+        "title": "Start from work items"
+      }
     }
   },
-  "common": {
-    "retry": "Retry"
+  "terminal": {
+    "defaultTitle": "Terminal {{index}}"
+  },
+  "worktree": {
+    "status": {
+      "active": "Active",
+      "working": "Working",
+      "monitoring": "Monitoring background tasks",
+      "permission": "Needs permission",
+      "interrupted": "Interrupted",
+      "done": "Done",
+      "inactive": "Inactive"
+    }
   }
 }

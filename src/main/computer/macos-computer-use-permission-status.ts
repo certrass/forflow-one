@@ -103,7 +103,7 @@ function launchPermissionStatusHelper(helperAppPath: string, statusPath: string)
   return new Promise((resolve, reject) => {
     const launch = spawn(
       '/usr/bin/open',
-      ['-n', helperAppPath, '--args', '--permission-status-file', statusPath],
+      ['-g', '-n', helperAppPath, '--args', '--permission-status-file', statusPath],
       {
         stdio: ['ignore', 'pipe', 'pipe']
       }

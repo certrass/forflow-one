@@ -1,10 +1,16 @@
 import { ipcMain } from 'electron'
+import { registerForflowIdentityHandlers } from '../forflow/identity-ipc'
+import { registerForflowApprovalHandlers } from '../forflow/approval-broker'
+import { registerForflowBundledSkillHandlers } from '../forflow/bundled-skill-ipc'
 import { recoverLegacyWorkerTerminalsForRendererStartup } from './legacy-worker-renderer-recovery'
 import { logStartupMilestone } from './startup-diagnostics'
 import { mainProcessState as state } from './main-process-state'
 import { resolveOpenedMarkdownDocuments } from './os-opened-markdown-files'
 
 export function registerMainProcessIpcHandlers(): void {
+  registerForflowIdentityHandlers()
+  registerForflowApprovalHandlers()
+  registerForflowBundledSkillHandlers()
   ipcMain.handle('app:awaitFirstWindowStartupServices', async () => {
     await Promise.all([
       state.firstWindowStartupServicesReady,

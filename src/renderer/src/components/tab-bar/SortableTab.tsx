@@ -20,6 +20,7 @@ import { preventMiddleButtonDefault } from './middle-button-default-guard'
 import { useSortableTabRename } from './use-sortable-tab-rename'
 import { SortableTabContextMenu } from './SortableTabContextMenu'
 import { translate } from '@/i18n/i18n'
+import { localizeDefaultTerminalTitle } from '@/lib/default-terminal-title'
 import { TAB_CONTAINER_WIDTH_CLASSES, TAB_LABEL_WIDTH_CLASSES } from './tab-width-rules'
 import { useOptionalShortcutLabel } from '@/hooks/useShortcutLabel'
 import { useTabStripPointerActivation } from './tab-strip-pointer-activation'
@@ -118,7 +119,8 @@ export default function SortableTab({
 
   // Why: with a provider icon shown, strip the agent's own leading glyph so the tab doesn't show two icons for one agent.
   const displayTitle =
-    tab.customTitle ?? (tabAgent ? stripLeadingAgentTitleDecoration(tab.title) : tab.title)
+    tab.customTitle ??
+    localizeDefaultTerminalTitle(tabAgent ? stripLeadingAgentTitleDecoration(tab.title) : tab.title)
 
   const { attributes, listeners, setNodeRef } = useSortable({
     id: tab.id,
@@ -175,7 +177,7 @@ export default function SortableTab({
   })
   const closeShortcut = useOptionalShortcutLabel('tab.close')
   const closeLabel = translate('auto.components.tab.bar.SortableTab.95db5f2f7d', 'Close tab')
-  const tabTitle = tab.customTitle ?? tab.title
+  const tabTitle = tab.customTitle ?? localizeDefaultTerminalTitle(tab.title)
   const tabRoot = (
     <div
       ref={setNodeRef}

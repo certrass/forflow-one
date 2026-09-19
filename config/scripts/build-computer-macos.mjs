@@ -5,8 +5,11 @@ import path from 'node:path'
 const repoRoot = path.resolve(import.meta.dirname, '../..')
 const packagePath = path.join(repoRoot, 'native', 'computer-use-macos')
 const binaryPath = path.join(packagePath, '.build', 'release', 'orca-computer-use-macos')
-const appPath = path.join(packagePath, '.build', 'release', 'Orca Computer Use.app')
-const appExecutablePath = path.join(appPath, 'Contents', 'MacOS', 'orca-computer-use-macos')
+const forflow = process.env.FORFLOW_BUILD === '1'
+const displayName = forflow ? 'Forflow One 电脑操作' : 'Orca Computer Use'
+const appPath = path.join(packagePath, '.build', 'release', `${displayName}.app`)
+const executableName = forflow ? 'forflow-computer-use-macos' : 'orca-computer-use-macos'
+const appExecutablePath = path.join(appPath, 'Contents', 'MacOS', executableName)
 const appIconPath = path.join(appPath, 'Contents', 'Resources', 'AppIcon.icns')
 const entitlementsPath = path.join(
   repoRoot,
@@ -14,10 +17,13 @@ const entitlementsPath = path.join(
   'build',
   'entitlements.computer-use.mac.plist'
 )
-const bundleId = process.env.ORCA_COMPUTER_MACOS_BUNDLE_ID ?? 'com.stablyai.orca.computer-use'
-const displayName = 'Orca Computer Use'
+const bundleId =
+  process.env.ORCA_COMPUTER_MACOS_BUNDLE_ID ??
+  (forflow ? 'cn.forflow.one.computer-use' : 'com.stablyai.orca.computer-use')
 const signingIdentity = resolveSigningIdentity()
-const universalTriples = ['arm64-apple-macosx', 'x86_64-apple-macosx']
+const universalTriples = process.argv.includes('--single-arch')
+  ? [process.arch === 'arm64' ? 'arm64-apple-macosx' : 'x86_64-apple-macosx']
+  : ['arm64-apple-macosx', 'x86_64-apple-macosx']
 
 if (process.platform !== 'darwin') {
   process.exit(0)
@@ -33,7 +39,11 @@ function buildUniversalBinary() {
     return path.join(packagePath, '.build', triple, 'release', 'orca-computer-use-macos')
   })
   mkdirSync(path.dirname(binaryPath), { recursive: true })
-  run('lipo', ['-create', ...builtBinaries, '-output', binaryPath])
+  if (builtBinaries.length === 1) {
+    copyFileSync(builtBinaries[0], binaryPath)
+  } else {
+    run('lipo', ['-create', ...builtBinaries, '-output', binaryPath])
+  }
 }
 
 function createHelperApp() {
@@ -41,7 +51,10 @@ function createHelperApp() {
   mkdirSync(path.dirname(appExecutablePath), { recursive: true })
   mkdirSync(path.join(appPath, 'Contents', 'Resources'), { recursive: true })
   copyFileSync(binaryPath, appExecutablePath)
-  copyFileSync(path.join(repoRoot, 'resources', 'build', 'icon.icns'), appIconPath)
+  copyFileSync(
+    path.join(repoRoot, 'resources', forflow ? 'forflow' : 'build', 'icon.icns'),
+    appIconPath
+  )
   chmodSync(appExecutablePath, 0o755)
   writeFileSync(path.join(appPath, 'Contents', 'Info.plist'), infoPlist(), 'utf8')
   const signer = spawnSync('codesign', codesignArgs(signingIdentity, appPath), { stdio: 'inherit' })
@@ -101,7 +114,7 @@ function infoPlist() {
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleExecutable</key>
-  <string>orca-computer-use-macos</string>
+  <string>${executableName}</string>
   <key>CFBundleIdentifier</key>
   <string>${escapePlist(bundleId)}</string>
   <key>CFBundleInfoDictionaryVersion</key>
@@ -123,9 +136,9 @@ function infoPlist() {
   <key>LSUIElement</key>
   <true/>
   <key>NSAccessibilityUsageDescription</key>
-  <string>Orca Computer Use needs Accessibility permission to read and interact with app interfaces when you ask Orca to use apps.</string>
+  <string>${forflow ? 'Forflow One 电脑操作需要辅助功能权限，以执行你发起的应用操作任务。' : 'Orca Computer Use needs Accessibility permission to read and interact with app interfaces when you ask Orca to use apps.'}</string>
   <key>NSScreenCaptureUsageDescription</key>
-  <string>Orca Computer Use needs Screen Recording permission to capture app windows when you ask Orca to inspect your screen.</string>
+  <string>${forflow ? 'Forflow One 电脑操作需要屏幕录制权限，以查看你指定的应用窗口。' : 'Orca Computer Use needs Screen Recording permission to capture app windows when you ask Orca to inspect your screen.'}</string>
 </dict>
 </plist>
 `

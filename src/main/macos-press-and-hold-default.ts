@@ -26,6 +26,8 @@ import { writeFileAtomically } from './codex-accounts/fs-utils'
  * only on a developer Mac: CI has no macOS test runner, so those tests never execute there.
  */
 
+import { getProductIdentity } from '../shared/product-branding'
+
 export const PRESS_AND_HOLD_KEY = 'ApplePressAndHoldEnabled'
 export const PRESS_AND_HOLD_RECORD_FILE = 'macos-press-and-hold-default.json'
 export const PRESS_AND_HOLD_RECORD_VERSION = 1
@@ -42,7 +44,7 @@ const DEFAULTS_TIMEOUT_MS = 5_000
 /** Why: `defaults` exits 1 for "does not exist"; anything else means the probe itself failed. */
 const DEFAULTS_MISSING_STATUS = 1
 
-const ORCA_BUNDLE_ID = 'com.stablyai.orca'
+const ORCA_BUNDLE_ID = getProductIdentity().appId
 
 export type PressAndHoldDecision =
   /** Not macOS — nothing is read or written. */

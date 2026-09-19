@@ -2618,9 +2618,6 @@
   },
   "components": {
     "native-chat": {
-      "approval": {
-        "cancel": "Cancel"
-      },
       "composer": {
         "effort": "Effort"
       },
@@ -2743,6 +2740,27 @@
       "board": "Dashboard",
       "label": "Dashboard view",
       "map": "Agent Map"
+    }
+  },
+  "forflow": {
+    "approval": {
+      "allow": "Allow this operation",
+      "cancel": "Cancel",
+      "expiry": "Cancels after two minutes without a decision. This does not grant permanent access.",
+      "failed": "Could not submit the decision. Retry or cancel.",
+      "permission": "Confirm website permission",
+      "upload": "Confirm data transfer"
+    },
+    "guide": {
+      "addProjectFirst": "First add a project you'd like to work on."
+    },
+    "skills": {
+      "installed": "Installed",
+      "missing": "Not detected yet",
+      "recheck": "Check local skills again",
+      "recheckFailed": "Could not check local skills. Check the local skill folders.",
+      "registerCli": "Orca needs to register its CLI on PATH.",
+      "registerCliDescription": "Approve the system prompt so skill setup can use the Orca CLI command."
     }
   },
   "runtimeRpc": {

@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { BookOpen, Download, History, Link2, MoreHorizontal, Share2, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -88,17 +89,21 @@ export function SkillsPageHeader({
             ) : null}
           </div>
         </div>
-        <Button type="button" size="sm" onClick={onStartShare}>
-          <Share2 className="size-3.5" />
-          {translate(
-            'auto.components.skills.SkillShareSelectionControls.01c5a15e02',
-            'Share skills'
-          )}
-        </Button>
-        <Button type="button" variant="outline" size="sm" onClick={onInstallFromLink}>
-          <Download className="size-3.5" />
-          {translate('auto.components.skills.SkillsPage.aee7b99cc6', 'Install from link')}
-        </Button>
+        {!isForflowBuild() ? (
+          <>
+            <Button type="button" size="sm" onClick={onStartShare}>
+              <Share2 className="size-3.5" />
+              {translate(
+                'auto.components.skills.SkillShareSelectionControls.01c5a15e02',
+                'Share skills'
+              )}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={onInstallFromLink}>
+              <Download className="size-3.5" />
+              {translate('auto.components.skills.SkillsPage.aee7b99cc6', 'Install from link')}
+            </Button>
+          </>
+        ) : null}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -118,10 +123,12 @@ export function SkillsPageHeader({
               <History />
               {translate('auto.components.skills.SkillsPage.c13b82793c', 'Manage installs')}
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={onOpenSharedLinks}>
-              <Link2 />
-              {translate('auto.components.skills.SkillsPage.sharedLinks', 'Shared links')}
-            </DropdownMenuItem>
+            {!isForflowBuild() ? (
+              <DropdownMenuItem onSelect={onOpenSharedLinks}>
+                <Link2 />
+                {translate('auto.components.skills.SkillsPage.sharedLinks', 'Shared links')}
+              </DropdownMenuItem>
+            ) : null}
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="pointer-events-auto block">

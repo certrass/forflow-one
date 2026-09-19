@@ -25,6 +25,9 @@ import {
   notifyOrchestrationSetupStateChanged
 } from '@/lib/orchestration-setup-state'
 import type { EventProps } from '../../../../shared/telemetry-events'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { completeOnboardingSkillSetup } from './onboarding-skill-install'
+import { registerOnboardingCli } from './onboarding-cli-registration'
 
 export type OnboardingFeatureSetupId =
   | 'browserUse'
@@ -121,6 +124,9 @@ export function buildOnboardingFeatureSetupClipboardText(
 export function buildOnboardingFeatureSetupSkillCommand(
   selection: OnboardingFeatureSetupSelection
 ): string | null {
+  if (isForflowBuild()) {
+    return null
+  }
   const skillNames = selectedOnboardingFeatureSetupIds(selection).map(
     (id) => FEATURE_SKILL_NAMES[id]
   )
@@ -224,6 +230,27 @@ export async function runOnboardingFeatureSetup(
   const skillInstallCommand = buildOnboardingFeatureSetupSkillCommand(selection)
   let computerUsePermissionsOpened = false
 
+  if (
+    isForflowBuild() &&
+    (runtimeContext?.canUseLocalSkillFreshness === false ||
+      agentRuntime?.runtime === 'wsl' ||
+      runtimeContext?.installDisabledReason)
+  ) {
+    return {
+      selectedIds,
+      cliTouched,
+      skillCommandsCopied,
+      skillInstallCommand,
+      computerUsePermissionsOpened,
+      warnings: [
+        {
+          featureId: 'skills',
+          message: '内置技能安装仅作用于本机。请切换到本地环境，远程或 WSL 环境请由管理员分发技能。'
+        }
+      ]
+    }
+  }
+
   deps.setStorageItem(BROWSER_USE_ENABLED_STORAGE_KEY, selection.browserUse ? '1' : '0')
   deps.setStorageItem(ORCHESTRATION_ENABLED_STORAGE_KEY, selection.orchestration ? '1' : '0')
   if (selection.orchestration) {
@@ -242,35 +269,7 @@ export async function runOnboardingFeatureSetup(
     }
   }
 
-  try {
-    const status = await deps.getCliStatus()
-    if (!status.supported) {
-      warnings.push({
-        featureId: 'cli',
-        message: status.detail ?? 'Orca CLI registration is not available on this platform.'
-      })
-    } else if (status.pathConfigured === null) {
-      // Why: an unknown registry read cannot safely drive a PATH read-modify-write.
-      warnings.push({
-        featureId: 'cli',
-        message: status.detail ?? 'Orca could not check your Windows user PATH.'
-      })
-    } else if (status.state !== 'installed' || status.pathConfigured === false) {
-      await deps.showCliRegistrationPrompt?.()
-      const next = await deps.installCli()
-      cliTouched = true
-      if (next.state !== 'installed') {
-        warnings.push({
-          featureId: 'cli',
-          message: next.detail ?? 'Orca CLI registration needs attention.'
-        })
-      } else if (next.pathConfigured !== true && next.detail) {
-        warnings.push({ featureId: 'cli', message: next.detail })
-      }
-    }
-  } catch (error) {
-    warnings.push({ featureId: 'cli', message: formatFeatureSetupError(error) })
-  }
+  cliTouched = await registerOnboardingCli(deps, warnings)
 
   if (selection.computerUse) {
     try {
@@ -302,7 +301,12 @@ export async function runOnboardingFeatureSetup(
     }
   }
 
-  skillCommandsCopied = await copySkillCommands(selection, deps, warnings, agentRuntime)
+  skillCommandsCopied = await completeOnboardingSkillSetup(
+    selectedIds.map((id) => FEATURE_SKILL_NAMES[id]),
+    buildOnboardingFeatureSetupClipboardText(selection, agentRuntime),
+    deps,
+    warnings
+  )
 
   return {
     selectedIds,
@@ -316,23 +320,4 @@ export async function runOnboardingFeatureSetup(
 
 function formatFeatureSetupError(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
-}
-
-async function copySkillCommands(
-  selection: OnboardingFeatureSetupSelection,
-  deps: OnboardingFeatureSetupDeps,
-  warnings: OnboardingFeatureSetupWarning[],
-  agentRuntime?: ProjectAgentSkillRuntime
-): Promise<boolean> {
-  const clipboardText = buildOnboardingFeatureSetupClipboardText(selection, agentRuntime)
-  if (!clipboardText) {
-    return false
-  }
-  try {
-    await deps.writeClipboardText(clipboardText)
-    return true
-  } catch (error) {
-    warnings.push({ featureId: 'skills', message: formatFeatureSetupError(error) })
-    return false
-  }
 }

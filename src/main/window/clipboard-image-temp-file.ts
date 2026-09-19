@@ -7,6 +7,7 @@ import { requireSshFilesystemProvider } from '../providers/ssh-filesystem-dispat
 import { isWindowsAbsolutePathLike } from '../../shared/cross-platform-path'
 import { assertClipboardImageByteLengthWithinLimit } from '../../shared/clipboard-image'
 import { authorizeExternalPath } from '../ipc/filesystem-auth'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 
 export type SaveClipboardImageAsTempFileArgs = {
   connectionId?: string | null
@@ -31,9 +32,19 @@ export async function saveClipboardImageBufferAsTempFile(
   const fileName = `orca-paste-${Date.now()}-${randomUUID()}.png`
 
   if (args?.connectionId) {
+    const validate = isForflowPrivateDeployment()
+      ? await (
+          await import('../forflow/transfer-approval')
+        ).confirmForflowSshTransfer(
+          args.connectionId,
+          `将上传剪贴板图片，共 ${buffer.byteLength} 字节。`,
+          '远端临时目录'
+        )
+      : () => {}
     const provider = requireSshFilesystemProvider(args.connectionId)
     const remoteTempDir = (await provider.getTempDir?.()) ?? REMOTE_CLIPBOARD_IMAGE_TEMP_DIR
     const remotePath = joinRemotePath(remoteTempDir, fileName)
+    validate()
     // Why: SSH terminal agents run on the remote host, so the pasted path must
     // name a remote file. The provider's base64 path writes binary bytes via SFTP.
     await provider.writeFileBase64(remotePath, buffer.toString('base64'))

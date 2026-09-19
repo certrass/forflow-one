@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import type { SkillCloudOwnedShare } from '../../../../shared/skill-cloud-contract'
@@ -32,6 +33,10 @@ export function useOwnedSkillShares(): OwnedSkillShares {
   const generation = useRef(0)
 
   const load = useCallback(async (): Promise<void> => {
+    if (isForflowBuild()) {
+      setLoading(false)
+      return
+    }
     const current = ++generation.current
     setLoading(true)
     setError(null)

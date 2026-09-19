@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../shared/product-branding'
 import { LinearIcon } from '@/components/icons/LinearIcon'
 import { getAccountsPaneSearchEntries } from '@/components/settings/accounts-search'
 import { getAgentsPaneSearchEntries } from '@/components/settings/agents-search'
@@ -130,13 +131,20 @@ export function buildSetupSettingsSections({
       ? [
           {
             id: 'orca-account',
-            title: translate('auto.components.settings.orcaAccount.title', 'Orca Account'),
-            description: translate(
-              'auto.components.settings.orcaAccount.description',
-              'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
-            ),
+            title: isForflowBuild()
+              ? translate('forflow.identity.heading', 'Forflow 企业账号')
+              : translate('auto.components.settings.orcaAccount.title', 'Orca Account'),
+            description: isForflowBuild()
+              ? translate(
+                  'forflow.identity.sectionDescription',
+                  '连接部署方的身份服务，管理团队账号和登录记录。'
+                )
+              : translate(
+                  'auto.components.settings.orcaAccount.description',
+                  'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
+                ),
             icon: CircleUserRound,
-            searchEntries: getOrcaAccountSettingsSearchEntries(),
+            searchEntries: isForflowBuild() ? [] : getOrcaAccountSettingsSearchEntries(),
             group: 'setup'
           }
         ]

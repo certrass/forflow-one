@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { pickTuiAgent } from '../../../../shared/tui-agent-selection'
@@ -24,8 +25,7 @@ import {
 
 import { useOnboardingFlowActions } from './use-onboarding-flow-actions'
 import { useOnboardingFlowTelemetry } from './use-onboarding-flow-telemetry'
-export { STEPS } from './use-onboarding-flow-types'
-export type { StepId, StepNumber } from './use-onboarding-flow-types'
+export { STEPS, type StepId, type StepNumber } from './use-onboarding-flow-types'
 
 export function useOnboardingFlow(
   onboarding: OnboardingState,
@@ -48,7 +48,7 @@ export function useOnboardingFlow(
   // Why: renderToStaticMarkup uses Zustand's initial snapshot; the sync read keeps tests and the first client render aligned.
   const effectivePreflightStatus = preflightStatus ?? useAppStore.getState().preflightStatus
 
-  const skipIntegrations = shouldSkipIntegrationsStep(effectivePreflightStatus)
+  const skipIntegrations = !isForflowBuild() && shouldSkipIntegrationsStep(effectivePreflightStatus)
   const skipWindowsTerminal = shouldSkipWindowsTerminalStep(isWindowsUserAgent())
   const skipOptions = useMemo(
     () => ({ skipIntegrations, skipWindowsTerminal }),

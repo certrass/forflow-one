@@ -68,7 +68,7 @@ export function AgentCapabilitiesSetupAction(props: {
     if (setupBusyLabel !== null || featureSetupCommand !== null) {
       return
     }
-    setSetupBusyLabel('Setting up capabilities...')
+    setSetupBusyLabel(translate('forflow.skills.settingUp', '正在配置能力…'))
     try {
       const result = await runOnboardingFeatureSetup(featureSetup, undefined, activeSkillRuntime)
       if (featureSetup.browserUse) {
@@ -275,7 +275,11 @@ function AgentCapabilitySetupChecklist(props: {
               type="button"
               role="checkbox"
               aria-checked={selected}
-              aria-label={`${selected ? 'Disable' : 'Enable'} ${row.title}`}
+              aria-label={
+                selected
+                  ? translate('forflow.skills.disable', '取消选择 {{name}}', { name: row.title })
+                  : translate('forflow.skills.enable', '选择 {{name}}', { name: row.title })
+              }
               className={cn(
                 'flex min-h-24 flex-col rounded-lg border px-4 py-3 text-left transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',

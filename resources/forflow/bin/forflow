@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+FORFLOW_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$FORFLOW_SOURCE" ]; do
+  FORFLOW_DIR="$(cd -P "$(dirname "$FORFLOW_SOURCE")" && pwd)"
+  FORFLOW_SOURCE="$(readlink "$FORFLOW_SOURCE")"
+  [[ "$FORFLOW_SOURCE" != /* ]] && FORFLOW_SOURCE="$FORFLOW_DIR/$FORFLOW_SOURCE"
+done
+FORFLOW_CONTENTS="$(cd -P "$(dirname "$FORFLOW_SOURCE")/../.." && pwd)"
+export ORCA_USER_DATA_PATH="${ORCA_USER_DATA_PATH:-$HOME/Library/Application Support/Forflow One}"
+export FORFLOW_DEPLOYMENT_PROFILE=cn-private
+export ORCA_TELEMETRY_DISABLED=1
+export ORCA_NODE_OPTIONS="${NODE_OPTIONS-}"
+export ORCA_NODE_REPL_EXTERNAL_MODULE="${NODE_REPL_EXTERNAL_MODULE-}"
+unset NODE_OPTIONS NODE_REPL_EXTERNAL_MODULE
+ELECTRON_RUN_AS_NODE=1 exec "$FORFLOW_CONTENTS/MacOS/Forflow One" "$FORFLOW_CONTENTS/Resources/app.asar.unpacked/out/cli/index.js" "$@"

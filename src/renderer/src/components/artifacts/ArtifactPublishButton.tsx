@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import type { ComponentProps } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Loader2, Share2 } from 'lucide-react'
 import type { ArtifactWriteRequest } from '../../../../shared/artifacts'
@@ -17,7 +19,7 @@ type PublishedLinkLookup = {
   shareUrl: string | null
 }
 
-export function ArtifactPublishButton({
+function UpstreamArtifactPublishButton({
   sourceKey,
   createRequest,
   className,
@@ -292,4 +294,10 @@ export function ArtifactPublishButton({
       </PopoverContent>
     </Popover>
   )
+}
+
+export function ArtifactPublishButton(
+  props: ComponentProps<typeof UpstreamArtifactPublishButton>
+): React.JSX.Element | null {
+  return isForflowBuild() ? null : <UpstreamArtifactPublishButton {...props} />
 }

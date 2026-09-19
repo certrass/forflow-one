@@ -4,6 +4,7 @@ export type OnboardingFeatureSetupRuntimeContext = {
   agentRuntime?: ProjectAgentSkillRuntime
   installDisabledReason: string | null
   terminalShellOverride?: string
+  canUseLocalSkillFreshness?: boolean
 }
 
 export function getOnboardingFeatureSetupAgentRuntime(

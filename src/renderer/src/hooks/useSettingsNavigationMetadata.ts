@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { isForflowBuild } from '../../../shared/product-branding'
 import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
 // Why: this registry mirrors the Settings sidebar in one neutral module so
@@ -92,7 +93,11 @@ export function buildSettingsNavigationMetadata({
     ...buildWorkflowSettingsSections(options, terminalPaneSearchEntries),
     ...buildInterfaceSettingsSections(options),
     ...buildRemoteSettingsSections(options, runtimeEnvironmentsSearchEntry, reposById)
-  ]
+  ].filter(
+    (section) =>
+      !isForflowBuild() ||
+      !['artifacts', 'share-skills', 'mobile', 'dev-tools'].includes(section.id)
+  )
 }
 
 export function useSettingsNavigationMetadata(): SettingsNavSection[] {

@@ -1,6 +1,8 @@
+import { copySkillSetupCommand } from './copy-skill-setup-command'
+import { ForflowOfflineSkillSetup } from './ForflowOfflineSkillSetup'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Copy, Loader2, RefreshCw, Terminal } from 'lucide-react'
-import { toast } from 'sonner'
 import { IntegrationStatusPill } from '../integration-status-pill'
 import { SkillFreshnessStatusPill } from '../skills/SkillFreshnessStatusPill'
 import { OnboardingInlineCommandTerminal } from '../onboarding/OnboardingInlineCommandTerminal'
@@ -18,7 +20,7 @@ import { isOrcaCliAvailableOnPath } from '@/lib/agent-skill-cli-prerequisite'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
 
-export function AgentSkillSetupPanel({
+function UpstreamAgentSkillSetupPanel({
   title,
   description,
   command,
@@ -182,23 +184,7 @@ export function AgentSkillSetupPanel({
     }
   }
 
-  const copyActiveCommand = async (): Promise<void> => {
-    try {
-      await window.api.ui.writeClipboardText(openTerminalCommand)
-      toast.success(
-        translate('auto.components.settings.AgentSkillSetupPanel.copiedCommand', 'Copied command.')
-      )
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : translate(
-              'auto.components.settings.AgentSkillSetupPanel.failedToCopyCommand',
-              'Failed to copy command.'
-            )
-      )
-    }
-  }
+  const copyActiveCommand = (): Promise<void> => copySkillSetupCommand(openTerminalCommand)
 
   const actionRow = (
     <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -410,4 +396,9 @@ export function AgentSkillSetupPanel({
       ) : null}
     </div>
   )
+}
+
+export function AgentSkillSetupPanel(props: AgentSkillSetupPanelProps): React.JSX.Element {
+  const Panel = isForflowBuild() ? ForflowOfflineSkillSetup : UpstreamAgentSkillSetupPanel
+  return <Panel {...props} />
 }

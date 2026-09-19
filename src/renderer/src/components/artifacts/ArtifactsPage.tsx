@@ -1,3 +1,5 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { ForflowSetupGuide } from '../settings/ForflowSetupGuide'
 import { useEffect, useState } from 'react'
 import type { ArtifactCloudOperation, ArtifactListItem } from '../../../../shared/artifacts'
 import { useConfirmationDialog } from '@/components/confirmation-dialog-context'
@@ -17,7 +19,7 @@ import { artifactAccountIdentity, useArtifactPagination } from './useArtifactPag
 
 const LOCAL_RUNTIME = { kind: 'local' } as const
 
-export default function ArtifactsPage(): React.JSX.Element {
+function UpstreamArtifactsPage(): React.JSX.Element {
   const closePage = useAppStore((state) => state.closeArtifactsPage)
   const authStatus = useAppStore((state) => state.orcaProfileAuthStatus)
   const connecting = useAppStore((state) => state.orcaProfileConnecting)
@@ -233,5 +235,15 @@ export default function ArtifactsPage(): React.JSX.Element {
         onDelete={(target) => void deleteArtifact(target)}
       />
     </main>
+  )
+}
+
+export default function ArtifactsPage(): React.JSX.Element {
+  return isForflowBuild() ? (
+    <div className="overflow-auto scrollbar-sleek p-6">
+      <ForflowSetupGuide />
+    </div>
+  ) : (
+    <UpstreamArtifactsPage />
   )
 }

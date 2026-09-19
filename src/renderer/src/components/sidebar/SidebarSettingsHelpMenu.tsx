@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import logo from '../../../../../resources/logo.svg'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -253,20 +254,26 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
               )}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleOpenFeedback}>
-              <MessageSquareText className="size-3.5" />
-              {translate(
-                'auto.components.sidebar.SidebarSettingsHelpMenu.4cf5b868d7',
-                'Send Feedback'
-              )}
-            </DropdownMenuItem>
+            {!isForflowBuild() && (
+              <DropdownMenuItem onSelect={handleOpenFeedback}>
+                <MessageSquareText className="size-3.5" />
+                {translate(
+                  'auto.components.sidebar.SidebarSettingsHelpMenu.4cf5b868d7',
+                  'Send Feedback'
+                )}
+              </DropdownMenuItem>
+            )}
             {showMilestones ? (
               <DropdownMenuItem onSelect={openMilestones}>
                 <img
                   src={logo}
                   alt=""
                   aria-hidden="true"
-                  className="size-3.5 object-contain invert opacity-55 dark:invert-0"
+                  className={
+                    isForflowBuild()
+                      ? 'size-5 rounded object-contain'
+                      : 'size-3.5 object-contain invert opacity-55 dark:invert-0'
+                  }
                 />
                 {translate(
                   'auto.components.sidebar.SidebarSettingsHelpMenu.f8a2c91d4e',
@@ -291,41 +298,48 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
                 'Onboarding'
               )}
             </DropdownMenuItem>
-            <ExternalMenuItem
-              label={translate(
-                'auto.components.sidebar.SidebarSettingsHelpMenu.cdc87f897e',
-                'Docs'
-              )}
-              url={DOCS_URL}
-              icon={<BookOpen className="size-3.5" />}
-            />
-            <ExternalMenuItem
-              label={translate(
-                'auto.components.sidebar.SidebarSettingsHelpMenu.5f83d86d92',
-                'Changelog'
-              )}
-              url={CHANGELOG_URL}
-              icon={<ScrollText className="size-3.5" />}
-            />
-            <DropdownMenuSeparator />
-            <ExternalMenuItem
-              label={translate(
-                'auto.components.sidebar.SidebarSettingsHelpMenu.5687ab246a',
-                'GitHub'
-              )}
-              url={GITHUB_URL}
-              icon={<Github className="size-3.5" />}
-            />
-            <DropdownMenuItem onSelect={() => openExternalUrl(DISCORD_URL)}>
-              <DiscordIcon />
-              {translate('auto.components.sidebar.SidebarSettingsHelpMenu.eb9884e55b', 'Discord')}
-              <ExternalLink className="ml-auto size-3 text-muted-foreground" />
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => openExternalUrl(X_URL)}>
-              <XIcon />
-              {translate('auto.components.sidebar.SidebarSettingsHelpMenu.c4f8e1b72a', 'X')}
-              <ExternalLink className="ml-auto size-3 text-muted-foreground" />
-            </DropdownMenuItem>
+            {!isForflowBuild() && (
+              <>
+                <ExternalMenuItem
+                  label={translate(
+                    'auto.components.sidebar.SidebarSettingsHelpMenu.cdc87f897e',
+                    'Docs'
+                  )}
+                  url={DOCS_URL}
+                  icon={<BookOpen className="size-3.5" />}
+                />
+                <ExternalMenuItem
+                  label={translate(
+                    'auto.components.sidebar.SidebarSettingsHelpMenu.5f83d86d92',
+                    'Changelog'
+                  )}
+                  url={CHANGELOG_URL}
+                  icon={<ScrollText className="size-3.5" />}
+                />
+                <DropdownMenuSeparator />
+                <ExternalMenuItem
+                  label={translate(
+                    'auto.components.sidebar.SidebarSettingsHelpMenu.5687ab246a',
+                    'GitHub'
+                  )}
+                  url={GITHUB_URL}
+                  icon={<Github className="size-3.5" />}
+                />
+                <DropdownMenuItem onSelect={() => openExternalUrl(DISCORD_URL)}>
+                  <DiscordIcon />
+                  {translate(
+                    'auto.components.sidebar.SidebarSettingsHelpMenu.eb9884e55b',
+                    'Discord'
+                  )}
+                  <ExternalLink className="ml-auto size-3 text-muted-foreground" />
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => openExternalUrl(X_URL)}>
+                  <XIcon />
+                  {translate('auto.components.sidebar.SidebarSettingsHelpMenu.c4f8e1b72a', 'X')}
+                  <ExternalLink className="ml-auto size-3 text-muted-foreground" />
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               disabled={updateStatus.state === 'checking' || updateStatus.state === 'downloading'}

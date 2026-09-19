@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import type React from 'react'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import { useAppStore } from '../../store'
@@ -232,7 +233,7 @@ export function GeneralPane({
           {section}
         </div>
       ))}
-      {matchesSettingsSearch(searchQuery, getGeneralSupportSearchEntries()) ? (
+      {!isForflowBuild() && matchesSettingsSearch(searchQuery, getGeneralSupportSearchEntries()) ? (
         <GeneralSupportSection hasPrecedingSections={visibleSections.length > 0} />
       ) : null}
     </div>

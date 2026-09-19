@@ -1,9 +1,10 @@
 import { LOCAL_BUILD_COMPATIBILITY_CONTRACT } from './local-build-compatibility-contract'
+import { getProductIdentity } from './product-branding'
 
 export const LOCAL_BUILD_COMPATIBILITY_FILENAME = 'orca-local-build.json'
 export const LOCAL_BUILD_COMPATIBILITY_FORMAT_VERSION =
   LOCAL_BUILD_COMPATIBILITY_CONTRACT.formatVersion
-export const ORCA_APP_ID = LOCAL_BUILD_COMPATIBILITY_CONTRACT.appId
+export const ORCA_APP_ID = getProductIdentity().appId
 
 export type LocalBuildArchitecture = 'arm64' | 'x64'
 

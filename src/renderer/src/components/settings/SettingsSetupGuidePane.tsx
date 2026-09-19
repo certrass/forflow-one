@@ -6,6 +6,7 @@ import {
 import type { FeatureWallSetupStepId } from '../../../../shared/feature-wall-setup-steps'
 import { FeatureWallSetupChecklist } from '../feature-wall/FeatureWallSetupChecklist'
 import { useSettingsSetupGuideFullProgress } from './settings-setup-guide-progress'
+import { translate } from '@/i18n/i18n'
 
 export function SettingsSetupGuidePane(): React.JSX.Element {
   const setupSteps = useMemo(() => getFeatureWallSetupSteps(), [])
@@ -46,6 +47,11 @@ export function SettingsSetupGuidePane(): React.JSX.Element {
 
   return (
     <div className="h-[min(740px,calc(100vh-14rem))] min-h-[540px] px-7 py-6">
+      {!progress.ready ? (
+        <p className="mb-3 text-xs text-muted-foreground">
+          {translate('forflow.guide.checkingHint', '正在检测完成状态；可以先浏览各项设置。')}
+        </p>
+      ) : null}
       <FeatureWallSetupChecklist
         layout="embedded"
         activeStep={activeStep}

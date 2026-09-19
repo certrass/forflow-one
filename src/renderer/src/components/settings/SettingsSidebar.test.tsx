@@ -8,10 +8,31 @@ import { SettingsSidebar } from './SettingsSidebar'
 import { TooltipProvider } from '../ui/tooltip'
 import type { SettingsSetupGuideProgress } from './settings-setup-guide-progress'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
+import type * as ProductBranding from '../../../../shared/product-branding'
 
 const mocks = vi.hoisted(() => ({
+  forflow: false,
   useSettingsSetupGuideProgress: vi.fn()
 }))
+
+vi.mock('../../../../shared/product-branding', async (importOriginal) => ({
+  ...(await importOriginal<typeof ProductBranding>()),
+  isForflowBuild: () => mocks.forflow
+}))
+
+afterEach(() => {
+  mocks.forflow = false
+})
+
+it('keeps the Forflow checklist accessible while probing and after completion', () => {
+  mocks.forflow = true
+  mocks.useSettingsSetupGuideProgress.mockReturnValue(makeSetupGuideProgress({ ready: false }))
+  expect(renderSidebar()).toContain('入门清单，正在检测完成状态。')
+  mocks.useSettingsSetupGuideProgress.mockReturnValue(
+    makeSetupGuideProgress({ doneCount: 8, firstIncompleteStepId: null })
+  )
+  expect(renderSidebar()).toContain('Onboarding checklist, 8 of 8 done.')
+})
 
 vi.mock('@/hooks/useShortcutLabel', () => ({
   useShortcutLabel: () => '⌘F',

@@ -1,5 +1,11 @@
 import { assertClipboardImageByteLengthWithinLimit } from '../../shared/clipboard-image'
 import { callRuntimeEnvironment } from '../ipc/runtime-environment-transport-routing'
+import { confirmForflowRuntimeTransfer } from '../forflow/transfer-approval'
+
+type ClipboardUploadFence = {
+  expectedEnvironmentPairingRevision?: number
+  expectedEnvironmentRuntimeId?: string
+}
 
 const CLIPBOARD_IMAGE_UPLOAD_CHUNK_BASE64_CHARS = 512 * 1024
 const CLIPBOARD_IMAGE_SINGLE_FRAME_FALLBACK_BASE64_CHARS = 256 * 1024
@@ -9,14 +15,18 @@ async function callRuntimeClipboardMethod<TResult>(
   userDataPath: string,
   runtimeEnvironmentId: string,
   method: string,
-  params: unknown
+  params: unknown,
+  fence: ClipboardUploadFence
 ): Promise<TResult> {
   const response = await callRuntimeEnvironment(
     userDataPath,
     runtimeEnvironmentId,
     method,
     params,
-    CLIPBOARD_IMAGE_SAVE_TIMEOUT_MS
+    CLIPBOARD_IMAGE_SAVE_TIMEOUT_MS,
+    fence.expectedEnvironmentPairingRevision,
+    undefined,
+    { expectedEnvironmentRuntimeId: fence.expectedEnvironmentRuntimeId }
   )
   if (!response.ok) {
     throw new Error(response.error.message)
@@ -30,12 +40,21 @@ async function saveClipboardImageBase64InRuntime(
   contentBase64: string,
   connectionId: string | null
 ): Promise<string> {
+  const fence = await confirmForflowRuntimeTransfer(
+    userDataPath,
+    runtimeEnvironmentId,
+    `将上传剪贴板图片；编码后 ${contentBase64.length} 字符。${connectionId ? `\n运行环境内的 SSH 目标：${JSON.stringify(connectionId)}` : ''}`
+  )
+  runtimeEnvironmentId = fence.environmentId
   const startResponse = await callRuntimeEnvironment(
     userDataPath,
     runtimeEnvironmentId,
     'clipboard.startImageUpload',
     { expectedBase64Length: contentBase64.length, connectionId },
-    CLIPBOARD_IMAGE_SAVE_TIMEOUT_MS
+    CLIPBOARD_IMAGE_SAVE_TIMEOUT_MS,
+    fence.expectedEnvironmentPairingRevision,
+    undefined,
+    { expectedEnvironmentRuntimeId: fence.expectedEnvironmentRuntimeId }
   )
   if (!startResponse.ok) {
     if (
@@ -46,7 +65,8 @@ async function saveClipboardImageBase64InRuntime(
         userDataPath,
         runtimeEnvironmentId,
         'clipboard.saveImageAsTempFile',
-        { contentBase64, connectionId }
+        { contentBase64, connectionId },
+        fence
       )
     }
     throw new Error(startResponse.error.message)
@@ -77,14 +97,16 @@ async function saveClipboardImageBase64InRuntime(
             offset,
             offset + CLIPBOARD_IMAGE_UPLOAD_CHUNK_BASE64_CHARS
           )
-        }
+        },
+        fence
       )
     }
     const remotePath = await callRuntimeClipboardMethod<string>(
       userDataPath,
       runtimeEnvironmentId,
       'clipboard.commitImageUpload',
-      { uploadId }
+      { uploadId },
+      fence
     )
     if (typeof remotePath !== 'string') {
       throw new Error('Remote clipboard image save returned an invalid path')
@@ -99,7 +121,8 @@ async function saveClipboardImageBase64InRuntime(
       'clipboard.abortImageUpload',
       {
         uploadId
-      }
+      },
+      fence
     ).catch(() => {})
     throw error
   }
