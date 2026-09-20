@@ -89,7 +89,8 @@ export function CodexAccountUsage() {
       </dl>
       <p className="text-xs text-muted-foreground">
         账户范围 · {target?.runtime === 'wsl' ? `WSL ${target.wslDistro ?? ''}` : '本机登录'} ·{' '}
-        {formatUpdatedAt(limits?.updatedAt || null)}。套餐与额度不受下方日志的项目和时间筛选影响。
+        {limits?.updatedAt ? formatUpdatedAt(limits.updatedAt) : '尚未读取账户'}
+        。套餐与额度不受下方日志的项目和时间筛选影响。
       </p>
       {(error || limits?.error) && (
         <p role="alert" className="text-xs text-destructive">

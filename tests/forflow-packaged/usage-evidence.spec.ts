@@ -67,22 +67,21 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
   const { app, page, errors } = await launch(profile)
   try {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1600, 1150))
-    await page.evaluate(() => {
-      const read = window.api.rateLimits.get
-      window.api.rateLimits.get = async () => ({
-        ...(await read()),
-        codex: {
-          provider: 'codex',
-          planType: 'pro',
-          credits: { hasCredits: false, unlimited: false, balance: '0' },
-          session: null,
-          weekly: { usedPercent: 71, windowMinutes: 10080, resetsAt: null, resetDescription: null },
-          status: 'ok',
-          error: null,
-          updatedAt: Date.now()
-        }
-      })
-    })
+    const accountState = await page.evaluate(() => window.api.rateLimits.get())
+    accountState.codex = {
+      provider: 'codex',
+      planType: 'pro',
+      credits: { hasCredits: false, unlimited: false, balance: '0' },
+      session: null,
+      weekly: { usedPercent: 71, windowMinutes: 10080, resetsAt: null, resetDescription: null },
+      status: 'ok',
+      error: null,
+      updatedAt: Date.now()
+    }
+    await app.evaluate(({ ipcMain }, state) => {
+      ipcMain.removeHandler('rateLimits:get')
+      ipcMain.handle('rateLimits:get', () => state)
+    }, accountState)
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '统计和使用情况', exact: true }).click()
     const providerMenu = page.getByRole('button', { name: /使用情况分析提供商/ })

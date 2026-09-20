@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CodexUsageAudit } from '../../../../shared/codex-usage-audit-types'
 import { ChevronDown, ShieldCheck } from 'lucide-react'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -15,7 +16,7 @@ const AUDIT_DIMENSIONS = [
     name: '上下文',
     kind: 'context',
     status: '未关联',
-    visible: 'Codex 日志中的回合上下文与压缩事件；未留存的历史不能回填。',
+    visible: '当前提供商尚未关联回合上下文与用量记录。',
     missing: '每次调用实际发送的上下文版本、材料来源、裁剪与脱敏记录。'
   },
   {
@@ -29,7 +30,7 @@ const AUDIT_DIMENSIONS = [
     name: '工具调用',
     kind: 'tool',
     status: '未接入',
-    visible: 'Codex 日志中的工具名称、调用编号及返回记录；不从任意命令文本推断数据读取。',
+    visible: '当前提供商尚未接入工具审计明细。',
     missing: '工具名称、参数摘要、权限决定、结果状态，以及与模型调用的关联。'
   },
   {
@@ -40,6 +41,18 @@ const AUDIT_DIMENSIONS = [
     missing: '文件版本、表及字段范围、读取主体、授权依据与结果；不能从 Token 数反推。'
   }
 ] as const
+
+function auditStatus(
+  item: (typeof AUDIT_DIMENSIONS)[number],
+  audit: CodexUsageAudit | null,
+  fallback: string
+): string {
+  if (audit && item.kind !== 'data') {
+    const count = audit.counts[item.kind]
+    return count ? `Codex ${count.toLocaleString()} 条 · 局部可见` : 'Codex 当前片段无记录'
+  }
+  return item.status ?? fallback
+}
 
 export function UsageEvidencePanel({ selection }: { selection: UsageEvidenceSelection }) {
   const model = useUsageEvidence(selection)
@@ -70,7 +83,8 @@ export function UsageEvidencePanel({ selection }: { selection: UsageEvidenceSele
         </p>
         {audit && (
           <p className="text-xs text-muted-foreground">
-            Codex 明细：已读取 {audit.filesRead} / {audit.candidateFiles} 个候选日志文件；
+            Codex 明细（{new Date(audit.updatedAt).toLocaleString('zh-CN')}）：已读取{' '}
+            {audit.filesRead} / {audit.candidateFiles} 个候选日志文件；
             {audit.truncatedFiles} 个仅读取尾部。每次最多 8 个文件、每个 2 MiB，非全量审计。
             {audit.failedFiles > 0 ? ` ${audit.failedFiles} 个文件读取失败。` : ''}
             {audit.skippedUnknownScope > 0
@@ -111,9 +125,7 @@ export function UsageEvidencePanel({ selection }: { selection: UsageEvidenceSele
                   </Button>
                 </CollapsibleTrigger>
                 <p className="px-1 text-xs text-muted-foreground">
-                  {audit && item.kind !== 'data'
-                    ? `Codex ${audit.counts[item.kind].toLocaleString()} 条 · 局部可见`
-                    : (item.status ?? model.modelCoverage)}
+                  {auditStatus(item, audit, model.modelCoverage)}
                 </p>
               </div>
               <CollapsibleContent
@@ -122,16 +134,15 @@ export function UsageEvidencePanel({ selection }: { selection: UsageEvidenceSele
               >
                 <div className="space-y-2 rounded-md bg-muted/40 p-3 text-xs">
                   <p className="font-medium">
-                    {item.name} ·{' '}
-                    {audit && item.kind !== 'data'
-                      ? `Codex ${audit.counts[item.kind].toLocaleString()} 条 · 局部可见`
-                      : (item.status ?? model.modelCoverage)}
+                    {item.name} · {auditStatus(item, audit, model.modelCoverage)}
                   </p>
                   <p className="text-muted-foreground">
                     现有证据：
                     {item.name === '模型调用' && model.observedRecords === 0
                       ? '当前来源或范围尚无可核验的模型用量记录。'
-                      : item.visible}
+                      : audit && item.kind !== 'data'
+                        ? '以下为当前 Codex 日志片段中实际读到的记录。'
+                        : item.visible}
                   </p>
                   {audit && <CodexAuditDetails audit={audit} kind={item.kind} />}
                   <p className="text-muted-foreground">待补证据：{item.missing}</p>
