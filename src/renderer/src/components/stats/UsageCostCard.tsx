@@ -31,7 +31,7 @@ export function UsageCostCard({ selection }: { selection: UsageEvidenceSelection
       value: model.estimatedCostUsd === null ? '暂无金额' : formatUsageCost(model.estimatedCostUsd),
       description: model.hasReadError ? '读取异常 · 上次快照' : partial ? '已知部分' : '非实际扣费'
     },
-    settled: { value: '未接入账单', description: '待账单对账' },
+    settled: { value: '待对账金额', description: '官方账单入口见下方' },
     allocated: { value: '未配置分摊', description: '待设分摊规则' },
     unmetered: {
       value: model.observedRecords

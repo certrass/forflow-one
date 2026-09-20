@@ -17,7 +17,35 @@ function seedUsage(profile: string, id: string, model: string): void {
   }
   const records = [
     { type: 'session_meta', payload: { id, cwd: path.join(profile, 'folder-project') } },
-    { type: 'turn_context', payload: { model } },
+    {
+      timestamp,
+      type: 'turn_context',
+      payload: { model, cwd: path.join(profile, 'folder-project'), turn_id: id }
+    },
+    {
+      timestamp,
+      type: 'token_usage_record',
+      payload: { response_id: `response-${id}`, session_id: id, usage: tokens }
+    },
+    {
+      timestamp,
+      type: 'response_item',
+      payload: {
+        type: 'function_call',
+        name: 'exec',
+        call_id: `call-${id}`,
+        arguments: 'private test arguments'
+      }
+    },
+    {
+      timestamp,
+      type: 'response_item',
+      payload: {
+        type: 'function_call_output',
+        call_id: `call-${id}`,
+        output: 'private test output'
+      }
+    },
     {
       timestamp,
       type: 'event_msg',
@@ -39,6 +67,22 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
   const { app, page, errors } = await launch(profile)
   try {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1600, 1150))
+    await page.evaluate(() => {
+      const read = window.api.rateLimits.get
+      window.api.rateLimits.get = async () => ({
+        ...(await read()),
+        codex: {
+          provider: 'codex',
+          planType: 'pro',
+          credits: { hasCredits: false, unlimited: false, balance: '0' },
+          session: null,
+          weekly: { usedPercent: 71, windowMinutes: 10080, resetsAt: null, resetDescription: null },
+          status: 'ok',
+          error: null,
+          updatedAt: Date.now()
+        }
+      })
+    })
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '统计和使用情况', exact: true }).click()
     const providerMenu = page.getByRole('button', { name: /使用情况分析提供商/ })
@@ -57,10 +101,15 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
     seedUsage(profile, 'unknown-model', 'unpriced-private-model')
     await page.getByRole('button', { name: '刷新 Codex 使用量', exact: true }).click()
     await expect(panel).toContainText('已读取 2 条用量记录')
+    await expect(panel).toContainText('Codex 2 条 · 局部可见')
+    const account = page.getByLabel('Codex 套餐与额度')
+    await expect(account).toContainText('Pro')
+    await expect(account).toContainText('已用 71%')
+    await expect(account.getByText('0', { exact: true })).toBeVisible()
     await expect(cost).toContainText('已知部分')
     for (const [basis, value] of [
       ['不可计量', '1 条缺价'],
-      ['已结算', '未接入账单'],
+      ['已结算', '待对账金额'],
       ['套餐分摊', '未配置分摊'],
       ['估算', 'USD']
     ]) {
@@ -82,6 +131,16 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
       ).toHaveCount(1)
     }
     await panel.getByRole('button', { name: '数据读取审计详情' }).click()
+    await panel.getByRole('button', { name: '工具调用审计详情' }).click()
+    await expect(panel.getByLabel('工具调用审计证据')).toContainText('call-known-model')
+    await expect(panel.getByLabel('工具调用审计证据')).toContainText('已找到返回记录')
+    await expect(panel).not.toContainText('private test arguments')
+    await panel.getByRole('button', { name: '模型调用审计详情' }).click()
+    await expect(panel.getByLabel('模型调用审计证据')).toContainText('response-known-model')
+    const audit = await page.evaluate(() =>
+      window.api.codexUsage.getAudit?.({ scope: 'all', range: '30d' })
+    )
+    expect(audit?.counts).toEqual({ context: 2, request: 2, tool: 2, data: 0 })
     const summary = await page.evaluate(() =>
       window.api.codexUsage.getSummary({ scope: 'all', range: '30d' })
     )
@@ -90,6 +149,7 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
       unpricedRecords: 1,
       unclassifiedRecords: 0
     })
+    await panel.getByRole('button', { name: '模型调用审计详情' }).click()
     await filters.click()
     await page.getByRole('menuitemradio', { name: '仅 Forflow One 工作树', exact: true }).click()
     await expect(panel).toContainText('已读取 0 条用量记录')
@@ -170,7 +230,8 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
             'light and narrow dark',
             'hidden windows'
           ],
-          summary
+          summary,
+          audit
         },
         null,
         2

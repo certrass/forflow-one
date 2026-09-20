@@ -227,5 +227,10 @@
   "src/renderer/src/components/stats/usage-overview-model.test.ts",
   "src/main/codex-usage/store-model-pricing.test.ts",
   "src/main/claude-usage/store.test.ts",
-  "src/main/opencode-usage/store.test.ts"
+  "src/main/opencode-usage/store.test.ts",
+  "src/main/codex-usage/codex-usage-audit.test.ts",
+  "src/main/rate-limits/codex-account-metadata.test.ts",
+  "src/main/rate-limits/codex-rpc-rate-limit-probe.test.ts",
+  "src/main/rate-limits/codex-fetcher-backend.test.ts",
+  "src/renderer/src/components/stats/CodexAccountUsage.test.tsx"
 ]

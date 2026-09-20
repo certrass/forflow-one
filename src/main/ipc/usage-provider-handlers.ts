@@ -64,5 +64,18 @@ function registerProviderHandlers<Scope, Range, BreakdownKind>(
 export function registerUsageProviderHandlers(stores: UsageProviderStores): void {
   registerProviderHandlers('claudeUsage', stores.claudeUsage)
   registerProviderHandlers('codexUsage', stores.codexUsage)
+  ipcMain.handle('codexUsage:getAudit', (_event, args: unknown) => {
+    if (
+      !args ||
+      typeof args !== 'object' ||
+      !('scope' in args) ||
+      !('range' in args) ||
+      (args.scope !== 'all' && args.scope !== 'orca') ||
+      (args.range !== '7d' && args.range !== '30d' && args.range !== '90d' && args.range !== 'all')
+    ) {
+      throw new Error('审计查询范围无效')
+    }
+    return stores.codexUsage.getAudit(args.scope, args.range)
+  })
   registerProviderHandlers('openCodeUsage', stores.openCodeUsage)
 }

@@ -1,5 +1,6 @@
 import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared/claude-usage-types'
 import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
+import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
 import type {
   OpenCodeUsageBreakdownKind,
   OpenCodeUsageSnapshot
@@ -40,7 +41,9 @@ export type UsageProviderApi<Snapshot extends UsageProviderSnapshot, BreakdownKi
 
 export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBreakdownKind>
 
-export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind>
+export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind> & {
+  getAudit?: (args: UsageQueryArgs<CodexUsageSnapshot>) => Promise<CodexUsageAudit>
+}
 
 export type OpenCodeUsageApi = UsageProviderApi<OpenCodeUsageSnapshot, OpenCodeUsageBreakdownKind>
 

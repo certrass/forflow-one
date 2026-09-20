@@ -1,4 +1,9 @@
 import { app } from 'electron'
+import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
+import { readCodexUsageAudit } from './codex-usage-audit'
+import { createUsageWorktreeResolver } from '../usage/usage-worktree-resolver'
+import { createWorktreeRefs } from '../usage/usage-worktree-refs'
+import { loadKnownUsageWorktreesByRepo } from '../usage-worktree-metadata'
 import { join } from 'node:path'
 import type {
   CodexUsageBreakdownKind,
@@ -82,8 +87,11 @@ export class CodexUsageStore extends UsageProviderStoreLifecycle<
   CodexUsagePersistedState,
   'hasAnyCodexData'
 > {
-  constructor(store: Pick<Store, 'getRepos' | 'getAllWorktreeMeta'>) {
-    super(store, {
+  private auditCache: { key: string; expiresAt: number; value: Promise<CodexUsageAudit> } | null =
+    null
+
+  constructor(private readonly auditStore: Pick<Store, 'getRepos' | 'getAllWorktreeMeta'>) {
+    super(auditStore, {
       logTag: '[codex-usage]',
       resolveCacheFile: getCodexUsageFile,
       createDefaultState: getDefaultState,
@@ -92,6 +100,21 @@ export class CodexUsageStore extends UsageProviderStoreLifecycle<
       dataPresenceKey: 'hasAnyCodexData',
       scan: codexUsageProvider.scan
     })
+  }
+
+  getAudit(scope: CodexUsageScope, range: CodexUsageRange): Promise<CodexUsageAudit> {
+    const key = JSON.stringify([scope, range, this.state.scanState, this.state.worktreeFingerprint])
+    if (this.auditCache?.key === key && this.auditCache.expiresAt > Date.now()) {
+      return this.auditCache.value
+    }
+    const repos = this.auditStore.getRepos()
+    const refs = createWorktreeRefs(repos, loadKnownUsageWorktreesByRepo(this.auditStore, repos))
+    const state = this.state
+    const value = createUsageWorktreeResolver(refs).then((resolver) =>
+      readCodexUsageAudit(state, scope, range, resolver)
+    )
+    this.auditCache = { key, expiresAt: Date.now() + 30_000, value }
+    return value
   }
 
   getSnapshot(
