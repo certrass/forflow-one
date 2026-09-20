@@ -7,7 +7,6 @@ import { CodexUsagePane } from './CodexUsagePane'
 import { GrokUsagePane } from './GrokUsagePane'
 import { OpenCodeUsagePane } from './OpenCodeUsagePane'
 import { UsageOverviewPane } from './UsageOverviewPane'
-import { UsageEvidencePanel } from './UsageEvidencePanel'
 import { Button } from '../ui/button'
 import {
   DropdownMenu,
@@ -213,7 +212,6 @@ export function StatsPane(): React.JSX.Element {
             <GrokUsagePane />
           )}
         </div>
-        <UsageEvidencePanel selection={activeUsageTab} />
       </div>
     </div>
   )

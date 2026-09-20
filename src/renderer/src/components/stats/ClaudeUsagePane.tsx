@@ -1,21 +1,15 @@
 import { useEffect } from 'react'
-import {
-  Activity,
-  Coins,
-  DatabaseZap,
-  FolderKanban,
-  Gauge,
-  Sparkles,
-  Waypoints
-} from 'lucide-react'
+import { Activity, DatabaseZap, FolderKanban, Gauge, Sparkles, Waypoints } from 'lucide-react'
 import type { ClaudeUsageRange, ClaudeUsageScope } from '../../../../shared/claude-usage-types'
 import { useAppStore } from '../../store'
 import { ClaudeUsageDetails } from './ClaudeUsageDetails'
 import { ClaudeUsageLoadingState } from './ClaudeUsageLoadingState'
 import { ShareUsageButton } from './ShareUsageButton'
 import { StatCard } from './StatCard'
+import { UsageCostCard } from './UsageCostCard'
+import { UsageEvidencePanel } from './UsageEvidencePanel'
 import { UsageFilterRadioGroup, UsageTrackingPaneShell } from './UsageTrackingPaneShell'
-import { formatCost, formatTokens, formatUpdatedAt } from './usage-formatters'
+import { formatTokens, formatUpdatedAt } from './usage-formatters'
 import { translate } from '@/i18n/i18n'
 
 const RANGE_OPTIONS: ClaudeUsageRange[] = ['7d', '30d', '90d', 'all']
@@ -86,6 +80,7 @@ export function ClaudeUsagePane(): React.JSX.Element {
     return (
       <UsageTrackingPaneShell
         enabled={false}
+        summaryContent={<UsageEvidencePanel selection="claude" />}
         title={title}
         disabledDescription={translate(
           'auto.components.stats.ClaudeUsagePane.0cb1a36d7d',
@@ -164,85 +159,80 @@ export function ClaudeUsagePane(): React.JSX.Element {
           <ShareUsageButton provider="claude" summary={summary} daily={daily} range={range} />
         ) : undefined
       }
+      summaryContent={
+        <>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label={translate('auto.components.stats.ClaudeUsagePane.ea71fae8fc', 'Input tokens')}
+              value={formatTokens(summary?.inputTokens ?? 0)}
+              icon={<Sparkles className="size-4" />}
+            />
+            <StatCard
+              label={translate('auto.components.stats.ClaudeUsagePane.2b8a2f14aa', 'Output tokens')}
+              value={formatTokens(summary?.outputTokens ?? 0)}
+              icon={<Activity className="size-4" />}
+            />
+            <StatCard
+              label={translate('auto.components.stats.ClaudeUsagePane.268cf0af51', 'Cache read')}
+              value={formatTokens(summary?.cacheReadTokens ?? 0)}
+              icon={<DatabaseZap className="size-4" />}
+            />
+            <StatCard
+              label={translate('auto.components.stats.ClaudeUsagePane.b786fb4a70', 'Cache write')}
+              value={formatTokens(summary?.cacheWriteTokens ?? 0)}
+              icon={<Waypoints className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.ClaudeUsagePane.1634c4f404',
+                'Cache reuse rate'
+              )}
+              value={
+                summary?.cacheReuseRate !== null && summary?.cacheReuseRate !== undefined
+                  ? `${Math.round(summary.cacheReuseRate * 100)}%`
+                  : 'n/a'
+              }
+              icon={<Gauge className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.ClaudeUsagePane.8cc23be4a3',
+                'Zero-cache-read turns'
+              )}
+              value={
+                summary && summary.turns > 0
+                  ? `${Math.round((summary.zeroCacheReadTurns / summary.turns) * 100)}%`
+                  : 'n/a'
+              }
+              icon={<DatabaseZap className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.ClaudeUsagePane.0f3e696ca9',
+                'Sessions / Turns'
+              )}
+              value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.turns ?? 0).toLocaleString()}`}
+              icon={<FolderKanban className="size-4" />}
+            />
+            <UsageCostCard selection="claude" />
+          </div>
+          <p className="px-1 text-xs text-muted-foreground">
+            {translate(
+              'auto.components.stats.ClaudeUsagePane.51ae85fa00',
+              'Cache reuse rate is calculated as cache read tokens / (input tokens + cache read tokens).'
+            )}
+          </p>
+          <UsageEvidencePanel selection="claude" />
+        </>
+      }
     >
-      <>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            label={translate('auto.components.stats.ClaudeUsagePane.ea71fae8fc', 'Input tokens')}
-            value={formatTokens(summary?.inputTokens ?? 0)}
-            icon={<Sparkles className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.ClaudeUsagePane.2b8a2f14aa', 'Output tokens')}
-            value={formatTokens(summary?.outputTokens ?? 0)}
-            icon={<Activity className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.ClaudeUsagePane.268cf0af51', 'Cache read')}
-            value={formatTokens(summary?.cacheReadTokens ?? 0)}
-            icon={<DatabaseZap className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.ClaudeUsagePane.b786fb4a70', 'Cache write')}
-            value={formatTokens(summary?.cacheWriteTokens ?? 0)}
-            icon={<Waypoints className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.ClaudeUsagePane.1634c4f404',
-              'Cache reuse rate'
-            )}
-            value={
-              summary?.cacheReuseRate !== null && summary?.cacheReuseRate !== undefined
-                ? `${Math.round(summary.cacheReuseRate * 100)}%`
-                : 'n/a'
-            }
-            icon={<Gauge className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.ClaudeUsagePane.8cc23be4a3',
-              'Zero-cache-read turns'
-            )}
-            value={
-              summary && summary.turns > 0
-                ? `${Math.round((summary.zeroCacheReadTurns / summary.turns) * 100)}%`
-                : 'n/a'
-            }
-            icon={<DatabaseZap className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.ClaudeUsagePane.0f3e696ca9',
-              'Sessions / Turns'
-            )}
-            value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.turns ?? 0).toLocaleString()}`}
-            icon={<FolderKanban className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.ClaudeUsagePane.b26d4ddb58',
-              'Est. API-equivalent cost'
-            )}
-            value={formatCost(summary?.estimatedCostUsd ?? null)}
-            icon={<Coins className="size-4" />}
-          />
-        </div>
-        <p className="px-1 text-xs text-muted-foreground">
-          {translate(
-            'auto.components.stats.ClaudeUsagePane.51ae85fa00',
-            'Cache reuse rate is calculated as cache read tokens / (input tokens + cache read tokens).'
-          )}
-        </p>
-
-        <ClaudeUsageDetails
-          daily={daily}
-          modelBreakdown={modelBreakdown}
-          projectBreakdown={projectBreakdown}
-          recentSessions={recentSessions}
-          summary={summary}
-        />
-      </>
+      <ClaudeUsageDetails
+        daily={daily}
+        modelBreakdown={modelBreakdown}
+        projectBreakdown={projectBreakdown}
+        recentSessions={recentSessions}
+        summary={summary}
+      />
     </UsageTrackingPaneShell>
   )
 }

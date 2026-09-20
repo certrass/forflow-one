@@ -1,14 +1,16 @@
 import { useEffect, useMemo } from 'react'
-import { Activity, CalendarDays, Coins, DatabaseZap, RefreshCw, Sparkles } from 'lucide-react'
+import { Activity, CalendarDays, DatabaseZap, RefreshCw, Sparkles } from 'lucide-react'
 import { useAppStore } from '../../store'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { StatCard } from './StatCard'
+import { UsageCostCard } from './UsageCostCard'
+import { UsageEvidencePanel } from './UsageEvidencePanel'
 import { getRecentUsageDays } from './usage-overview-daily-series'
-import { buildUsageOverview, formatUsageCost, formatUsageTokens } from './usage-overview-model'
+import { buildUsageOverview, formatUsageTokens } from './usage-overview-model'
 import { DailyIntensityGrid, ProviderUsageRow, TokenMixBar } from './usage-overview-sections'
-import { translate } from '@/i18n/i18n'
+import { getIntlLocale, translate } from '@/i18n/i18n'
 
 const RECENT_DAY_COUNT = 42
 
@@ -24,7 +26,7 @@ function formatUpdatedAt(timestamp: number | null): string {
     return translate('forflow.usage.50e631f628', 'Not scanned yet')
   }
   return translate('forflow.usage.updated', 'Updated {{time}}', {
-    time: new Date(timestamp).toLocaleString()
+    time: new Date(timestamp).toLocaleString(getIntlLocale())
   })
 }
 
@@ -203,11 +205,7 @@ export function UsageOverviewPane(): React.JSX.Element {
                 value={formatUsageTokens(overview.totalTokens)}
                 icon={<Sparkles className="size-4" />}
               />
-              <StatCard
-                label={translate('auto.components.stats.UsageOverviewPane.0eaf937335', 'Est. cost')}
-                value={formatUsageCost(overview.estimatedCostUsd)}
-                icon={<Coins className="size-4" />}
-              />
+              <UsageCostCard selection="overview" />
               <StatCard
                 label={translate(
                   'auto.components.stats.UsageOverviewPane.327603fe8b',
@@ -226,6 +224,8 @@ export function UsageOverviewPane(): React.JSX.Element {
               />
             </div>
 
+            <UsageEvidencePanel selection="overview" />
+
             {!overview.hasAnyData ? (
               <div className="mt-4 rounded-lg border border-dashed border-border/60 bg-card/30 px-4 py-5 text-sm text-muted-foreground">
                 {translate(
@@ -241,6 +241,7 @@ export function UsageOverviewPane(): React.JSX.Element {
             )}
           </>
         )}
+        {!overview.hasAnyEnabledProvider && <UsageEvidencePanel selection="overview" />}
       </section>
 
       <section className="space-y-3">

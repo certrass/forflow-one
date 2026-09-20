@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Activity, Brain, Coins, DatabaseZap, FolderKanban, Sparkles } from 'lucide-react'
+import { Activity, Brain, DatabaseZap, FolderKanban, Sparkles } from 'lucide-react'
 import type {
   OpenCodeUsageRange,
   OpenCodeUsageScope
@@ -8,8 +8,10 @@ import { useAppStore } from '../../store'
 import { ClaudeUsageLoadingState } from './ClaudeUsageLoadingState'
 import { OpenCodeUsageDetails } from './OpenCodeUsageDetails'
 import { StatCard } from './StatCard'
+import { UsageCostCard } from './UsageCostCard'
+import { UsageEvidencePanel } from './UsageEvidencePanel'
 import { UsageFilterRadioGroup, UsageTrackingPaneShell } from './UsageTrackingPaneShell'
-import { formatCost, formatTokens, formatUpdatedAt } from './usage-formatters'
+import { formatTokens, formatUpdatedAt } from './usage-formatters'
 import { translate } from '@/i18n/i18n'
 
 const RANGE_OPTIONS: OpenCodeUsageRange[] = ['7d', '30d', '90d', 'all']
@@ -83,6 +85,7 @@ export function OpenCodeUsagePane(): React.JSX.Element {
     return (
       <UsageTrackingPaneShell
         enabled={false}
+        summaryContent={<UsageEvidencePanel selection="opencode" />}
         title={title}
         disabledDescription={translate(
           'auto.components.stats.OpenCodeUsagePane.b8b3522436',
@@ -162,61 +165,68 @@ export function OpenCodeUsagePane(): React.JSX.Element {
       )}
       onEnabledChange={handleSetEnabled}
       onRefresh={() => void refreshOpenCodeUsage()}
+      summaryContent={
+        <>
+          <div className="grid gap-3 md:grid-cols-3">
+            <StatCard
+              label={translate(
+                'auto.components.stats.OpenCodeUsagePane.d637a892ed',
+                'Input tokens'
+              )}
+              value={formatTokens(summary?.inputTokens ?? 0)}
+              icon={<Sparkles className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.OpenCodeUsagePane.7aa4d8ce35',
+                'Output tokens'
+              )}
+              value={formatTokens(summary?.outputTokens ?? 0)}
+              icon={<Activity className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.OpenCodeUsagePane.603504ee3b',
+                'Cached input'
+              )}
+              value={formatTokens(summary?.cachedInputTokens ?? 0)}
+              icon={<DatabaseZap className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.OpenCodeUsagePane.5a65d68b77',
+                'Reasoning output'
+              )}
+              value={formatTokens(summary?.reasoningOutputTokens ?? 0)}
+              icon={<Brain className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.OpenCodeUsagePane.7e9433469a',
+                'Sessions / Events'
+              )}
+              value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.events ?? 0).toLocaleString()}`}
+              icon={<FolderKanban className="size-4" />}
+            />
+            <UsageCostCard selection="opencode" />
+          </div>
+          <p className="px-1 text-xs text-muted-foreground">
+            {translate(
+              'auto.components.stats.OpenCodeUsagePane.e5bb23d85e',
+              'Cost comes from the local OpenCode database when the assistant message recorded one.'
+            )}
+          </p>
+          <UsageEvidencePanel selection="opencode" />
+        </>
+      }
     >
-      <>
-        <div className="grid gap-3 md:grid-cols-3">
-          <StatCard
-            label={translate('auto.components.stats.OpenCodeUsagePane.d637a892ed', 'Input tokens')}
-            value={formatTokens(summary?.inputTokens ?? 0)}
-            icon={<Sparkles className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.OpenCodeUsagePane.7aa4d8ce35', 'Output tokens')}
-            value={formatTokens(summary?.outputTokens ?? 0)}
-            icon={<Activity className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.OpenCodeUsagePane.603504ee3b', 'Cached input')}
-            value={formatTokens(summary?.cachedInputTokens ?? 0)}
-            icon={<DatabaseZap className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.OpenCodeUsagePane.5a65d68b77',
-              'Reasoning output'
-            )}
-            value={formatTokens(summary?.reasoningOutputTokens ?? 0)}
-            icon={<Brain className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.OpenCodeUsagePane.7e9433469a',
-              'Sessions / Events'
-            )}
-            value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.events ?? 0).toLocaleString()}`}
-            icon={<FolderKanban className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.OpenCodeUsagePane.15c34d4b08', 'Recorded cost')}
-            value={formatCost(summary?.estimatedCostUsd ?? null)}
-            icon={<Coins className="size-4" />}
-          />
-        </div>
-        <p className="px-1 text-xs text-muted-foreground">
-          {translate(
-            'auto.components.stats.OpenCodeUsagePane.e5bb23d85e',
-            'Cost comes from the local OpenCode database when the assistant message recorded one.'
-          )}
-        </p>
-
-        <OpenCodeUsageDetails
-          daily={daily}
-          modelBreakdown={modelBreakdown}
-          projectBreakdown={projectBreakdown}
-          recentSessions={recentSessions}
-          summary={summary}
-        />
-      </>
+      <OpenCodeUsageDetails
+        daily={daily}
+        modelBreakdown={modelBreakdown}
+        projectBreakdown={projectBreakdown}
+        recentSessions={recentSessions}
+        summary={summary}
+      />
     </UsageTrackingPaneShell>
   )
 }

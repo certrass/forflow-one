@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
-import { Activity, Brain, Coins, DatabaseZap, FolderKanban, Sparkles } from 'lucide-react'
+import { Activity, Brain, DatabaseZap, FolderKanban, Sparkles } from 'lucide-react'
 import type { CodexUsageRange, CodexUsageScope } from '../../../../shared/codex-usage-types'
 import { useAppStore } from '../../store'
 import { ClaudeUsageLoadingState } from './ClaudeUsageLoadingState'
 import { CodexUsageDetails } from './CodexUsageDetails'
 import { ShareUsageButton } from './ShareUsageButton'
 import { StatCard } from './StatCard'
+import { UsageCostCard } from './UsageCostCard'
+import { UsageEvidencePanel } from './UsageEvidencePanel'
 import { UsageFilterRadioGroup, UsageTrackingPaneShell } from './UsageTrackingPaneShell'
-import { formatCost, formatTokens, formatUpdatedAt } from './usage-formatters'
+import { formatTokens, formatUpdatedAt } from './usage-formatters'
 import { translate } from '@/i18n/i18n'
 
 const RANGE_OPTIONS: CodexUsageRange[] = ['7d', '30d', '90d', 'all']
@@ -75,6 +77,7 @@ export function CodexUsagePane(): React.JSX.Element {
     return (
       <UsageTrackingPaneShell
         enabled={false}
+        summaryContent={<UsageEvidencePanel selection="codex" />}
         title={title}
         disabledDescription={translate(
           'auto.components.stats.CodexUsagePane.13badcd8f2',
@@ -159,61 +162,59 @@ export function CodexUsagePane(): React.JSX.Element {
           <ShareUsageButton provider="codex" summary={summary} daily={daily} range={range} />
         ) : undefined
       }
+      summaryContent={
+        <>
+          <div className="grid gap-3 md:grid-cols-3">
+            <StatCard
+              label={translate('auto.components.stats.CodexUsagePane.e365eaa6fd', 'Input tokens')}
+              value={formatTokens(summary?.inputTokens ?? 0)}
+              icon={<Sparkles className="size-4" />}
+            />
+            <StatCard
+              label={translate('auto.components.stats.CodexUsagePane.5d8eba87bd', 'Output tokens')}
+              value={formatTokens(summary?.outputTokens ?? 0)}
+              icon={<Activity className="size-4" />}
+            />
+            <StatCard
+              label={translate('auto.components.stats.CodexUsagePane.a9ac0f423a', 'Cached input')}
+              value={formatTokens(summary?.cachedInputTokens ?? 0)}
+              icon={<DatabaseZap className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.CodexUsagePane.6e18146e9b',
+                'Reasoning output'
+              )}
+              value={formatTokens(summary?.reasoningOutputTokens ?? 0)}
+              icon={<Brain className="size-4" />}
+            />
+            <StatCard
+              label={translate(
+                'auto.components.stats.CodexUsagePane.907b31865f',
+                'Sessions / Events'
+              )}
+              value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.events ?? 0).toLocaleString()}`}
+              icon={<FolderKanban className="size-4" />}
+            />
+            <UsageCostCard selection="codex" />
+          </div>
+          <p className="px-1 text-xs text-muted-foreground">
+            {translate(
+              'auto.components.stats.CodexUsagePane.94ac1f1ee7',
+              'Reasoning tokens are shown for visibility, but cost is calculated from uncached input, cached input, and output only.'
+            )}
+          </p>
+          <UsageEvidencePanel selection="codex" />
+        </>
+      }
     >
-      <>
-        <div className="grid gap-3 md:grid-cols-3">
-          <StatCard
-            label={translate('auto.components.stats.CodexUsagePane.e365eaa6fd', 'Input tokens')}
-            value={formatTokens(summary?.inputTokens ?? 0)}
-            icon={<Sparkles className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.CodexUsagePane.5d8eba87bd', 'Output tokens')}
-            value={formatTokens(summary?.outputTokens ?? 0)}
-            icon={<Activity className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.CodexUsagePane.a9ac0f423a', 'Cached input')}
-            value={formatTokens(summary?.cachedInputTokens ?? 0)}
-            icon={<DatabaseZap className="size-4" />}
-          />
-          <StatCard
-            label={translate('auto.components.stats.CodexUsagePane.6e18146e9b', 'Reasoning output')}
-            value={formatTokens(summary?.reasoningOutputTokens ?? 0)}
-            icon={<Brain className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.CodexUsagePane.907b31865f',
-              'Sessions / Events'
-            )}
-            value={`${(summary?.sessions ?? 0).toLocaleString()} / ${(summary?.events ?? 0).toLocaleString()}`}
-            icon={<FolderKanban className="size-4" />}
-          />
-          <StatCard
-            label={translate(
-              'auto.components.stats.CodexUsagePane.1a18fbd56b',
-              'Est. API-equivalent cost'
-            )}
-            value={formatCost(summary?.estimatedCostUsd ?? null)}
-            icon={<Coins className="size-4" />}
-          />
-        </div>
-        <p className="px-1 text-xs text-muted-foreground">
-          {translate(
-            'auto.components.stats.CodexUsagePane.94ac1f1ee7',
-            'Reasoning tokens are shown for visibility, but cost is calculated from uncached input, cached input, and output only.'
-          )}
-        </p>
-
-        <CodexUsageDetails
-          daily={daily}
-          modelBreakdown={modelBreakdown}
-          projectBreakdown={projectBreakdown}
-          recentSessions={recentSessions}
-          summary={summary}
-        />
-      </>
+      <CodexUsageDetails
+        daily={daily}
+        modelBreakdown={modelBreakdown}
+        projectBreakdown={projectBreakdown}
+        recentSessions={recentSessions}
+        summary={summary}
+      />
     </UsageTrackingPaneShell>
   )
 }
