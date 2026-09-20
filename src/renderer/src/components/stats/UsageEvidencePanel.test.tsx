@@ -36,6 +36,7 @@ describe('usage evidence panel', () => {
     expect(screen.getByText('未配置分摊')).toBeVisible()
     expect(screen.getByText('尚无法判断')).toBeVisible()
     expect(screen.getByText('暂无可核验记录')).toBeVisible()
+    expect(screen.getByText('现有证据：当前来源或范围尚无可核验的模型用量记录。')).toBeVisible()
     expect(screen.queryByText(/100%|\$0/)).not.toBeInTheDocument()
   })
   it('shows Grok quota limitation after changing selection', () => {

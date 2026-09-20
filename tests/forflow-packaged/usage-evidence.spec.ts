@@ -95,8 +95,20 @@ test('usage evidence: real local scan, missing price, source filters and four au
       .click()
     await page.getByRole('button', { name: '统计和使用情况', exact: true }).click()
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1000, 720))
-    await panel.screenshot({
-      path: path.join(evidence, 'usage-evidence-dark.png'),
+    await panel.locator('h3').scrollIntoViewIfNeeded()
+    await expect(panel.locator('h3')).toBeInViewport()
+    await page.screenshot({
+      path: path.join(evidence, 'usage-evidence-dark-top.png'),
+      animations: 'disabled'
+    })
+    const lastDimension = panel
+      .getByLabel('审计覆盖明细')
+      .locator('p')
+      .filter({ hasText: /^数据读取/ })
+    await lastDimension.scrollIntoViewIfNeeded()
+    await expect(lastDimension).toBeInViewport()
+    await page.screenshot({
+      path: path.join(evidence, 'usage-evidence-dark-bottom.png'),
       animations: 'disabled'
     })
     expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)

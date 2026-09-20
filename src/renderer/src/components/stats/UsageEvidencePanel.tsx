@@ -1,4 +1,5 @@
 import { useAppStore } from '../../store'
+import { getIntlLocale } from '@/i18n/i18n'
 import { Badge } from '../ui/badge'
 import { buildUsageEvidence, type UsageEvidenceSelection } from './usage-evidence-model'
 import { formatUsageCost } from './usage-overview-model'
@@ -131,7 +132,7 @@ export function UsageEvidencePanel({
                 {source.scope} · {source.range} · {source.observedRecords.toLocaleString()}{' '}
                 {source.activityLabel === 'turns' ? '条轮次记录' : '条计量事件'}
                 {source.enabled && source.lastScanCompletedAt
-                  ? ` · 扫描于 ${new Date(source.lastScanCompletedAt).toLocaleString()}`
+                  ? ` · 扫描于 ${new Date(source.lastScanCompletedAt).toLocaleString(getIntlLocale())}`
                   : ''}
               </p>
               <p className="text-muted-foreground">
@@ -154,7 +155,12 @@ export function UsageEvidencePanel({
               {item.name}
               <Badge variant="outline">{item.status ?? model.modelCoverage}</Badge>
             </p>
-            <p className="text-xs text-muted-foreground">现有证据：{item.visible}</p>
+            <p className="text-xs text-muted-foreground">
+              现有证据：
+              {item.name === '模型调用' && model.observedRecords === 0
+                ? '当前来源或范围尚无可核验的模型用量记录。'
+                : item.visible}
+            </p>
             <p className="text-xs text-muted-foreground">待补证据：{item.missing}</p>
           </div>
         ))}
