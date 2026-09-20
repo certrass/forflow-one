@@ -1,6 +1,6 @@
 # Forflow One
 
-本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.21](docs/forflow/release-1.4.205-forflow.21.md) 已安装到本机，保留 `.20` 回退。默认仍打开原有自动化管理页，新增本机 Codex 任务只读入口，安装版真实读取到 8 项任务。
+本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.23](docs/forflow/release-1.4.205-forflow.23.md) 已安装到本机，保留 `.21` 回退。本版将费用口径切换和审计覆盖 Beta 融入原统计页，2,204 项回归及候选、安装版各 14 项 smoke 通过。
 
 使用请先看 [Forflow One 操作手册](docs/forflow/user-manual.md)；账号服务、权限和内部交付见 [管理员手册](docs/forflow/admin-manual.md)。
 
