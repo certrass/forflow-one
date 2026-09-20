@@ -63,6 +63,21 @@ describe('Feishu read-only CLI connection', () => {
     )
     expect(await new FeishuTaskClient(directory, { run, resolve }).status()).toEqual(status)
   })
+  it('explains an unconfigured real CLI instead of conflating it with network or login failure', async () => {
+    run.mockResolvedValue({
+      ...result(null),
+      code: 3,
+      stdout: '',
+      stderr: JSON.stringify({
+        ok: false,
+        error: { type: 'config', subtype: 'not_configured', message: 'not configured' }
+      })
+    })
+    await expect(client.connect()).rejects.toThrow('尚未配置飞书应用')
+    expect((await client.status()).connection).toBeNull()
+    run.mockResolvedValue(result(identity()))
+    expect((await client.connect()).connection?.userId).toBe('ou_user1')
+  })
   it('pins identity, uses literal JSON args, paginates without an unbounded fetch or mutation', async () => {
     await client.connect()
     const token = "$(touch /tmp/should-not-exist); ' token"

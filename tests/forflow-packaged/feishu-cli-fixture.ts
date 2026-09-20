@@ -1,11 +1,17 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
-export function createFeishuCliFixture(profile: string): { bin: string; ledger: string } {
+export function createFeishuCliFixture(profile: string): {
+  bin: string
+  ledger: string
+  state: string
+} {
   const bin = path.join(profile, 'fixture-bin')
   const ledger = path.join(profile, 'feishu-calls.jsonl')
+  const state = path.join(profile, 'feishu-fixture-state.txt')
   mkdirSync(bin)
   writeFileSync(ledger, '')
+  writeFileSync(state, 'ready')
   writeFileSync(
     path.join(bin, 'lark-cli'),
     `#!${process.execPath}
@@ -14,6 +20,10 @@ const args = process.argv.slice(2)
 fs.appendFileSync(${JSON.stringify(ledger)}, JSON.stringify(args) + '\\n')
 const task = {guid:'task-1',summary:'修复任务登录流程',description:'保留现有登录方式。完成后给出测试结果。',completed_at:'0',url:'https://applink.feishu.cn/client/todo/detail?guid=task-1',updated_at:'1789848000000'}
 if (args.includes('auth') && args.includes('status')) {
+  if (fs.readFileSync(${JSON.stringify(state)}, 'utf8') === 'not_configured') {
+    console.error(JSON.stringify({ok:false,error:{type:'config',subtype:'not_configured',message:'not configured',hint:'secret-must-not-render'}}))
+    process.exit(3)
+  }
   console.log(JSON.stringify({appId:'cli_fixture',brand:'feishu',identities:{user:{status:'ready',openId:'ou_fixture',userName:'隔离测试用户',scope:'task:task:read task:tasklist:read'}}}))
 } else {
   const index = args.indexOf('task')
@@ -28,5 +38,5 @@ if (args.includes('auth') && args.includes('status')) {
 `,
     { mode: 0o700 }
   )
-  return { bin, ledger }
+  return { bin, ledger, state }
 }

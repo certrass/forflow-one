@@ -190,6 +190,8 @@
   "src/renderer/src/components/native-chat/use-native-chat-interactive-send.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatMessageRow.test.tsx",
   "src/main/forflow/feishu-task-client.test.ts",
+  "src/main/forflow/feishu-cli-error.test.ts",
+  "src/renderer/src/components/settings/ForflowFeishuConnection.test.tsx",
   "src/main/forflow/feishu-task-ipc.test.ts",
   "src/shared/forflow-feishu.test.ts",
   "src/shared/task-providers.test.ts",

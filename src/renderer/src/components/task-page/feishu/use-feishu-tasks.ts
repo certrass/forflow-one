@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '@/store'
+import { readIpcErrorMessage } from '@/lib/ipc-error'
 import {
   getSettingsFocusedExecutionHostId,
   LOCAL_EXECUTION_HOST_ID
@@ -46,7 +47,7 @@ export function useFeishuTasks() {
         await action(isCurrent)
       } catch (cause) {
         if (isCurrent()) {
-          setError(cause instanceof Error ? cause.message : '读取失败，请重试。')
+          setError(readIpcErrorMessage(cause) ?? '读取失败，请重试。')
         }
       } finally {
         if (isCurrent()) {

@@ -7,12 +7,13 @@ import {
   getSettingsFocusedExecutionHostId,
   LOCAL_EXECUTION_HOST_ID
 } from '../../../../shared/execution-host'
-import type { FeishuStatus } from '../../../../shared/forflow-feishu'
+import { feishuProfileSchema, type FeishuStatus } from '../../../../shared/forflow-feishu'
 import { IntegrationCardShell, IntegrationCardDetails } from './integration-card-shell'
+import { readIpcErrorMessage } from '@/lib/ipc-error'
 
-export const FEISHU_SETUP_COMMANDS = [
+const FEISHU_SETUP_COMMANDS = [
   { title: '1. 安装官方 CLI（已有可跳过）', command: 'npm install -g @larksuite/cli' },
-  { title: '2. 配置飞书应用（已有可跳过）', command: 'lark-cli config init --new' },
+  { title: '2. 配置飞书应用（在提示中选择复用已有应用或新建）', command: 'lark-cli config init' },
   {
     title: '3. 授予任务读取权限',
     command: 'lark-cli auth login --scope "task:task:read task:tasklist:read offline_access"'
@@ -32,6 +33,14 @@ export function ForflowFeishuConnection({
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [profile, setProfile] = useState('')
+  const appId = profile.trim() || status?.connection?.appId || ''
+  const validProfile = feishuProfileSchema.safeParse(appId)
+  const setupCommands = FEISHU_SETUP_COMMANDS.map((step) => ({
+    ...step,
+    command: validProfile.success
+      ? step.command.replace('lark-cli auth', `lark-cli --profile ${validProfile.data} auth`)
+      : step.command
+  }))
   const update = useCallback(
     (value: FeishuStatus | null) => {
       setStatus(value)
@@ -73,10 +82,14 @@ export function ForflowFeishuConnection({
         await api.disconnect()
         update({ installed: true, connection: null })
       } else {
-        update(await api.connect(profile.trim() || status?.connection?.appId || undefined))
+        if (appId && !validProfile.success) {
+          setError('应用 ID 格式不正确，应以 cli_ 开头；留空可使用 CLI 默认应用。')
+          return
+        }
+        update(await api.connect(appId || undefined))
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '飞书连接失败，请重试。')
+      setError(readIpcErrorMessage(cause) ?? '飞书连接失败，请重试。')
     } finally {
       setBusy(false)
     }
@@ -135,14 +148,21 @@ export function ForflowFeishuConnection({
             绑定；不会退出其他工具的飞书登录。实际任务权限将在读取时验证。
           </p>
         ) : null}
-        <details open={!status?.connection}>
+        {!status?.connection && status ? (
+          <p className="text-xs text-muted-foreground">
+            {status.installed
+              ? '官方 CLI 已检测到；仍需完成应用配置和个人授权。'
+              : '尚未检测到官方 CLI，请先完成第 1 步安装。'}
+          </p>
+        ) : null}
+        <details open={Boolean(error) || !status?.connection}>
           <summary className="cursor-pointer text-sm font-medium">首次连接与授权指引</summary>
           <div className="mt-3 space-y-3">
             <p className="text-xs text-muted-foreground">
               在系统终端依次执行，按提示到飞书完成应用配置和个人授权，再点击上方“连接本机飞书”。企业管理员可能需要批准应用权限。密钥由官方
               CLI 管理，无需粘贴到 Forflow。
             </p>
-            {FEISHU_SETUP_COMMANDS.map((step) => (
+            {setupCommands.map((step) => (
               <div key={step.command} className="space-y-1">
                 <p className="text-sm">{step.title}</p>
                 <div className="flex items-start gap-2">
@@ -170,6 +190,7 @@ export function ForflowFeishuConnection({
                 onChange={(event) => setProfile(event.target.value)}
                 placeholder="cli_…，留空使用 CLI 默认应用"
                 autoComplete="off"
+                disabled={busy}
               />
             </label>
             <Button

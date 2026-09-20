@@ -15,6 +15,7 @@ import {
 } from '../../shared/forflow-feishu'
 import { resolveCommandOnLocalPath } from '../ipc/command-path-resolver'
 import { writeCredentialFileAtomic } from '../integration-credential-file'
+import { readFeishuCliError } from './feishu-cli-error'
 import {
   cliEnvelopeSchema,
   pageSchema,
@@ -96,8 +97,11 @@ export class FeishuTaskClient {
     if (result.timedOut) {
       throw new Error('飞书读取超时，请检查网络后重试。')
     }
-    if (result.code !== 0 || result.outputTruncated) {
-      throw new Error('飞书读取失败，请检查个人登录、应用权限和网络后重试；可按连接指引重新授权。')
+    if (result.outputTruncated) {
+      throw new Error('飞书返回内容超过读取上限，请缩小读取范围后重试。')
+    }
+    if (result.code !== 0) {
+      throw new Error(readFeishuCliError(result.stderr))
     }
     try {
       return JSON.parse(result.stdout)

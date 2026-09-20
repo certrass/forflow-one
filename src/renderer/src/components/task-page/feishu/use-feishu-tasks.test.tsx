@@ -103,7 +103,9 @@ it('clears loaded data and refuses local reads when switching to a remote runtim
 })
 
 it('keeps a recoverable error without claiming an empty successful result', async () => {
-  vi.mocked(api.tasks).mockRejectedValueOnce(new Error('授权已失效'))
+  vi.mocked(api.tasks).mockRejectedValueOnce(
+    new Error("Error invoking remote method 'forflow:feishu:tasks': Error: 授权已失效")
+  )
   const { result } = renderHook(() => useFeishuTasks())
   act(() => result.current.setStatus(status))
   await act(() => result.current.load())

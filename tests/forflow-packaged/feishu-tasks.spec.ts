@@ -10,6 +10,7 @@ import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electr
 test('Feishu: connect, tasklist, paging, editable import and unsent Codex draft', async () => {
   const profile = privateProfile('feishu-tasks')
   const cli = createFeishuCliFixture(profile)
+  writeFileSync(cli.state, 'not_configured')
   const codex = createChatProviderFixture(profile, 'codex')
   const file = path.join(profile, 'orca-data.json')
   const data = JSON.parse(readFileSync(file, 'utf8'))
@@ -31,7 +32,17 @@ test('Feishu: connect, tasklist, paging, editable import and unsent Codex draft'
     const connection = page.locator('[data-settings-section="forflow-feishu"]')
     await expect(connection).toContainText('首次连接与授权指引')
     await connection.scrollIntoViewIfNeeded()
+    await connection.getByRole('button', { name: '连接本机飞书', exact: true }).click()
+    await expect(connection.getByRole('alert')).toContainText('尚未配置飞书应用')
+    await expect(connection).not.toContainText('Error invoking remote method')
+    await expect(connection).not.toContainText('secret-must-not-render')
+    await expect(connection).toContainText('lark-cli config init')
+    await expect(connection).not.toContainText('config init --new')
+    await page.screenshot({ path: path.join(evidence, 'feishu-config-required.png') })
+    await connection.getByRole('textbox').fill('cli_fixture')
+    await expect(connection).toContainText('lark-cli --profile cli_fixture auth login')
     await page.screenshot({ path: path.join(evidence, 'feishu-setup.png') })
+    writeFileSync(cli.state, 'ready')
     await connection.getByRole('button', { name: '连接本机飞书', exact: true }).click()
     await expect(connection).toContainText('已绑定 · 隔离测试用户')
     expect(readFileSync(cli.ledger, 'utf8')).not.toContain('"task"')
@@ -82,7 +93,15 @@ test('Feishu: connect, tasklist, paging, editable import and unsent Codex draft'
     writeFileSync(
       path.join(evidence, 'feishu-task-receipt.json'),
       JSON.stringify(
-        { packageFingerprint, calls, errors, liveFeishu: false, draftSent: false },
+        {
+          packageFingerprint,
+          calls,
+          errors,
+          liveFeishu: false,
+          draftSent: false,
+          unconfiguredRecovery: true,
+          profileScopedAuthorization: true
+        },
         null,
         2
       )
