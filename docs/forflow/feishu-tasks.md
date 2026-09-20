@@ -40,4 +40,4 @@ Forflow 保存应用 ID、个人 ID 和显示名，使用官方 CLI 管理的凭
 
 官方 CLI 文档：[larksuite/cli](https://github.com/larksuite/cli)。本次源码合同锁定 [v1.0.84](https://github.com/larksuite/cli/tree/2d787fe5d6f35e279f39fe630328ad3689bf2aff)：`auth status --json`、个人身份、`task tasklists list/tasks`、`task tasks list/get`、显式分页与 JSON 响应。
 
-开发机 CLI 1.0.84 本次实际复现了退出码 3、`config/not_configured`；该状态与未安装 CLI、个人登录失效、应用权限不足分开处理。错误类型依据 [官方错误合同](https://github.com/larksuite/cli/blob/2d787fe5d6f35e279f39fe630328ad3689bf2aff/errs/ERROR_CONTRACT.md)，不直接展示可能含凭据的原始错误文本。单元与成品测试使用隔离的 CLI 合同夹具；实际租户授权、管理员审批及真实飞书接口仍需在配置后验证。版本发布结果见本版发布回执。
+开发机 CLI 1.0.84 本次实际复现了退出码 3、`config/not_configured`；该状态与未安装 CLI、个人登录失效、应用权限不足分开处理。错误类型依据 [官方错误合同](https://github.com/larksuite/cli/blob/2d787fe5d6f35e279f39fe630328ad3689bf2aff/errs/ERROR_CONTRACT.md)，不直接展示可能含凭据的原始错误文本。单元与成品测试使用隔离的 CLI 合同夹具；2026-09-20 另完成用户已有应用和个人授权，在已安装 `.20` 的实际配置中绑定并成功读取 2 条未完成任务、2 个任务清单。其他租户及应用的管理员配置仍需分别验证，见 [本版发布回执](release-1.4.205-forflow.20.md)。
