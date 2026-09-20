@@ -78,10 +78,6 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
       error: null,
       updatedAt: Date.now()
     }
-    await app.evaluate(({ ipcMain }, state) => {
-      ipcMain.removeHandler('rateLimits:get')
-      ipcMain.handle('rateLimits:get', () => state)
-    }, accountState)
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '统计和使用情况', exact: true }).click()
     const providerMenu = page.getByRole('button', { name: /使用情况分析提供商/ })
@@ -101,6 +97,9 @@ test('usage Beta: integrated cost switch, expandable evidence, real scan and fil
     await page.getByRole('button', { name: '刷新 Codex 使用量', exact: true }).click()
     await expect(panel).toContainText('已读取 2 条用量记录')
     await expect(panel).toContainText('Codex 2 条 · 局部可见')
+    await app.evaluate(({ BrowserWindow }, state) => {
+      BrowserWindow.getAllWindows()[0].webContents.send('rateLimits:update', state)
+    }, accountState)
     const account = page.getByLabel('Codex 套餐与额度')
     await expect(account).toContainText('Pro')
     await expect(account).toContainText('已用 71%')
