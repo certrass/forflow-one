@@ -1,4 +1,8 @@
 [
+  "src/main/automations/codex-automation-reader.test.ts",
+  "src/main/ipc/automations-external-scope.test.ts",
+  "src/renderer/src/components/automations/CodexAutomationsPanel.test.tsx",
+  "src/renderer/src/components/automations/codex-automation-display.test.ts",
   "config/scripts/forflow-model-probe.test.mjs",
   "src/main/macos-press-and-hold-default.test.ts",
   "src/main/updater.startup-scheduling.test.ts",

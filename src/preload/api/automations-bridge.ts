@@ -16,8 +16,11 @@ import type {
   ScopedExternalManagerUpdateRequest
 } from '../../shared/external-automation-scope'
 import type { AutomationsChangedPayload } from '../../shared/runtime-client-events'
+import type { CodexAutomationList } from '../../shared/codex-automations'
 
 export const automationsApi = {
+  listLocalCodex: (): Promise<CodexAutomationList> =>
+    ipcRenderer.invoke('automations:listLocalCodex'),
   listExternalManagerForOwner: (
     request: ScopedExternalManagerListRequest
   ): Promise<ExternalAutomationManagerResult> =>
