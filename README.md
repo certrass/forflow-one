@@ -1,10 +1,10 @@
 # Forflow One
 
-本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.20](docs/forflow/release-1.4.205-forflow.20.md) 已安装到本机，安装后 12 个 smoke 场景通过，`.19` 回退副本已保留。
+本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.21](docs/forflow/release-1.4.205-forflow.21.md) 已安装到本机，保留 `.20` 回退。默认仍打开原有自动化管理页，新增本机 Codex 任务只读入口，安装版真实读取到 8 项任务。
 
 使用请先看 [Forflow One 操作手册](docs/forflow/user-manual.md)；账号服务、权限和内部交付见 [管理员手册](docs/forflow/admin-manual.md)。
 
-飞书已有应用配置、个人授权和实际 Forflow 绑定已完成；真实只读验证成功读取 2 条未完成任务与 2 个任务清单。
+此前 `.20` 已完成飞书已有应用配置、个人授权和实际 Forflow 绑定，真实只读验证读取到 2 条未完成任务与 2 个任务清单。`.21` 候选包 13 项 smoke 全过；安装后扩展场景曾出现窗口关闭、差异列表超时和终端关闭 EPERM，专项复测通过，根因仍待定位，原始失败及对照记录均见发布说明。
 
 `origin` 指向本私有仓库。Orca 仅作为 `upstream` 上游源码来源，保留其历史、许可证及以下原始说明；其中的云服务、安装与发布流程不等同于 Forflow 私有版的交付流程。
 
