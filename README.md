@@ -4,6 +4,8 @@
 
 使用请先看 [Forflow One 操作手册](docs/forflow/user-manual.md)；账号服务、权限和内部交付见 [管理员手册](docs/forflow/admin-manual.md)。
 
+[`.20` 飞书连接修正版](docs/forflow/release-1.4.205-forflow.20.md) 已通过回归与成品验证，待运行中的 `.19` 退出后安装；真实飞书连接仍待已有应用配置和个人授权。
+
 `origin` 指向本私有仓库。Orca 仅作为 `upstream` 上游源码来源，保留其历史、许可证及以下原始说明；其中的云服务、安装与发布流程不等同于 Forflow 私有版的交付流程。
 
 ---
