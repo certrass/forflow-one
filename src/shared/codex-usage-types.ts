@@ -1,3 +1,5 @@
+import type { UsageCostCoverage } from './usage-cost-coverage'
+
 export type CodexUsageScope = 'orca' | 'all'
 export type CodexUsageRange = '7d' | '30d' | '90d' | 'all'
 export type CodexUsageBreakdownKind = 'model' | 'project'
@@ -22,6 +24,7 @@ export type CodexUsageSummary = {
   reasoningOutputTokens: number
   totalTokens: number
   estimatedCostUsd: number | null
+  costCoverage?: UsageCostCoverage
   topModel: string | null
   topProject: string | null
   hasAnyCodexData: boolean

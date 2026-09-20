@@ -30,6 +30,7 @@ export function buildOpenCodeUsageSummary(
   let totalTokens = 0
   let events = 0
   let estimatedCostUsd: number | null = null
+  const costCoverage = { pricedRecords: 0, unpricedRecords: 0, unclassifiedRecords: 0 }
   const byModel = new Map<string, number>()
   const byProject = new Map<string, number>()
 
@@ -41,6 +42,12 @@ export function buildOpenCodeUsageSummary(
     totalTokens += row.totalTokens
     events += row.eventCount
     estimatedCostUsd = addCost(estimatedCostUsd, row.estimatedCostUsd)
+    // A daily sum can hide unpriced events; only an entirely missing sum proves a gap.
+    if (row.estimatedCostUsd === null) {
+      costCoverage.unpricedRecords += row.eventCount
+    } else {
+      costCoverage.unclassifiedRecords += row.eventCount
+    }
     byModel.set(
       row.model ?? 'Unknown model',
       (byModel.get(row.model ?? 'Unknown model') ?? 0) + row.totalTokens
@@ -62,6 +69,7 @@ export function buildOpenCodeUsageSummary(
     reasoningOutputTokens,
     totalTokens,
     estimatedCostUsd,
+    costCoverage,
     topModel,
     topProject,
     hasAnyOpenCodeData: filteredSessions.length > 0 || filteredDaily.length > 0

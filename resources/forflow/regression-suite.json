@@ -220,5 +220,12 @@
   "src/renderer/src/components/settings/ExperimentalPane.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatStructuredSession.test.tsx",
   "src/renderer/src/components/native-chat/NativeChatView.test.tsx",
-  "src/renderer/src/components/native-chat/NativeChatConversationBody.test.tsx"
+  "src/renderer/src/components/native-chat/NativeChatConversationBody.test.tsx",
+  "src/main/usage/usage-cost-coverage.test.ts",
+  "src/renderer/src/components/stats/usage-evidence-model.test.ts",
+  "src/renderer/src/components/stats/UsageEvidencePanel.test.tsx",
+  "src/renderer/src/components/stats/usage-overview-model.test.ts",
+  "src/main/codex-usage/store-model-pricing.test.ts",
+  "src/main/claude-usage/store.test.ts",
+  "src/main/opencode-usage/store.test.ts"
 ]

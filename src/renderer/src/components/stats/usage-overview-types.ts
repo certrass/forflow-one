@@ -1,3 +1,4 @@
+import type { UsageCostCoverage } from '../../../../shared/usage-cost-coverage'
 import type {
   ClaudeUsageDailyPoint,
   ClaudeUsageScanState,
@@ -32,6 +33,7 @@ export type UsageProviderOverview = {
   outputTokens: number
   cacheTokens: number
   reasoningTokens: number
+  costCoverage?: UsageCostCoverage
   estimatedCostUsd: number | null
   topModel: string | null
   topProject: string | null

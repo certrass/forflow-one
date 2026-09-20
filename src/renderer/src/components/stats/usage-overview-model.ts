@@ -34,7 +34,12 @@ export function buildUsageOverview(input: UsageOverviewInput): UsageOverviewMode
   const knownCost = providers.reduce((sum, provider) => sum + (provider.estimatedCostUsd ?? 0), 0)
   const hasKnownCost = providers.some((provider) => provider.estimatedCostUsd !== null)
   const hasPartialCost = providers.some(
-    (provider) => provider.hasData && provider.estimatedCostUsd === null
+    (provider) =>
+      provider.hasData &&
+      (provider.estimatedCostUsd === null ||
+        !provider.costCoverage ||
+        provider.costCoverage.unpricedRecords > 0 ||
+        provider.costCoverage.unclassifiedRecords > 0)
   )
   const lastUpdatedAt =
     providers.reduce<number | null>(

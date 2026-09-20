@@ -112,8 +112,8 @@ export function UsageOverviewPane(): React.JSX.Element {
               {formatUpdatedAt(overview.lastUpdatedAt)}
               {overview.hasPartialCost
                 ? translate(
-                    'auto.components.stats.UsageOverviewPane.55c910f4f1',
-                    '- some model prices are unavailable'
+                    'forflow.usage.partialCost',
+                    '— cost may be incomplete; see cost basis and audit coverage'
                   )
                 : ''}
             </p>

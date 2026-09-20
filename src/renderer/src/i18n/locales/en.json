@@ -18097,6 +18097,7 @@
       "7de3b38e32": "Too much output to announce. Navigate to rows manually to read."
     },
     "usage": {
+      "partialCost": "— cost may be incomplete; see cost basis and audit coverage",
       "updated": "Updated {{time}}",
       "50e631f628": "Not scanned yet",
       "67a926f700": "Not available"
