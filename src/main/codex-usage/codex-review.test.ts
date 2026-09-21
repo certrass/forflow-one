@@ -1,4 +1,4 @@
-import { mkdtemp, writeFile, readFile, rm, appendFile } from 'node:fs/promises'
+import { mkdtemp, writeFile, readFile, rm, appendFile, utimes } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -315,6 +315,149 @@ describe('durable, versioned session review', () => {
     const next = await f.store.open(f.query)
     expect(compareCodexReviewVersions(next.versions[0], next.versions[1]).removed).toHaveLength(1)
     expect(next.issues[0].status).toBe('open')
+    await expect(f.mutate(next, { type: 'confirm' })).rejects.toThrow('未处理')
+  })
+  it.each(['record', 'return', 'removed'] as const)(
+    'reopens a closed record issue when its %s evidence changes',
+    async (change) => {
+      const f = await fixture([meta('a') + context() + call() + result()])
+      let review = await f.store.open(f.query)
+      const key = review.versions[0].audit.rows.find((row) => row.kind === 'tool')!.evidenceKey!
+      review = await f.mutate(review, {
+        type: 'issue',
+        title: 'Check return',
+        detail: 'The decision depends on this call and its return.',
+        evidenceKey: key
+      })
+      review = await f.mutate(review, {
+        type: 'resolve',
+        issueId: review.issues[0].id,
+        status: 'resolved',
+        reason: 'Verified the saved return'
+      })
+      const closingComment = review.comments.at(-1)!
+      review = await f.mutate(review, { type: 'confirm' })
+      const changed =
+        change === 'record'
+          ? call('same-id', 'changed arguments') + result()
+          : change === 'return'
+            ? call() +
+              line('response_item', {
+                type: 'function_call_output',
+                call_id: 'same-id',
+                output: 'Exit code 1'
+              })
+            : ''
+      await writeFile(f.path, meta('a') + context() + changed)
+      const next = await f.store.open(f.query)
+      expect(next.issues[0]).toMatchObject({ status: 'open', resolvedInVersion: null })
+      expect(next.comments).toContainEqual(closingComment)
+      expect(
+        next.comments.some(
+          (comment) =>
+            comment.issueId === review.issues[0].id &&
+            comment.versionId === next.versions.at(-1)!.id
+        )
+      ).toBe(true)
+      expect(next.confirmations).toEqual(review.confirmations)
+      expect(codexReviewStatus(next)).toBe('issues')
+      await expect(f.mutate(next, { type: 'confirm' })).rejects.toThrow('未处理')
+      const reviewed = await f.mutate(next, {
+        type: 'resolve',
+        issueId: next.issues[0].id,
+        status: 'dismissed',
+        reason: 'Rechecked the changed evidence and current scope'
+      })
+      expect(codexReviewStatus(await f.mutate(reviewed, { type: 'confirm' }))).toBe('confirmed')
+    }
+  )
+  it('keeps a closed record decision when only unrelated evidence or file timestamps change', async () => {
+    const f = await fixture([meta('a') + context() + call() + result()])
+    let review = await f.store.open(f.query)
+    review = await f.mutate(review, {
+      type: 'issue',
+      title: 'Check this return',
+      detail: '',
+      evidenceKey: review.versions[0].audit.rows.find((row) => row.kind === 'tool')!.evidenceKey!
+    })
+    review = await f.mutate(review, {
+      type: 'resolve',
+      issueId: review.issues[0].id,
+      status: 'dismissed',
+      reason: 'This call has a verified return'
+    })
+    const decision = review.issues[0]
+    await appendFile(f.path, call('another-call') + result('another-call'))
+    let next = await f.store.open(f.query)
+    expect(next.issues[0]).toEqual(decision)
+    await utimes(f.path, new Date(), new Date(Date.now() + 10_000))
+    next = await f.store.open(f.query)
+    expect(next.issues[0]).toEqual(decision)
+    expect(codexReviewStatus(await f.mutate(next, { type: 'confirm' }))).toBe('confirmed')
+  })
+  it('blocks direct confirmation of a historical carried-forward decision and repairs it on reread', async () => {
+    const f = await fixture()
+    let review = await f.store.open(f.query)
+    review = await f.mutate(review, {
+      type: 'issue',
+      title: 'Check arguments',
+      detail: '',
+      evidenceKey: review.versions[0].audit.rows.find((row) => row.kind === 'tool')!.evidenceKey!
+    })
+    review = await f.mutate(review, {
+      type: 'resolve',
+      issueId: review.issues[0].id,
+      status: 'dismissed',
+      reason: 'The original arguments were expected'
+    })
+    const oldDecision = structuredClone(review.issues[0])
+    const oldComments = structuredClone(review.comments)
+    await writeFile(f.path, meta('a') + context() + call('same-id', 'changed arguments'))
+    const legacy = await f.store.open(f.query)
+    legacy.issues[0] = oldDecision
+    legacy.comments = oldComments
+    await writeFile(f.ledger, JSON.stringify({ schemaVersion: 1, reviews: [legacy] }))
+    await expect(f.mutate(f.store.get(legacy.id), { type: 'confirm' })).rejects.toThrow(
+      '问题处理依据已变化'
+    )
+    expect(f.store.get(legacy.id)).toEqual(legacy)
+    const reopened = await f.store.open(f.query)
+    expect(reopened.versions).toEqual(legacy.versions)
+    expect(reopened.revision).toBe(legacy.revision + 1)
+    expect(reopened.issues[0]).toMatchObject({ status: 'open', resolvedInVersion: null })
+    expect(reopened.comments).toEqual(expect.arrayContaining(oldComments))
+    await expect(f.mutate(reopened, { type: 'confirm' })).rejects.toThrow('未处理')
+    expect(await f.store.open(f.query)).toEqual(reopened)
+    const reviewed = await f.mutate(reopened, {
+      type: 'resolve',
+      issueId: reopened.issues[0].id,
+      status: 'resolved',
+      reason: 'Verified the changed arguments after rereading'
+    })
+    expect(codexReviewStatus(await f.mutate(reviewed, { type: 'confirm' }))).toBe('confirmed')
+  })
+  it('requires reassessment when the historical record has no verifiable content hash', async () => {
+    const f = await fixture()
+    let review = await f.store.open(f.query)
+    const row = review.versions[0].audit.rows.find((entry) => entry.kind === 'tool')!
+    review = await f.mutate(review, {
+      type: 'issue',
+      title: 'Legacy evidence decision',
+      detail: '',
+      evidenceKey: row.evidenceKey!
+    })
+    review = await f.mutate(review, {
+      type: 'resolve',
+      issueId: review.issues[0].id,
+      status: 'resolved',
+      reason: 'Closed by a previous application version'
+    })
+    delete review.versions[0].audit.rows.find((entry) => entry.kind === 'tool')!.contentHash
+    await writeFile(f.ledger, JSON.stringify({ schemaVersion: 1, reviews: [review] }))
+    await appendFile(f.path, call('unrelated-call'))
+    const next = await f.store.open(f.query)
+    expect(next.issues[0]).toMatchObject({ status: 'open', resolvedInVersion: null })
+    expect(next.comments).toEqual(expect.arrayContaining(review.comments))
     await expect(f.mutate(next, { type: 'confirm' })).rejects.toThrow('未处理')
   })
   it('refuses confirmation when records conflict or are damaged', async () => {

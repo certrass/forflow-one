@@ -342,6 +342,25 @@ describe('Jev review lifecycle', () => {
       expect(f.ledger.all()).toEqual([])
     }
   )
+  it.each(['forflow-review-v1', 'forflow-review-future'])(
+    'preserves %s receipts but refuses adopting their suggestions under current questions',
+    async (questionVersion) => {
+      const f = await fixture()
+      const preview = await f.service.prepare(f.input)
+      const receipt = { ...(await f.service.run(preview)), questionVersion }
+      f.ledger.put(receipt)
+      await expect(
+        f.service.accept({
+          receiptId: receipt.id,
+          question: 'evidence',
+          expectedRevision: f.review.revision
+        })
+      ).rejects.toThrow('问题版本')
+      expect(f.service.list(f.review.id)).toEqual([receipt])
+      expect(f.reviews.get(f.review.id)).toEqual(f.review)
+      expect(f.send).toHaveBeenCalledOnce()
+    }
+  )
   it('expires previews and prevents history being attached to a newer review version', async () => {
     const f = await fixture()
     const preview = await f.service.prepare(f.input)

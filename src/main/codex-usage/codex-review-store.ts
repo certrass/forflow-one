@@ -19,6 +19,7 @@ import {
   type ReviewSourceQuery
 } from './codex-review-version'
 import { getLocalUsageDay } from '../usage/usage-calendar-range'
+import { reassessCodexReviewIssues } from './codex-review-reassessment'
 
 const ledgerSchema = z.object({
   schemaVersion: z.literal(1),
@@ -142,12 +143,17 @@ export class CodexReviewStore {
         throw new Error('审阅已在其他窗口更新，请重新打开后重试')
       }
       if (review.versions.at(-1)?.id === version.id) {
+        if (reassessCodexReviewIssues(review, version)) {
+          review.revision++
+          this.save(ledger)
+        }
         return review
       }
       if (review.versions.length >= 100) {
         throw new Error('此审阅已达到 100 个版本，请保留现有历史')
       }
       review.versions.push(version)
+      reassessCodexReviewIssues(review, version)
       addWorkspaceSensitiveFindings(review, version)
       review.revision++
       this.save(ledger)
@@ -250,6 +256,9 @@ export class CodexReviewStore {
         createdAt: Date.now()
       })
     } else {
+      if (reassessCodexReviewIssues(review, version)) {
+        throw new Error('问题处理依据已变化，请重新读取并复核后确认')
+      }
       if (
         version.audit.rows.length === 0 &&
         !version.workspace?.files.some((file) => file.status === 'read')

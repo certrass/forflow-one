@@ -203,6 +203,9 @@ export class JevAuditService {
 
   async accept(input: Parameters<JevAuditApi['accept']>[0]) {
     const receipt = this.ledger.all().find((entry) => entry.id === input.receiptId)
+    if (receipt && receipt.questionVersion !== JEV_QUESTION_VERSION) {
+      throw new Error('Jev 问题版本已变化，请按当前问题重新检查后采纳。历史结果仍保留。')
+    }
     const answer = receipt?.result?.answers[input.question]
     if (
       !receipt ||

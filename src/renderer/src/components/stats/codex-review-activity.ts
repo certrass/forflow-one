@@ -1,5 +1,5 @@
 import type { CodexReview } from '../../../../shared/codex-review-types'
-import type { JevReceipt } from '../../../../shared/jev-audit-types'
+import { JEV_QUESTION_VERSION, type JevReceipt } from '../../../../shared/jev-audit-types'
 
 export type ReviewActivity = {
   id: string
@@ -58,7 +58,9 @@ export function buildReviewActivity(review: CodexReview, receipts: JevReceipt[])
 }
 
 export function summarizeReviewChecks(receipts: JevReceipt[], versionId: string) {
-  const checks = receipts.filter((receipt) => receipt.versionId === versionId)
+  const checks = receipts.filter(
+    (receipt) => receipt.versionId === versionId && receipt.questionVersion === JEV_QUESTION_VERSION
+  )
   return {
     total: checks.length,
     completed: checks.filter((receipt) => receipt.status === 'completed').length,

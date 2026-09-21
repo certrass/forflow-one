@@ -1,6 +1,9 @@
 import { expect, it } from 'vitest'
+import { JEV_QUESTION_VERSION } from '../../../../shared/jev-audit-types'
 import { buildReviewActivity, summarizeReviewChecks } from './codex-review-activity'
-import { review, receipt } from './review-workspace-fixtures'
+import { review, receipt as historicalReceipt } from './review-workspace-fixtures'
+
+const receipt = { ...historicalReceipt, questionVersion: JEV_QUESTION_VERSION }
 
 it('keeps unknown checks distinct from completed checks and scopes counts to a source version', () => {
   const receipts = [
@@ -20,6 +23,29 @@ it('keeps unknown checks distinct from completed checks and scopes counts to a s
     incomplete: 0,
     attention: 0
   })
+})
+
+it('retains checks under other question versions in activity without counting them as current checks', () => {
+  const outdated = [
+    historicalReceipt,
+    { ...receipt, id: 'future', questionVersion: 'forflow-review-future' },
+    { ...historicalReceipt, id: 'pending', status: 'pending' as const, result: null }
+  ]
+  expect(summarizeReviewChecks(outdated, receipt.versionId)).toEqual({
+    total: 0,
+    completed: 0,
+    incomplete: 0,
+    attention: 0
+  })
+  expect(summarizeReviewChecks([...outdated, receipt], receipt.versionId)).toEqual({
+    total: 1,
+    completed: 1,
+    incomplete: 0,
+    attention: 1
+  })
+  const events = buildReviewActivity(review, outdated).filter((entry) => entry.kind === 'check')
+  expect(events).toHaveLength(3)
+  expect(events.map((event) => event.check)).toEqual(expect.arrayContaining(outdated))
 })
 
 it('orders persisted decisions with checks without assigning an old check to a new version', () => {

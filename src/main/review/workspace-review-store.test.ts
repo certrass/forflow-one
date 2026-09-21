@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, realpath, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, realpath, rm, writeFile, utimes } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -188,6 +188,87 @@ describe('workspace Review store and linked inputs', () => {
     await writeFile(join(f.rootPath, 'code.ts'), 'changed after review')
     await expect(mutate(f.store, review, { type: 'confirm' })).rejects.toThrow('来源已经变化')
     expect(f.store.get(review.id).confirmations).toEqual([])
+  })
+
+  it.each(['changed', 'removed', 'unreadable'] as const)(
+    'reopens a dismissed file issue when the source becomes %s',
+    async (change) => {
+      const f = await fixture()
+      await writeFile(join(f.rootPath, 'other.md'), 'Unrelated material')
+      f.query.selection.files.push({ path: 'other.md', kind: 'document' })
+      let review = await f.store.open(f.query)
+      review = await mutate(f.store, review, {
+        type: 'issue',
+        title: '需核对的值',
+        detail: '判断依赖 code.ts 的当前内容',
+        evidenceKey: review.versions[0].workspace!.files[0].evidenceKey
+      })
+      review = await mutate(f.store, review, {
+        type: 'resolve',
+        issueId: review.issues[0].id,
+        status: 'dismissed',
+        reason: '已核对，此处为示例值'
+      })
+      const closingComment = review.comments.at(-1)!
+      review = await mutate(f.store, review, { type: 'confirm' })
+      if (change === 'changed') {
+        await writeFile(join(f.rootPath, 'code.ts'), 'export const result = 2\n')
+      } else if (change === 'removed') {
+        f.query.selection.files = [{ path: 'other.md', kind: 'document' }]
+      } else {
+        await rm(join(f.rootPath, 'code.ts'))
+        await mkdir(join(f.rootPath, 'code.ts'))
+      }
+      const next = await f.store.open(f.query)
+      expect(next.issues[0]).toMatchObject({
+        status: 'open',
+        resolution: null,
+        resolvedInVersion: null
+      })
+      expect(next.comments).toContainEqual(closingComment)
+      expect(
+        next.comments.some(
+          (comment) =>
+            comment.issueId === review.issues[0].id &&
+            comment.versionId === next.versions.at(-1)!.id
+        )
+      ).toBe(true)
+      expect(next.confirmations).toEqual(review.confirmations)
+      await expect(mutate(f.store, next, { type: 'confirm' })).rejects.toThrow('未处理')
+      const unchanged = await f.store.open(f.query)
+      expect(unchanged.comments).toEqual(next.comments)
+      expect(unchanged.versions).toHaveLength(next.versions.length)
+    }
+  )
+
+  it('compares against the resolution version and retains decisions after unrelated or timestamp changes', async () => {
+    const f = await fixture()
+    await writeFile(join(f.rootPath, 'other.md'), 'Unrelated material')
+    f.query.selection.files.push({ path: 'other.md', kind: 'document' })
+    let review = await f.store.open(f.query)
+    review = await mutate(f.store, review, {
+      type: 'issue',
+      title: '待修复',
+      detail: '',
+      evidenceKey: review.versions[0].workspace!.files[0].evidenceKey
+    })
+    await writeFile(join(f.rootPath, 'code.ts'), 'export const result = 2\n')
+    review = await f.store.open(f.query)
+    review = await mutate(f.store, review, {
+      type: 'resolve',
+      issueId: review.issues[0].id,
+      status: 'resolved',
+      reason: '已在第二版核对修复'
+    })
+    const decision = review.issues[0]
+    expect(decision.resolvedInVersion).toBe(review.versions[1].id)
+    await writeFile(join(f.rootPath, 'other.md'), 'Changed unrelated material')
+    review = await f.store.open(f.query)
+    expect(review.issues[0]).toEqual(decision)
+    await utimes(join(f.rootPath, 'code.ts'), new Date(), new Date(Date.now() + 10_000))
+    review = await f.store.open(f.query)
+    expect(review.issues[0]).toEqual(decision)
+    expect(codexReviewStatus(await mutate(f.store, review, { type: 'confirm' }))).toBe('confirmed')
   })
 
   it('retains missing selections and prevents confirmation until their source is available', async () => {
