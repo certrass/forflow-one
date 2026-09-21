@@ -1,3 +1,4 @@
+import { redactWorkspaceText } from '../review/workspace-sensitive-signals'
 import { createHash, randomUUID } from 'node:crypto'
 import {
   JEV_MODEL,
@@ -9,6 +10,7 @@ import {
   type JevAuditApi
 } from '../../shared/jev-audit-types'
 import { codexEvidenceKey } from '../../shared/codex-review-types'
+import { isCodexAuditPartial } from '../../shared/codex-audit-coverage'
 import type { CodexReviewStore } from '../codex-usage/codex-review-store'
 import { readCodexReviewEvidence } from '../codex-usage/codex-review-evidence'
 import type { ForflowModelAccountStorage } from './model-account-storage'
@@ -21,47 +23,51 @@ export class JevAuditService {
   private readonly drafts = new Map<string, Draft>()
   private readonly pending = new Map<string, Promise<JevReceipt>>()
   constructor(
-    private readonly reviews: CodexReviewStore,
+    private readonly reviews: Pick<CodexReviewStore, 'get' | 'mutate'>,
     private readonly accounts: ForflowModelAccountStorage,
     private readonly ledger: JevAuditLedger,
     private readonly send: (url: string, init?: RequestInit) => Promise<Response>,
-    private readonly enabled: () => boolean
+    private readonly enabled: () => boolean,
+    private readonly readEvidence: typeof readCodexReviewEvidence = readCodexReviewEvidence
   ) {}
 
   private current(input: JevPrepareInput) {
-    if (!this.enabled()) {
-      throw new Error('请先启用 Codex 使用情况读取。')
-    }
     const review = this.reviews.get(input.reviewId)
     const version = review.versions.at(-1)!
     if (version.id !== input.versionId) {
       throw new Error('审阅版本已变化，请重新预览。')
     }
+    const file = version.workspace?.files.find((entry) => entry.evidenceKey === input.evidenceKey)
+    if (!file && !this.enabled()) {
+      throw new Error('请先启用 Codex 使用情况读取。')
+    }
     const row = version.audit.rows.find((entry) => codexEvidenceKey(entry) === input.evidenceKey)
-    if (!row) {
+    if (!row && (!file || file.status !== 'read')) {
       throw new Error('此记录不属于当前审阅版本。')
     }
-    return { review, version, row }
+    return { review, version, row, file }
   }
 
   private async requestFor(input: JevPrepareInput, model: string): Promise<JevRequest> {
     const { review, version, row } = this.current(input)
-    const record = await readCodexReviewEvidence(review, version.id, input.evidenceKey)
-    const result = row.resultSource
-      ? await readCodexReviewEvidence(review, version.id, input.evidenceKey, 'result')
+    if (row?.recordFormat === 'response_message' && !row.messageTextChars) {
+      throw new Error('此消息没有可读取的文字正文，暂不能审阅图片或摘要块。')
+    }
+    const record = await this.readEvidence(review, version.id, input.evidenceKey)
+    const result = row?.resultSource
+      ? await this.readEvidence(review, version.id, input.evidenceKey, 'result')
       : null
+    const redact = version.workspace ? redactWorkspaceText : redactJevText
     return buildJevRequest(model, {
-      focus: redactJevText(version.focus),
-      claim: redactJevText(input.claim),
-      record: redactJevText(record.text),
-      result: result ? redactJevText(result.text) : null,
+      focus: redact(version.focus),
+      claim: redact(input.claim),
+      record: redact(record.text),
+      result: result ? redact(result.text) : null,
       partial:
+        !!version.workspace ||
         record.truncated ||
         !!result?.truncated ||
-        version.audit.truncatedFiles > 0 ||
-        version.audit.failedFiles > 0 ||
-        version.audit.malformedLines > 0 ||
-        (version.audit.conflictingRecords ?? 0) > 0
+        isCodexAuditPartial(version.audit)
     })
   }
 

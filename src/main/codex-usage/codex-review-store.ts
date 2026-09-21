@@ -1,3 +1,4 @@
+import { addWorkspaceSensitiveFindings } from '../review/workspace-review-findings'
 import { randomUUID } from 'node:crypto'
 import { readFileSync, statSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
@@ -14,7 +15,8 @@ import { writeFileAtomically } from '../codex-accounts/fs-utils'
 import {
   buildCodexReviewVersion,
   codexReviewId,
-  type CodexReviewSource
+  type CodexReviewSource,
+  type ReviewSourceQuery
 } from './codex-review-version'
 import { getLocalUsageDay } from '../usage/usage-calendar-range'
 
@@ -27,7 +29,7 @@ const MAX_BYTES = 32 * 1024 * 1024
 export class CodexReviewStore {
   constructor(
     private readonly file: string,
-    private readonly readSource: (query: CodexReviewSourceQuery) => Promise<CodexReviewSource>
+    private readonly readSource: (query: ReviewSourceQuery) => Promise<CodexReviewSource>
   ) {}
 
   private read() {
@@ -56,7 +58,9 @@ export class CodexReviewStore {
   summaries(scope: CodexReviewSourceQuery['scope'], range: CodexReviewSourceQuery['range']) {
     return Object.fromEntries(
       this.read()
-        .reviews.filter((review) => review.scope === scope && review.range === range)
+        .reviews.filter(
+          (review) => review.sessionId !== null && review.scope === scope && review.range === range
+        )
         .map((review) => [
           review.sessionId,
           { id: review.id, status: this.summaryStatus(review), versions: review.versions.length }
@@ -90,6 +94,14 @@ export class CodexReviewStore {
     }
   }
 
+  list(): CodexReview[] {
+    return this.read().reviews
+  }
+
+  has(id: string): boolean {
+    return this.read().reviews.some((review) => review.id === id)
+  }
+
   get(id: string): CodexReview {
     const review = this.read().reviews.find((entry) => entry.id === id)
     if (!review) {
@@ -98,7 +110,7 @@ export class CodexReviewStore {
     return review
   }
 
-  async open(query: CodexReviewSourceQuery): Promise<CodexReview> {
+  async open(query: ReviewSourceQuery): Promise<CodexReview> {
     const id = codexReviewId(query)
     const initial = this.read().reviews.find((entry) => entry.id === id)
     const expectedRevision = query.expectedRevision ?? initial?.revision
@@ -107,13 +119,17 @@ export class CodexReviewStore {
         ? (initial.versions.at(-1)?.focus ?? query.focus)
         : query.focus
     const source = await this.readSource({ ...query, focus })
-    if (source.audit.status !== 'ready' || !source.audit.filesRead) {
+    if (
+      source.workspace
+        ? !source.workspace.files.some((file) => file.status === 'read')
+        : source.audit.status !== 'ready' || !source.audit.filesRead
+    ) {
       throw new Error('当前范围没有可读取的日志，无法创建审阅版本')
     }
-    const expectedSourcePath = query.expectedSourcePath
+    const expectedSourcePath = 'expectedSourcePath' in query ? query.expectedSourcePath : undefined
     if (
       expectedSourcePath &&
-      (source.usage.sessionId !== query.sessionId ||
+      (source.usage?.sessionId !== ('sessionId' in query ? query.sessionId : null) ||
         !source.audit.sources?.some((entry) => resolve(entry.path) === resolve(expectedSourcePath)))
     ) {
       throw new Error('搜索命中的来源未包含在当前审阅记录中，请刷新搜索或从使用分析重新打开')
@@ -132,21 +148,23 @@ export class CodexReviewStore {
         throw new Error('此审阅已达到 100 个版本，请保留现有历史')
       }
       review.versions.push(version)
+      addWorkspaceSensitiveFindings(review, version)
       review.revision++
       this.save(ledger)
       return review
     }
     const created: CodexReview = {
       id,
-      sessionId: query.sessionId,
-      scope: query.scope,
-      range: query.range,
+      sessionId: 'sessionId' in query ? query.sessionId : null,
+      scope: 'scope' in query ? query.scope : 'all',
+      range: 'range' in query ? query.range : 'all',
       revision: 0,
       versions: [version],
       issues: [],
       comments: [],
       confirmations: []
     }
+    addWorkspaceSensitiveFindings(created, version)
     ledger.reviews.push(created)
     this.save(ledger)
     return created
@@ -159,7 +177,19 @@ export class CodexReviewStore {
       if (!version) {
         throw new Error('审阅版本不存在')
       }
-      const source = await this.readSource({ ...current, focus: version.focus })
+      const sourceQuery: ReviewSourceQuery = version.workspace
+        ? {
+            workspaceId: version.workspace.target.id,
+            selection: version.workspace.selection,
+            focus: version.focus
+          }
+        : {
+            sessionId: current.sessionId ?? '',
+            scope: current.scope,
+            range: current.range,
+            focus: version.focus
+          }
+      const source = await this.readSource(sourceQuery)
       if (buildCodexReviewVersion(version.focus, source).id !== version.id) {
         throw new Error('来源已经变化，请重新读取并比较版本后确认')
       }
@@ -188,7 +218,8 @@ export class CodexReviewStore {
     } else if (action.type === 'issue') {
       if (
         action.evidenceKey &&
-        !version.audit.rows.some((row) => codexEvidenceKey(row) === action.evidenceKey)
+        !version.audit.rows.some((row) => codexEvidenceKey(row) === action.evidenceKey) &&
+        !version.workspace?.files.some((file) => file.evidenceKey === action.evidenceKey)
       ) {
         throw new Error('问题引用不属于当前审阅版本')
       }
@@ -219,13 +250,17 @@ export class CodexReviewStore {
         createdAt: Date.now()
       })
     } else {
-      if (version.audit.rows.length === 0) {
+      if (
+        version.audit.rows.length === 0 &&
+        !version.workspace?.files.some((file) => file.status === 'read')
+      ) {
         throw new Error('当前片段没有可审阅记录，请先补充来源')
       }
       if (review.issues.some((issue) => issue.status === 'open')) {
         throw new Error('仍有未处理问题，不能确认此版本')
       }
       if (
+        version.workspace?.files.some((file) => file.status !== 'read') ||
         version.audit.failedFiles ||
         version.audit.conflictingRecords ||
         version.audit.malformedLines

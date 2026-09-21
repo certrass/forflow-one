@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { workspaceReviewSnapshotSchema } from './workspace-review-types'
 
 export const codexReviewScopeSchema = z.object({
   scope: z.enum(['all', 'orca']),
@@ -56,6 +57,10 @@ const auditRowSchema = z.object({
   hasResult: z.boolean().nullable(),
   evidenceKey: z.string().optional(),
   contentHash: z.string().optional(),
+  messageRole: z.enum(['user', 'assistant']).optional(),
+  recordFormat: z.enum(['response_message', 'turn_context', 'compaction']).optional(),
+  messageTextChars: z.number().int().nonnegative().optional(),
+  unsupportedContentBlocks: z.number().int().nonnegative().optional(),
   resultSource: z
     .object({ sourcePath: z.string(), byteOffset: z.number(), contentHash: z.string() })
     .optional()
@@ -78,6 +83,12 @@ export const codexReviewAuditSchema = codexReviewScopeSchema.extend({
   toolResults: z.number(),
   rows: z.array(auditRowSchema),
   conflictingRecords: z.number().optional(),
+  messageCounts: z.object({ user: z.number(), assistant: z.number() }).optional(),
+  omittedRows: z.number().int().nonnegative().optional(),
+  incompleteLines: z.number().int().nonnegative().optional(),
+  unreadSources: z
+    .array(z.object({ path: z.string(), reason: z.enum(['file_limit', 'read_failed']) }))
+    .optional(),
   sources: z
     .array(
       z.object({
@@ -95,7 +106,8 @@ const versionSchema = z.object({
   id: z.string(),
   createdAt: z.number(),
   focus: z.string(),
-  usage: codexAnalyticsRowSchema,
+  usage: codexAnalyticsRowSchema.nullable(),
+  workspace: workspaceReviewSnapshotSchema.optional(),
   audit: codexReviewAuditSchema
 })
 const issueSchema = z.object({
@@ -111,7 +123,7 @@ const issueSchema = z.object({
 })
 export const codexReviewSchema = codexReviewScopeSchema.extend({
   id: z.string(),
-  sessionId: z.string(),
+  sessionId: z.string().nullable(),
   revision: z.number().int(),
   versions: z.array(versionSchema).min(1),
   issues: z.array(issueSchema),

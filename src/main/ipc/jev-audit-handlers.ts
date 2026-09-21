@@ -1,3 +1,4 @@
+import { readCodexReviewEvidence } from '../codex-usage/codex-review-evidence'
 import { app, ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { join } from 'node:path'
 import { z } from 'zod'
@@ -12,8 +13,9 @@ import { getMainHttpClient } from '../network/http-client'
 import { isTrustedUIRenderer } from './ui'
 
 export function registerJevAuditHandlers(
-  reviews: CodexReviewStore,
-  usage: Pick<CodexUsageStore, 'getScanState'>
+  reviews: Pick<CodexReviewStore, 'get' | 'mutate'>,
+  usage: Pick<CodexUsageStore, 'getScanState'>,
+  readEvidence: typeof readCodexReviewEvidence = readCodexReviewEvidence
 ): void {
   let instance: JevAuditService | undefined
   const service = (event: IpcMainInvokeEvent): JevAuditService => {
@@ -29,7 +31,8 @@ export function registerJevAuditHandlers(
       new ForflowModelAccountStorage(app.getPath('userData')),
       new JevAuditLedger(join(app.getPath('userData'), 'forflow-jev-audit.json')),
       getMainHttpClient().fetch,
-      () => usage.getScanState().enabled
+      () => usage.getScanState().enabled,
+      readEvidence
     )
     return instance
   }

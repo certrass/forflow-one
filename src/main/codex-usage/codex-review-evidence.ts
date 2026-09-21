@@ -1,6 +1,23 @@
 import { open } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { codexEvidenceKey, type CodexReview } from '../../shared/codex-review-types'
+import { readCodexAuditMessage } from './codex-audit-message'
+
+function messageExcerpt(line: string): string {
+  const parsed: unknown = JSON.parse(line)
+  if (!parsed || typeof parsed !== 'object' || !('payload' in parsed)) {
+    throw new Error('消息原文格式无效，请重新读取')
+  }
+  const payload = parsed.payload
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('消息原文格式无效，请重新读取')
+  }
+  const message = readCodexAuditMessage(Object.fromEntries(Object.entries(payload)))
+  if (!message) {
+    throw new Error('消息原文格式无效，请重新读取')
+  }
+  return JSON.stringify({ type: 'message', ...message })
+}
 
 function redact(text: string): string {
   return text
@@ -51,7 +68,9 @@ export async function readCodexReviewEvidence(
     const offset = location.byteOffset - source.start
     const newline = bytes.indexOf(10, offset)
     const line = bytes.toString('utf8', offset, newline === -1 ? bytes.length : newline)
-    const text = redact(line)
+    const text = redact(
+      part === 'record' && row?.recordFormat === 'response_message' ? messageExcerpt(line) : line
+    )
     return {
       text: text.slice(0, 16000),
       truncated: text.length > 16000,

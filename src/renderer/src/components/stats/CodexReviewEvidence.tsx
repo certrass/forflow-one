@@ -7,6 +7,7 @@ import {
 import { Button } from '../ui/button'
 import { reviewCopy } from './review-copy'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
+import { conversationReviewCopy, conversationRecordLabel } from './conversation-review-copy'
 import { formatSessionTime } from './usage-formatters'
 
 export function CodexReviewEvidence({
@@ -26,6 +27,7 @@ export function CodexReviewEvidence({
 }): React.JSX.Element {
   const c = reviewCopy()
   const w = reviewWorkspaceCopy()
+  const s = conversationReviewCopy()
   const [page, setPage] = useState(
     Math.max(
       1,
@@ -98,7 +100,27 @@ export function CodexReviewEvidence({
             {rows.map((row) => (
               <tr key={codexEvidenceKey(row)} className="border-b border-border/60 align-top">
                 <td className="max-w-64 py-3">
-                  <p className="font-medium">{row.name}</p>
+                  <p className="font-medium">{conversationRecordLabel(row, s) ?? row.name}</p>
+                  {row.kind === 'context' && !row.recordFormat && (
+                    <p className="text-xs text-muted-foreground">
+                      {s.recordType}: {c.unknown}
+                    </p>
+                  )}
+                  {row.recordFormat === 'turn_context' && (
+                    <p className="text-xs text-muted-foreground">{row.name}</p>
+                  )}
+                  {row.recordFormat === 'compaction' && (
+                    <p className="text-xs text-muted-foreground">{s.summaryNote}</p>
+                  )}
+                  {row.recordFormat === 'response_message' && (
+                    <p className="text-xs text-muted-foreground">
+                      {s.textChars}: {row.messageTextChars ?? c.unknown} · {s.unsupportedBlocks}:{' '}
+                      {row.unsupportedContentBlocks ?? c.unknown}
+                    </p>
+                  )}
+                  {row.recordFormat === 'response_message' && row.messageTextChars === 0 && (
+                    <p className="text-xs text-muted-foreground">{s.noText}</p>
+                  )}
                   <p className="text-xs text-muted-foreground">
                     {formatSessionTime(row.timestamp)}
                   </p>

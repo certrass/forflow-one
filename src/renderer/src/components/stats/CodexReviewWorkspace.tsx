@@ -15,6 +15,11 @@ import { CodexReviewCoverage } from './CodexReviewCoverage'
 import { summarizeReviewChecks } from './codex-review-activity'
 import { useJevReviewChecks } from './use-jev-review-checks'
 import { JevAuditPanel } from './JevAuditPanel'
+import { WorkspaceReviewIntake } from './WorkspaceReviewIntake'
+import { WorkspaceReviewSummary } from './WorkspaceReviewSummary'
+import { WorkspaceReviewEvidence } from './WorkspaceReviewEvidence'
+import { WorkspaceReviewChanges } from './WorkspaceReviewChanges'
+import { workspaceReviewCopy } from './workspace-review-copy'
 
 export function CodexReviewWorkspace({
   initial,
@@ -25,6 +30,7 @@ export function CodexReviewWorkspace({
 }): React.JSX.Element {
   const c = reviewCopy()
   const w = reviewWorkspaceCopy()
+  const p = workspaceReviewCopy()
   const [review, setReview] = useState(initial)
   const [selected, setSelected] = useState(initial.versions.length - 1)
   const [tab, setTab] = useState('overview')
@@ -34,6 +40,7 @@ export function CodexReviewWorkspace({
   const [jevEvidenceKey, setJevEvidenceKey] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [checking, setChecking] = useState(false)
+  const [editingScope, setEditingScope] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { receipts, failed, refresh, record } = useJevReviewChecks(review.id)
   const version = review.versions[selected] ?? review.versions.at(-1)
@@ -91,8 +98,20 @@ export function CodexReviewWorkspace({
     })
   const reread = (): Promise<boolean> =>
     apply(async () => {
+      if (version.workspace) {
+        const openWorkspace = window.api?.codexUsage?.openWorkspaceReview
+        if (!openWorkspace) {
+          throw new Error(p.unavailable)
+        }
+        return openWorkspace({
+          workspaceId: version.workspace.target.id,
+          selection: version.workspace.selection,
+          focus,
+          expectedRevision: review.revision
+        })
+      }
       const open = window.api?.codexUsage?.openReview
-      if (!open) {
+      if (!open || !review.sessionId) {
         throw new Error(c.unavailable)
       }
       return open({
@@ -103,6 +122,24 @@ export function CodexReviewWorkspace({
         expectedRevision: review.revision
       })
     })
+  if (editingScope) {
+    return (
+      <WorkspaceReviewIntake
+        active
+        initial={review}
+        onCancel={() => setEditingScope(false)}
+        onOpenReview={(value) => {
+          setReview(value)
+          setSelected(value.versions.length - 1)
+          setFocus(value.versions.at(-1)?.focus ?? focus)
+          setEvidenceKey(null)
+          setLocateKey(null)
+          setJevEvidenceKey(null)
+          setEditingScope(false)
+        }}
+      />
+    )
+  }
   return (
     <section className="min-w-0 space-y-6" data-testid="codex-review">
       <CodexReviewHeader
@@ -121,6 +158,11 @@ export function CodexReviewWorkspace({
         onConfirm={() => void mutate({ type: 'confirm' })}
       />
       {readOnly && <p className="text-xs text-muted-foreground">{c.historic}</p>}
+      {version.workspace && !readOnly && (
+        <Button size="sm" variant="ghost" disabled={locked} onClick={() => setEditingScope(true)}>
+          {p.editScope}
+        </Button>
+      )}
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -167,6 +209,7 @@ export function CodexReviewWorkspace({
                 </details>
               )}
             </section>
+            {version.workspace && <WorkspaceReviewSummary snapshot={version.workspace} />}
             <section
               className="space-y-3 border-b border-border pb-5"
               data-testid="review-check-summary"
@@ -193,7 +236,9 @@ export function CodexReviewWorkspace({
                     : w.noChecks}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">{w.checkScope}</p>
+              <p className="text-xs text-muted-foreground">
+                {version.workspace ? p.jevScope : w.checkScope}
+              </p>
             </section>
             <CodexReviewActivity
               review={review}
@@ -219,7 +264,11 @@ export function CodexReviewWorkspace({
           />
         </TabsContent>
         <TabsContent value="changes">
-          <CodexReviewChanges previous={previous} current={version} />
+          {version.workspace ? (
+            <WorkspaceReviewChanges previous={previous} current={version} />
+          ) : (
+            <CodexReviewChanges previous={previous} current={version} />
+          )}
         </TabsContent>
         <TabsContent value="jev">
           <JevAuditPanel
@@ -237,28 +286,53 @@ export function CodexReviewWorkspace({
           />
         </TabsContent>
         <TabsContent value="records">
-          <CodexReviewEvidence
-            key={`${version.id}:${locateKey}`}
-            review={review}
-            version={version}
-            locateKey={locateKey}
-            readOnly={readOnly || locked}
-            onFlag={(key) => {
-              setEvidenceKey(key)
-              setTab('issues')
-            }}
-            onAudit={
-              window.api?.forflowJevAudit && !focusChanged
-                ? (key) => {
-                    setJevEvidenceKey(key)
-                    setTab('jev')
-                  }
-                : undefined
-            }
-          />
+          {version.workspace && (
+            <WorkspaceReviewEvidence
+              key={`${version.id}:files:${locateKey}`}
+              review={review}
+              version={version}
+              locateKey={locateKey}
+              readOnly={readOnly || locked}
+              onFlag={(key) => {
+                setEvidenceKey(key)
+                setTab('issues')
+              }}
+              onAudit={
+                window.api?.forflowJevAudit && !focusChanged
+                  ? (key) => {
+                      setJevEvidenceKey(key)
+                      setTab('jev')
+                    }
+                  : undefined
+              }
+            />
+          )}
+          {(!version.workspace || version.audit.rows.length > 0) && (
+            <CodexReviewEvidence
+              key={`${version.id}:${locateKey}`}
+              review={review}
+              version={version}
+              locateKey={locateKey}
+              readOnly={readOnly || locked}
+              onFlag={(key) => {
+                setEvidenceKey(key)
+                setTab('issues')
+              }}
+              onAudit={
+                window.api?.forflowJevAudit && !focusChanged
+                  ? (key) => {
+                      setJevEvidenceKey(key)
+                      setTab('jev')
+                    }
+                  : undefined
+              }
+            />
+          )}
         </TabsContent>
       </Tabs>
-      <CodexReviewCoverage version={version} />
+      {(!version.workspace || version.workspace.selection.sessionIds.length > 0) && (
+        <CodexReviewCoverage version={version} />
+      )}
       <p className="text-xs text-muted-foreground">{w.local}</p>
     </section>
   )

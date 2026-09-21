@@ -263,5 +263,16 @@
   "src/renderer/src/components/settings/browser-search.test.ts",
   "src/renderer/src/components/settings/native-chat-experimental-search-entry.test.ts",
   "src/renderer/src/components/stats/CodexTranscriptSearch.test.tsx",
-  "src/renderer/src/components/right-sidebar/use-ai-vault-search.test.tsx"
+  "src/renderer/src/components/right-sidebar/use-ai-vault-search.test.tsx",
+  "src/main/codex-usage/codex-audit-message.test.ts",
+  "src/main/forflow/jev-audit-service.test.ts",
+  "src/main/ipc/usage-provider-handlers.test.ts",
+  "src/main/ipc/workspace-review-handlers.test.ts",
+  "src/main/review/workspace-jev-audit.test.ts",
+  "src/main/review/workspace-review-catalog.test.ts",
+  "src/main/review/workspace-review-source.test.ts",
+  "src/main/review/workspace-review-store.test.ts",
+  "src/main/review/workspace-sensitive-signals.test.ts",
+  "src/renderer/src/components/stats/WorkspaceReviewIntake.test.tsx",
+  "src/renderer/src/components/native-chat/native-chat-composer-state.test.ts"
 ]

@@ -17,6 +17,7 @@ import { Badge } from '../ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { reviewCopy } from './review-copy'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
+import { workspaceReviewCopy } from './workspace-review-copy'
 import { summarizeReviewChecks } from './codex-review-activity'
 import { RANGE_LABELS, SCOPE_OPTIONS } from './codex-usage-filter-options'
 
@@ -51,16 +52,17 @@ export function CodexReviewHeader({
 }): React.JSX.Element {
   const c = reviewCopy()
   const w = reviewWorkspaceCopy()
+  const p = workspaceReviewCopy()
   const status = codexReviewStatus(review)
   const checks = summarizeReviewChecks(receipts, version.id)
   return (
     <header className="space-y-5">
       <Button variant="ghost" size="sm" disabled={busy} onClick={onBack}>
         <ArrowLeft />
-        {c.back}
+        {version.workspace ? p.back : c.back}
       </Button>
       <h3 className="break-words text-xl font-semibold">
-        {version.usage.title ?? review.sessionId}
+        {version.workspace?.target.name ?? version.usage?.title ?? review.sessionId ?? c.unknown}
       </h3>
       <dl className="grid grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-4 text-sm">
         <dt className="flex items-center gap-2 text-muted-foreground">
@@ -68,7 +70,9 @@ export function CodexReviewHeader({
           {c.source}
         </dt>
         <dd className="min-w-0 break-words">
-          Codex · {version.usage.projectLabels.join(' · ') || review.sessionId}
+          {version.workspace
+            ? `${p.local} · ${version.workspace.target.rootPath}`
+            : `Codex · ${version.usage?.projectLabels.join(' · ') || review.sessionId || c.unknown}`}
         </dd>
         <dt className="flex items-center gap-2 text-muted-foreground">
           <GitBranch className="size-4" />
@@ -139,14 +143,22 @@ export function CodexReviewHeader({
         </dd>
       </dl>
       <p className="text-xs text-muted-foreground">
-        {SCOPE_OPTIONS.find((option) => option.value === review.scope)?.label} ·{' '}
-        {RANGE_LABELS[review.range]} · {c.frozen}
+        {version.workspace
+          ? p.snapshot
+          : `${SCOPE_OPTIONS.find((option) => option.value === review.scope)?.label} · ${RANGE_LABELS[review.range]}`}{' '}
+        · {c.frozen}
       </p>
       <div className="flex flex-wrap gap-2">
         {window.api?.forflowJevAudit && (
           <Button
             size="sm"
-            disabled={busy || readOnly || focusChanged || !version.audit.rows.length}
+            disabled={
+              busy ||
+              readOnly ||
+              focusChanged ||
+              (!version.audit.rows.length &&
+                !version.workspace?.files.some((file) => file.status === 'read'))
+            }
             onClick={onChecks}
           >
             <Bot />

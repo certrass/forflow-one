@@ -38,7 +38,11 @@ export async function readCodexUsageAudit(
     toolResults: 0,
     rows: [],
     sources: [],
-    conflictingRecords: 0
+    conflictingRecords: 0,
+    messageCounts: { user: 0, assistant: 0 },
+    omittedRows: 0,
+    incompleteLines: 0,
+    unreadSources: []
   }
   if (!state.scanState.enabled) {
     return audit
@@ -52,6 +56,9 @@ export async function readCodexUsageAudit(
     .filter((file) => file.sessions.some((session) => selected.has(session.sessionId)))
     .sort((a, b) => b.mtimeMs - a.mtimeMs)
   audit.candidateFiles = files.length
+  audit.unreadSources = files
+    .slice(MAX_FILES)
+    .map((file) => ({ path: file.path, reason: 'file_limit' }))
   const accumulator: AuditAccumulator = {
     audit,
     cutoff: getUsageRangeCutoff(range),
@@ -71,6 +78,7 @@ export async function readCodexUsageAudit(
         const stat = await handle.stat()
         if (!stat.isFile()) {
           audit.failedFiles++
+          audit.unreadSources.push({ path: file.path, reason: 'read_failed' })
           continue
         }
         const start = Math.max(0, stat.size - MAX_FILE_BYTES)
@@ -88,9 +96,17 @@ export async function readCodexUsageAudit(
         if (start > 0) {
           audit.truncatedFiles++
         }
-        let offset = start > 0 ? buffer.indexOf(10) + 1 : 0
-        if (start > 0 && offset === 0) {
-          continue
+        let offset = 0
+        if (start > 0) {
+          const preceding = Buffer.alloc(1)
+          await handle.read(preceding, 0, 1, start - 1)
+          if (preceding[0] !== 10) {
+            audit.incompleteLines = (audit.incompleteLines ?? 0) + 1
+            offset = buffer.indexOf(10) + 1
+            if (offset === 0) {
+              continue
+            }
+          }
         }
         const cursor: AuditCursor = {
           sessionId: file.sessions.length === 1 ? file.sessions[0].sessionId : null,
@@ -128,6 +144,7 @@ export async function readCodexUsageAudit(
         while (offset < bytesRead) {
           const end = buffer.indexOf(10, offset)
           if (end === -1 || end >= bytesRead) {
+            audit.incompleteLines = (audit.incompleteLines ?? 0) + 1
             break
           }
           collectCodexAuditLine(
@@ -144,6 +161,7 @@ export async function readCodexUsageAudit(
       }
     } catch {
       audit.failedFiles++
+      audit.unreadSources.push({ path: file.path, reason: 'read_failed' })
     }
   }
   finishCodexAudit(accumulator)

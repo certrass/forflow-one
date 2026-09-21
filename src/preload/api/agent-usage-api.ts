@@ -1,3 +1,7 @@
+import type {
+  WorkspaceReviewQuery,
+  WorkspaceReviewTarget
+} from '../../shared/workspace-review-types'
 import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared/claude-usage-types'
 import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
 import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
@@ -49,6 +53,9 @@ export type UsageProviderApi<Snapshot extends UsageProviderSnapshot, BreakdownKi
 export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBreakdownKind>
 
 export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind> & {
+  listWorkspaceReviewTargets?: () => Promise<WorkspaceReviewTarget[]>
+  listWorkspaceReviews?: () => Promise<CodexReview[]>
+  openWorkspaceReview?: (args: WorkspaceReviewQuery) => Promise<CodexReview>
   getAudit?: (args: UsageQueryArgs<CodexUsageSnapshot>) => Promise<CodexUsageAudit>
   getAnalytics?: (args: CodexAnalyticsQuery) => Promise<CodexAnalyticsResult>
   openReview?: (args: CodexReviewSourceQuery) => Promise<CodexReview>

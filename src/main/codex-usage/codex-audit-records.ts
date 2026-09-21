@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import type { CodexAuditRow, CodexUsageAudit } from '../../shared/codex-usage-audit-types'
 import { getLocalUsageDay } from '../usage/usage-calendar-range'
 import type { UsageWorktreeResolver } from '../usage/usage-worktree-resolver'
+import { readCodexAuditMessage } from './codex-audit-message'
 
 function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -95,8 +96,18 @@ export function collectCodexAuditLine(
   let name: string
   let recordId: string | null = null
   let tokens: number | null = null
+  let recordFormat: CodexAuditRow['recordFormat']
+  const message = row.type === 'response_item' ? readCodexAuditMessage(payload) : null
   let key = `${namespace}:${identity}`
-  if (
+  if (message) {
+    kind = 'context'
+    name = message.role === 'user' ? '用户消息' : '助手消息'
+    recordFormat = 'response_message'
+    recordId = text(payload.id)
+    if (recordId) {
+      key = `${namespace}:message:${recordId}`
+    }
+  } else if (
     row.type === 'turn_context' ||
     row.type === 'compacted' ||
     (row.type === 'event_msg' && payload.type === 'context_compacted')
@@ -107,6 +118,7 @@ export function collectCodexAuditLine(
         ? `回合上下文 · ${text(payload.model) ?? '模型未记录'}`
         : '上下文压缩记录'
     recordId = text(payload.turn_id)
+    recordFormat = row.type === 'turn_context' ? 'turn_context' : 'compaction'
   } else if (row.type === 'token_usage_record' && text(payload.response_id)) {
     kind = 'request'
     name = '模型响应用量'
@@ -150,7 +162,18 @@ export function collectCodexAuditLine(
     tokens,
     hasResult: kind === 'tool' ? false : null,
     evidenceKey: createHash('sha256').update(key).digest('hex'),
-    contentHash: identity
+    contentHash: identity,
+    ...(recordFormat ? { recordFormat } : {}),
+    ...(message
+      ? {
+          messageRole: message.role,
+          messageTextChars: message.text.length,
+          unsupportedContentBlocks: message.unsupportedContentBlocks
+        }
+      : {})
+  }
+  if (message && audit.messageCounts) {
+    audit.messageCounts[message.role]++
   }
   audit.counts[kind]++
   audit.rows.push(entry)
@@ -169,7 +192,9 @@ export function finishCodexAudit(accumulator: AuditAccumulator): void {
   }
   // Keep metadata only; command arguments and result bodies never enter the audit snapshot.
   const counts = { context: 0, request: 0, tool: 0, data: 0 }
+  const totalRows = accumulator.audit.rows.length
   accumulator.audit.rows = accumulator.audit.rows
     .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
     .filter((row) => ++counts[row.kind] <= (accumulator.rowLimit ?? 12))
+  accumulator.audit.omittedRows = totalRows - accumulator.audit.rows.length
 }

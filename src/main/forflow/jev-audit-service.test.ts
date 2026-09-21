@@ -65,6 +65,11 @@ async function fixture(configured = true) {
       failedFiles: 0,
       malformedLines: 0,
       skippedUnknownScope: 0,
+      conflictingRecords: 0,
+      messageCounts: { user: 0, assistant: 0 },
+      omittedRows: 0,
+      incompleteLines: 0,
+      unreadSources: [],
       counts: { context: 0, request: 0, tool: 1, data: 0 },
       toolResults: 0,
       sources: [
@@ -152,6 +157,72 @@ async function fixture(configured = true) {
 }
 
 describe('Jev review lifecycle', () => {
+  it.each<{ label: string; missing: Partial<CodexReviewSource['audit']> }>([
+    { label: 'bounded but complete source', missing: {} },
+    { label: 'unread file', missing: { candidateFiles: 2 } },
+    { label: 'row limit', missing: { omittedRows: 1 } },
+    { label: 'incomplete line', missing: { incompleteLines: 1 } },
+    { label: 'unclassified scope', missing: { skippedUnknownScope: 1 } },
+    { label: 'legacy row coverage', missing: { omittedRows: undefined } },
+    { label: 'legacy line coverage', missing: { incompleteLines: undefined } },
+    { label: 'legacy file coverage', missing: { unreadSources: undefined } },
+    { label: 'legacy message coverage', missing: { messageCounts: undefined } }
+  ])('carries $label into the exact preview partial flag', async ({ missing }) => {
+    const f = await fixture()
+    Object.assign(f.source.audit, missing)
+    const updated = await f.reviews.open({ ...f.query, expectedRevision: f.review.revision })
+    const preview = await f.service.prepare({ ...f.input, versionId: updated.versions.at(-1)!.id })
+    expect(JSON.parse(preview.body).state.partial).toBe(Object.keys(missing).length > 0)
+    expect(f.send).not.toHaveBeenCalled()
+  })
+  it('persists message identity and previews verified text without images or summaries', async () => {
+    const f = await fixture()
+    const message = `${JSON.stringify({
+      type: 'response_item',
+      payload: {
+        type: 'message',
+        role: 'assistant',
+        content: [
+          { type: 'output_text', text: '本次只保存了配置，尚未连接验证。' },
+          { type: 'image', image_url: 'private-image-bytes' },
+          { type: 'summary_text', text: 'invented-summary-claim' }
+        ]
+      }
+    })}\n`
+    await writeFile(f.path, message)
+    f.source.audit.sources![0] = {
+      path: f.path,
+      start: 0,
+      end: Buffer.byteLength(message),
+      size: Buffer.byteLength(message),
+      sha256: createHash('sha256').update(message).digest('hex')
+    }
+    Object.assign(f.source.audit.rows[0], {
+      kind: 'context',
+      messageRole: 'assistant',
+      recordFormat: 'response_message',
+      messageTextChars: 20,
+      unsupportedContentBlocks: 2
+    })
+    const updated = await f.reviews.open({ ...f.query, expectedRevision: f.review.revision })
+    const reloaded = new CodexReviewStore(join(f.dir, 'reviews.json'), async () => f.source)
+    expect(reloaded.get(updated.id).versions.at(-1)!.audit.rows[0]).toMatchObject({
+      messageRole: 'assistant',
+      recordFormat: 'response_message',
+      unsupportedContentBlocks: 2
+    })
+    const preview = await f.service.prepare({ ...f.input, versionId: updated.versions.at(-1)!.id })
+    const state = JSON.parse(preview.body).state
+    expect(state.record).toContain('本次只保存了配置，尚未连接验证。')
+    expect(state.record).not.toMatch(/private-image-bytes|invented-summary-claim/)
+    expect(state.partial).toBe(true)
+    expect(f.send).not.toHaveBeenCalled()
+    f.source.audit.rows[0].messageTextChars = 0
+    const empty = await f.reviews.open({ ...f.query, expectedRevision: updated.revision })
+    await expect(
+      f.service.prepare({ ...f.input, versionId: empty.versions.at(-1)!.id })
+    ).rejects.toThrow('没有可读取的文字正文')
+  })
   it('includes the fingerprint-verified paired return and redacts its nested data', async () => {
     const f = await fixture()
     const original = await readFile(f.path, 'utf8')

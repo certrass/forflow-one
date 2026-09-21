@@ -44,7 +44,10 @@ export function JevAuditPanel({
   const api = window.api?.forflowJevAudit
   const first = version.audit.rows.find((row) => row.kind === 'tool') ?? version.audit.rows[0]
   const [selected, setSelected] = useState(
-    initialEvidenceKey ?? (first ? codexEvidenceKey(first) : '')
+    initialEvidenceKey ??
+      (first
+        ? codexEvidenceKey(first)
+        : (version.workspace?.files.find((file) => file.status === 'read')?.evidenceKey ?? ''))
   )
   const [claim, setClaim] = useState('')
   const [preview, setPreview] = useState<JevPreview | null>(null)
@@ -89,6 +92,13 @@ export function JevAuditPanel({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                {version.workspace?.files
+                  .filter((file) => file.status === 'read')
+                  .map((file) => (
+                    <SelectItem key={file.evidenceKey} value={file.evidenceKey}>
+                      {file.path}
+                    </SelectItem>
+                  ))}
                 {version.audit.rows.map((row) => (
                   <SelectItem key={codexEvidenceKey(row)} value={codexEvidenceKey(row)}>
                     {row.name} · {new Date(row.timestamp).toLocaleString()} · {row.byteOffset}

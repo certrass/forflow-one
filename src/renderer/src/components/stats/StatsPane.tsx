@@ -5,15 +5,20 @@ import { StatsOverviewTab } from './StatsOverviewTab'
 import { CodexAnalyticsPanel } from './CodexAnalyticsPanel'
 import { CodexReviewWorkspace } from './CodexReviewWorkspace'
 import { usageWorkspaceCopy } from './usage-workspace-copy'
+import { workspaceReviewCopy } from './workspace-review-copy'
+import { WorkspaceReviewIntake } from './WorkspaceReviewIntake'
 export { getStatsPaneSearchEntries } from './stats-search'
 
 export function StatsPane(): React.JSX.Element {
   const c = usageWorkspaceCopy()
+  const w = workspaceReviewCopy()
   const [tab, setTab] = useState('overview')
   const [review, setReview] = useState<CodexReview | null>(null)
   const [revision, setRevision] = useState(0)
+  const [objectType, setObjectType] = useState('conversation')
   const openReview = (value: CodexReview): void => {
     setReview(value)
+    setObjectType(value.versions.at(-1)?.workspace ? 'workspace' : 'conversation')
     setTab('review')
   }
   return (
@@ -36,6 +41,16 @@ export function StatsPane(): React.JSX.Element {
         />
       </TabsContent>
       <TabsContent value="review" forceMount className="mt-4 data-[state=inactive]:hidden">
+        {!review && (
+          <div className="mb-5">
+            <Tabs value={objectType} onValueChange={setObjectType}>
+              <TabsList aria-label={w.objectType}>
+                <TabsTrigger value="conversation">{w.conversations}</TabsTrigger>
+                <TabsTrigger value="workspace">{w.workspaces}</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
         {review ? (
           <CodexReviewWorkspace
             key={`${review.id}:${review.revision}:${review.versions.at(-1)?.id}`}
@@ -43,9 +58,11 @@ export function StatsPane(): React.JSX.Element {
             onBack={() => {
               setReview(null)
               setRevision((value) => value + 1)
-              setTab('analytics')
+              setTab(objectType === 'workspace' ? 'review' : 'analytics')
             }}
           />
+        ) : objectType === 'workspace' ? (
+          <WorkspaceReviewIntake active={tab === 'review'} onOpenReview={openReview} />
         ) : (
           <CodexAnalyticsPanel
             active={tab === 'review'}

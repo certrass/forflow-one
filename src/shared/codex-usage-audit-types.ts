@@ -13,6 +13,10 @@ export type CodexAuditRow = {
   hasResult: boolean | null
   evidenceKey?: string
   contentHash?: string
+  messageRole?: 'user' | 'assistant'
+  recordFormat?: 'response_message' | 'turn_context' | 'compaction'
+  messageTextChars?: number
+  unsupportedContentBlocks?: number
   resultSource?: { sourcePath: string; byteOffset: number; contentHash: string }
 }
 export type CodexUsageAudit = {
@@ -30,6 +34,10 @@ export type CodexUsageAudit = {
   toolResults: number
   rows: CodexAuditRow[]
   conflictingRecords?: number
+  messageCounts?: { user: number; assistant: number }
+  omittedRows?: number
+  incompleteLines?: number
+  unreadSources?: { path: string; reason: 'file_limit' | 'read_failed' }[]
   sources?: {
     path: string
     start: number

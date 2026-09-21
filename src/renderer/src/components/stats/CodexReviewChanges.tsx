@@ -29,7 +29,7 @@ export function CodexReviewChanges({
         <div>
           <dt className="text-xs text-muted-foreground">{c.tokens}</dt>
           <dd className="text-sm tabular-nums">
-            {previous.usage.totalTokens ?? '—'} → {current.usage.totalTokens ?? '—'}
+            {previous.usage?.totalTokens ?? '—'} → {current.usage?.totalTokens ?? '—'}
           </dd>
         </div>
         <div>
