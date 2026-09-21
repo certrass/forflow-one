@@ -10,6 +10,12 @@ export function getNativeChatExperimentalSearchEntry(): SettingsSearchEntry {
       'Preview the desktop chat surface for supported agent terminal sessions.'
     ),
     keywords: [
+      ...translateSearchKeyword('forflow.settingsSearch.reconnect', 'reconnect'),
+      ...translateSearchKeyword('forflow.settingsSearch.restart', 'restart'),
+      translate(
+        'auto.components.settings.ExperimentalPane.nativeChat.resumeTitle',
+        'Reconnect working chats automatically after a restart'
+      ),
       ...translateSearchKeyword(
         'auto.components.settings.experimental.search.0d24759f14',
         'experimental'

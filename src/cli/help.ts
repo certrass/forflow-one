@@ -1,7 +1,7 @@
 import { brandCliDocumentation, cliCommandName, isForflowCli } from './cli-product'
 import { cliSpecPresentation, formatForflowRootHelp } from './forflow-help'
 import type { CommandSpec } from './args'
-import { findCommandSpec, isCommandGroup, supportsBrowserPageFlag } from './args'
+import { findCommandSpec, isCommandGroup, matches, supportsBrowserPageFlag } from './args'
 import { unknownCommandData } from './command-suggestion'
 import { formatCommandFlagHelp } from './command-flag-help'
 export { formatFlagHelp } from './command-flag-help'
@@ -17,8 +17,8 @@ export function printHelp(specs: CommandSpec[], commandPath: string[] = []): voi
     return
   }
 
-  if (isCommandGroup(commandPath)) {
-    console.log(formatGroupHelp(specs, commandPath[0]))
+  if (isCommandGroup(specs, commandPath)) {
+    console.log(formatGroupHelp(specs, commandPath))
     return
   }
 
@@ -75,8 +75,8 @@ export function formatCommandHelp(input: CommandSpec): string {
   return lines.join('\n')
 }
 
-export function formatGroupHelp(specs: CommandSpec[], group: string): string {
-  const groupSpecs = specs.filter((spec) => spec.path[0] === group && spec.hidden !== true)
+export function formatGroupHelp(specs: CommandSpec[], groupPath: string[]): string {
+  const group = groupPath.join(' ')
   const lines = [
     `${cliCommandName()} ${group}`,
     '',
@@ -84,8 +84,17 @@ export function formatGroupHelp(specs: CommandSpec[], group: string): string {
     '',
     isForflowCli() ? '命令：' : 'Commands:'
   ]
-  for (const spec of groupSpecs) {
-    lines.push(`  ${spec.path.slice(1).join(' ').padEnd(18)} ${cliSpecPresentation(spec).summary}`)
+  for (const spec of specs) {
+    if (
+      spec.hidden === true ||
+      spec.path.length <= groupPath.length ||
+      !matches(spec.path.slice(0, groupPath.length), groupPath)
+    ) {
+      continue
+    }
+    lines.push(
+      `  ${spec.path.slice(groupPath.length).join(' ').padEnd(18)} ${cliSpecPresentation(spec).summary}`
+    )
   }
   lines.push(
     '',

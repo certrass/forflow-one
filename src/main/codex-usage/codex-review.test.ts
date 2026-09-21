@@ -232,6 +232,25 @@ describe('scoped audit identities', () => {
 })
 
 describe('durable, versioned session review', () => {
+  it('opens the indexed source and keeps the search path out of the saved review identity', async () => {
+    const { store, query, path } = await fixture()
+    const fromSearch = await store.open({ ...query, expectedSourcePath: path })
+    expect(await store.open(query)).toEqual(fromSearch)
+    expect(fromSearch.versions[0].audit.sources?.some((source) => source.path === path)).toBe(true)
+    expect(fromSearch).not.toHaveProperty('expectedSourcePath')
+  })
+
+  it('refuses a search source mismatch before creating or updating a ledger', async () => {
+    const { store, query, ledger, dir } = await fixture()
+    const expectedSourcePath = join(dir, 'another-home', 'same-session.jsonl')
+    await expect(store.open({ ...query, expectedSourcePath })).rejects.toThrow('搜索命中的来源')
+    await expect(readFile(ledger)).rejects.toMatchObject({ code: 'ENOENT' })
+    await store.open(query)
+    const original = await readFile(ledger, 'utf8')
+    await expect(store.open({ ...query, expectedSourcePath })).rejects.toThrow('搜索命中的来源')
+    expect(await readFile(ledger, 'utf8')).toBe(original)
+  })
+
   it('persists comments and anchored issues across reopening without changing source logs', async () => {
     const f = await fixture()
     const sourceBefore = await readFile(f.path, 'utf8')

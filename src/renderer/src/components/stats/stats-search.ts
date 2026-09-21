@@ -1,5 +1,6 @@
 import { translate } from '@/i18n/i18n'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
+import { codexTranscriptSearchCopy } from './codex-transcript-search-copy'
 
 export const getStatsPaneSearchEntries = createLocalizedCatalog(() => [
   {
@@ -9,6 +10,8 @@ export const getStatsPaneSearchEntries = createLocalizedCatalog(() => [
       'Orca stats plus Claude, Codex, OpenCode token analytics and Grok subscription usage.'
     ),
     keywords: [
+      codexTranscriptSearchCopy().title,
+      'transcript search',
       '费用口径',
       '估算',
       '已结算',

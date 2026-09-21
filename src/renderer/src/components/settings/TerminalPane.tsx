@@ -23,6 +23,8 @@ import { TerminalInteractionSection } from './TerminalInteractionSection'
 import { TerminalRenderingSection } from './TerminalRenderingSection'
 import { TerminalSetupScriptSection } from './TerminalSetupScriptSection'
 import { TerminalWindowsShellSection } from './TerminalWindowsShellSection'
+import { TerminalDefaultShellSection } from './TerminalDefaultShellSection'
+import { getTerminalDefaultShellSearchEntry } from './terminal-default-shell-copy'
 
 type TerminalPaneProps = {
   settings: GlobalSettings
@@ -61,6 +63,14 @@ export function TerminalPane({
     showWindowsHostSettings && windowsShell === 'powershell.exe'
 
   const visibleSections = [
+    !showWindowsHostSettings &&
+    matchesSettingsSearch(searchQuery, getTerminalDefaultShellSearchEntry()) ? (
+      <TerminalDefaultShellSection
+        key="default-shell"
+        settings={settings}
+        updateSettings={updateSettings}
+      />
+    ) : null,
     showWindowsHostSettings &&
     matchesSettingsSearch(searchQuery, getTerminalWindowsShellSearchEntry()) ? (
       <TerminalWindowsShellSection

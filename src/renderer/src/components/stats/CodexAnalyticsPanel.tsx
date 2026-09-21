@@ -14,6 +14,7 @@ import { CodexAnalyticsChats } from './CodexAnalyticsChats'
 import { CodexAnalyticsBreakdown } from './CodexAnalyticsBreakdown'
 import { useCodexAnalytics } from './use-codex-analytics'
 import { formatUpdatedAt } from './usage-formatters'
+import { CodexTranscriptSearch } from './CodexTranscriptSearch'
 
 export function CodexAnalyticsPanel({
   active,
@@ -69,6 +70,7 @@ export function CodexAnalyticsPanel({
           <Badge variant="outline">Beta</Badge>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <CodexTranscriptSearch active={active} onOpenReview={onOpenReview} />
           <Select
             value={scope}
             onValueChange={(value) => {

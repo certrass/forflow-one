@@ -3,11 +3,7 @@ import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
 import { useAppStore } from '../../store'
 import { sendRuntimePtyInput } from '@/runtime/runtime-terminal-inspection'
 import { getSettingsForAgentTabRuntimeOwner } from '@/lib/agent-paste-draft'
-import {
-  applyMentionSuggestion,
-  EMPTY_HISTORY,
-  type HistoryState
-} from './native-chat-composer-state'
+import { EMPTY_HISTORY, type HistoryState } from './native-chat-composer-state'
 import { useNativeChatDraft } from './use-native-chat-draft'
 import { useNativeChatLaunchDraftAdoption } from './use-native-chat-launch-draft-adoption'
 import { NativeChatComposerField } from './NativeChatComposerField'
@@ -190,7 +186,8 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
       ? !hasPty || !onStop
       : disabled || hasPendingAttachment || (draft.trim() === '' && imageAttachments.length === 0)
 
-    const { insertTypedText, focus } = useNativeChatTypedInsertion({
+    const { insertTypedText, focus, acceptMention } = useNativeChatTypedInsertion({
+      autocomplete,
       textareaRef,
       caret,
       draft,
@@ -247,7 +244,8 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         targetPtyId,
         dispatchCommand: dispatchSessionOptionCommand,
         onAgentPicker: onSwitchToTerminal,
-        readTerminalScreen
+        readTerminalScreen,
+        paneKey
       })
     const sessionOptionsSurface = structuredTransport?.optionsSurface ?? ptySessionOptionsSurface
     const sessionOptionsSnapshot = structuredTransport?.optionSnapshot ?? ptySessionOptionsSnapshot
@@ -313,10 +311,9 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         return
       }
       const target = resolveTarget()
-      if (!target) {
-        return
+      if (target) {
+        sendRuntimePtyInput(target.settings, target.ptyId, ESC)
       }
-      sendRuntimePtyInput(target.settings, target.ptyId, ESC)
     }, [cancelPendingSends, isWorking, onStop, resolveTarget])
 
     const dispatchPtyPickerCommand = useNativeChatPickerCommandDispatch({
@@ -418,17 +415,7 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         pickerListboxId={picker.listboxId}
         onChoosePickerItem={completeItem}
         onRetrySkills={picker.retrySkills}
-        onAcceptMention={() => {
-          if (autocomplete.mode !== 'mention') {
-            return
-          }
-          const result = applyMentionSuggestion(draft, caret, autocomplete.query)
-          setDraft(result.draft)
-          setCaret(result.caret)
-          const textarea = textareaRef.current
-          textarea?.focus()
-          requestAnimationFrame(() => textarea?.setSelectionRange(result.caret, result.caret))
-        }}
+        onAcceptMention={acceptMention}
         onRemoveImageAttachment={(id) => removeImageAttachment(id)}
         onAttach={pickAttachment}
         onDictationToggle={toggleDictation}

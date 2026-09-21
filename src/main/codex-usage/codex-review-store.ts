@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { readFileSync, statSync, mkdirSync } from 'node:fs'
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { z } from 'zod'
 import {
   codexReviewSchema,
@@ -109,6 +109,14 @@ export class CodexReviewStore {
     const source = await this.readSource({ ...query, focus })
     if (source.audit.status !== 'ready' || !source.audit.filesRead) {
       throw new Error('当前范围没有可读取的日志，无法创建审阅版本')
+    }
+    const expectedSourcePath = query.expectedSourcePath
+    if (
+      expectedSourcePath &&
+      (source.usage.sessionId !== query.sessionId ||
+        !source.audit.sources?.some((entry) => resolve(entry.path) === resolve(expectedSourcePath)))
+    ) {
+      throw new Error('搜索命中的来源未包含在当前审阅记录中，请刷新搜索或从使用分析重新打开')
     }
     const version = buildCodexReviewVersion(focus, source)
     const ledger = this.read()

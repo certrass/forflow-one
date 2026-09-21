@@ -1,4 +1,7 @@
 export const FORFLOW_COMMAND_SUMMARIES: Readonly<Record<string, string>> = {
+  search: '搜索执行主机上的智能体会话记录',
+  'browser identity get': '读取应用级浏览器标识',
+  'browser identity set': '设置应用级浏览器标识',
   open: '启动 Forflow One，并等待运行时就绪',
   serve: '启动 Forflow One 无窗口运行时服务',
   status: '查看应用、运行时和工作区数据的就绪状态',

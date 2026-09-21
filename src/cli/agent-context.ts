@@ -29,6 +29,8 @@ export type AgentContextSchema = {
 
 export function buildAgentContext(specs: CommandSpec[]): AgentContextSchema {
   const commands = specs
+    // Why: hidden specs dispatch but stay off every discovery surface, including this one.
+    .filter((spec) => spec.hidden !== true)
     .map(cliSpecPresentation)
     .map((spec) => ({
       command: spec.path.join(' '),

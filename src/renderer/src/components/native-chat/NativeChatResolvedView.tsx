@@ -401,6 +401,7 @@ export function NativeChatResolvedView({
       >
         <NativeChatMessageList
           session={sessionWithPending}
+          isVisible={isVisible}
           isWorking={isWorking}
           expandSignal={false}
           fontScale={fontScale.scale}

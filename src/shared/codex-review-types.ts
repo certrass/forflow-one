@@ -40,6 +40,7 @@ export type CodexAnalyticsResult = {
 export const codexReviewSourceQuerySchema = codexReviewScopeSchema.extend({
   sessionId: z.string().min(1).max(256),
   focus: z.string().trim().min(1).max(2000),
+  expectedSourcePath: z.string().min(1).max(4096).optional(),
   expectedRevision: z.number().int().min(0).optional()
 })
 export type CodexReviewSourceQuery = z.infer<typeof codexReviewSourceQuerySchema>

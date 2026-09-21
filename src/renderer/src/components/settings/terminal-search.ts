@@ -1,4 +1,5 @@
 import type { SettingsSearchEntry } from './settings-search'
+import { getTerminalDefaultShellSearchEntry } from './terminal-default-shell-copy'
 import {
   getTerminalAdvancedSearchEntries,
   getTerminalGhosttyImportSearchEntries,
@@ -113,7 +114,7 @@ export function getTerminalPaneSearchEntries(platform: {
           ...getTerminalWindowsShellSearchEntry(),
           ...getTerminalWindowsPowershellImplementationSearchEntry()
         ]
-      : []),
+      : [getTerminalDefaultShellSearchEntry()]),
     ...getTerminalRightClickToPasteSearchEntry(),
     ...getTerminalSetupScriptSearchEntries(),
     ...getManageSessionsSearchEntries(),

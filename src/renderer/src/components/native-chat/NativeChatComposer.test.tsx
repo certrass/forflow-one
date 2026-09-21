@@ -66,6 +66,7 @@ vi.mock('../../store', () => {
   const state = {
     dictationState: 'idle',
     settings: { voice: { enabled: false }, nativeChatSessionOptions: {} },
+    agentStatusByPaneKey: {},
     updateSettings: vi.fn(),
     clearNativeChatLaunchDraft: mocks.clearNativeChatLaunchDraft,
     markNativeChatLaunchDraftAdopted: mocks.markNativeChatLaunchDraftAdopted
@@ -162,7 +163,19 @@ vi.mock('./use-native-chat-send-lifecycle', () => ({
   })
 }))
 
-import { NativeChatComposer } from './NativeChatComposer'
+import { NativeChatComposer, type NativeChatComposerProps } from './NativeChatComposer'
+
+function TestComposer(props: Partial<NativeChatComposerProps>): React.JSX.Element {
+  return (
+    <NativeChatComposer
+      terminalTabId="tab-1"
+      paneKey="tab-1:leaf-1"
+      targetPtyId="pty-1"
+      agent="codex"
+      {...props}
+    />
+  )
+}
 
 describe('NativeChatComposer', () => {
   beforeEach(() => {
@@ -255,16 +268,7 @@ describe('NativeChatComposer', () => {
 
   it('cancels delayed composer writes before the Stop button interrupts the agent', () => {
     const onStop = vi.fn()
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-        isWorking
-        onStop={onStop}
-      />
-    )
+    render(<TestComposer isWorking onStop={onStop} />)
 
     act(() => mocks.fieldProps?.onStop?.())
 
@@ -277,15 +281,7 @@ describe('NativeChatComposer', () => {
 
   it('associates a delayed submit with its optimistic cache entry', () => {
     const onOptimisticSend = vi.fn(() => 'pending-1')
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-        onOptimisticSend={onOptimisticSend}
-      />
-    )
+    render(<TestComposer onOptimisticSend={onOptimisticSend} />)
 
     act(() => mocks.fieldProps?.onSend?.())
 
@@ -418,14 +414,7 @@ describe('NativeChatComposer', () => {
 
   it('disables Send and blocks a send while an image attachment is still pending', () => {
     mocks.imageAttachments = [{ id: 'image-1', path: '', pending: true }]
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
 
     expect(mocks.fieldProps?.sendButtonDisabled).toBe(true)
 
@@ -438,30 +427,17 @@ describe('NativeChatComposer', () => {
 
   it('enables Send and dispatches once a pending attachment resolves', () => {
     mocks.imageAttachments = [{ id: 'image-1', path: '', pending: true }]
-    const view = render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    const view = render(<TestComposer />)
     expect(mocks.fieldProps?.sendButtonDisabled).toBe(true)
 
     mocks.imageAttachments = [{ id: 'image-1', path: '/tmp/pasted.png' }]
-    view.rerender(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    view.rerender(<TestComposer />)
     expect(mocks.fieldProps?.sendButtonDisabled).toBe(false)
 
     act(() => mocks.fieldProps?.onSend?.())
 
     expect(mocks.sendNativeChatMessageWithImageAttachments).toHaveBeenCalledWith(
+      'codex',
       {},
       'pty-1',
       'hello',
@@ -472,14 +448,7 @@ describe('NativeChatComposer', () => {
 
   it('types Codex slash composer sends instead of pasting them', () => {
     mocks.draft = '/status'
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
 
     act(() => mocks.fieldProps?.onSend?.())
 
@@ -489,14 +458,7 @@ describe('NativeChatComposer', () => {
 
   it('keeps Codex skill sends pasted', () => {
     mocks.draft = '$ref-oss'
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
 
     act(() => mocks.fieldProps?.onSend?.())
 
@@ -522,14 +484,7 @@ describe('NativeChatComposer', () => {
   })
 
   it('retires the launch-draft seed once a send clears the TUI input line', () => {
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
     expect(mocks.clearNativeChatLaunchDraft).not.toHaveBeenCalled()
 
     act(() => mocks.fieldProps?.onSend?.())
@@ -570,14 +525,7 @@ describe('NativeChatComposer', () => {
   })
 
   it('remounts the composer field when draft ownership moves to another pane', () => {
-    const view = render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    const view = render(<TestComposer />)
     const previousField = view.getByTestId('native-chat-composer-field')
     act(() => mocks.fieldProps?.imeEnterGesture?.setComposing(true))
     expect(mocks.composerIsComposing?.()).toBe(true)
@@ -596,14 +544,7 @@ describe('NativeChatComposer', () => {
   })
 
   it('shares one stable composition owner between keyboard and attachment paths', () => {
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
 
     expect(mocks.attachmentIsComposing).toBe(mocks.composerIsComposing)
     act(() => mocks.fieldProps?.imeEnterGesture?.setComposing(true))
@@ -611,14 +552,7 @@ describe('NativeChatComposer', () => {
   })
 
   it('adopts an IME deletion delivered only by compositionend', () => {
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
     const textarea = document.createElement('textarea')
     textarea.value = ''
     mocks.setDraft.mockClear()
@@ -638,14 +572,7 @@ describe('NativeChatComposer', () => {
   })
 
   it('does not duplicate a composition value already adopted by onChange', () => {
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
+    render(<TestComposer />)
     const textarea = document.createElement('textarea')
     textarea.value = 'hello'
     mocks.setDraft.mockClear()
@@ -863,15 +790,7 @@ describe('NativeChatComposer', () => {
   it('types the Codex picker command and switches to the terminal', async () => {
     mocks.sendHandle.settleAfterMs = 0
     const onSwitchToTerminal = vi.fn()
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-        onSwitchToTerminal={onSwitchToTerminal}
-      />
-    )
+    render(<TestComposer onSwitchToTerminal={onSwitchToTerminal} />)
 
     await act(async () => {
       await mocks.fieldProps?.sessionOptionsSurface?.invokeAction('model')

@@ -27,7 +27,7 @@ describe('Forflow CLI identity and compatibility', () => {
     vi.stubEnv('FORFLOW_DEPLOYMENT_PROFILE', 'upstream')
     vi.stubEnv('FORFLOW_BUILD', '')
     expect(isForflowCli()).toBe(false)
-    expect(formatGroupHelp(COMMAND_SPECS, 'worktree')).toContain('Usage: orca worktree')
+    expect(formatGroupHelp(COMMAND_SPECS, ['worktree'])).toContain('Usage: orca worktree')
   })
 
   it('covers every command with a Chinese summary and runnable Forflow usage', () => {
