@@ -157,6 +157,25 @@ async function fixture(configured = true) {
 }
 
 describe('Jev review lifecycle', () => {
+  it('bounds simultaneous previews and releases reservations after a failed prepare', async () => {
+    const f = await fixture()
+    await expect(
+      f.service.prepare({ ...f.input, evidenceKey: 'missing-evidence' })
+    ).rejects.toThrow('不属于当前审阅版本')
+    const outcomes = await Promise.allSettled(
+      Array.from({ length: 21 }, () => f.service.prepare(f.input))
+    )
+    expect(outcomes.filter((outcome) => outcome.status === 'fulfilled')).toHaveLength(20)
+    expect(outcomes.filter((outcome) => outcome.status === 'rejected')).toHaveLength(1)
+    await expect(f.service.prepare(f.input)).rejects.toThrow('预览数量已达上限')
+    expect(f.send).not.toHaveBeenCalled()
+    vi.useFakeTimers()
+    vi.setSystemTime(Date.now() + 11 * 60_000)
+    await expect(f.service.prepare(f.input)).resolves.toMatchObject({
+      reviewId: f.input.reviewId
+    })
+  })
+
   it.each<{ label: string; missing: Partial<CodexReviewSource['audit']> }>([
     { label: 'bounded but complete source', missing: {} },
     { label: 'unread file', missing: { candidateFiles: 2 } },

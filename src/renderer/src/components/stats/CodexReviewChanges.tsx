@@ -4,10 +4,12 @@ import { reviewCopy } from './review-copy'
 
 export function CodexReviewChanges({
   previous,
-  current
+  current,
+  showFocus = true
 }: {
   previous?: CodexReviewVersion
   current: CodexReviewVersion
+  showFocus?: boolean
 }): React.JSX.Element {
   const c = reviewCopy()
   if (!previous) {
@@ -26,18 +28,20 @@ export function CodexReviewChanges({
     <div className="space-y-4 py-3">
       <p className="text-xs text-muted-foreground">{c.changesNote}</p>
       <dl className="grid grid-cols-2 gap-3">
-        <div>
-          <dt className="text-xs text-muted-foreground">{c.tokens}</dt>
-          <dd className="text-sm tabular-nums">
-            {previous.usage?.totalTokens ?? '—'} → {current.usage?.totalTokens ?? '—'}
-          </dd>
-        </div>
+        {(previous.usage || current.usage) && (
+          <div>
+            <dt className="text-xs text-muted-foreground">{c.tokens}</dt>
+            <dd className="text-sm tabular-nums">
+              {previous.usage?.totalTokens ?? '—'} → {current.usage?.totalTokens ?? '—'}
+            </dd>
+          </div>
+        )}
         <div>
           <dt className="text-xs text-muted-foreground">{c.unchanged}</dt>
           <dd className="text-sm tabular-nums">{changes.unchanged.length}</dd>
         </div>
       </dl>
-      {previous.focus !== current.focus && (
+      {showFocus && previous.focus !== current.focus && (
         <section className="space-y-2 rounded-md border border-border p-3">
           <h4 className="text-sm font-medium">{c.focus}</h4>
           <p className="whitespace-pre-wrap text-xs text-muted-foreground">{previous.focus}</p>

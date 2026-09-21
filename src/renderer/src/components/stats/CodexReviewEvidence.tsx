@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   codexEvidenceKey,
   type CodexReview,
@@ -28,6 +28,7 @@ export function CodexReviewEvidence({
   const c = reviewCopy()
   const w = reviewWorkspaceCopy()
   const s = conversationReviewCopy()
+  const located = useRef<HTMLTableRowElement | null>(null)
   const [page, setPage] = useState(
     Math.max(
       1,
@@ -44,6 +45,9 @@ export function CodexReviewEvidence({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const rows = version.audit.rows.slice((page - 1) * 20, page * 20)
+  useEffect(() => {
+    located.current?.scrollIntoView({ block: 'nearest' })
+  }, [locateKey, page])
   const read = async (evidenceKey: string, part: 'record' | 'result' = 'record'): Promise<void> => {
     setLoading(true)
     setExcerpt(null)
@@ -98,7 +102,12 @@ export function CodexReviewEvidence({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={codexEvidenceKey(row)} className="border-b border-border/60 align-top">
+              <tr
+                key={codexEvidenceKey(row)}
+                ref={codexEvidenceKey(row) === locateKey ? located : undefined}
+                data-current={codexEvidenceKey(row) === locateKey}
+                className="border-b border-border/60 align-top data-[current=true]:bg-accent"
+              >
                 <td className="max-w-64 py-3">
                   <p className="font-medium">{conversationRecordLabel(row, s) ?? row.name}</p>
                   {row.kind === 'context' && !row.recordFormat && (

@@ -249,6 +249,22 @@ describe('workspace review registered catalog', () => {
     })
   })
 
+  it.each(['ssh:peer', 'runtime:peer'] as const)(
+    'keeps an explicitly local folder readable in a group containing %s repositories',
+    async (hostId) => {
+      const f = fixture()
+      f.repos[0] = repo({ projectGroupId: 'group-a' })
+      f.repos.push(
+        repo({ id: 'remote', path: '/remote', projectGroupId: 'group-a', executionHostId: hostId })
+      )
+      f.folders.push(folder({ executionHostId: 'local' }))
+      f.groups.push(group())
+      const target = (await f.catalog.list()).find((entry) => entry.kind === 'folder')
+      expect(target).toMatchObject({ hostId: 'local', available: true, unavailableReason: null })
+      expect(f.runtime.getRuntimeGitStatus).not.toHaveBeenCalled()
+    }
+  )
+
   it('keeps WSL and runtime-repair targets unavailable', async () => {
     const f = fixture()
     mocks.resolution.mockReturnValue({

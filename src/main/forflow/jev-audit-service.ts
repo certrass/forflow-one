@@ -22,6 +22,7 @@ type Draft = { preview: JevPreview; request: JevRequest }
 export class JevAuditService {
   private readonly drafts = new Map<string, Draft>()
   private readonly pending = new Map<string, Promise<JevReceipt>>()
+  private preparing = 0
   constructor(
     private readonly reviews: Pick<CodexReviewStore, 'get' | 'mutate'>,
     private readonly accounts: ForflowModelAccountStorage,
@@ -77,26 +78,31 @@ export class JevAuditService {
         this.drafts.delete(id)
       }
     }
-    if (this.drafts.size >= 20) {
+    if (this.drafts.size + this.preparing >= 20) {
       throw new Error('预览数量已达上限，请等待旧预览过期。')
     }
-    const model = this.accounts.account('jev').model ?? JEV_MODEL
-    const request = await this.requestFor(input, model)
-    this.current(input)
-    const body = JSON.stringify(request)
-    if (Buffer.byteLength(body) > 24 * 1024) {
-      throw new Error('此记录超过 Beta 的 24 KiB 发送上限，请选择较短记录。')
+    this.preparing++
+    try {
+      const model = this.accounts.account('jev').model ?? JEV_MODEL
+      const request = await this.requestFor(input, model)
+      this.current(input)
+      const body = JSON.stringify(request)
+      if (Buffer.byteLength(body) > 24 * 1024) {
+        throw new Error('此记录超过 Beta 的 24 KiB 发送上限，请选择较短记录。')
+      }
+      const preview: JevPreview = {
+        ...input,
+        claim: request.state.claim,
+        id: randomUUID(),
+        body,
+        inputHash: createHash('sha256').update(body).digest('hex'),
+        expiresAt: Date.now() + 10 * 60_000
+      }
+      this.drafts.set(preview.id, { preview, request })
+      return { ...preview }
+    } finally {
+      this.preparing--
     }
-    const preview: JevPreview = {
-      ...input,
-      claim: request.state.claim,
-      id: randomUUID(),
-      body,
-      inputHash: createHash('sha256').update(body).digest('hex'),
-      expiresAt: Date.now() + 10 * 60_000
-    }
-    this.drafts.set(preview.id, { preview, request })
-    return { ...preview }
   }
 
   list(reviewId: string): JevReceipt[] {

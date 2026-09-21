@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { WorkspaceSensitiveSignal } from '../../shared/workspace-review-types'
-import { redactJevText } from '../forflow/jev-audit-input'
+import { CREDENTIAL_ASSIGNMENT_PATTERN, redactJevText } from '../forflow/jev-audit-input'
 
 export const MAX_WORKSPACE_SENSITIVE_SIGNALS = 100
 
@@ -31,8 +31,7 @@ const rules: SensitiveRule[] = [
   {
     ruleId: 'credential-assignment',
     category: 'credential',
-    pattern:
-      /((?:\b(?:[A-Z0-9_]*(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|REFRESH[_-]?TOKEN|TOKEN|PASSWORD|PASSWD|SECRET)|apiKey|clientSecret)|密码|口令|密钥|令牌)["']?[ \t]*[=:：][ \t]*)("(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\$\{[^}\r\n]+\}|<[^<>\r\n]+>|[^\s,;，；}"']+)/gi,
+    pattern: CREDENTIAL_ASSIGNMENT_PATTERN,
     assignment: true
   },
   {

@@ -179,7 +179,10 @@ export class WorkspaceReviewCatalog {
       const candidates = findFolderWorkspaceCandidateRepos(state, workspace.id)
       const unavailableReason =
         localReason(hostId, workspace.folderPath) ??
-        candidates.map((repo) => this.repoReason(repo)).find((reason) => reason !== null) ??
+        candidates
+          .filter((repo) => getRepoExecutionHostId(repo) === hostId)
+          .map((repo) => this.repoReason(repo))
+          .find((reason) => reason !== null) ??
         null
       targets.push({
         id: `folder:${encodeURIComponent(hostId)}:${encodeURIComponent(workspace.id)}`,

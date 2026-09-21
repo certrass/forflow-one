@@ -127,4 +127,23 @@ describe('Jev typed API contract', () => {
       buildJevRequest(JEV_MODEL, { ...request.state, claim: 'completed' }).questions.claim
     ).toBeDefined()
   })
+  it.each([
+    'export API_KEY="synthetic quoted secret"',
+    "PASSWORD='synthetic quoted secret'",
+    'apiKey: "synthetic quoted secret"',
+    '密码："synthetic quoted secret"'
+  ])('redacts quoted credential assignments in plain text: %s', (text) => {
+    expect(redactJevText(text)).not.toContain('synthetic quoted secret')
+    expect(redactJevText(JSON.stringify({ command: text }))).not.toContain(
+      'synthetic quoted secret'
+    )
+  })
+  it('redacts Chinese credential fields in both structured and nested JSON', () => {
+    const credentials = { 密码: 'synthetic-password', 服务密钥: 'synthetic-api-value' }
+    for (const input of [credentials, { arguments: JSON.stringify(credentials) }]) {
+      const redacted = redactJevText(JSON.stringify(input))
+      expect(redacted).not.toMatch(/synthetic-password|synthetic-api-value/)
+      expect(redactJevText(redacted)).toBe(redacted)
+    }
+  })
 })

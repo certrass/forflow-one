@@ -1,6 +1,7 @@
 import { open } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { codexEvidenceKey, type CodexReview } from '../../shared/codex-review-types'
+import { redactJevText } from '../forflow/jev-audit-input'
 import { readCodexAuditMessage } from './codex-audit-message'
 
 function messageExcerpt(line: string): string {
@@ -17,17 +18,6 @@ function messageExcerpt(line: string): string {
     throw new Error('消息原文格式无效，请重新读取')
   }
   return JSON.stringify({ type: 'message', ...message })
-}
-
-function redact(text: string): string {
-  return text
-    .replace(/\b(?:sk|ghp|github_pat)-?[A-Za-z0-9_-]{20,}\b/g, '[credential redacted]')
-    .replace(
-      /("(?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|secret|authorization)"\s*:\s*")[^"\n]+/gi,
-      '$1[redacted]'
-    )
-    .replace(/\bBearer\s+[A-Za-z0-9._~+/-]+/gi, 'Bearer [redacted]')
-    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[email redacted]')
 }
 
 export async function readCodexReviewEvidence(
@@ -68,7 +58,7 @@ export async function readCodexReviewEvidence(
     const offset = location.byteOffset - source.start
     const newline = bytes.indexOf(10, offset)
     const line = bytes.toString('utf8', offset, newline === -1 ? bytes.length : newline)
-    const text = redact(
+    const text = redactJevText(
       part === 'record' && row?.recordFormat === 'response_message' ? messageExcerpt(line) : line
     )
     return {

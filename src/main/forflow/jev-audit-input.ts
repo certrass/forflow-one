@@ -1,5 +1,8 @@
 import type { JevRequest } from '../../shared/jev-audit-types'
 
+export const CREDENTIAL_ASSIGNMENT_PATTERN =
+  /((?:\b(?:[A-Z0-9_]*(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|REFRESH[_-]?TOKEN|TOKEN|PASSWORD|PASSWD|SECRET)|apiKey|clientSecret)|密码|口令|密钥|令牌)["']?[ \t]*[=:：][ \t]*)("(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\$\{[^}\r\n]+\}|<[^<>\r\n]+>|[^\s,;，；}"']+)/gi
+
 function redactText(value: string): string {
   return value
     .replace(
@@ -8,10 +11,10 @@ function redactText(value: string): string {
     )
     .replace(/\b(?:sk[-_]|ghp_|github_pat_)[A-Za-z0-9_-]{16,}\b/g, '[credential redacted]')
     .replace(/\bBearer\s+[A-Za-z0-9._~+/-]+/gi, 'Bearer [redacted]')
-    .replace(
-      /\b((?:[A-Z_]*API_KEY|[A-Z_]*TOKEN|PASSWORD|SECRET)\s*[=:]\s*)[^\s,;"']+/gi,
-      '$1[redacted]'
-    )
+    .replace(CREDENTIAL_ASSIGNMENT_PATTERN, (_match, prefix: string, value: string) => {
+      const quote = /^["']/.test(value) ? value[0] : ''
+      return `${prefix}${quote}[redacted]${quote}`
+    })
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[email redacted]')
     .replace(/\/(?:Users|home)\/[^/\s"\\]+/g, '[home]')
     .replace(/[A-Z]:\\Users\\[^\\\s"]+/gi, '[home]')
@@ -38,7 +41,9 @@ function sanitize(value: unknown, depth: number): unknown {
     return Object.fromEntries(
       Object.entries(value).map(([key, entry]) => [
         key,
-        /(?:api[_-]?key|token|password|secret|authorization|cookie|private[_-]?key)/i.test(key)
+        /(?:api[_-]?key|token|password|secret|authorization|cookie|private[_-]?key|密码|口令|密钥|令牌)/i.test(
+          key
+        )
           ? '[redacted]'
           : sanitize(entry, depth + 1)
       ])
@@ -65,7 +70,8 @@ export function buildJevRequest(model: string, state: JevRequest['state']): JevR
         attention:
           'An observed execution or service result explicitly shows an unexpected, unresolved failure or exception.',
         none: 'An observed outcome has no unresolved execution failure relevant to the focus; this does not establish overall success.',
-        unknown: 'There is no observable execution outcome sufficient to assess failure, for example only a call, self-report, truncated outcome or loss of remote contact.'
+        unknown:
+          'There is no observable execution outcome sufficient to assess failure, for example only a call, self-report, truncated outcome or loss of remote contact.'
       }
     },
     evidence: {

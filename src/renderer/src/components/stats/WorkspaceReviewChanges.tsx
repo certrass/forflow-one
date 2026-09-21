@@ -2,6 +2,7 @@ import type { CodexReviewVersion } from '../../../../shared/codex-review-types'
 import type { WorkspaceReviewFile } from '../../../../shared/workspace-review-types'
 import { workspaceReviewCopy } from './workspace-review-copy'
 import { reviewCopy } from './review-copy'
+import { CodexReviewChanges } from './CodexReviewChanges'
 
 function classifyFileChange(before?: WorkspaceReviewFile, after?: WorkspaceReviewFile) {
   if (!before) {
@@ -38,6 +39,61 @@ export function WorkspaceReviewChanges({
   }
   const before = new Map(previous.workspace.files.map((file) => [file.path, file]))
   const after = new Map(current.workspace.files.map((file) => [file.path, file]))
+  const applicability = {
+    unconfirmed: c.unconfirmed,
+    applies: c.applies,
+    not_applicable: c.notApplicable
+  }
+  const gitStatus = { ready: c.read, unavailable: c.unreadable, not_applicable: c.notApplicable }
+  const gitChanges = [
+    {
+      label: c.branch,
+      before: previous.workspace.git.branch ?? '',
+      after: current.workspace.git.branch ?? ''
+    },
+    {
+      label: `Git · ${c.fileStatus}`,
+      before: [gitStatus[previous.workspace.git.status], previous.workspace.git.reason]
+        .filter(Boolean)
+        .join('\n'),
+      after: [gitStatus[current.workspace.git.status], current.workspace.git.reason]
+        .filter(Boolean)
+        .join('\n')
+    },
+    {
+      label: c.gitChanges,
+      before: previous.workspace.git.changes
+        .map((change) => `${change.status} · ${change.path}`)
+        .toSorted()
+        .join('\n'),
+      after: current.workspace.git.changes
+        .map((change) => `${change.status} · ${change.path}`)
+        .toSorted()
+        .join('\n')
+    }
+  ].filter((change) => change.before !== change.after)
+  const selectionChanges = [
+    {
+      label: c.sessions,
+      before: previous.workspace.selection.sessionIds.toSorted().join('\n'),
+      after: current.workspace.selection.sessionIds.toSorted().join('\n')
+    },
+    {
+      label: c.policy,
+      before: previous.workspace.selection.policyReference,
+      after: current.workspace.selection.policyReference
+    },
+    {
+      label: c.applicability,
+      before: applicability[previous.workspace.selection.applicability],
+      after: applicability[current.workspace.selection.applicability]
+    },
+    {
+      label: c.applicabilityReason,
+      before: previous.workspace.selection.applicabilityReason,
+      after: current.workspace.selection.applicabilityReason
+    }
+  ].filter((change) => change.before !== change.after)
   const groups: Record<
     ReturnType<typeof classifyFileChange>,
     { label: string; paths: string[] }
@@ -66,6 +122,16 @@ export function WorkspaceReviewChanges({
           <p className="whitespace-pre-wrap text-sm">{current.focus}</p>
         </section>
       )}
+      {[...gitChanges, ...selectionChanges].map((change) => (
+        <section key={change.label} className="space-y-2">
+          <h5 className="text-sm font-medium">{change.label}</h5>
+          <p className="whitespace-pre-wrap break-words text-xs text-muted-foreground">
+            {change.before || '—'}
+          </p>
+          <p className="whitespace-pre-wrap break-words text-sm">→ {change.after || '—'}</p>
+        </section>
+      ))}
+      {gitChanges.length > 0 && <p className="text-xs text-muted-foreground">{c.gitNote}</p>}
       {Object.values(groups).map((group) => (
         <section key={group.label} className="space-y-2">
           <h5 className="text-sm font-medium">
@@ -80,6 +146,12 @@ export function WorkspaceReviewChanges({
           </ul>
         </section>
       ))}
+      {(previous.audit.rows.length > 0 || current.audit.rows.length > 0) && (
+        <section className="space-y-2 border-t border-border pt-3">
+          <h4 className="text-base font-medium">{c.sessions}</h4>
+          <CodexReviewChanges previous={previous} current={current} showFocus={false} />
+        </section>
+      )}
     </section>
   )
 }
