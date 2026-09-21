@@ -4,6 +4,7 @@ import { translate } from '@/i18n/i18n'
 import { Button } from '../ui/button'
 import { SettingsSubsectionHeader } from './SettingsFormControls'
 import { ForflowModelAccountCard } from './ForflowModelAccountCard'
+import { JevAccountSection } from './JevAccountSection'
 
 export function ForflowModelAccountsSection({
   localHost
@@ -77,21 +78,24 @@ export function ForflowModelAccountsSection({
             )}
           </p>
           <div className="space-y-3">
-            {accounts.map((account) => (
-              <ForflowModelAccountCard
-                key={account.provider}
-                account={account}
-                api={api}
-                onChanged={(next) =>
-                  setAccounts(
-                    (previous) =>
-                      previous?.map((item) => (item.provider === next.provider ? next : item)) ??
-                      null
-                  )
-                }
-              />
-            ))}
+            {accounts
+              .filter((account) => account.provider !== 'jev')
+              .map((account) => (
+                <ForflowModelAccountCard
+                  key={account.provider}
+                  account={account}
+                  api={api}
+                  onChanged={(next) =>
+                    setAccounts(
+                      (previous) =>
+                        previous?.map((item) => (item.provider === next.provider ? next : item)) ??
+                        null
+                    )
+                  }
+                />
+              ))}
           </div>
+          <JevAccountSection />
         </>
       ) : (
         <p role="status" className="text-sm text-muted-foreground">

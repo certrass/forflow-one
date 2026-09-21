@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 import type { ClaudeUsageStore } from '../claude-usage/store'
 import type { CodexUsageStore } from '../codex-usage/store'
 import type { OpenCodeUsageStore } from '../opencode-usage/store'
+import { registerCodexReviewHandlers } from './codex-review-handlers'
 
 type UsageProviderStores = {
   claudeUsage: ClaudeUsageStore
@@ -64,6 +65,7 @@ function registerProviderHandlers<Scope, Range, BreakdownKind>(
 export function registerUsageProviderHandlers(stores: UsageProviderStores): void {
   registerProviderHandlers('claudeUsage', stores.claudeUsage)
   registerProviderHandlers('codexUsage', stores.codexUsage)
+  registerCodexReviewHandlers(stores.codexUsage)
   ipcMain.handle('codexUsage:getAudit', (_event, args: unknown) => {
     if (
       !args ||

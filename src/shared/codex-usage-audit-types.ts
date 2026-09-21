@@ -11,6 +11,9 @@ export type CodexAuditRow = {
   recordId: string | null
   tokens: number | null
   hasResult: boolean | null
+  evidenceKey?: string
+  contentHash?: string
+  resultSource?: { sourcePath: string; byteOffset: number; contentHash: string }
 }
 export type CodexUsageAudit = {
   scope: CodexUsageScope
@@ -26,4 +29,13 @@ export type CodexUsageAudit = {
   counts: Record<CodexAuditKind, number>
   toolResults: number
   rows: CodexAuditRow[]
+  conflictingRecords?: number
+  sources?: {
+    path: string
+    start: number
+    end: number
+    size: number
+    sha256: string
+    mtimeMs?: number
+  }[]
 }

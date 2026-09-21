@@ -2,6 +2,13 @@ import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared
 import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
 import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
 import type {
+  CodexAnalyticsQuery,
+  CodexAnalyticsResult,
+  CodexReview,
+  CodexReviewSourceQuery,
+  CodexReviewMutation
+} from '../../shared/codex-review-types'
+import type {
   OpenCodeUsageBreakdownKind,
   OpenCodeUsageSnapshot
 } from '../../shared/opencode-usage-types'
@@ -43,6 +50,16 @@ export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBr
 
 export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind> & {
   getAudit?: (args: UsageQueryArgs<CodexUsageSnapshot>) => Promise<CodexUsageAudit>
+  getAnalytics?: (args: CodexAnalyticsQuery) => Promise<CodexAnalyticsResult>
+  openReview?: (args: CodexReviewSourceQuery) => Promise<CodexReview>
+  getReview?: (id: string) => Promise<CodexReview>
+  updateReview?: (args: CodexReviewMutation) => Promise<CodexReview>
+  readReviewEvidence?: (args: {
+    id: string
+    versionId: string
+    evidenceKey: string
+    part?: 'record' | 'result'
+  }) => Promise<{ text: string; truncated: boolean; sourcePath: string; byteOffset: number }>
 }
 
 export type OpenCodeUsageApi = UsageProviderApi<OpenCodeUsageSnapshot, OpenCodeUsageBreakdownKind>

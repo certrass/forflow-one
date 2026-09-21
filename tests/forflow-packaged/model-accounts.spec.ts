@@ -30,10 +30,10 @@ test('official API accounts: encrypted persistence, explicit mock probes, failur
   try {
     const { app, page, errors } = await launch(profile)
     running = app
-    await app.evaluate(() => {
-      const original = globalThis.fetch
+    await app.evaluate(({ net }) => {
+      const original = net.fetch.bind(net)
       process.env.FORFLOW_QA_MODEL_PROBE_COUNT = '0'
-      globalThis.fetch = async (input, init) => {
+      net.fetch = async (input, init) => {
         const url = new URL(typeof input === 'string' || input instanceof URL ? input : input.url)
         if (!['api.moonshot.cn', 'open.bigmodel.cn', 'api.deepseek.com'].includes(url.hostname)) {
           return original(input, init)
@@ -72,7 +72,14 @@ test('official API accounts: encrypted persistence, explicit mock probes, failur
     }
     expect(await app.evaluate(() => process.env.FORFLOW_QA_MODEL_PROBE_COUNT)).toBe('0')
     const status = await page.evaluate(() => window.api.forflowModelAccounts!.list())
-    expect(status).toHaveLength(3)
+    expect(status).toEqual([
+      ...providers.map((provider) => ({
+        provider: provider.id,
+        state: 'configured',
+        model: 'synthetic-model'
+      })),
+      { provider: 'jev', state: 'missing', model: null }
+    ])
     expect(JSON.stringify(status)).not.toContain(syntheticKey)
     expect(readFileSync(path.join(profile, 'orca-data.json'), 'utf8')).not.toContain(syntheticKey)
     for (const provider of providers) {
@@ -125,7 +132,7 @@ test('official API accounts: encrypted persistence, explicit mock probes, failur
         {
           packageFingerprint,
           providers: providers.map((provider) => provider.id),
-          network: 'mock fetch; no vendor requests',
+          network: 'mock Electron net.fetch; no vendor requests',
           encryption: 'Electron safeStorage with mock keychain in isolated HOME',
           verifiedAt: new Date().toISOString()
         },

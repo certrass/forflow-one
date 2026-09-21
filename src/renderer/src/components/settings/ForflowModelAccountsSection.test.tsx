@@ -17,7 +17,7 @@ let api: ForflowModelAccountsApi
 beforeEach(async () => {
   await i18n.changeLanguage('zh')
   vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
-  accounts = (['kimi', 'zhipu', 'deepseek'] as const).map((provider) => ({
+  accounts = (['kimi', 'zhipu', 'deepseek', 'jev'] as const).map((provider) => ({
     provider,
     state: 'missing',
     model: null
@@ -46,6 +46,23 @@ afterEach(async () => {
 })
 
 describe('domestic API accounts', () => {
+  it('exposes Jev separately with a pinned model and no request on save', async () => {
+    render(<ForflowModelAccountsSection localHost />)
+    const summary = await screen.findByText('Jev 审计 Beta · API 配置')
+    summary.closest('details')?.setAttribute('open', '')
+    const row = within(await screen.findByRole('region', { name: 'Jev · 审计 Beta' }))
+    expect(row.getByLabelText('模型名称')).toHaveValue('jev-1.13.0')
+    const key = row.getByLabelText('API Key')
+    fireEvent.change(key, { target: { value: 'synthetic-jev-key' } })
+    fireEvent.click(row.getByRole('button', { name: '保存配置' }))
+    await waitFor(() => expect(key).toHaveValue(''))
+    expect(api.save).toHaveBeenCalledWith({
+      provider: 'jev',
+      model: 'jev-1.13.0',
+      apiKey: 'synthetic-jev-key'
+    })
+    expect(api.test).not.toHaveBeenCalled()
+  })
   it.each(['Kimi', '智谱 GLM', 'DeepSeek'])(
     'saves and explicitly tests %s without retaining the input key',
     async (label) => {
@@ -118,7 +135,7 @@ describe('domestic API accounts', () => {
     expect(row.getByRole('alert').textContent).not.toContain('synthetic-key-do-not-log')
   })
 
-  it.each(['kimi', '月之暗面', '智谱', 'deepseek', '深度求索'])(
+  it.each(['kimi', '月之暗面', '智谱', 'deepseek', '深度求索', 'Jev', 'Typesafe', '审计'])(
     'finds this section by %s',
     (query) => {
       expect(matchesSettingsSearch(query, getAccountsPaneSearchEntries())).toBe(true)

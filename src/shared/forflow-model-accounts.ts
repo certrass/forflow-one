@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const forflowModelProviderSchema = z.enum(['kimi', 'zhipu', 'deepseek'])
+export const forflowModelProviderSchema = z.enum(['kimi', 'zhipu', 'deepseek', 'jev'])
 export type ForflowModelProvider = z.infer<typeof forflowModelProviderSchema>
 
 export const FORFLOW_MODEL_PROVIDERS = {
@@ -15,6 +15,12 @@ export const FORFLOW_MODEL_PROVIDERS = {
     baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     modelExample: 'glm-5.3',
     docsUrl: 'https://docs.bigmodel.cn/cn/guide/develop/openai/introduction'
+  },
+  jev: {
+    label: 'Jev · 审计 Beta',
+    baseUrl: 'https://api.typesafe.ai/v1',
+    modelExample: 'jev-1.13.0',
+    docsUrl: 'https://docs.typesafe.ai/introduction/quickstart'
   },
   deepseek: {
     label: 'DeepSeek',
@@ -50,6 +56,10 @@ export const forflowModelAccountInputSchema = z
       .optional()
   })
   .strict()
+  .refine((value) => value.provider !== 'jev' || /^jev-\d+\.\d+\.\d+$/.test(value.model), {
+    message: 'Jev 审计需要固定模型版本，例如 jev-1.13.0。',
+    path: ['model']
+  })
 export type ForflowModelAccountInput = z.infer<typeof forflowModelAccountInputSchema>
 export type ForflowModelAccount = {
   provider: ForflowModelProvider

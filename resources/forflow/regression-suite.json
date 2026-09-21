@@ -1,4 +1,5 @@
 [
+  "src/main/codex-usage/codex-review.test.ts",
   "src/main/automations/codex-automation-reader.test.ts",
   "src/main/ipc/automations-external-scope.test.ts",
   "src/renderer/src/components/automations/CodexAutomationsPanel.test.tsx",

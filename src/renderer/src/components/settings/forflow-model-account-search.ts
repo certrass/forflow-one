@@ -18,6 +18,9 @@ export function getForflowModelAccountSearchEntries(): SettingsSearchEntry[] {
         'DeepSeek',
         '深度求索',
         'API',
+        'Jev',
+        'Typesafe',
+        '审计',
         '账户',
         '密钥'
       ]

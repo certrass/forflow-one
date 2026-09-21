@@ -9,6 +9,8 @@ import {
 } from '../../shared/forflow-model-accounts'
 import { ForflowModelAccountStorage } from './model-account-storage'
 import { ForflowModelAccountClient } from './model-account-client'
+import { JEV_MODEL, JEV_ENDPOINT, type JevRequest } from '../../shared/jev-audit-types'
+import { buildJevRequest } from './jev-audit-input'
 
 let directory: string
 let client: ForflowModelAccountClient
@@ -39,6 +41,44 @@ afterEach(() => {
 })
 
 describe('bounded explicit connection tests', () => {
+  it('tests Jev with typed choice questions, a pinned model and only synthetic text', async () => {
+    client.save({ provider: 'jev', model: JEV_MODEL, apiKey: 'fixture-jev-key' })
+    const payload: JevRequest = buildJevRequest(JEV_MODEL, {
+      focus: 'Verify the arithmetic claim.',
+      claim: '2 + 2 = 4',
+      record: '2 + 2 = 4',
+      result: null,
+      partial: false
+    })
+    request.mockResolvedValue(
+      response({
+        model: JEV_MODEL,
+        answers: Object.fromEntries(
+          Object.entries(payload.questions).map(([id, question]) => {
+            const options = Object.keys(question.criteria)
+            return [
+              id,
+              {
+                type: 'choice',
+                choice: options[0],
+                confidence: 1,
+                probabilities: Object.fromEntries(
+                  options.map((option, i) => [option, i === 0 ? 1 : 0])
+                )
+              }
+            ]
+          })
+        ),
+        usage: { input_tokens: 100, output_tokens: 0 }
+      })
+    )
+    expect((await client.test('jev')).ok).toBe(true)
+    expect(request).toHaveBeenCalledExactlyOnceWith(
+      JEV_ENDPOINT,
+      expect.objectContaining({ body: JSON.stringify(payload) })
+    )
+    expect(() => client.save({ provider: 'jev', model: 'jev-latest' })).toThrow('配置格式无效')
+  })
   it.each<ForflowModelProvider>(['kimi', 'zhipu', 'deepseek'])(
     'uses only the official %s destination and fixed prompt',
     async (provider) => {

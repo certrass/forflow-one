@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Activity, Brain, DatabaseZap, FolderKanban, Sparkles } from 'lucide-react'
-import type { CodexUsageRange, CodexUsageScope } from '../../../../shared/codex-usage-types'
+import { RANGE_OPTIONS, RANGE_LABELS, SCOPE_OPTIONS } from './codex-usage-filter-options'
 import { useAppStore } from '../../store'
 import { ClaudeUsageLoadingState } from './ClaudeUsageLoadingState'
 import { CodexUsageDetails } from './CodexUsageDetails'
@@ -12,43 +12,12 @@ import { UsageFilterRadioGroup, UsageTrackingPaneShell } from './UsageTrackingPa
 import { formatTokens, formatUpdatedAt } from './usage-formatters'
 import { translate } from '@/i18n/i18n'
 
-const RANGE_OPTIONS: CodexUsageRange[] = ['7d', '30d', '90d', 'all']
-const SCOPE_OPTIONS: { value: CodexUsageScope; label: string }[] = [
-  {
-    value: 'orca',
-    get label() {
-      return translate('auto.components.stats.CodexUsagePane.201766b754', 'Orca worktrees only')
-    }
-  },
-  {
-    value: 'all',
-    get label() {
-      return translate('auto.components.stats.CodexUsagePane.4fe8820098', 'All local Codex usage')
-    }
-  }
-]
-const RANGE_LABELS: Record<CodexUsageRange, string> = {
-  get '7d'() {
-    return translate('auto.components.stats.CodexUsagePane.rangeLast7Days', 'Last 7 days')
-  },
-  get '30d'() {
-    return translate('auto.components.stats.CodexUsagePane.rangeLast30Days', 'Last 30 days')
-  },
-  get '90d'() {
-    return translate('auto.components.stats.CodexUsagePane.rangeLast90Days', 'Last 90 days')
-  },
-  get all() {
-    return translate('auto.components.stats.CodexUsagePane.rangeAllTime', 'All time')
-  }
-}
-
 export function CodexUsagePane(): React.JSX.Element {
   const scanState = useAppStore((state) => state.codexUsageScanState)
   const summary = useAppStore((state) => state.codexUsageSummary)
   const daily = useAppStore((state) => state.codexUsageDaily)
   const modelBreakdown = useAppStore((state) => state.codexUsageModelBreakdown)
   const projectBreakdown = useAppStore((state) => state.codexUsageProjectBreakdown)
-  const recentSessions = useAppStore((state) => state.codexUsageRecentSessions)
   const scope = useAppStore((state) => state.codexUsageScope)
   const range = useAppStore((state) => state.codexUsageRange)
   const fetchCodexUsage = useAppStore((state) => state.fetchCodexUsage)
@@ -212,7 +181,6 @@ export function CodexUsagePane(): React.JSX.Element {
         daily={daily}
         modelBreakdown={modelBreakdown}
         projectBreakdown={projectBreakdown}
-        recentSessions={recentSessions}
         summary={summary}
       />
     </UsageTrackingPaneShell>

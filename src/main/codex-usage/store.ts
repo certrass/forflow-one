@@ -24,6 +24,8 @@ import { resolveCodexAutomationRunUsage } from './codex-automation-run-attributi
 import { buildRecentSessions } from './codex-usage-session-rows'
 import { buildBreakdown, buildDaily, buildSummary } from './codex-usage-rollup-projections'
 import { UsageProviderStoreLifecycle } from '../usage/usage-provider-store-lifecycle'
+import { buildCodexAnalytics } from './codex-session-analytics'
+import type { CodexAnalyticsQuery, CodexReviewSourceQuery } from '../../shared/codex-review-types'
 
 const SCHEMA_VERSION = CODEX_USAGE_SCHEMA_VERSION
 
@@ -166,5 +168,50 @@ export class CodexUsageStore extends UsageProviderStoreLifecycle<
       refresh: (force) => this.refresh(force),
       isScanning: () => this.getScanState().isScanning
     })
+  }
+
+  async getAnalytics(query: CodexAnalyticsQuery) {
+    await this.refresh(false)
+    if (!this.state.scanState.enabled) {
+      return { rows: [], total: 0, page: 1, pageSize: query.pageSize, projects: [] }
+    }
+    return buildCodexAnalytics(this.state, query)
+  }
+
+  async getReviewSource(query: CodexReviewSourceQuery) {
+    if (!this.state.scanState.enabled) {
+      throw new Error('请先启用 Codex 使用情况读取')
+    }
+    const scan = await this.refresh(true)
+    if (scan.lastScanError) {
+      throw new Error('无法刷新当前用量索引，请重试后再审阅')
+    }
+    const session = this.state.sessions.find((entry) => entry.sessionId === query.sessionId)
+    if (!session) {
+      throw new Error('会话已不在当前索引中，请刷新使用记录')
+    }
+    const analytics = await buildCodexAnalytics(
+      { ...this.state, sessions: [session] },
+      {
+        ...query,
+        search: '',
+        project: '',
+        order: 'recent',
+        page: 1,
+        pageSize: 1
+      }
+    )
+    const usage = analytics.rows[0]
+    if (!usage) {
+      throw new Error('当前期间或工作区范围中没有此会话')
+    }
+    const repos = this.auditStore.getRepos()
+    const refs = createWorktreeRefs(repos, loadKnownUsageWorktreesByRepo(this.auditStore, repos))
+    const resolver = await createUsageWorktreeResolver(refs)
+    const audit = await readCodexUsageAudit(this.state, query.scope, query.range, resolver, {
+      sessionId: query.sessionId,
+      rowLimit: 200
+    })
+    return { usage, audit }
   }
 }

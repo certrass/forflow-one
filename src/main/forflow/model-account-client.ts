@@ -8,6 +8,9 @@ import {
 } from '../../shared/forflow-model-accounts'
 import { readFetchResponseJsonWithinLimit } from '../../shared/fetch-response-body'
 import type { ForflowModelAccountStorage } from './model-account-storage'
+import { getMainHttpClient } from '../network/http-client'
+import { buildJevRequest } from './jev-audit-input'
+import { requestJev } from './jev-client'
 
 const responseSchema = z.object({
   choices: z
@@ -47,7 +50,10 @@ export class ForflowModelAccountClient {
   private readonly pending = new Map<ForflowModelProvider, PendingTest>()
   constructor(
     private readonly storage: ForflowModelAccountStorage,
-    private readonly request: typeof fetch = fetch
+    private readonly request: (
+      url: string,
+      init?: RequestInit
+    ) => Promise<Response> = getMainHttpClient().fetch
   ) {}
 
   list(): ForflowModelAccount[] {
@@ -94,6 +100,21 @@ export class ForflowModelAccountClient {
       const credential = this.storage.credential(provider)
       if (!credential) {
         return result(false, '请先保存此提供商的账户。')
+      }
+      if (provider === 'jev') {
+        await requestJev(
+          buildJevRequest(credential.model, {
+            focus: 'Verify the arithmetic claim.',
+            claim: '2 + 2 = 4',
+            record: '2 + 2 = 4',
+            result: null,
+            partial: false
+          }),
+          credential.apiKey,
+          this.request,
+          controller.signal
+        )
+        return result(true, 'Jev 已返回有效的结构化响应；测试仅使用固定算术文本。')
       }
       const response = await this.request(
         `${FORFLOW_MODEL_PROVIDERS[provider].baseUrl}/chat/completions`,

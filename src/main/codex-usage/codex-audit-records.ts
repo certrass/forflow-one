@@ -10,7 +10,7 @@ function text(value: unknown): string | null {
   return typeof value === 'string' && value.length <= 256 ? value : null
 }
 
-export type AuditCursor = { sessionId: string | null; cwd: string | null }
+export type AuditCursor = { sessionId: string | null; cwd: string | null; turnId?: string | null }
 export type AuditAccumulator = {
   audit: CodexUsageAudit
   cutoff: string | null
@@ -18,6 +18,10 @@ export type AuditAccumulator = {
   seen: Set<string>
   calls: Map<string, CodexAuditRow>
   results: Set<string>
+  resultSources: Map<string, NonNullable<CodexAuditRow['resultSource']>>
+  identities: Map<string, string>
+  sessionId?: string
+  rowLimit?: number
 }
 
 export function collectCodexAuditLine(
@@ -42,10 +46,16 @@ export function collectCodexAuditLine(
   if (row.type === 'session_meta') {
     cursor.sessionId = text(payload.id)
     cursor.cwd = typeof payload.cwd === 'string' ? payload.cwd : null
+    cursor.turnId = null
     return
   }
   if (row.type === 'turn_context') {
     cursor.cwd = typeof payload.cwd === 'string' ? payload.cwd : cursor.cwd
+    cursor.turnId = text(payload.turn_id)
+  }
+  const sessionId = text(payload.session_id) ?? cursor.sessionId
+  if (accumulator.sessionId && sessionId !== accumulator.sessionId) {
+    return
   }
   const timestamp = text(row.timestamp)
   const day = timestamp ? getLocalUsageDay(timestamp) : null
@@ -63,12 +73,21 @@ export function collectCodexAuditLine(
   }
   const identity = createHash('sha256').update(line).digest('hex')
   const callId = text(payload.call_id)
+  const namespace = JSON.stringify([sessionId ?? sourcePath, cursor.turnId ?? null])
+  const scopedCallId = `${namespace}:tool:${callId}`
   if (
     row.type === 'response_item' &&
     (payload.type === 'function_call_output' || payload.type === 'custom_tool_call_output')
   ) {
     if (callId) {
-      results.add(callId)
+      const outputKey = `${scopedCallId}:output`
+      const previous = accumulator.identities.get(outputKey)
+      if (previous && previous !== identity) {
+        audit.conflictingRecords = (audit.conflictingRecords ?? 0) + 1
+      }
+      accumulator.identities.set(outputKey, identity)
+      accumulator.resultSources.set(scopedCallId, { sourcePath, byteOffset, contentHash: identity })
+      results.add(scopedCallId)
     }
     return
   }
@@ -76,7 +95,7 @@ export function collectCodexAuditLine(
   let name: string
   let recordId: string | null = null
   let tokens: number | null = null
-  let key = identity
+  let key = `${namespace}:${identity}`
   if (
     row.type === 'turn_context' ||
     row.type === 'compacted' ||
@@ -92,7 +111,7 @@ export function collectCodexAuditLine(
     kind = 'request'
     name = '模型响应用量'
     recordId = text(payload.response_id)
-    key = `request:${recordId}`
+    key = `${namespace}:request:${recordId}`
     tokens =
       record(payload.usage) &&
       typeof payload.usage.total_tokens === 'number' &&
@@ -108,14 +127,18 @@ export function collectCodexAuditLine(
     kind = 'tool'
     name = text(payload.name) ?? '未命名工具'
     recordId = callId
-    key = `tool:${callId}`
+    key = scopedCallId
   } else {
     return
   }
   if (seen.has(key)) {
+    if (accumulator.identities.get(key) !== identity) {
+      audit.conflictingRecords = (audit.conflictingRecords ?? 0) + 1
+    }
     return
   }
   seen.add(key)
+  accumulator.identities.set(key, identity)
   const entry: CodexAuditRow = {
     kind,
     name,
@@ -123,20 +146,23 @@ export function collectCodexAuditLine(
     timestamp,
     sourcePath,
     byteOffset,
-    sessionId: text(payload.session_id) ?? cursor.sessionId,
+    sessionId,
     tokens,
-    hasResult: kind === 'tool' ? false : null
+    hasResult: kind === 'tool' ? false : null,
+    evidenceKey: createHash('sha256').update(key).digest('hex'),
+    contentHash: identity
   }
   audit.counts[kind]++
   audit.rows.push(entry)
   if (kind === 'tool' && callId) {
-    calls.set(callId, entry)
+    calls.set(scopedCallId, entry)
   }
 }
 
 export function finishCodexAudit(accumulator: AuditAccumulator): void {
   for (const [callId, row] of accumulator.calls) {
     row.hasResult = accumulator.results.has(callId)
+    row.resultSource = accumulator.resultSources.get(callId)
     if (row.hasResult) {
       accumulator.audit.toolResults++
     }
@@ -145,5 +171,5 @@ export function finishCodexAudit(accumulator: AuditAccumulator): void {
   const counts = { context: 0, request: 0, tool: 0, data: 0 }
   accumulator.audit.rows = accumulator.audit.rows
     .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
-    .filter((row) => ++counts[row.kind] <= 12)
+    .filter((row) => ++counts[row.kind] <= (accumulator.rowLimit ?? 12))
 }

@@ -1,4 +1,5 @@
 import { open } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import type { CodexUsageRange, CodexUsageScope } from '../../shared/codex-usage-types'
 import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
 import type { UsageWorktreeResolver } from '../usage/usage-worktree-resolver'
@@ -8,6 +9,7 @@ import { getFilteredSessions } from './codex-usage-scope-filters'
 import {
   collectCodexAuditLine,
   finishCodexAudit,
+  type AuditCursor,
   type AuditAccumulator
 } from './codex-audit-records'
 
@@ -18,7 +20,8 @@ export async function readCodexUsageAudit(
   state: CodexUsagePersistedState,
   scope: CodexUsageScope,
   range: CodexUsageRange,
-  resolveWorktree: UsageWorktreeResolver
+  resolveWorktree: UsageWorktreeResolver,
+  options: { sessionId?: string; rowLimit?: number } = {}
 ): Promise<CodexUsageAudit> {
   const audit: CodexUsageAudit = {
     scope,
@@ -33,13 +36,17 @@ export async function readCodexUsageAudit(
     skippedUnknownScope: 0,
     counts: { context: 0, request: 0, tool: 0, data: 0 },
     toolResults: 0,
-    rows: []
+    rows: [],
+    sources: [],
+    conflictingRecords: 0
   }
   if (!state.scanState.enabled) {
     return audit
   }
   const selected = new Set(
-    getFilteredSessions(state, scope, range).map((session) => session.sessionId)
+    getFilteredSessions(state, scope, range)
+      .filter((session) => !options.sessionId || session.sessionId === options.sessionId)
+      .map((session) => session.sessionId)
   )
   const files = state.processedFiles
     .filter((file) => file.sessions.some((session) => selected.has(session.sessionId)))
@@ -51,7 +58,11 @@ export async function readCodexUsageAudit(
     resolveWorktree,
     seen: new Set(),
     calls: new Map(),
-    results: new Set()
+    results: new Set(),
+    resultSources: new Map(),
+    identities: new Map(),
+    sessionId: options.sessionId,
+    rowLimit: options.rowLimit
   }
   for (const file of files.slice(0, MAX_FILES)) {
     try {
@@ -65,6 +76,14 @@ export async function readCodexUsageAudit(
         const start = Math.max(0, stat.size - MAX_FILE_BYTES)
         const buffer = Buffer.alloc(Math.min(stat.size, MAX_FILE_BYTES))
         const { bytesRead } = await handle.read(buffer, 0, buffer.length, start)
+        audit.sources?.push({
+          path: file.path,
+          start,
+          end: start + bytesRead,
+          size: stat.size,
+          mtimeMs: stat.mtimeMs,
+          sha256: createHash('sha256').update(buffer.subarray(0, bytesRead)).digest('hex')
+        })
         audit.filesRead++
         if (start > 0) {
           audit.truncatedFiles++
@@ -73,7 +92,39 @@ export async function readCodexUsageAudit(
         if (start > 0 && offset === 0) {
           continue
         }
-        const cursor = { sessionId: null, cwd: null }
+        const cursor: AuditCursor = {
+          sessionId: file.sessions.length === 1 ? file.sessions[0].sessionId : null,
+          cwd: null
+        }
+        if (start > 0) {
+          const header = Buffer.alloc(Math.min(stat.size, 65536))
+          const read = await handle.read(header, 0, header.length, 0)
+          cursor.sessionId = null
+          try {
+            const metadata: unknown = JSON.parse(
+              header.toString('utf8', 0, Math.min(read.bytesRead, header.indexOf(10)))
+            )
+            if (
+              metadata &&
+              typeof metadata === 'object' &&
+              'type' in metadata &&
+              metadata.type === 'session_meta' &&
+              'payload' in metadata
+            ) {
+              const payload = metadata.payload
+              if (
+                payload &&
+                typeof payload === 'object' &&
+                'id' in payload &&
+                typeof payload.id === 'string'
+              ) {
+                cursor.sessionId = payload.id
+              }
+            }
+          } catch {
+            /* A partial header cannot establish session identity. */
+          }
+        }
         while (offset < bytesRead) {
           const end = buffer.indexOf(10, offset)
           if (end === -1 || end >= bytesRead) {

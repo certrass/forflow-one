@@ -13,15 +13,17 @@ import { SettingsBadge } from './SettingsFormControls'
 export function ForflowModelAccountCard({
   account,
   api,
-  onChanged
+  onChanged,
+  defaultModel = ''
 }: {
   account: ForflowModelAccount
   api: ForflowModelAccountsApi
   onChanged: (account: ForflowModelAccount) => void
+  defaultModel?: string
 }): React.JSX.Element {
   const id = useId()
   const provider = FORFLOW_MODEL_PROVIDERS[account.provider]
-  const [model, setModel] = useState(account.model ?? '')
+  const [model, setModel] = useState(account.model ?? defaultModel)
   const [apiKey, setApiKey] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -45,7 +47,7 @@ export function ForflowModelAccountCard({
       } else if (action === 'remove') {
         await api.remove(account.provider)
         onChanged({ provider: account.provider, state: 'missing', model: null })
-        setModel('')
+        setModel(defaultModel)
         setApiKey('')
         setMessage(translate('forflow.modelAccounts.removed', '已移除此 API 配置。'))
       } else {
