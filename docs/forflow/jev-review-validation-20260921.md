@@ -6,7 +6,7 @@
 
 Review 顶部展示来源、版本、审阅者、评论、检查和状态；下方包含审阅说明、检查、活动记录、评论，以及问题／版本变化／记录／Jev 页签。从具体记录可直接准备 Jev 预览，采纳后的问题和调用可定位原片段。保留原概览的每日强度和 Token 分布，并在最终包中实际检查。
 
-基线为 `55df22488be40034e44c58bada2bdbdb1620607e`，分支 `codex/forflow-cn-v1.4.205`。本轮修改尚未提交。
+构建起始基线为 `55df22488be40034e44c58bada2bdbdb1620607e`，分支 `codex/forflow-cn-v1.4.205`。验证期间共享工作区新增提交 `296221fa118f462cdf39bec0c17aba701c1814d0`，已包含本轮源码、整包测试及固定样本；当前源码和测试与该提交一致，最终文档更新尚未提交。本任务未执行提交或推送。候选仍按下方实际包指纹登记。
 
 - 最终候选：`~/Library/Caches/Forflow One/builds/review-jev-v2-20260921/mac-arm64/Forflow One.app`，`1.4.205-forflow.25`，macOS arm64，本机 ad-hoc 签名。
 - `app.asar` SHA-256：`eae4747cbf0241fedc4060b83eb1121a77daf7e137ba5816b03bc66a8ad7c096`。
