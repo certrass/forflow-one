@@ -1,3 +1,4 @@
+import { selectReviewFiles, captureReviewIntake } from './workspace-review-intake-qa'
 import { test, expect, type Page } from '@stablyai/playwright-test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -53,9 +54,9 @@ function seedRemoteTarget(profile: string): void {
 async function chooseTarget(page: Page, name: string): Promise<void> {
   await page
     .getByTestId('workspace-review-intake')
-    .getByRole('combobox', { name: '工作区', exact: true })
+    .getByRole('combobox', { name: '项目', exact: true })
     .click()
-  await page.getByPlaceholder('搜索工作区').fill(name)
+  await page.getByPlaceholder('搜索项目').fill(name)
   await page.getByRole('option').filter({ hasText: name }).click()
 }
 
@@ -69,7 +70,7 @@ async function showWorkspaceReviews(page: Page, initial = false): Promise<void> 
     await page.getByRole('menuitem', { name: 'Codex', exact: true }).click()
   }
   await page.getByRole('tab', { name: '审阅', exact: true }).click()
-  await page.getByRole('tab', { name: '研发工作区', exact: true }).click()
+  await page.getByRole('tab', { name: '项目', exact: true }).click()
 }
 
 test('workspace review package: registered targets, local evidence, sensitive disposition, versions and restart', async () => {
@@ -93,9 +94,13 @@ test('workspace review package: registered targets, local evidence, sensitive di
     })
     await addPrivateProject(page, profile)
     const repo = path.join(profile, '测试项目')
+    mkdirSync(path.join(repo, 'docs'))
     const source = path.join(repo, 'code.ts')
     writeFileSync(source, `export const apiKey = '${credential}'\nexport const result = 1\n`)
-    writeFileSync(path.join(repo, 'requirements.md'), 'Keep behavior. Remove the credential.\n')
+    writeFileSync(
+      path.join(repo, 'docs/requirements.md'),
+      'Keep behavior. Remove the credential.\n'
+    )
     writeFileSync(
       path.join(repo, 'checks.txt'),
       'Synthetic receipt: 3 passed; version unverified.\n'
@@ -129,17 +134,18 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await chooseTarget(page, remoteName)
     const intake = page.getByTestId('workspace-review-intake')
     await expect(intake).toContainText('远端内容尚未读取')
-    await expect(
-      intake.getByRole('button', { name: '保存本机审阅快照', exact: true })
-    ).toBeDisabled()
+    await expect(intake.getByRole('button', { name: '进入审阅', exact: true })).toBeDisabled()
     await chooseTarget(page, repo)
     await intake
-      .getByRole('textbox', { name: '目标与检查说明', exact: true })
+      .getByRole('textbox', { name: '检查目标', exact: true })
       .fill('保留原功能，核对选定代码与验收材料；检查敏感线索及其处置依据。')
-    await intake.getByRole('textbox', { name: '代码', exact: true }).fill('code.ts')
-    await intake.getByRole('textbox', { name: '文档与需求', exact: true }).fill('requirements.md')
-    await intake.getByRole('textbox', { name: '测试与构建回执', exact: true }).fill('checks.txt')
-    await intake.getByRole('button', { name: '保存本机审阅快照', exact: true }).click()
+    await selectReviewFiles(intake, [
+      { path: 'code.ts' },
+      { path: 'docs/requirements.md' },
+      { path: 'checks.txt', verification: true }
+    ])
+    await captureReviewIntake(app, page)
+    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')
     await expect(review.getByTestId('workspace-review-summary')).toContainText('流向：未知')
     await expect(review.getByRole('button', { name: '确认此版本', exact: true })).toBeDisabled()
@@ -148,7 +154,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     expect(initial.versions[0].usage).toBeNull()
     expect(initial.versions[0].workspace?.selection.files).toEqual([
       { path: 'code.ts', kind: 'code' },
-      { path: 'requirements.md', kind: 'document' },
+      { path: 'docs/requirements.md', kind: 'document' },
       { path: 'checks.txt', kind: 'verification' }
     ])
     expect(initial.versions[0].workspace?.git.status).toBe('ready')
@@ -201,13 +207,13 @@ test('workspace review package: registered targets, local evidence, sensitive di
       .fill('仅验收明确选择的三个文件，测试回执尚待版本关联。')
     await review.getByRole('button', { name: '保存评论', exact: true }).click()
     await expect(review).toContainText('仅验收明确选择的三个文件，测试回执尚待版本关联。')
-    await review.getByRole('button', { name: '返回工作区审阅', exact: true }).click()
+    await review.getByRole('button', { name: '返回项目审阅', exact: true }).click()
     await chooseTarget(page, 'Folder review fixture')
     await intake
-      .getByRole('textbox', { name: '目标与检查说明', exact: true })
+      .getByRole('textbox', { name: '检查目标', exact: true })
       .fill('审阅普通文件夹中的指定说明。')
-    await intake.getByRole('textbox', { name: '文档与需求', exact: true }).fill('notes.md')
-    await intake.getByRole('button', { name: '保存本机审阅快照', exact: true }).click()
+    await selectReviewFiles(intake, [{ path: 'notes.md' }])
+    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     await expect(review).toContainText('Folder review fixture')
     const all = await page.evaluate(() => window.api.codexUsage.listWorkspaceReviews!())
     expect(all).toHaveLength(2)

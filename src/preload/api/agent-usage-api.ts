@@ -1,4 +1,6 @@
 import type {
+  WorkspaceReviewDirectory,
+  WorkspaceReviewDirectoryQuery,
   WorkspaceReviewQuery,
   WorkspaceReviewTarget
 } from '../../shared/workspace-review-types'
@@ -54,6 +56,9 @@ export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBr
 
 export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind> & {
   listWorkspaceReviewTargets?: () => Promise<WorkspaceReviewTarget[]>
+  listWorkspaceReviewFiles?: (
+    args: WorkspaceReviewDirectoryQuery
+  ) => Promise<WorkspaceReviewDirectory>
   listWorkspaceReviews?: () => Promise<CodexReview[]>
   openWorkspaceReview?: (args: WorkspaceReviewQuery) => Promise<CodexReview>
   getAudit?: (args: UsageQueryArgs<CodexUsageSnapshot>) => Promise<CodexUsageAudit>

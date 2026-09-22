@@ -279,5 +279,7 @@
   "config/scripts/jev-evaluator-fingerprint.test.ts",
   "src/main/forflow/jev-native-client.test.ts",
   "src/main/forflow/jev-delivery-input.test.ts",
-  "src/renderer/src/components/stats/JevAuditResults.test.tsx"
+  "src/renderer/src/components/stats/JevAuditResults.test.tsx",
+  "src/main/review/workspace-review-directory.test.ts",
+  "src/renderer/src/components/stats/WorkspaceReviewFilePicker.test.tsx"
 ]

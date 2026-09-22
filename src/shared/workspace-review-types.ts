@@ -13,6 +13,17 @@ export const workspaceReviewTargetSchema = z.object({
 })
 export type WorkspaceReviewTarget = z.infer<typeof workspaceReviewTargetSchema>
 
+export const workspaceReviewDirectoryQuerySchema = z.object({
+  workspaceId: z.string().min(1).max(2000),
+  directory: z.string().max(2000)
+})
+export type WorkspaceReviewDirectoryQuery = z.infer<typeof workspaceReviewDirectoryQuerySchema>
+export type WorkspaceReviewDirectory = {
+  directory: string
+  entries: { path: string; name: string; kind: 'file' | 'directory' }[]
+  truncated: boolean
+}
+
 export const workspaceReviewSelectionSchema = z.object({
   files: z
     .array(

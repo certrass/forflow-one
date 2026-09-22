@@ -60,7 +60,11 @@ export function normalizeWorkspaceReviewPath(path: string): string {
   }
 }
 
-async function assertUnlinkedPath(root: string, relativePath: string): Promise<string> {
+async function assertUnlinkedPath(
+  root: string,
+  relativePath: string,
+  leafKind: 'file' | 'directory' = 'file'
+): Promise<string> {
   const parts = relativePath.split('/')
   let path = root
   for (const [index, part] of parts.entries()) {
@@ -68,7 +72,9 @@ async function assertUnlinkedPath(root: string, relativePath: string): Promise<s
     const entry = await lstat(path)
     if (
       entry.isSymbolicLink() ||
-      (index < parts.length - 1 ? !entry.isDirectory() : !entry.isFile())
+      (index < parts.length - 1 || leafKind === 'directory'
+        ? !entry.isDirectory()
+        : !entry.isFile())
     ) {
       throw new WorkspaceReviewUnsafePathError()
     }
@@ -78,6 +84,34 @@ async function assertUnlinkedPath(root: string, relativePath: string): Promise<s
     throw new WorkspaceReviewUnsafePathError()
   }
   return canonical
+}
+
+export async function resolveWorkspaceReviewDirectory(
+  root: WorkspaceReviewRoot,
+  directory: string,
+  authorizePath: WorkspaceReviewAuthorizePath
+): Promise<{ path: string; stats: Stats }> {
+  const normalized = directory === '' ? '' : normalizeWorkspaceReviewPath(directory)
+  const path = normalized ? await assertUnlinkedPath(root.path, normalized, 'directory') : root.path
+  const before = await lstat(path)
+  if (resolve(await authorizePath(path)) !== resolve(path)) {
+    throw new WorkspaceReviewUnsafePathError()
+  }
+  const currentRoot = await resolveWorkspaceReviewRoot(root.path, authorizePath)
+  const currentPath = normalized
+    ? await assertUnlinkedPath(root.path, normalized, 'directory')
+    : currentRoot.path
+  const after = await lstat(currentPath)
+  if (
+    currentRoot.identity !== root.identity ||
+    currentPath !== path ||
+    !before.isDirectory() ||
+    !after.isDirectory() ||
+    !sameFile(before, after)
+  ) {
+    throw new WorkspaceReviewUnsafePathError()
+  }
+  return { path, stats: after }
 }
 
 export async function readWorkspaceReviewFile(

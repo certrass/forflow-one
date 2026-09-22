@@ -1,3 +1,4 @@
+import { selectReviewFiles } from './workspace-review-intake-qa'
 import { test, expect } from '@stablyai/playwright-test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -110,19 +111,20 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     await page.getByTestId('usage-provider-select').click()
     await page.getByRole('menuitem', { name: 'Codex', exact: true }).click()
     await page.getByRole('tab', { name: '审阅', exact: true }).click()
-    await page.getByRole('tab', { name: '研发工作区', exact: true }).click()
+    await page.getByRole('tab', { name: '项目', exact: true }).click()
     const intake = page.getByTestId('workspace-review-intake')
-    await intake.getByRole('combobox', { name: '工作区', exact: true }).click()
-    await page.getByPlaceholder('搜索工作区').fill('交付质量成品验证')
+    await intake.getByRole('combobox', { name: '项目', exact: true }).click()
+    await page.getByPlaceholder('搜索项目').fill('交付质量成品验证')
     await page.getByRole('option').filter({ hasText: '交付质量成品验证' }).click()
     await intake
-      .getByRole('textbox', { name: '目标与检查说明', exact: true })
+      .getByRole('textbox', { name: '检查目标', exact: true })
       .fill('新增问题后重启，标题和状态保持一致。')
-    await intake
-      .getByRole('textbox', { name: '文档与需求', exact: true })
-      .fill('requirement.md\nhandoff.md')
-    await intake.getByRole('textbox', { name: '测试与构建回执', exact: true }).fill('receipt.txt')
-    await intake.getByRole('button', { name: '保存本机审阅快照', exact: true }).click()
+    await selectReviewFiles(intake, [
+      { path: 'requirement.md' },
+      { path: 'handoff.md' },
+      { path: 'receipt.txt', verification: true }
+    ])
+    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')
     await review.getByRole('tab', { name: 'Jev · Beta', exact: true }).click()
     const panel = review.getByTestId('jev-audit-panel')

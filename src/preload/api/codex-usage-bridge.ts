@@ -5,6 +5,8 @@ import type { PreloadApi } from '../api-types'
 export const codexUsageApi = {
   ...createUsageProviderApi(ipcRenderer, 'codexUsage'),
   listWorkspaceReviewTargets: () => ipcRenderer.invoke('codexUsage:listWorkspaceReviewTargets'),
+  listWorkspaceReviewFiles: (args) =>
+    ipcRenderer.invoke('codexUsage:listWorkspaceReviewFiles', args),
   listWorkspaceReviews: () => ipcRenderer.invoke('codexUsage:listWorkspaceReviews'),
   openWorkspaceReview: (args) => ipcRenderer.invoke('codexUsage:openWorkspaceReview', args),
   getAudit: (args) => ipcRenderer.invoke('codexUsage:getAudit', args),

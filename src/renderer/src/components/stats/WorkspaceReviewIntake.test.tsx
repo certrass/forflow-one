@@ -12,6 +12,10 @@ import { review } from './review-workspace-fixtures'
 import { WorkspaceReviewIntake } from './WorkspaceReviewIntake'
 
 const originalApi = window.api
+let rootPath = targetRoot()
+function targetRoot() {
+  return '/fixture/project'
+}
 const target: WorkspaceReviewTarget = {
   id: 'workspace-folder-1',
   selector: 'folder:one',
@@ -24,15 +28,26 @@ const target: WorkspaceReviewTarget = {
   unavailableReason: null
 }
 const open = vi.fn<(query: WorkspaceReviewQuery) => Promise<CodexReview>>()
+const analytics = vi.fn(async () => ({
+  rows: [],
+  total: 0,
+  page: 1,
+  pageSize: 10,
+  projects: [],
+  reviews: {}
+}))
 beforeEach(async () => {
   await i18n.changeLanguage('zh')
   open.mockReset().mockResolvedValue(review)
+  rootPath = targetRoot()
+  analytics.mockClear()
   Object.defineProperty(window, 'api', {
     configurable: true,
     value: {
       codexUsage: {
         listWorkspaceReviewTargets: async () => [
-          target,
+          { ...target, rootPath },
+          { ...target, id: 'second', name: 'Second project', rootPath: '/fixture/second' },
           {
             ...target,
             id: 'remote',
@@ -43,14 +58,15 @@ beforeEach(async () => {
           }
         ],
         listWorkspaceReviews: async () => [],
-        getAnalytics: async () => ({
-          rows: [],
-          total: 0,
-          page: 1,
-          pageSize: 10,
-          projects: [],
-          reviews: {}
+        listWorkspaceReviewFiles: async ({ workspaceId }: { workspaceId: string }) => ({
+          directory: '',
+          entries: (workspaceId === 'second'
+            ? ['second.md']
+            : ['code.ts', 'view.tsx', 'checks.log']
+          ).map((path) => ({ path, name: path, kind: 'file' })),
+          truncated: false
         }),
+        getAnalytics: analytics,
         openWorkspaceReview: (query: WorkspaceReviewQuery) => open(query)
       }
     }
@@ -62,13 +78,21 @@ afterEach(async () => {
   await i18n.changeLanguage('en')
 })
 async function selectTarget(name: string) {
-  const picker = screen.getByRole('combobox', { name: '工作区' })
+  const picker = screen.getByRole('combobox', { name: '项目' })
   await waitFor(() => expect(picker).not.toBeDisabled())
   fireEvent.click(picker)
   fireEvent.click(await screen.findByRole('option', { name: new RegExp(name) }))
 }
+async function selectFile(name: string) {
+  fireEvent.click(await screen.findByRole('checkbox', { name }))
+}
+function setGoal() {
+  fireEvent.change(screen.getByLabelText('检查目标'), {
+    target: { value: '重启后问题的标题和状态保持不变' }
+  })
+}
 
-it('saves only explicit paths, categories and goal through the workspace API and locks duplicate submits', async () => {
+it('opens a local review from checked files with no required policy or conversation and locks duplicate submits', async () => {
   let finish: ((value: CodexReview) => void) | undefined
   open.mockImplementation(
     () =>
@@ -78,25 +102,29 @@ it('saves only explicit paths, categories and goal through the workspace API and
   )
   const onOpenReview = vi.fn()
   render(<WorkspaceReviewIntake active onOpenReview={onOpenReview} />)
+  expect(screen.getByRole('button', { name: '进入审阅' })).toBeDisabled()
+  expect(screen.getByText('检查制度或合规要求（可选）').closest('details')).not.toHaveAttribute(
+    'open'
+  )
+  expect(analytics).not.toHaveBeenCalled()
   await selectTarget('Local fixture')
-  fireEvent.change(screen.getByLabelText('目标与检查说明'), {
-    target: { value: '验证恢复行为并保留原功能' }
-  })
-  fireEvent.change(screen.getByLabelText('代码'), {
-    target: { value: ' src/task.ts\n\n src/view.tsx ' }
-  })
-  fireEvent.change(screen.getByLabelText('测试与构建回执'), { target: { value: 'proof/test.txt' } })
-  fireEvent.click(screen.getByRole('button', { name: '保存本机审阅快照' }))
-  fireEvent.click(screen.getByRole('button', { name: '正在读取指定证据…' }))
+  setGoal()
+  expect(screen.getByRole('button', { name: '进入审阅' })).toBeDisabled()
+  await selectFile('code.ts')
+  await selectFile('view.tsx')
+  await selectFile('checks.log')
+  expect(open).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: '进入审阅' }))
+  fireEvent.click(screen.getByRole('button', { name: '正在准备审阅材料…' }))
   expect(open).toHaveBeenCalledTimes(1)
   expect(open).toHaveBeenCalledWith({
     workspaceId: target.id,
-    focus: '验证恢复行为并保留原功能',
+    focus: '重启后问题的标题和状态保持不变',
     selection: {
       files: [
-        { path: 'src/task.ts', kind: 'code' },
-        { path: 'src/view.tsx', kind: 'code' },
-        { path: 'proof/test.txt', kind: 'verification' }
+        { path: 'code.ts', kind: 'code' },
+        { path: 'view.tsx', kind: 'code' },
+        { path: 'checks.log', kind: 'verification' }
       ],
       sessionIds: [],
       policyReference: '',
@@ -108,26 +136,38 @@ it('saves only explicit paths, categories and goal through the workspace API and
   await waitFor(() => expect(onOpenReview).toHaveBeenCalledWith(review))
 })
 
-it('shows the execution-host limitation and cannot submit an unsupported workspace', async () => {
+it('shows the execution-host limitation and cannot submit an unsupported project', async () => {
   render(<WorkspaceReviewIntake active onOpenReview={vi.fn()} />)
   await selectTarget('Remote fixture')
-  expect(screen.getByText('SSH evidence reader is not connected.', { exact: true })).toBeVisible()
-  expect(screen.getByRole('button', { name: '保存本机审阅快照' })).toBeDisabled()
+  expect(
+    screen.getAllByText('SSH evidence reader is not connected.', { exact: true })
+  ).not.toHaveLength(0)
+  expect(screen.getByRole('button', { name: '进入审阅' })).toBeDisabled()
   expect(open).not.toHaveBeenCalled()
 })
 
-it('rejects duplicate file paths across categories without reading the workspace', async () => {
+it('clears the previous project goal and files when choosing another project', async () => {
   render(<WorkspaceReviewIntake active onOpenReview={vi.fn()} />)
   await selectTarget('Local fixture')
-  fireEvent.change(screen.getByLabelText('目标与检查说明'), { target: { value: '审阅选定文件' } })
-  fireEvent.change(screen.getByLabelText('代码'), { target: { value: 'src/task.ts' } })
-  fireEvent.change(screen.getByLabelText('文档与需求'), { target: { value: 'src/task.ts' } })
-  fireEvent.click(screen.getByRole('button', { name: '保存本机审阅快照' }))
-  expect(screen.getByRole('alert')).toHaveTextContent('每个文件路径只需出现一次')
-  expect(open).not.toHaveBeenCalled()
+  setGoal()
+  await selectFile('code.ts')
+  await selectTarget('Second project')
+  expect(screen.getByLabelText('检查目标')).toHaveValue('')
+  expect(screen.queryByRole('button', { name: '移除 code.ts' })).toBeNull()
+  await selectFile('second.md')
+  setGoal()
+  fireEvent.click(screen.getByRole('button', { name: '进入审阅' }))
+  await waitFor(() =>
+    expect(open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 'second',
+        selection: expect.objectContaining({ files: [{ path: 'second.md', kind: 'document' }] })
+      })
+    )
+  )
 })
 
-it('does not pull the user back into Review after they leave during a local snapshot read', async () => {
+it('does not pull the user into an old result after leaving and returning during preparation', async () => {
   let finish: ((value: CodexReview) => void) | undefined
   open.mockImplementation(
     () =>
@@ -138,13 +178,30 @@ it('does not pull the user back into Review after they leave during a local snap
   const onOpenReview = vi.fn()
   const view = render(<WorkspaceReviewIntake active onOpenReview={onOpenReview} />)
   await selectTarget('Local fixture')
-  fireEvent.change(screen.getByLabelText('目标与检查说明'), { target: { value: '审阅选定文件' } })
-  fireEvent.change(screen.getByLabelText('代码'), { target: { value: 'src/task.ts' } })
-  fireEvent.click(screen.getByRole('button', { name: '保存本机审阅快照' }))
+  setGoal()
+  await selectFile('code.ts')
+  fireEvent.click(screen.getByRole('button', { name: '进入审阅' }))
   view.rerender(<WorkspaceReviewIntake active={false} onOpenReview={onOpenReview} />)
+  view.rerender(<WorkspaceReviewIntake active onOpenReview={onOpenReview} />)
   finish?.(review)
   await waitFor(() =>
-    expect(screen.queryByRole('button', { name: '正在读取指定证据…' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '正在准备审阅材料…' })).toBeNull()
   )
   expect(onOpenReview).not.toHaveBeenCalled()
+})
+
+it('clears prior materials when the same project id moves to a different folder', async () => {
+  render(<WorkspaceReviewIntake active onOpenReview={vi.fn()} />)
+  await selectTarget('Local fixture')
+  setGoal()
+  await selectFile('code.ts')
+  rootPath = '/fixture/relocated'
+  fireEvent.click(screen.getByRole('button', { name: '刷新记录' }))
+  await waitFor(() =>
+    expect(screen.getByRole('alert')).toHaveTextContent('项目位置或执行环境已变化')
+  )
+  expect(screen.getByLabelText('检查目标')).toHaveValue('')
+  expect(screen.queryByRole('button', { name: '移除 code.ts' })).toBeNull()
+  expect(screen.getByRole('button', { name: '进入审阅' })).toBeDisabled()
+  expect(open).not.toHaveBeenCalled()
 })

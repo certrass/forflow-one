@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   session: { list: vi.fn(), open: vi.fn(), get: vi.fn(), mutate: vi.fn() },
   catalogList: vi.fn(),
   catalogResolve: vi.fn(),
+  directoryFiles: vi.fn(),
   workspaceEvidence: vi.fn(),
   sessionEvidence: vi.fn(),
   sourceInput: vi.fn(),
@@ -51,6 +52,9 @@ vi.mock('../review/workspace-review-catalog', () => ({
     resolve = mocks.catalogResolve
     git = vi.fn()
   }
+}))
+vi.mock('../review/workspace-review-directory', () => ({
+  listWorkspaceReviewFiles: mocks.directoryFiles
 }))
 vi.mock('../review/workspace-review-source', () => ({
   WorkspaceReviewSource: class {
@@ -161,6 +165,7 @@ beforeEach(() => {
 describe('workspace Review IPC authority and routing', () => {
   it.each([
     ['listWorkspaceReviewTargets', undefined],
+    ['listWorkspaceReviewFiles', { workspaceId: mocks.targetId, directory: '' }],
     ['listWorkspaceReviews', undefined],
     ['openWorkspaceReview', query],
     ['getReview', mocks.workspaceId],
@@ -180,12 +185,31 @@ describe('workspace Review IPC authority and routing', () => {
     for (const spy of [
       mocks.catalogList,
       mocks.catalogResolve,
+      mocks.directoryFiles,
       ...Object.values(mocks.workspace),
       mocks.workspaceEvidence,
       mocks.sourceInput
     ]) {
       expect(spy).not.toHaveBeenCalled()
     }
+  })
+
+  it('validates directory browsing input and strips arbitrary filesystem roots', () => {
+    const input = { workspaceId: mocks.targetId, directory: 'src' }
+    invoke('listWorkspaceReviewFiles', { ...input, rootPath: '/arbitrary/root' })
+    expect(mocks.directoryFiles).toHaveBeenCalledWith(input, {
+      resolveTarget: expect.any(Function),
+      authorizePath: expect.any(Function)
+    })
+    mocks.directoryFiles.mockClear()
+    for (const invalid of [
+      { directory: '' },
+      { ...input, directory: 1 },
+      { ...input, workspaceId: '' }
+    ]) {
+      expect(() => invoke('listWorkspaceReviewFiles', invalid)).toThrow()
+    }
+    expect(mocks.directoryFiles).not.toHaveBeenCalled()
   })
 
   it('strips a supplied root, target and per-file source path before resolving a registered ID', () => {

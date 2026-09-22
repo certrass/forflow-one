@@ -4,9 +4,13 @@ import type { Store } from '../persistence'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import type { CodexUsageStore } from '../codex-usage/store'
 import { CodexReviewStore } from '../codex-usage/codex-review-store'
-import { workspaceReviewQuerySchema } from '../../shared/workspace-review-types'
+import {
+  workspaceReviewDirectoryQuerySchema,
+  workspaceReviewQuerySchema
+} from '../../shared/workspace-review-types'
 import { WorkspaceReviewCatalog } from '../review/workspace-review-catalog'
 import { WorkspaceReviewSource } from '../review/workspace-review-source'
+import { listWorkspaceReviewFiles } from '../review/workspace-review-directory'
 import { readWorkspaceReviewInput } from '../review/workspace-review-input'
 import { inspectWorkspaceText } from '../review/workspace-sensitive-signals'
 import { resolveAuthorizedPath } from './filesystem-auth'
@@ -48,6 +52,13 @@ export function registerWorkspaceReviewHandlers(
   ipcMain.handle('codexUsage:listWorkspaceReviewTargets', (event) => {
     assertWorkspaceReviewRenderer(event)
     return catalog.list()
+  })
+  ipcMain.handle('codexUsage:listWorkspaceReviewFiles', (event, input: unknown) => {
+    assertWorkspaceReviewRenderer(event)
+    return listWorkspaceReviewFiles(workspaceReviewDirectoryQuerySchema.parse(input), {
+      resolveTarget: (id) => catalog.resolve(id),
+      authorizePath: (path) => resolveAuthorizedPath(path, deps.store)
+    })
   })
   ipcMain.handle('codexUsage:listWorkspaceReviews', (event) => {
     assertWorkspaceReviewRenderer(event)
