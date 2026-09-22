@@ -1,6 +1,6 @@
 # Forflow One 1.4.206-forflow.3 候选验证
 
-2026-09-22，macOS arm64 本地测试包。已构建、签名及成品验证；**未替换 `/Applications/Forflow One.app`，安装版仍为 1.4.205-forflow.26**。本次沿用已确认的交付质量优先级，不将模型判断作为人工验收或合规认证。
+2026-09-22，macOS arm64 本地测试包。已构建、签名及成品验证；随后经用户明确要求，于北京时间 15:55 安装至 `/Applications/Forflow One.app`，**当前安装版为 1.4.206-forflow.3**。本次沿用已确认的交付质量优先级，不将模型判断作为人工验收或合规认证。
 
 ## 本次交付
 
@@ -51,3 +51,13 @@ ZIP SHA-256：`a98d796a5aca1d692ae0d2494ff727eea4bda99358c6b645cd13e68f980e08b6`
 实现提交为 `8ed21d938cb0d10b09ded5389034112c0839b799`，提交 hook 后 50 个源码／配置文件与成品验证清单哈希全部一致。Node.js 24.14.0、pnpm 11.19.0、Electron 43.7.0。本地 ad-hoc 签名，未公证；同目录 `DELIVERY.json` 保留交付与解压复验记录。
 
 Q2Q 行业适配、独立人工保留集、真实资料去标识化执行、整项目多要求自动验收均未纳入此候选；合规与敏感事项仍独立保留。
+
+## 安装后验证（2026-09-22）
+
+正常退出旧版后，先验证暂存应用，再保留旧包并原位替换；未改写用户配置或凭据。安装后严格签名及 ASAR 指纹与上述候选一致，系统 `forflow --version` 返回 `1.4.206-forflow.3`。
+
+安装目录另完成 **4 项成品复验，零失败、零跳过、零重试**：CLI、新交付质量审阅、中文启动与私有默认值、项目／工作树／终端／编辑／差异及重启。正常后台启动后，真实配置的 `forflow status --json` 回读版本正确，桌面窗口 available、runtime ready/connected、graph ready。
+
+原配置 Playwright 回读未完成：单次 renderer evaluate 没有超时，循环期限不能中断它。日志显示该轮渲染约 141 秒，随后普通启动约 3.5 秒。保留未完成回执，不将其计为真实配置下 Analytics／Review 交互通过，也不归因到凭据。仅结束自建验证器，正常后台应用保持运行。
+
+安装及复验回执：`.forflow/evidence/forflow206-3-installed/`，含 `installation.json`、`packaged-tests.json`、`runtime-status-final.json` 及原始未完成记录。旧版回退副本：`/Users/zezhou/Library/Caches/Forflow One/rollback/1.4.205-forflow.26-before-1.4.206-forflow.3/Forflow One.app`。
