@@ -61,3 +61,7 @@ Q2Q 行业适配、独立人工保留集、真实资料去标识化执行、整�
 原配置 Playwright 回读未完成：单次 renderer evaluate 没有超时，循环期限不能中断它。日志显示该轮渲染约 141 秒，随后普通启动约 3.5 秒。保留未完成回执，不将其计为真实配置下 Analytics／Review 交互通过，也不归因到凭据。仅结束自建验证器，正常后台应用保持运行。
 
 安装及复验回执：`.forflow/evidence/forflow206-3-installed/`，含 `installation.json`、`packaged-tests.json`、`runtime-status-final.json` 及原始未完成记录。旧版回退副本：`/Users/zezhou/Library/Caches/Forflow One/rollback/1.4.205-forflow.26-before-1.4.206-forflow.3/Forflow One.app`。
+
+### 安装后的窗口交接修正
+
+用户随后反馈打不开。此前保留的 PID 6117 带有 `ORCA_BACKGROUND_LAUNCH=1`，属于隐藏验收进程；单实例路由把用户再次打开的请求交给该进程，而其后台保护禁止显示窗口。系统日志记录 17:31、17:32 两次前台请求，以及 17:32:57 正常退出、退出码 0。签名完整，无 quarantine 标记，后台环境没有持久化。应结束验收实例后由用户正常打开，不把隐藏测试进程作为用户应用交付；无需放宽后台保护。原运行状态 ready 只证明当时运行时可用，不证明用户能看到窗口。用户随后明确回复“现在能打开了”，正常窗口启动已获用户确认；证据为 `window-handoff-correction.json`。
