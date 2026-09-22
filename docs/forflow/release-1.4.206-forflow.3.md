@@ -44,6 +44,10 @@ ASAR SHA-256：`c0f5adb5b7e72f7f9d54ab2a55ab4d9e7f001e8d5a081f8e59a236f109e69491
 
 审计器指纹：`0daf92f66a0ae8c602d26e7922bdbe4e73e9807b978506f038fd5d46ca387b63`。
 
-Node.js 24.14.0、pnpm 11.19.0、Electron 43.7.0。本地 ad-hoc 签名，未公证。压缩包及解压复验记录见同目录交付清单。
+压缩包：`/Users/zezhou/Library/Caches/Forflow One/builds/1.4.206-forflow.3/Forflow-One-1.4.206-forflow.3-arm64.zip`。
+
+ZIP SHA-256：`a98d796a5aca1d692ae0d2494ff727eea4bda99358c6b645cd13e68f980e08b6`。解压后的严格签名验证通过，ASAR 与上述候选一致。
+
+实现提交为 `8ed21d938cb0d10b09ded5389034112c0839b799`，提交 hook 后 50 个源码／配置文件与成品验证清单哈希全部一致。Node.js 24.14.0、pnpm 11.19.0、Electron 43.7.0。本地 ad-hoc 签名，未公证；同目录 `DELIVERY.json` 保留交付与解压复验记录。
 
 Q2Q 行业适配、独立人工保留集、真实资料去标识化执行、整项目多要求自动验收均未纳入此候选；合规与敏感事项仍独立保留。
