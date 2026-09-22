@@ -2,8 +2,26 @@ import { expect, it } from 'vitest'
 import { JEV_QUESTION_VERSION } from '../../../../shared/jev-audit-types'
 import { buildReviewActivity, summarizeReviewChecks } from './codex-review-activity'
 import { review, receipt as historicalReceipt } from './review-workspace-fixtures'
+import { deliveryReceipt } from './jev-delivery-fixtures'
 
 const receipt = { ...historicalReceipt, questionVersion: JEV_QUESTION_VERSION }
+
+it('counts current mixed checks without treating uncalibrated scores or probabilities as actionable findings', () => {
+  const result = summarizeReviewChecks(
+    [
+      receipt,
+      deliveryReceipt,
+      { ...deliveryReceipt, id: 'pending-delivery', status: 'pending', result: null },
+      {
+        ...deliveryReceipt,
+        id: 'old-delivery',
+        basis: { ...deliveryReceipt.basis!, evaluatorVersion: 'obsolete' }
+      }
+    ],
+    receipt.versionId
+  )
+  expect(result).toEqual({ total: 3, completed: 2, incomplete: 1, attention: 2 })
+})
 
 it('keeps unknown checks distinct from completed checks and scopes counts to a source version', () => {
   const receipts = [

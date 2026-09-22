@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { JEV_ENDPOINT, JEV_MODEL, type JevResponse } from '../../shared/jev-audit-types'
+import { JEV_ENDPOINT, JEV_MODEL, type JevLegacyResponse } from '../../shared/jev-audit-types'
 import { buildJevRequest, redactJevText } from './jev-audit-input'
 import { requestJev, validateJevResponse } from './jev-client'
 
@@ -18,7 +18,7 @@ function answer(choice: string, options: string[]) {
     probabilities: Object.fromEntries(options.map((option) => [option, option === choice ? 1 : 0]))
   }
 }
-function response(): JevResponse {
+function response(): JevLegacyResponse {
   return {
     model: JEV_MODEL,
     answers: {
@@ -46,31 +46,31 @@ describe('Jev typed API contract', () => {
     )
   })
   it.each([
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.model = 'jev-latest'
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       delete value.answers.evidence
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.extra = value.answers.outcome
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.outcome.choice = 'pass'
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.outcome.probabilities.none = 0.2
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.outcome.choice = 'none'
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.outcome.probabilities.unknown = -0.1
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.answers.outcome.confidence = 2
     },
-    (value: JevResponse) => {
+    (value: JevLegacyResponse) => {
       value.usage.input_tokens = -1
     }
   ])('rejects a mismatched model, answer set, choice or probability vector', (change) => {

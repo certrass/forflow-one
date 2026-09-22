@@ -9,6 +9,7 @@ import { buildReviewActivity } from './codex-review-activity'
 import { reviewCopy } from './review-copy'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
 import { jevAuditCopy } from './jev-audit-copy'
+import { jevDeliveryCopy } from './jev-delivery-copy'
 
 export function CodexReviewActivity({
   review,
@@ -32,6 +33,7 @@ export function CodexReviewActivity({
   const c = reviewCopy()
   const w = reviewWorkspaceCopy()
   const j = jevAuditCopy()
+  const d = jevDeliveryCopy()
   const [comment, setComment] = useState('')
   const [limit, setLimit] = useState(20)
   const events = buildReviewActivity(review, receipts)
@@ -77,8 +79,9 @@ export function CodexReviewActivity({
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                     <span>
-                      {entry.kind === 'check' ? entry.text : c.localReviewer} · {labels[entry.kind]}{' '}
-                      · v{index + 1}
+                      {entry.kind === 'check' ? entry.text : c.localReviewer} ·{' '}
+                      {entry.check?.mode === 'delivery' ? d.delivery : labels[entry.kind]} · v
+                      {index + 1}
                     </span>
                     <time dateTime={new Date(entry.timestamp).toISOString()}>
                       {new Date(entry.timestamp).toLocaleString()}

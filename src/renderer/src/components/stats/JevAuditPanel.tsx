@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   codexEvidenceKey,
   type CodexReview,
@@ -6,14 +6,15 @@ import {
 } from '../../../../shared/codex-review-types'
 import type { JevPreview, JevReceipt } from '../../../../shared/jev-audit-types'
 import { Button } from '../ui/button'
-import { Textarea } from '../ui/textarea'
-import { Label } from '../ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { JevAccountSection } from '../settings/JevAccountSection'
 import { JevAuditResults } from './JevAuditResults'
 import { jevAuditCopy } from './jev-audit-copy'
 import { JevRequestPreview } from './JevRequestPreview'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
+import { jevDeliveryCopy } from './jev-delivery-copy'
+import { JevDeliveryInput } from './JevDeliveryInput'
+import { JevRecordInput } from './JevRecordInput'
 
 export function JevAuditPanel({
   review,
@@ -40,8 +41,13 @@ export function JevAuditPanel({
 }): React.JSX.Element {
   const c = jevAuditCopy()
   const w = reviewWorkspaceCopy()
-  const id = useId()
+  const d = jevDeliveryCopy()
   const api = window.api?.forflowJevAudit
+  const [mode, setMode] = useState(initialEvidenceKey ? 'record' : 'delivery')
+  const [evidenceKeys, setEvidenceKeys] = useState<string[]>(
+    initialEvidenceKey ? [initialEvidenceKey] : []
+  )
+  const [handoffEvidenceKeys, setHandoffEvidenceKeys] = useState<string[]>([])
   const first = version.audit.rows.find((row) => row.kind === 'tool') ?? version.audit.rows[0]
   const [selected, setSelected] = useState(
     initialEvidenceKey ??
@@ -52,11 +58,13 @@ export function JevAuditPanel({
   const [claim, setClaim] = useState('')
   const [preview, setPreview] = useState<JevPreview | null>(null)
   const [busy, setBusy] = useState(false)
+  const inFlight = useRef(false)
   const [error, setError] = useState<string | null>(null)
   const perform = async (operation: () => Promise<void>): Promise<void> => {
-    if (busy) {
+    if (inFlight.current || readOnly) {
       return
     }
+    inFlight.current = true
     setBusy(true)
     onBusyChange?.(true)
     setError(null)
@@ -65,6 +73,7 @@ export function JevAuditPanel({
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : c.error)
     } finally {
+      inFlight.current = false
       setBusy(false)
       onBusyChange?.(false)
     }
@@ -74,74 +83,87 @@ export function JevAuditPanel({
   }
   return (
     <section className="space-y-4" data-testid="jev-audit-panel">
-      <p className="text-sm text-muted-foreground">{c.scope}</p>
+      <p className="text-sm text-muted-foreground">{mode === 'delivery' ? d.scope : c.scope}</p>
       <JevAccountSection />
       {!readOnly && (
         <>
-          <div className="space-y-2">
-            <Label htmlFor={`${id}-record`}>{c.record}</Label>
-            <Select
-              value={selected}
-              disabled={busy}
-              onValueChange={(key) => {
-                setSelected(key)
-                setPreview(null)
-              }}
-            >
-              <SelectTrigger id={`${id}-record`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {version.workspace?.files
-                  .filter((file) => file.status === 'read')
-                  .map((file) => (
-                    <SelectItem key={file.evidenceKey} value={file.evidenceKey}>
-                      {file.path}
-                    </SelectItem>
-                  ))}
-                {version.audit.rows.map((row) => (
-                  <SelectItem key={codexEvidenceKey(row)} value={codexEvidenceKey(row)}>
-                    {row.name} · {new Date(row.timestamp).toLocaleString()} · {row.byteOffset}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor={`${id}-claim`}>{c.claim}</Label>
-            <Textarea
-              id={`${id}-claim`}
-              value={claim}
-              disabled={busy}
-              maxLength={2000}
-              placeholder={c.claimHint}
-              onChange={(event) => {
-                setClaim(event.target.value)
-                setPreview(null)
-              }}
-            />
-          </div>
+          <Tabs
+            value={mode}
+            onValueChange={(value) => {
+              setMode(value)
+              setPreview(null)
+            }}
+          >
+            <TabsList aria-label={d.mode}>
+              <TabsTrigger value="delivery" disabled={busy}>
+                {d.delivery}
+              </TabsTrigger>
+              <TabsTrigger value="record" disabled={busy}>
+                {d.record}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="delivery">
+              <JevDeliveryInput
+                version={version}
+                evidenceKeys={evidenceKeys}
+                handoffEvidenceKeys={handoffEvidenceKeys}
+                busy={busy}
+                onLocate={onLocate}
+                onChange={(keys, handoff) => {
+                  setEvidenceKeys(keys)
+                  setHandoffEvidenceKeys(handoff)
+                  setPreview(null)
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="record">
+              <JevRecordInput
+                version={version}
+                selected={selected}
+                claim={claim}
+                busy={busy}
+                onSelect={(key) => {
+                  setSelected(key)
+                  setPreview(null)
+                }}
+                onClaim={(value) => {
+                  setClaim(value)
+                  setPreview(null)
+                }}
+              />
+            </TabsContent>
+          </Tabs>
           <Button
             size="sm"
             variant="outline"
-            disabled={busy || !selected}
+            disabled={busy || (mode === 'delivery' ? evidenceKeys.length === 0 : !selected)}
             onClick={() =>
               void perform(async () => {
                 setPreview(null)
                 setPreview(
-                  await api.prepare({
-                    reviewId: review.id,
-                    versionId: version.id,
-                    evidenceKey: selected,
-                    claim
-                  })
+                  await api.prepare(
+                    mode === 'delivery'
+                      ? {
+                          mode: 'delivery',
+                          reviewId: review.id,
+                          versionId: version.id,
+                          evidenceKeys,
+                          handoffEvidenceKeys
+                        }
+                      : {
+                          reviewId: review.id,
+                          versionId: version.id,
+                          evidenceKey: selected,
+                          claim
+                        }
+                  )
                 )
               })
             }
           >
             {c.prepare}
           </Button>
-          {preview && (
+          {preview && preview.reviewId === review.id && preview.versionId === version.id && (
             <div className="space-y-3 rounded-md border border-border p-3">
               <h4 className="text-sm font-medium">{c.preview}</h4>
               <p className="text-sm text-muted-foreground">{c.external}</p>

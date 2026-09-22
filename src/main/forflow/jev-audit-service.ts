@@ -1,22 +1,25 @@
-import { redactWorkspaceText } from '../review/workspace-sensitive-signals'
 import { createHash, randomUUID } from 'node:crypto'
 import {
   JEV_MODEL,
   JEV_QUESTION_VERSION,
+  JEV_DELIVERY_QUESTION_VERSION,
+  jevPrepareSchema,
   type JevPrepareInput,
   type JevPreview,
   type JevReceipt,
   type JevRequest,
-  type JevAuditApi
+  type JevAuditApi,
+  type JevLegacyPrepareInput,
+  type JevDeliveryPrepareInput
 } from '../../shared/jev-audit-types'
-import { codexEvidenceKey } from '../../shared/codex-review-types'
-import { isCodexAuditPartial } from '../../shared/codex-audit-coverage'
 import type { CodexReviewStore } from '../codex-usage/codex-review-store'
 import { readCodexReviewEvidence } from '../codex-usage/codex-review-evidence'
 import type { ForflowModelAccountStorage } from './model-account-storage'
 import type { JevAuditLedger } from './jev-audit-ledger'
-import { buildJevRequest, redactJevText } from './jev-audit-input'
 import { JevRequestError, requestJev } from './jev-client'
+import { currentJevReview, readJevAuditRequest } from './jev-audit-request'
+import { jevAdoptionSuggestion } from './jev-audit-adoption'
+import { hasCurrentJevEvaluator } from '../../shared/jev-delivery-assessment'
 
 type Draft = { preview: JevPreview; request: JevRequest }
 export class JevAuditService {
@@ -33,46 +36,19 @@ export class JevAuditService {
   ) {}
 
   private current(input: JevPrepareInput) {
-    const review = this.reviews.get(input.reviewId)
-    const version = review.versions.at(-1)!
-    if (version.id !== input.versionId) {
-      throw new Error('审阅版本已变化，请重新预览。')
-    }
-    const file = version.workspace?.files.find((entry) => entry.evidenceKey === input.evidenceKey)
-    if (!file && !this.enabled()) {
-      throw new Error('请先启用 Codex 使用情况读取。')
-    }
-    const row = version.audit.rows.find((entry) => codexEvidenceKey(entry) === input.evidenceKey)
-    if (!row && (!file || file.status !== 'read')) {
-      throw new Error('此记录不属于当前审阅版本。')
-    }
-    return { review, version, row, file }
+    return currentJevReview(this.reviews, input, this.enabled)
   }
 
-  private async requestFor(input: JevPrepareInput, model: string): Promise<JevRequest> {
-    const { review, version, row } = this.current(input)
-    if (row?.recordFormat === 'response_message' && !row.messageTextChars) {
-      throw new Error('此消息没有可读取的文字正文，暂不能审阅图片或摘要块。')
-    }
-    const record = await this.readEvidence(review, version.id, input.evidenceKey)
-    const result = row?.resultSource
-      ? await this.readEvidence(review, version.id, input.evidenceKey, 'result')
-      : null
-    const redact = version.workspace ? redactWorkspaceText : redactJevText
-    return buildJevRequest(model, {
-      focus: redact(version.focus),
-      claim: redact(input.claim),
-      record: redact(record.text),
-      result: result ? redact(result.text) : null,
-      partial:
-        !!version.workspace ||
-        record.truncated ||
-        !!result?.truncated ||
-        isCodexAuditPartial(version.audit)
-    })
+  private requestFor(input: JevPrepareInput, model: string) {
+    const { review, version } = this.current(input)
+    return readJevAuditRequest(input, model, review, version, this.readEvidence)
   }
 
+  prepare(input: JevLegacyPrepareInput): Promise<Extract<JevPreview, JevLegacyPrepareInput>>
+  prepare(input: JevDeliveryPrepareInput): Promise<Extract<JevPreview, JevDeliveryPrepareInput>>
+  prepare(input: JevPrepareInput): Promise<JevPreview>
   async prepare(input: JevPrepareInput): Promise<JevPreview> {
+    input = jevPrepareSchema.parse(input)
     for (const [id, draft] of this.drafts) {
       if (draft.preview.expiresAt < Date.now()) {
         this.drafts.delete(id)
@@ -84,20 +60,25 @@ export class JevAuditService {
     this.preparing++
     try {
       const model = this.accounts.account('jev').model ?? JEV_MODEL
-      const request = await this.requestFor(input, model)
+      const { request, basis } = await this.requestFor(input, model)
       this.current(input)
       const body = JSON.stringify(request)
       if (Buffer.byteLength(body) > 24 * 1024) {
         throw new Error('此记录超过 Beta 的 24 KiB 发送上限，请选择较短记录。')
       }
-      const preview: JevPreview = {
-        ...input,
-        claim: request.state.claim,
+      const identity = {
         id: randomUUID(),
         body,
         inputHash: createHash('sha256').update(body).digest('hex'),
         expiresAt: Date.now() + 10 * 60_000
       }
+      if (input.mode === 'delivery' && !basis) {
+        throw new Error('质量审阅依据不完整。')
+      }
+      const preview: JevPreview =
+        input.mode === 'delivery'
+          ? { ...input, ...identity, basis: basis! }
+          : { ...input, ...identity, claim: 'claim' in request.state ? request.state.claim : '' }
       this.drafts.set(preview.id, { preview, request })
       return { ...preview }
     } finally {
@@ -158,7 +139,11 @@ export class JevAuditService {
       throw new Error('模型配置已变化，请重新预览。')
     }
     const current = await this.requestFor(draft.preview, credential.model)
-    if (JSON.stringify(current) !== draft.preview.body) {
+    if (
+      JSON.stringify(current.request) !== draft.preview.body ||
+      (draft.preview.mode === 'delivery' &&
+        JSON.stringify(current.basis) !== JSON.stringify(draft.preview.basis))
+    ) {
       throw new Error('发送内容已变化，请重新预览。')
     }
     this.current(draft.preview)
@@ -174,9 +159,21 @@ export class JevAuditService {
       id: input.id,
       reviewId: draft.preview.reviewId,
       versionId: draft.preview.versionId,
-      evidenceKey: draft.preview.evidenceKey,
+      evidenceKey:
+        draft.preview.mode === 'delivery'
+          ? draft.preview.evidenceKeys[0]
+          : draft.preview.evidenceKey,
+      ...(draft.preview.mode === 'delivery'
+        ? {
+            mode: 'delivery' as const,
+            evidenceKeys: draft.preview.evidenceKeys,
+            handoffEvidenceKeys: draft.preview.handoffEvidenceKeys,
+            basis: draft.preview.basis
+          }
+        : { legacyClaim: draft.preview.claim }),
       inputHash: input.inputHash,
-      questionVersion: JEV_QUESTION_VERSION,
+      questionVersion:
+        draft.preview.mode === 'delivery' ? JEV_DELIVERY_QUESTION_VERSION : JEV_QUESTION_VERSION,
       requestedModel: credential.model,
       createdAt: Date.now(),
       completedAt: null,
@@ -203,23 +200,26 @@ export class JevAuditService {
 
   async accept(input: Parameters<JevAuditApi['accept']>[0]) {
     const receipt = this.ledger.all().find((entry) => entry.id === input.receiptId)
-    if (receipt && receipt.questionVersion !== JEV_QUESTION_VERSION) {
+    if (
+      receipt &&
+      receipt.questionVersion !==
+        (receipt.mode === 'delivery' ? JEV_DELIVERY_QUESTION_VERSION : JEV_QUESTION_VERSION)
+    ) {
       throw new Error('Jev 问题版本已变化，请按当前问题重新检查后采纳。历史结果仍保留。')
     }
-    const answer = receipt?.result?.answers[input.question]
-    if (
-      !receipt ||
-      receipt.status !== 'completed' ||
-      !answer ||
-      !['attention', 'missing', 'conflict', 'unknown'].includes(answer.choice)
-    ) {
+    const suggestion = receipt && jevAdoptionSuggestion(receipt, input.question)
+    if (!receipt || receipt.status !== 'completed' || !suggestion) {
       throw new Error('此结果没有可采纳的待处理建议。')
+    }
+    if (!hasCurrentJevEvaluator(receipt)) {
+      throw new Error('审计器或模型依据已变化或无法核验，请重新检查后采纳。')
     }
     const marker = `[Jev:${receipt.id}:${input.question}]`
     const review = this.reviews.get(receipt.reviewId)
     if (review.issues.some((issue) => issue.detail.includes(marker))) {
       return review
     }
+    await this.assertReceiptCurrent(receipt)
     return this.reviews.mutate({
       id: review.id,
       versionId: receipt.versionId,
@@ -227,14 +227,39 @@ export class JevAuditService {
       action: {
         type: 'issue',
         evidenceKey: receipt.evidenceKey,
-        title:
-          answer.choice === 'conflict'
-            ? 'Jev：主张与所选记录冲突'
-            : answer.choice === 'attention'
-              ? 'Jev：所选记录存在待核实异常'
-              : 'Jev：所选记录需要补充证据',
-        detail: `${marker}\n人工采纳的 Beta 建议。仅针对所选记录，需核对原文。\n问题：${input.question}；结果：${answer.choice}\n模型：${receipt.result!.model}；问题版本：${receipt.questionVersion}\n输入摘要：${receipt.inputHash}\n模型概率未经当前行业数据集校准。`
+        ...(receipt.mode === 'delivery' ? { evidenceKeys: receipt.evidenceKeys } : {}),
+        title: suggestion.title,
+        detail: `${marker}\n人工采纳的 Beta 建议。仅针对所选证据，需核对原文；不代表验收通过。\n问题：${input.question}；结果：${suggestion.value}\n模型：${receipt.result!.model}；问题版本：${receipt.questionVersion}\n输入摘要：${receipt.inputHash}${receipt.basis ? `\n审计器版本：${receipt.basis.evaluatorVersion}；问题哈希：${receipt.basis.questionHash}` : ''}\n模型概率未经当前行业数据集校准。`
       }
     })
+  }
+
+  private async assertReceiptCurrent(receipt: JevReceipt): Promise<void> {
+    const input = jevPrepareSchema.parse(
+      receipt.mode === 'delivery'
+        ? {
+            mode: 'delivery',
+            reviewId: receipt.reviewId,
+            versionId: receipt.versionId,
+            evidenceKeys: receipt.evidenceKeys,
+            handoffEvidenceKeys: receipt.handoffEvidenceKeys
+          }
+        : {
+            reviewId: receipt.reviewId,
+            versionId: receipt.versionId,
+            evidenceKey: receipt.evidenceKey,
+            claim: receipt.legacyClaim ?? ''
+          }
+    )
+    const current = await this.requestFor(input, receipt.requestedModel)
+    if (
+      createHash('sha256').update(JSON.stringify(current.request)).digest('hex') !==
+        receipt.inputHash ||
+      (receipt.mode === 'delivery' &&
+        JSON.stringify(current.basis) !== JSON.stringify(receipt.basis))
+    ) {
+      throw new Error('历史回执依据不完整或已变化，请重新预览并检查后采纳。')
+    }
+    this.current(input)
   }
 }

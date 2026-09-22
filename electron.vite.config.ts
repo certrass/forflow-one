@@ -9,6 +9,9 @@ import { createPlainNodeEntryGuardPlugin } from './config/build-plugins/plain-no
 import packageJson from './package.json' with { type: 'json' }
 import { forflowBrandingPlugin, forflowBuildEnabled } from './config/build-plugins/forflow-branding'
 import { forflowLocalizationPlugin } from './config/build-plugins/forflow-localization'
+import { jevEvaluatorFingerprint } from './config/build-plugins/jev-evaluator-fingerprint'
+
+const jevEvaluatorHash = JSON.stringify(jevEvaluatorFingerprint())
 
 const BUNDLED_MAIN_DEPENDENCIES = new Set([
   '@streamparser/json',
@@ -284,6 +287,7 @@ export const electronViteConfig: UserConfig = {
     // Why: compile-time substitution for the telemetry gate. See the block
     // above for the full rationale.
     define: {
+      __FORFLOW_JEV_EVALUATOR_HASH__: jevEvaluatorHash,
       FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
       ORCA_BUILD_IDENTITY: ORCA_BUILD_IDENTITY_LITERAL,
       ORCA_POSTHOG_WRITE_KEY: ORCA_POSTHOG_WRITE_KEY_LITERAL,
@@ -309,7 +313,10 @@ export const electronViteConfig: UserConfig = {
     }
   },
   renderer: {
-    define: { FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled) },
+    define: {
+      FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
+      __FORFLOW_JEV_EVALUATOR_HASH__: jevEvaluatorHash
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),

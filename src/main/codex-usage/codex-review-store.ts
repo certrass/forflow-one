@@ -222,17 +222,27 @@ export class CodexReviewStore {
         createdAt: Date.now()
       })
     } else if (action.type === 'issue') {
+      const evidenceKeys = [
+        ...new Set([
+          ...(action.evidenceKeys ?? []),
+          ...(action.evidenceKey ? [action.evidenceKey] : [])
+        ])
+      ]
       if (
-        action.evidenceKey &&
-        !version.audit.rows.some((row) => codexEvidenceKey(row) === action.evidenceKey) &&
-        !version.workspace?.files.some((file) => file.evidenceKey === action.evidenceKey)
+        evidenceKeys.length > 12 ||
+        evidenceKeys.some(
+          (key) =>
+            !version.audit.rows.some((row) => codexEvidenceKey(row) === key) &&
+            !version.workspace?.files.some((file) => file.evidenceKey === key)
+        )
       ) {
         throw new Error('问题引用不属于当前审阅版本')
       }
       review.issues.push({
         id: randomUUID(),
         versionId: version.id,
-        evidenceKey: action.evidenceKey ?? null,
+        evidenceKey: action.evidenceKey ?? evidenceKeys[0] ?? null,
+        ...(action.evidenceKeys ? { evidenceKeys } : {}),
         title: action.title,
         detail: action.detail,
         status: 'open',

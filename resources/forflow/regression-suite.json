@@ -274,5 +274,10 @@
   "src/main/review/workspace-review-store.test.ts",
   "src/main/review/workspace-sensitive-signals.test.ts",
   "src/renderer/src/components/stats/WorkspaceReviewIntake.test.tsx",
-  "src/renderer/src/components/native-chat/native-chat-composer-state.test.ts"
+  "src/renderer/src/components/native-chat/native-chat-composer-state.test.ts",
+  "src/main/codex-usage/codex-review-multiple-evidence.test.ts",
+  "config/scripts/jev-evaluator-fingerprint.test.ts",
+  "src/main/forflow/jev-native-client.test.ts",
+  "src/main/forflow/jev-delivery-input.test.ts",
+  "src/renderer/src/components/stats/JevAuditResults.test.tsx"
 ]

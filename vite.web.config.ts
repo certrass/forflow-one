@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { forflowBrandingPlugin, forflowBuildEnabled } from './config/build-plugins/forflow-branding'
 import { createPdfjsViewerAssetsPlugin } from './config/build-plugins/pdfjs-viewer-assets'
+import { jevEvaluatorFingerprint } from './config/build-plugins/jev-evaluator-fingerprint'
 
 export default defineConfig({
   root: resolve('src/renderer'),
@@ -12,6 +13,7 @@ export default defineConfig({
   base: './',
   plugins: [react(), createPdfjsViewerAssetsPlugin(), tailwindcss(), forflowBrandingPlugin()],
   define: {
+    __FORFLOW_JEV_EVALUATOR_HASH__: JSON.stringify(jevEvaluatorFingerprint()),
     FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
     ORCA_FEATURE_WALL_ENABLED: 'true'
   },

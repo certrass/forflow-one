@@ -52,18 +52,20 @@ export function CodexReviewFindings({
             {review.versions.findIndex((version) => version.id === issue.versionId) + 1} ·{' '}
             {issue.evidenceKey ? c.recordIssue : c.scopeIssue}
           </p>
-          {issue.evidenceKey && (
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() => {
-                if (issue.evidenceKey) {
-                  onLocate(issue.versionId, issue.evidenceKey)
-                }
-              }}
-            >
-              {c.locate}
-            </Button>
+          {(issue.evidenceKeys ?? (issue.evidenceKey ? [issue.evidenceKey] : [])).map(
+            (key, index, keys) => (
+              <Button
+                key={key}
+                variant="ghost"
+                size="xs"
+                onClick={() => {
+                  onLocate(issue.versionId, key)
+                }}
+              >
+                {c.locate}
+                {keys.length > 1 ? ` ${index + 1}/${keys.length}` : ''}
+              </Button>
+            )
           )}
           {issue.resolution && <p className="text-xs">{issue.resolution}</p>}
           {!readOnly && (

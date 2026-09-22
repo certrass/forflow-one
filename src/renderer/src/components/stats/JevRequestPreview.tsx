@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Badge } from '../ui/badge'
 import { reviewCopy } from './review-copy'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
+import { JevDeliveryPreview } from './JevDeliveryPreview'
 
 const previewSchema = z.object({
   model: z.string(),
@@ -26,6 +27,7 @@ export function JevRequestPreview({ body }: { body: string }): React.JSX.Element
   const parsed = previewSchema.safeParse(input)
   return (
     <div className="space-y-3" data-testid="jev-request-preview">
+      <JevDeliveryPreview input={input} />
       {parsed.success && (
         <>
           <p className="text-xs text-muted-foreground">

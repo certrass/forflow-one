@@ -1,5 +1,9 @@
 import type { CodexReview } from '../../../../shared/codex-review-types'
-import { JEV_QUESTION_VERSION, type JevReceipt } from '../../../../shared/jev-audit-types'
+import type { JevReceipt } from '../../../../shared/jev-audit-types'
+import {
+  canRecordJevAnswer,
+  hasCurrentJevEvaluator
+} from '../../../../shared/jev-delivery-assessment'
 
 export type ReviewActivity = {
   id: string
@@ -59,7 +63,7 @@ export function buildReviewActivity(review: CodexReview, receipts: JevReceipt[])
 
 export function summarizeReviewChecks(receipts: JevReceipt[], versionId: string) {
   const checks = receipts.filter(
-    (receipt) => receipt.versionId === versionId && receipt.questionVersion === JEV_QUESTION_VERSION
+    (receipt) => receipt.versionId === versionId && hasCurrentJevEvaluator(receipt)
   )
   return {
     total: checks.length,
@@ -68,8 +72,8 @@ export function summarizeReviewChecks(receipts: JevReceipt[], versionId: string)
     attention: checks.reduce(
       (sum, receipt) =>
         sum +
-        Object.values(receipt.result?.answers ?? {}).filter((answer) =>
-          ['attention', 'missing', 'conflict', 'unknown'].includes(answer.choice)
+        Object.entries(receipt.result?.answers ?? {}).filter(([question, answer]) =>
+          canRecordJevAnswer(question, answer)
         ).length,
       0
     )

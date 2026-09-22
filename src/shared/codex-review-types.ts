@@ -114,6 +114,7 @@ const issueSchema = z.object({
   id: z.string(),
   versionId: z.string(),
   evidenceKey: z.string().nullable(),
+  evidenceKeys: z.array(z.string().min(1).max(4000)).min(1).max(12).optional(),
   title: z.string().min(1).max(200),
   detail: z.string().max(4000),
   status: z.enum(['open', 'resolved', 'dismissed']),
@@ -157,7 +158,8 @@ export const codexReviewMutationSchema = z.object({
       type: z.literal('issue'),
       title: z.string().trim().min(1).max(200),
       detail: z.string().trim().max(4000),
-      evidenceKey: z.string().optional()
+      evidenceKey: z.string().optional(),
+      evidenceKeys: z.array(z.string().min(1).max(4000)).min(1).max(12).optional()
     }),
     z.object({
       type: z.literal('resolve'),

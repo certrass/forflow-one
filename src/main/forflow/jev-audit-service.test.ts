@@ -3,7 +3,13 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createHash } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { JEV_MODEL, type JevReceipt } from '../../shared/jev-audit-types'
+import {
+  JEV_MODEL,
+  JEV_DELIVERY_QUESTION_VERSION,
+  type JevReceipt,
+  type JevRequest,
+  type JevAnswer
+} from '../../shared/jev-audit-types'
 import { setSecretStore, _resetSecretStoreForTests } from '../../shared/secret-store'
 import { CodexReviewStore } from '../codex-usage/codex-review-store'
 import type { CodexReviewSource } from '../codex-usage/codex-review-version'
@@ -107,7 +113,7 @@ async function fixture(configured = true) {
   const review = await reviews.open(query)
   const ledger = new JevAuditLedger(join(dir, 'jev.json'))
   const send = vi.fn(
-    async () =>
+    async (_url?: string, _init?: RequestInit) =>
       new Response(
         JSON.stringify({
           model: JEV_MODEL,
@@ -156,7 +162,307 @@ async function fixture(configured = true) {
   }
 }
 
+async function deliveryFixture() {
+  const f = await fixture()
+  const original = await readFile(f.path, 'utf8')
+  const output = `${JSON.stringify({ type: 'function_call_output', output: 'Exit code 1 for user@example.com' })}\n`
+  const message = `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: '重启应用并核对保存的记录；预期仍可读取。完成声明不代表已经执行。' }] } })}\n`
+  const combined = original + output + message
+  await writeFile(f.path, combined)
+  f.source.audit.sources![0] = {
+    path: f.path,
+    start: 0,
+    end: Buffer.byteLength(combined),
+    size: Buffer.byteLength(combined),
+    sha256: createHash('sha256').update(combined).digest('hex')
+  }
+  f.source.audit.rows[0].hasResult = true
+  f.source.audit.rows[0].resultSource = {
+    sourcePath: f.path,
+    byteOffset: Buffer.byteLength(original),
+    contentHash: createHash('sha256').update(output).digest('hex')
+  }
+  f.source.audit.rows.push({
+    ...f.source.audit.rows[0],
+    kind: 'context',
+    evidenceKey: 'handoff',
+    byteOffset: Buffer.byteLength(original + output),
+    hasResult: null,
+    resultSource: undefined,
+    messageRole: 'assistant',
+    recordFormat: 'response_message',
+    messageTextChars: 30
+  })
+  const review = await f.reviews.open({
+    ...f.query,
+    focus: '重启应用后，保存的记录仍可读取。',
+    expectedRevision: f.review.revision
+  })
+  f.send.mockImplementation(async (_url, init) => {
+    const request: JevRequest = JSON.parse(String(init?.body))
+    const answers: Record<string, JevAnswer> = {}
+    for (const [id, question] of Object.entries(request.questions)) {
+      if (question.type === 'noul') {
+        answers[id] = { type: 'noul', noul: 0.9 }
+      } else if (question.type === 'score') {
+        answers[id] = {
+          type: 'score',
+          score: 2,
+          confidence: 1,
+          legend: Object.fromEntries(
+            question.criteria.map((label, index) => [String(index), label])
+          ),
+          probabilities: Object.fromEntries(
+            question.criteria.map((_label, index) => [String(index), index === 2 ? 1 : 0])
+          )
+        }
+      } else {
+        const choice =
+          id === 'criterion_clarity'
+            ? 'clear'
+            : id === 'criterion_evidence'
+              ? 'insufficient'
+              : 'partial'
+        answers[id] = {
+          type: 'choice',
+          choice,
+          confidence: 1,
+          probabilities: Object.fromEntries(
+            Object.keys(question.criteria).map((key) => [key, key === choice ? 1 : 0])
+          )
+        }
+      }
+    }
+    return new Response(
+      JSON.stringify({ model: JEV_MODEL, answers, usage: { input_tokens: 200, output_tokens: 0 } }),
+      { headers: { 'content-type': 'application/json' } }
+    )
+  })
+  return {
+    ...f,
+    review,
+    input: {
+      mode: 'delivery' as const,
+      reviewId: review.id,
+      versionId: review.versions.at(-1)!.id,
+      evidenceKeys: ['evidence', 'handoff'],
+      handoffEvidenceKeys: ['handoff']
+    }
+  }
+}
+
 describe('Jev review lifecycle', () => {
+  it('previews a delivery criterion with explicit multiple sources, original fingerprints and distinct source roles', async () => {
+    const f = await deliveryFixture()
+    const preview = await f.service.prepare(f.input)
+    expect(preview.mode).toBe('delivery')
+    if (preview.mode !== 'delivery') {
+      throw new Error('Expected delivery preview')
+    }
+    const state = JSON.parse(preview.body).state
+    expect(state.targetCriterion.text).toBe(f.review.versions.at(-1)!.focus)
+    expect(state.sources.map((source: { role: string }) => source.role)).toEqual([
+      'tool_call',
+      'execution_result',
+      'assistant_claim'
+    ])
+    expect(state.handoff.sourceIds).toEqual(['S2'])
+    expect(state.coverage).toMatchObject({ wholeProject: false, partial: true })
+    expect(state).not.toHaveProperty('openIssues')
+    expect(preview.basis.sourceFingerprints.map((source) => source.evidenceKey)).toEqual(
+      f.input.evidenceKeys
+    )
+    expect(preview.basis.evaluationSuiteHash).toBeNull()
+    expect(preview.body).not.toMatch(/sensitive-record-value|user@example.com|test-session/)
+    expect(f.send).not.toHaveBeenCalled()
+  })
+
+  it('sends the delivery preview once and records independent human-adopted issues with all sources', async () => {
+    const f = await deliveryFixture()
+    const preview = await f.service.prepare(f.input)
+    const [receipt, duplicate] = await Promise.all([f.service.run(preview), f.service.run(preview)])
+    expect(receipt).toEqual(duplicate)
+    expect(receipt).toMatchObject({
+      mode: 'delivery',
+      status: 'completed',
+      questionVersion: JEV_DELIVERY_QUESTION_VERSION,
+      evidenceKeys: f.input.evidenceKeys
+    })
+    expect(f.send).toHaveBeenCalledOnce()
+    expect(f.send).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ body: preview.body })
+    )
+    const updated = await f.service.accept({
+      receiptId: receipt.id,
+      question: 'criterion_evidence',
+      expectedRevision: f.review.revision
+    })
+    expect(updated.issues[0].evidenceKeys).toEqual(f.input.evidenceKeys)
+    expect(updated.issues[0].detail).toContain(receipt.inputHash)
+    expect(updated.confirmations).toHaveLength(0)
+    const second = await f.service.accept({
+      receiptId: receipt.id,
+      question: 'handoff_criterion_coverage',
+      expectedRevision: updated.revision
+    })
+    expect(second.issues).toHaveLength(2)
+    expect(second.confirmations).toHaveLength(0)
+    expect(f.service.list(f.review.id)[0]).toEqual(receipt)
+    expect(await readFile(join(f.dir, 'jev.json'), 'utf8')).not.toContain(
+      '重启应用并核对保存的记录'
+    )
+  })
+
+  it.each(['source', 'question', 'evaluator', 'suite', 'fingerprint'] as const)(
+    'refuses delivery adoption when %s evidence changes',
+    async (change) => {
+      const f = await deliveryFixture()
+      const preview = await f.service.prepare(f.input)
+      const receipt = await f.service.run(preview)
+      if (!receipt.basis) {
+        throw new Error('Expected basis')
+      }
+      if (change === 'source') {
+        await writeFile(
+          f.path,
+          (await readFile(f.path, 'utf8')).replace(
+            'sensitive-record-value',
+            'different-secret-value'
+          )
+        )
+      }
+      if (change === 'question') {
+        receipt.basis.questionHash = '0'.repeat(64)
+      }
+      if (change === 'evaluator') {
+        receipt.basis.evaluatorVersion = 'old-adapter'
+      }
+      if (change === 'suite') {
+        receipt.basis.evaluationSuiteHash = '1'.repeat(64)
+      }
+      if (change === 'fingerprint') {
+        receipt.basis.sourceFingerprints[0].sha256 = '2'.repeat(64)
+      }
+      f.ledger.put(receipt)
+      await expect(
+        f.service.accept({
+          receiptId: receipt.id,
+          question: 'criterion_evidence',
+          expectedRevision: f.review.revision
+        })
+      ).rejects.toThrow(/变化|依据/)
+      expect(f.reviews.get(f.review.id).issues).toHaveLength(0)
+      expect(f.send).toHaveBeenCalledOnce()
+    }
+  )
+
+  it('rejects duplicate evidence, unrelated handoff sources and nonexistent delivery evidence', async () => {
+    const f = await deliveryFixture()
+    await expect(
+      f.service.prepare({ ...f.input, evidenceKeys: ['evidence', 'evidence'] })
+    ).rejects.toThrow()
+    await expect(
+      f.service.prepare({ ...f.input, handoffEvidenceKeys: ['unselected'] })
+    ).rejects.toThrow()
+    await expect(
+      f.service.prepare({ ...f.input, evidenceKeys: ['unselected'], handoffEvidenceKeys: [] })
+    ).rejects.toThrow('不属于当前审阅版本')
+    expect(f.send).not.toHaveBeenCalled()
+  })
+
+  it('uses the UTF-8 byte limit for the complete delivery request without silently dropping sources', async () => {
+    const f = await deliveryFixture()
+    const readEvidence = vi.fn(async () => ({
+      text: '汉'.repeat(9000),
+      truncated: false,
+      sourcePath: f.path,
+      byteOffset: 0
+    }))
+    const service = new JevAuditService(
+      f.reviews,
+      f.accounts,
+      f.ledger,
+      f.send,
+      () => true,
+      readEvidence
+    )
+    await expect(service.prepare(f.input)).rejects.toThrow('24 KiB')
+    expect(f.send).not.toHaveBeenCalled()
+    expect(f.ledger.all()).toEqual([])
+  })
+
+  it('blocks stale legacy adoption after a source changes even when the displayed secret is redacted', async () => {
+    const f = await fixture()
+    const receipt = await f.service.run(await f.service.prepare(f.input))
+    await writeFile(
+      f.path,
+      (await readFile(f.path, 'utf8')).replace('sensitive-record-value', 'different-secret-value')
+    )
+    await expect(
+      f.service.accept({
+        receiptId: receipt.id,
+        question: 'evidence',
+        expectedRevision: f.review.revision
+      })
+    ).rejects.toThrow('变化')
+    expect(f.reviews.get(f.review.id).issues).toHaveLength(0)
+  })
+
+  it('keeps Noul, Score and favorable delivery answers advisory without a numeric acceptance threshold', async () => {
+    const f = await deliveryFixture()
+    const receipt = await f.service.run(await f.service.prepare(f.input))
+    for (const question of [
+      'documented_current_nonconformance',
+      'handoff_operability',
+      'criterion_clarity'
+    ] as const) {
+      await expect(
+        f.service.accept({ receiptId: receipt.id, question, expectedRevision: f.review.revision })
+      ).rejects.toThrow('没有可采纳')
+    }
+    expect(f.reviews.get(f.review.id).issues).toHaveLength(0)
+    expect(f.reviews.get(f.review.id).confirmations).toHaveLength(0)
+  })
+
+  it('persists only the redacted legacy claim for rereading and refuses historical claims with no reconstructable basis', async () => {
+    const f = await fixture()
+    const originalSend = f.send.getMockImplementation()!
+    f.send.mockImplementation(async () => {
+      const response = await originalSend()
+      const payload = await response.json()
+      payload.answers.claim = {
+        type: 'choice',
+        choice: 'unknown',
+        confidence: 1,
+        probabilities: { supported: 0, conflict: 0, unknown: 1 }
+      }
+      return new Response(JSON.stringify(payload), {
+        headers: { 'content-type': 'application/json' }
+      })
+    })
+    const receipt = await f.service.run(
+      await f.service.prepare({ ...f.input, claim: 'API_KEY=private-claim-value 已经验证。' })
+    )
+    expect(receipt.legacyClaim).toContain('[redacted]')
+    expect(receipt.legacyClaim).not.toContain('private-claim-value')
+    f.ledger.put({ ...receipt, legacyClaim: undefined })
+    await expect(
+      f.service.accept({
+        receiptId: receipt.id,
+        question: 'claim',
+        expectedRevision: f.review.revision
+      })
+    ).rejects.toThrow('历史回执依据')
+    f.ledger.put(receipt)
+    const accepted = await f.service.accept({
+      receiptId: receipt.id,
+      question: 'claim',
+      expectedRevision: f.review.revision
+    })
+    expect(accepted.issues).toHaveLength(1)
+  })
+
   it('bounds simultaneous previews and releases reservations after a failed prepare', async () => {
     const f = await fixture()
     await expect(

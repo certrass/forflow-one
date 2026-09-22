@@ -48,11 +48,17 @@ export function reassessCodexReviewIssues(
 ): boolean {
   let changed = false
   for (const issue of review.issues) {
-    if (issue.status === 'open' || !issue.evidenceKey || issue.resolvedInVersion === version.id) {
+    const keys = [
+      ...new Set([...(issue.evidenceKeys ?? []), ...(issue.evidenceKey ? [issue.evidenceKey] : [])])
+    ]
+    if (issue.status === 'open' || !keys.length || issue.resolvedInVersion === version.id) {
       continue
     }
     const basis = review.versions.find((entry) => entry.id === issue.resolvedInVersion)
-    if (evidenceUnchanged(basis, version, issue.evidenceKey)) {
+    if (
+      (!issue.evidenceKeys || basis?.focus === version.focus) &&
+      keys.every((key) => evidenceUnchanged(basis, version, key))
+    ) {
       continue
     }
     const basisNumber = review.versions.findIndex((entry) => entry.id === issue.resolvedInVersion)

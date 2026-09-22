@@ -1,6 +1,8 @@
 import {
   JEV_ENDPOINT,
   jevResponseSchema,
+  type JevAnswer,
+  type JevQuestion,
   type JevRequest,
   type JevResponse
 } from '../../shared/jev-audit-types'
@@ -13,6 +15,41 @@ export class JevRequestError extends Error {
   ) {
     super(message)
   }
+}
+
+function validAnswer(answer: JevAnswer, question: JevQuestion): boolean {
+  if (question.type === 'noul') {
+    return answer.type === 'noul'
+  }
+  if (answer.type === 'noul' || answer.type !== question.type) {
+    return false
+  }
+  const options =
+    question.type === 'score'
+      ? question.criteria.map((_criterion, index) => String(index))
+      : Object.keys(question.criteria)
+  if (
+    Object.keys(answer.probabilities).length !== options.length ||
+    options.some((option) => answer.probabilities[option] === undefined)
+  ) {
+    return false
+  }
+  const probabilities = Object.values(answer.probabilities)
+  if (Math.abs(probabilities.reduce((sum, probability) => sum + probability, 0) - 1) > 0.001) {
+    return false
+  }
+  if (answer.type === 'choice') {
+    return (
+      options.includes(answer.choice) &&
+      answer.probabilities[answer.choice] + 0.000001 >= Math.max(...probabilities)
+    )
+  }
+  return (
+    question.type === 'score' &&
+    answer.score <= question.criteria.length - 1 &&
+    Object.keys(answer.legend).length === options.length &&
+    question.criteria.every((criterion, index) => answer.legend[String(index)] === criterion)
+  )
 }
 
 export function validateJevResponse(value: unknown, request: JevRequest): JevResponse {
@@ -28,20 +65,7 @@ export function validateJevResponse(value: unknown, request: JevRequest): JevRes
   }
   for (const [id, question] of Object.entries(request.questions)) {
     const answer = answers[id]
-    const options = Object.keys(question.criteria)
-    if (
-      !answer ||
-      !options.includes(answer.choice) ||
-      Object.keys(answer.probabilities).length !== options.length ||
-      options.some((option) => answer.probabilities[option] === undefined)
-    ) {
-      throw invalid()
-    }
-    const values = Object.values(answer.probabilities)
-    if (
-      Math.abs(values.reduce((sum, probability) => sum + probability, 0) - 1) > 0.001 ||
-      answer.probabilities[answer.choice] + 0.000001 < Math.max(...values)
-    ) {
+    if (!answer || !validAnswer(answer, question)) {
       throw invalid()
     }
   }

@@ -1,5 +1,27 @@
 {
   "extends": "./tsconfig.e2e.json",
+  "exclude": [
+    "../tests/e2e/.cross-version-checkouts/**",
+    "../**/node_modules/**",
+    "../**/* 1.ts",
+    "../**/* 1.tsx",
+    "../**/* 2.ts",
+    "../**/* 2.tsx",
+    "../**/* 3.ts",
+    "../**/* 3.tsx",
+    "../**/* 4.ts",
+    "../**/* 4.tsx",
+    "../**/* 5.ts",
+    "../**/* 5.tsx",
+    "../**/* 6.ts",
+    "../**/* 6.tsx",
+    "../**/* 7.ts",
+    "../**/* 7.tsx",
+    "../**/* 8.ts",
+    "../**/* 8.tsx",
+    "../**/* 9.ts",
+    "../**/* 9.tsx"
+  ],
   "include": [
     "../tests/forflow-packaged/**/*.ts",
     "../tests/playwright.forflow-packaged.config.ts",
