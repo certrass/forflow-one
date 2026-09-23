@@ -287,5 +287,7 @@
   "src/renderer/src/components/contextual-tours/contextual-tour-floating-position.test.ts",
   "src/renderer/src/components/contextual-tours/ContextualTourCallout.test.tsx",
   "src/renderer/src/components/stats/StatsPane.review-visibility.test.tsx",
-  "src/renderer/src/components/stats/WorkspaceReviewStepHelp.test.tsx"
+  "src/renderer/src/components/stats/WorkspaceReviewStepHelp.test.tsx",
+  "src/renderer/src/components/stats/JevDeliveryResults.test.tsx",
+  "src/renderer/src/components/stats/CodexReviewWorkspace.jev-navigation.test.tsx"
 ]

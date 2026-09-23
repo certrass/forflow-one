@@ -23,7 +23,7 @@ export function jevAuditCopy() {
     cancel: translate('forflow.jev.cancel', 'Discard preview'),
     busy: translate('forflow.jev.busy', 'Processing…'),
     history: translate('forflow.jev.history', 'Recent calls for this version (up to 20)'),
-    noCalls: translate('forflow.jev.noCalls', 'No Jev calls for this version.'),
+    noCalls: translate('forflow.jev.noCalls', 'No calls in this check mode for this version.'),
     unavailable: translate(
       'forflow.jev.unavailable',
       'Jev audit is available in the local Forflow desktop client.'
@@ -32,8 +32,8 @@ export function jevAuditCopy() {
       'forflow.jev.error',
       'The operation did not complete. Refresh the review and try again.'
     ),
-    accept: translate('forflow.jev.accept', 'Add to Issues'),
-    accepted: translate('forflow.jev.accepted', 'Added to Issues'),
+    accept: translate('forflow.jev.accept', 'Record an issue'),
+    accepted: translate('forflow.jev.accepted', 'Issue recorded'),
     calibration: translate(
       'forflow.jev.calibration',
       'Probabilities are model outputs, not calibrated audit accuracy. No visible issue does not confirm the review.'
@@ -52,7 +52,7 @@ export function jevAuditCopy() {
     missing: translate('forflow.jev.missing', 'More evidence needed'),
     supported: translate('forflow.jev.supported', 'Claim supported by selected evidence'),
     conflict: translate('forflow.jev.conflict', 'Claim conflicts with selected evidence'),
-    completed: translate('forflow.jev.completed', 'Completed'),
+    completed: translate('forflow.jev.completed', 'Request completed'),
     pending: translate('forflow.jev.pending', 'Awaiting response'),
     rejected: translate('forflow.jev.rejected', 'Request rejected'),
     uncertain: translate('forflow.jev.uncertain', 'Completion and usage unknown'),

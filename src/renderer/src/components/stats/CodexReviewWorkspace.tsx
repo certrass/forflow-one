@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { CodexReview, CodexReviewMutation } from '../../../../shared/codex-review-types'
 import { Button } from '../ui/button'
-import { Textarea } from '../ui/textarea'
-import { Label } from '../ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { reviewCopy } from './review-copy'
 import { reviewWorkspaceCopy } from './review-workspace-copy'
@@ -10,6 +8,7 @@ import { CodexReviewChanges } from './CodexReviewChanges'
 import { CodexReviewEvidence } from './CodexReviewEvidence'
 import { CodexReviewFindings } from './CodexReviewFindings'
 import { CodexReviewHeader } from './CodexReviewHeader'
+import { CodexReviewGoal } from './CodexReviewGoal'
 import { CodexReviewActivity } from './CodexReviewActivity'
 import { CodexReviewCoverage } from './CodexReviewCoverage'
 import { summarizeReviewChecks } from './codex-review-activity'
@@ -42,6 +41,8 @@ export function CodexReviewWorkspace({
   const [tab, setTab] = useState('overview')
   const walkthroughAnchors = useReviewWalkthroughAnchors()
   const [focus, setFocus] = useState(initial.versions.at(-1)?.focus ?? c.defaultFocus)
+  const [focusEditorOpen, setFocusEditorOpen] = useState(false)
+  const focusRequested = useRef(false)
   const [locateKey, setLocateKey] = useState<string | null>(null)
   const [evidenceKey, setEvidenceKey] = useState<string | null>(null)
   const [jevEvidenceKey, setJevEvidenceKey] = useState<string | null>(null)
@@ -56,15 +57,27 @@ export function CodexReviewWorkspace({
   const locked = busy || checking
   const focusChanged = !focus.trim() || focus.trim() !== version.focus
   const checks = summarizeReviewChecks(receipts, version.id)
+  const editGoal = (): void => {
+    if (!active || locked || readOnly) {
+      return
+    }
+    focusRequested.current = true
+    setFocusEditorOpen(true)
+    setTab('overview')
+  }
   const chooseVersion = (index: number): void => {
+    if (locked || index === selected) {
+      return
+    }
     setSelected(index)
+    setFocusEditorOpen(false)
     setEvidenceKey(null)
     setLocateKey(null)
     setJevEvidenceKey(null)
   }
   const navigate = (versionId: string, nextTab: string, key: string | null = null): void => {
     const index = review.versions.findIndex((entry) => entry.id === versionId)
-    if (index === -1) {
+    if (locked || index === -1) {
       return
     }
     chooseVersion(index)
@@ -129,230 +142,242 @@ export function CodexReviewWorkspace({
         expectedRevision: review.revision
       })
     })
-  if (editingScope) {
-    return (
-      <WorkspaceReviewIntake
-        active={active}
-        initial={review}
-        onCancel={() => setEditingScope(false)}
-        onOpenReview={(value) => {
-          setReview(value)
-          setSelected(value.versions.length - 1)
-          setFocus(value.versions.at(-1)?.focus ?? focus)
-          setEvidenceKey(null)
-          setLocateKey(null)
-          setJevEvidenceKey(null)
-          setEditingScope(false)
-        }}
-      />
-    )
-  }
   return (
-    <section className="min-w-0 space-y-6" data-testid="codex-review">
-      <CodexReviewHeader
-        review={review}
-        version={version}
-        selected={selected}
-        busy={locked}
-        readOnly={readOnly}
-        focusChanged={focusChanged}
-        receipts={receipts}
-        onBack={onBack}
-        onVersion={chooseVersion}
-        onOverview={() => setTab('overview')}
-        onChecks={() => setTab('jev')}
-        onReread={() => void reread()}
-        onConfirm={() => void mutate({ type: 'confirm' })}
-      />
-      {readOnly && <p className="text-xs text-muted-foreground">{c.historic}</p>}
-      {version.workspace && !readOnly && (
-        <Button size="sm" variant="ghost" disabled={locked} onClick={() => setEditingScope(true)}>
-          {p.editScope}
-        </Button>
+    <>
+      {editingScope && (
+        <WorkspaceReviewIntake
+          active={active}
+          initial={review}
+          onCancel={() => setEditingScope(false)}
+          onOpenReview={(value) => {
+            setReview(value)
+            setSelected(value.versions.length - 1)
+            setFocus(value.versions.at(-1)?.focus ?? focus)
+            setEvidenceKey(null)
+            setLocateKey(null)
+            setJevEvidenceKey(null)
+            setFocusEditorOpen(false)
+            setEditingScope(false)
+          }}
+        />
       )}
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList variant="line" className="max-w-full overflow-x-auto">
-          <TabsTrigger ref={walkthroughAnchors.overview} value="overview" disabled={locked}>
-            {w.overview}
-          </TabsTrigger>
-          <TabsTrigger ref={walkthroughAnchors.issues} value="issues" disabled={locked}>
-            {c.issues} ({review.issues.filter((issue) => issue.status === 'open').length})
-          </TabsTrigger>
-          <TabsTrigger ref={walkthroughAnchors.changes} value="changes" disabled={locked}>
-            {c.changes}
-          </TabsTrigger>
-          <TabsTrigger ref={walkthroughAnchors.records} value="records" disabled={locked}>
-            {c.records}
-          </TabsTrigger>
-          {window.api?.forflowJevAudit && (
-            <TabsTrigger ref={walkthroughAnchors.jev} value="jev" disabled={locked}>
-              Jev · Beta
-            </TabsTrigger>
-          )}
-        </TabsList>
-        {version.workspace && (
-          <WorkspaceReviewWalkthrough
-            active={active}
-            tab={tab}
-            anchors={walkthroughAnchors}
-            disabled={locked}
-            readOnly={readOnly}
-            hasJev={Boolean(window.api?.forflowJevAudit)}
-            singleRecord={jevEvidenceKey !== null}
-            onTab={setTab}
-          />
+      <section hidden={editingScope} className="min-w-0 space-y-6" data-testid="codex-review">
+        <CodexReviewHeader
+          review={review}
+          version={version}
+          selected={selected}
+          busy={locked}
+          readOnly={readOnly}
+          focusChanged={focusChanged}
+          receipts={receipts}
+          onBack={onBack}
+          onVersion={chooseVersion}
+          onOverview={() => setTab('overview')}
+          onChecks={() => setTab('jev')}
+          onReread={() => void reread()}
+          onConfirm={() => void mutate({ type: 'confirm' })}
+        />
+        {readOnly && <p className="text-xs text-muted-foreground">{c.historic}</p>}
+        {version.workspace && !readOnly && (
+          <Button size="sm" variant="ghost" disabled={locked} onClick={() => setEditingScope(true)}>
+            {p.editScope}
+          </Button>
         )}
-        <TabsContent value="overview">
-          <div className="space-y-6 pt-3">
-            <section className="space-y-3 border-b border-border pb-5">
-              <h4 className="text-base font-medium">{w.description}</h4>
-              <p className="whitespace-pre-wrap break-words text-sm">{version.focus}</p>
-              {!readOnly && (
-                <details className="space-y-3">
-                  <summary className="cursor-pointer text-xs text-muted-foreground">
-                    {c.focus}
-                  </summary>
-                  <Label htmlFor="codex-review-focus">{c.focus}</Label>
-                  <Textarea
-                    id="codex-review-focus"
-                    value={focus}
-                    disabled={locked}
-                    maxLength={2000}
-                    onChange={(event) => setFocus(event.target.value)}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        <Tabs value={tab} onValueChange={(value) => !locked && setTab(value)}>
+          <TabsList variant="line" className="max-w-full overflow-x-auto">
+            <TabsTrigger ref={walkthroughAnchors.overview} value="overview" disabled={locked}>
+              {w.overview}
+            </TabsTrigger>
+            <TabsTrigger ref={walkthroughAnchors.issues} value="issues" disabled={locked}>
+              {c.issues} ({review.issues.filter((issue) => issue.status === 'open').length})
+            </TabsTrigger>
+            <TabsTrigger ref={walkthroughAnchors.changes} value="changes" disabled={locked}>
+              {c.changes}
+            </TabsTrigger>
+            <TabsTrigger ref={walkthroughAnchors.records} value="records" disabled={locked}>
+              {c.records}
+            </TabsTrigger>
+            {window.api?.forflowJevAudit && (
+              <TabsTrigger ref={walkthroughAnchors.jev} value="jev" disabled={locked}>
+                Jev · Beta
+              </TabsTrigger>
+            )}
+          </TabsList>
+          {version.workspace && (
+            <div hidden={tab === 'jev'}>
+              <WorkspaceReviewWalkthrough
+                active={active && !editingScope && tab !== 'jev'}
+                tab={tab}
+                anchors={walkthroughAnchors}
+                disabled={locked}
+                readOnly={readOnly}
+                hasJev={Boolean(window.api?.forflowJevAudit)}
+                singleRecord={jevEvidenceKey !== null}
+                onTab={setTab}
+              />
+            </div>
+          )}
+          <TabsContent value="overview">
+            <div className="space-y-6 pt-3">
+              <section className="space-y-3 border-b border-border pb-5">
+                <h4 className="text-base font-medium">{w.description}</h4>
+                <p className="whitespace-pre-wrap break-words text-sm">{version.focus}</p>
+                {!readOnly && (
+                  <CodexReviewGoal
+                    active={active && !editingScope && tab === 'overview'}
+                    busy={locked}
+                    focus={focus}
+                    changed={focusChanged}
+                    open={focusEditorOpen}
+                    focusRequested={focusRequested}
+                    onOpenChange={setFocusEditorOpen}
+                    onChange={setFocus}
+                    onSave={() => void reread()}
                   />
-                </details>
-              )}
-            </section>
-            {version.workspace && <WorkspaceReviewSummary snapshot={version.workspace} />}
-            <section
-              className="space-y-3 border-b border-border pb-5"
-              data-testid="review-check-summary"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h4 className="text-base font-medium">{w.checks}</h4>
-                <Button variant="outline" size="sm" disabled={locked} onClick={() => setTab('jev')}>
-                  {w.viewChecks}
-                </Button>
-              </div>
-              {failed ? (
-                <div className="flex items-center gap-3">
-                  <p role="alert" className="text-sm text-destructive">
-                    {w.checkError}
-                  </p>
-                  <Button variant="ghost" size="sm" onClick={refresh}>
-                    {c.refresh}
+                )}
+              </section>
+              {version.workspace && <WorkspaceReviewSummary snapshot={version.workspace} />}
+              <section
+                className="space-y-3 border-b border-border pb-5"
+                data-testid="review-check-summary"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="text-base font-medium">{w.checks}</h4>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={locked}
+                    onClick={() => setTab('jev')}
+                  >
+                    {w.viewChecks}
                   </Button>
                 </div>
-              ) : (
-                <p className="text-sm">
-                  {checks.total
-                    ? `${w.checked} ${checks.completed} · ${w.attention} ${checks.attention} · ${w.incomplete} ${checks.incomplete}`
-                    : w.noChecks}
+                {failed ? (
+                  <div className="flex items-center gap-3">
+                    <p role="alert" className="text-sm text-destructive">
+                      {w.checkError}
+                    </p>
+                    <Button variant="ghost" size="sm" onClick={refresh}>
+                      {c.refresh}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-sm">
+                    {checks.total
+                      ? `${w.checked} ${checks.completed} · ${w.attention} ${checks.attention} · ${w.incomplete} ${checks.incomplete}`
+                      : w.noChecks}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {version.workspace ? p.jevScope : w.checkScope}
                 </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                {version.workspace ? p.jevScope : w.checkScope}
-              </p>
-            </section>
-            <CodexReviewActivity
+              </section>
+              <CodexReviewActivity
+                review={review}
+                receipts={receipts}
+                busy={locked}
+                readOnly={readOnly}
+                mutate={mutate}
+                onLocate={(id, key) => navigate(id, 'records', key)}
+                onVersion={(id) => navigate(id, 'changes')}
+                onChecks={(id) => navigate(id, 'jev')}
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="issues">
+            <CodexReviewFindings
               review={review}
-              receipts={receipts}
+              evidenceKey={evidenceKey}
               busy={locked}
               readOnly={readOnly}
               mutate={mutate}
               onLocate={(id, key) => navigate(id, 'records', key)}
-              onVersion={(id) => navigate(id, 'changes')}
-              onChecks={(id) => navigate(id, 'jev')}
+              onClearEvidence={() => setEvidenceKey(null)}
             />
-          </div>
-        </TabsContent>
-        <TabsContent value="issues">
-          <CodexReviewFindings
-            review={review}
-            evidenceKey={evidenceKey}
-            busy={locked}
-            readOnly={readOnly}
-            mutate={mutate}
-            onLocate={(id, key) => navigate(id, 'records', key)}
-            onClearEvidence={() => setEvidenceKey(null)}
-          />
-        </TabsContent>
-        <TabsContent value="changes">
-          {version.workspace ? (
-            <WorkspaceReviewChanges previous={previous} current={version} />
-          ) : (
-            <CodexReviewChanges previous={previous} current={version} />
-          )}
-        </TabsContent>
-        <TabsContent value="jev">
-          <JevAuditPanel
-            key={`${version.id}:${jevEvidenceKey}`}
-            review={review}
-            version={version}
-            readOnly={readOnly || busy || focusChanged}
-            initialEvidenceKey={jevEvidenceKey}
-            receipts={receipts}
-            onReceipt={record}
-            onBusyChange={setChecking}
-            onUpdated={setReview}
-            onLocate={(key) => navigate(version.id, 'records', key)}
-            onIssues={() => setTab('issues')}
-          />
-        </TabsContent>
-        <TabsContent value="records">
-          {version.workspace && (
-            <WorkspaceReviewEvidence
-              key={`${version.id}:files:${locateKey}`}
+          </TabsContent>
+          <TabsContent value="changes">
+            {version.workspace ? (
+              <WorkspaceReviewChanges previous={previous} current={version} />
+            ) : (
+              <CodexReviewChanges previous={previous} current={version} />
+            )}
+          </TabsContent>
+          <TabsContent value="jev" forceMount className="data-[state=inactive]:hidden">
+            <JevAuditPanel
+              key={`${version.id}:${jevEvidenceKey}`}
+              active={active && !editingScope && tab === 'jev'}
               review={review}
               version={version}
-              locateKey={locateKey}
-              readOnly={readOnly || locked}
-              onFlag={(key) => {
-                setEvidenceKey(key)
-                setTab('issues')
-              }}
-              onAudit={
-                window.api?.forflowJevAudit && !focusChanged
-                  ? (key) => {
-                      setJevEvidenceKey(key)
-                      setTab('jev')
-                    }
-                  : undefined
+              readOnly={readOnly || busy || focusChanged}
+              initialEvidenceKey={jevEvidenceKey}
+              receipts={receipts}
+              onReceipt={record}
+              onBusyChange={setChecking}
+              onUpdated={setReview}
+              onLocate={(key) => navigate(version.id, 'records', key)}
+              onIssues={() => !locked && setTab('issues')}
+              onEditGoal={editGoal}
+              onEditSources={
+                version.workspace && !readOnly ? () => !locked && setEditingScope(true) : undefined
               }
+              onReread={!readOnly ? () => !locked && void reread() : undefined}
             />
-          )}
-          {(!version.workspace || version.audit.rows.length > 0) && (
-            <CodexReviewEvidence
-              key={`${version.id}:${locateKey}`}
-              review={review}
-              version={version}
-              locateKey={locateKey}
-              readOnly={readOnly || locked}
-              onFlag={(key) => {
-                setEvidenceKey(key)
-                setTab('issues')
-              }}
-              onAudit={
-                window.api?.forflowJevAudit && !focusChanged
-                  ? (key) => {
-                      setJevEvidenceKey(key)
-                      setTab('jev')
-                    }
-                  : undefined
-              }
-            />
-          )}
-        </TabsContent>
-      </Tabs>
-      {(!version.workspace || version.workspace.selection.sessionIds.length > 0) && (
-        <CodexReviewCoverage version={version} />
-      )}
-      <p className="text-xs text-muted-foreground">{w.local}</p>
-    </section>
+          </TabsContent>
+          <TabsContent value="records">
+            {version.workspace && (
+              <WorkspaceReviewEvidence
+                key={`${version.id}:files:${locateKey}`}
+                review={review}
+                version={version}
+                locateKey={locateKey}
+                readOnly={readOnly || locked}
+                onFlag={(key) => {
+                  setEvidenceKey(key)
+                  setTab('issues')
+                }}
+                onAudit={
+                  window.api?.forflowJevAudit && !focusChanged
+                    ? (key) => {
+                        setJevEvidenceKey(key)
+                        setTab('jev')
+                      }
+                    : undefined
+                }
+              />
+            )}
+            {(!version.workspace || version.audit.rows.length > 0) && (
+              <CodexReviewEvidence
+                key={`${version.id}:${locateKey}`}
+                review={review}
+                version={version}
+                locateKey={locateKey}
+                readOnly={readOnly || locked}
+                onFlag={(key) => {
+                  setEvidenceKey(key)
+                  setTab('issues')
+                }}
+                onAudit={
+                  window.api?.forflowJevAudit && !focusChanged
+                    ? (key) => {
+                        setJevEvidenceKey(key)
+                        setTab('jev')
+                      }
+                    : undefined
+                }
+              />
+            )}
+          </TabsContent>
+        </Tabs>
+        {(!version.workspace || version.workspace.selection.sessionIds.length > 0) && (
+          <CodexReviewCoverage version={version} />
+        )}
+        <p className="text-xs text-muted-foreground">{w.local}</p>
+      </section>
+    </>
   )
 }

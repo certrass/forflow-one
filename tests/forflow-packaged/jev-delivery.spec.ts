@@ -4,6 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { launch, evidence, packageFingerprint } from './harness'
 import { privateProfile } from './private-fixture'
+import { captureJevGuide, prepareGuidedDelivery } from './jev-delivery-guide-qa'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 
 test('delivery quality: explicit multi-source preview, native answers, adoption and stale source', async () => {
@@ -124,14 +125,14 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     ])
     await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')
+    await page.getByRole('button', { name: '收起引导', exact: true }).click()
+    await expect(review.getByRole('button', { name: '带我审阅', exact: true })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    )
     await review.getByRole('tab', { name: 'Jev · Beta', exact: true }).click()
     const panel = review.getByTestId('jev-audit-panel')
-    await expect(panel.getByTestId('jev-delivery-input')).toBeVisible()
-    for (const file of ['requirement.md', 'receipt.txt', 'handoff.md']) {
-      await panel.getByRole('checkbox', { name: `选择证据: ${file}`, exact: true }).check()
-    }
-    await panel.getByRole('checkbox', { name: '作为交接说明: handoff.md', exact: true }).check()
-    await panel.getByRole('button', { name: '准备发送预览', exact: true }).click()
+    await prepareGuidedDelivery(app, page)
     const preview = panel.getByTestId('jev-request-preview')
     await expect(preview).toContainText('标题和状态保持一致')
     await expect(preview).toContainText('问题为空；测试失败')
@@ -140,6 +141,20 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     await panel.getByRole('button', { name: '将此预览发送至 Jev', exact: true }).click()
     const results = panel.getByTestId('jev-delivery-results')
     await expect(results).toContainText('待人工复核')
+    await expect(
+      panel.getByTestId('jev-delivery-workflow').getByRole('progressbar')
+    ).toHaveAttribute('aria-valuenow', '4')
+    await expect(page.locator('[data-workspace-review-step-help]')).toHaveCount(0)
+    await expect(results.getByTestId('jev-result-summary')).toContainText(
+      '材料记录了未达到要求的情况'
+    )
+    const checks = results.locator('details').filter({
+      has: page.locator('summary').filter({ hasText: '五项检查分别在看什么' })
+    })
+    await expect(checks).toHaveCount(1)
+    expect(await checks.getAttribute('open')).toBeNull()
+    await captureJevGuide(page, 4, 'jev-guide-result')
+    await checks.locator(':scope > summary').click()
     await expect(results).toContainText('有记录的当前不符合项')
     await expect(results).toContainText('交接说明可操作性')
     expect(await app.evaluate(() => process.env.FORFLOW_QA_DELIVERY_SENDS)).toBe('1')
@@ -154,8 +169,8 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
       receipt
     )
     expect(await app.evaluate(() => process.env.FORFLOW_QA_DELIVERY_SENDS)).toBe('1')
-    await results.getByRole('button', { name: '加入 Issues', exact: true }).first().click()
-    await expect(results.getByRole('button', { name: '已加入 Issues', exact: true })).toBeDisabled()
+    await results.getByRole('button', { name: '记录为待处理问题', exact: true }).first().click()
+    await expect(results.getByRole('button', { name: '已记录为问题', exact: true })).toBeDisabled()
     const stored = await page.evaluate(
       (id) => window.api.codexUsage.getReview!(id),
       receipt.reviewId
@@ -165,7 +180,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     ).toHaveLength(3)
     expect(stored.confirmations).toHaveLength(0)
     writeFileSync(path.join(folder, 'receipt.txt'), '版本 r2：复测通过，原结果已变化。\n')
-    await results.getByRole('button', { name: '加入 Issues', exact: true }).click()
+    await results.getByRole('button', { name: '记录为待处理问题', exact: true }).click()
     await expect(panel.getByRole('alert')).toContainText('变化')
     await page.screenshot({
       path: path.join(evidence, 'jev-delivery-results.png'),
@@ -196,6 +211,13 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
           sends: 1,
           selectedSources: 3,
           sourceFreshnessRejected: true,
+          guidedSteps: 4,
+          previewBeforeSend: true,
+          backDiscardedPreview: true,
+          selectionRetainedAfterSourceRead: true,
+          guideClosedAcrossSteps: true,
+          guidePausedOnHiddenTab: true,
+          guideWidths: [1450, 1000],
           restartReadback: true,
           humanConfirmation: false,
           hiddenWindows: true

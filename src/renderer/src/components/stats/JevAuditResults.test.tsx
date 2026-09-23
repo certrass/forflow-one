@@ -36,8 +36,8 @@ it('shows historical legacy and delivery replies without allowing obsolete quest
     />
   )
   expect(screen.getAllByText('历史问题或审计器版本 · 请重新检查后采纳')).toHaveLength(2)
-  expect(screen.getAllByRole('button', { name: '加入 Issues' })).toHaveLength(2)
-  for (const button of screen.getAllByRole('button', { name: '加入 Issues' })) {
+  expect(screen.getAllByRole('button', { name: '记录为待处理问题' })).toHaveLength(2)
+  for (const button of screen.getAllByRole('button', { name: '记录为待处理问题' })) {
     expect(button).toBeDisabled()
     fireEvent.click(button)
   }
@@ -60,7 +60,8 @@ it('locates every source and leaves even current delivery results read-only in h
   expect(buttons).toHaveLength(2)
   fireEvent.click(buttons[1])
   expect(onLocate).toHaveBeenCalledWith('linked-source')
-  expect(screen.getByRole('button', { name: '加入 Issues' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: '记录为待处理问题' })).toBeDisabled()
+  fireEvent.click(screen.getByText('五项检查分别在看什么'))
   expect(screen.getByText(/1.81 \/ 4/)).toBeVisible()
   expect(screen.getByText(/按返回概率重算: 1.70/)).toBeVisible()
 })
@@ -76,7 +77,7 @@ it('keeps current legacy choice adoption compatible', () => {
       receipts={[{ ...receipt, questionVersion: JEV_QUESTION_VERSION }]}
     />
   )
-  fireEvent.click(screen.getByRole('button', { name: '加入 Issues' }))
+  fireEvent.click(screen.getByRole('button', { name: '记录为待处理问题' }))
   expect(onAccept).toHaveBeenCalledWith(receipt.id, 'evidence')
 })
 

@@ -111,7 +111,7 @@ export function CodexReviewHeader({
           {c.comments}
         </dt>
         <dd>
-          <Button variant="link" size="xs" onClick={onOverview}>
+          <Button variant="link" size="xs" disabled={busy} onClick={onOverview}>
             {review.comments.length} {c.comments}
           </Button>
         </dd>
@@ -120,7 +120,7 @@ export function CodexReviewHeader({
           {w.checks}
         </dt>
         <dd>
-          <Button variant="link" size="xs" onClick={onChecks}>
+          <Button variant="link" size="xs" disabled={busy} onClick={onChecks}>
             {checks.total
               ? `${w.checked} ${checks.completed} · ${w.attention} ${checks.attention}`
               : w.noChecks}

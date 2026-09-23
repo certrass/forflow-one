@@ -18,7 +18,9 @@ export function JevAuditResults({
   busy,
   readOnly,
   onAccept,
-  onLocate
+  onLocate,
+  onIssues,
+  onRecheck
 }: {
   receipts: JevReceipt[]
   review: CodexReview
@@ -26,6 +28,8 @@ export function JevAuditResults({
   readOnly: boolean
   onAccept: (receiptId: string, question: Parameters<JevAuditApi['accept']>[0]['question']) => void
   onLocate?: (key: string) => void
+  onIssues?: () => void
+  onRecheck?: () => void
 }): React.JSX.Element {
   const c = jevAuditCopy()
   const r = reviewCopy()
@@ -99,6 +103,9 @@ export function JevAuditResults({
                       review={review}
                       disabled={busy || readOnly || !current || receipt.status !== 'completed'}
                       onAccept={onAccept}
+                      onIssues={onIssues}
+                      onRecheck={onRecheck}
+                      navigationDisabled={busy}
                     />
                   ) : (
                     (['outcome', 'evidence', 'claim'] as const).map((question) => {

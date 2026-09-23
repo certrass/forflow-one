@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { useState, type ComponentProps } from 'react'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { i18n } from '@/i18n/i18n'
@@ -78,7 +78,7 @@ it('requires a distinct send action and lets a human promote a suggestion into t
   expect(screen.getByText('only selected fixture', { exact: true })).toBeVisible()
   expect(api.run).not.toHaveBeenCalled()
   fireEvent.click(send)
-  const accept = await screen.findByRole('button', { name: '加入 Issues' })
+  const accept = await screen.findByRole('button', { name: '记录为待处理问题' })
   expect(api.run).toHaveBeenCalledExactlyOnceWith({ id: receipt.id, inputHash: receipt.inputHash })
   expect(api.accept).not.toHaveBeenCalled()
   fireEvent.click(accept)
@@ -111,6 +111,7 @@ it('requires explicit delivery sources, preserves handoff subset and invalidates
     <Panel review={review} version={review.versions[0]} readOnly={false} onUpdated={vi.fn()} />
   )
   expect(screen.getByRole('tab', { name: '交付质量' })).toHaveAttribute('data-state', 'active')
+  fireEvent.click(screen.getByRole('button', { name: '按这项要求选择材料' }))
   const prepare = screen.getByRole('button', { name: '准备发送预览' })
   expect(prepare).toBeDisabled()
   const evidence = screen.getByRole('checkbox', { name: /^选择证据:/ })
@@ -128,12 +129,17 @@ it('requires explicit delivery sources, preserves handoff subset and invalidates
     handoffEvidenceKeys: ['evidence']
   })
   expect(api.run).not.toHaveBeenCalled()
-  fireEvent.click(evidence)
-  expect(handoff).not.toBeChecked()
-  expect(handoff).toBeDisabled()
+  fireEvent.click(screen.getByRole('button', { name: '上一步' }))
+  const selectedEvidence = screen.getByRole('checkbox', { name: /^选择证据:/ })
+  const selectedHandoff = screen.getByRole('checkbox', { name: /^作为交接说明:/ })
+  expect(selectedEvidence).toBeChecked()
+  expect(selectedHandoff).toBeChecked()
+  fireEvent.click(selectedEvidence)
+  expect(selectedHandoff).not.toBeChecked()
+  expect(selectedHandoff).toBeDisabled()
   expect(screen.queryByRole('button', { name: '将此预览发送至 Jev' })).toBeNull()
-  fireEvent.click(evidence)
-  fireEvent.click(prepare)
+  fireEvent.click(selectedEvidence)
+  fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
   await screen.findByRole('button', { name: '将此预览发送至 Jev' })
   expect(api.prepare).toHaveBeenLastCalledWith(expect.objectContaining({ handoffEvidenceKeys: [] }))
   fireEvent.mouseDown(screen.getByRole('tab', { name: '单条检查' }), { button: 0 })
@@ -145,13 +151,15 @@ it('keeps mixed delivery results manual and never turns Noul or Score into issue
   render(
     <Panel review={review} version={review.versions[0]} readOnly={false} onUpdated={vi.fn()} />
   )
+  fireEvent.click(screen.getByRole('button', { name: '按这项要求选择材料' }))
   fireEvent.click(screen.getByRole('checkbox', { name: /^选择证据:/ }))
   fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
   fireEvent.click(await screen.findByRole('button', { name: '将此预览发送至 Jev' }))
   expect(await screen.findByText('待人工复核 · 不代表验收通过')).toBeVisible()
-  expect(screen.getByText('是的概率: 90.0%')).toBeVisible()
+  fireEvent.click(screen.getByText('五项检查分别在看什么'))
+  expect(screen.getByText(/材料明确记有尚未解决的未达成情况的概率: 90.0%/)).toBeVisible()
   expect(screen.getByText(/1.81 \/ 4/)).toBeVisible()
-  const accepts = screen.getAllByRole('button', { name: '加入 Issues' })
+  const accepts = screen.getAllByRole('button', { name: '记录为待处理问题' })
   expect(accepts).toHaveLength(1)
   fireEvent.click(accepts[0])
   await waitFor(() =>
@@ -219,6 +227,7 @@ it('caps an explicitly selected delivery packet at twelve sources and never reus
   const view = render(
     <Panel review={review} version={version} readOnly={false} onUpdated={vi.fn()} />
   )
+  fireEvent.click(screen.getByRole('button', { name: '按这项要求选择材料' }))
   const choices = screen.getAllByRole('checkbox', { name: /^选择证据:/ })
   for (const choice of choices.slice(0, 12)) {
     fireEvent.click(choice)
@@ -242,3 +251,129 @@ it('caps an explicitly selected delivery packet at twelve sources and never reus
   expect(screen.queryByRole('button', { name: '将此预览发送至 Jev' })).toBeNull()
   expect(api.run).not.toHaveBeenCalled()
 })
+
+it('keeps the selected material after a prepare error and requires a fresh send after retry', async () => {
+  api.prepare = vi.fn(api.prepare).mockRejectedValueOnce(new Error('Local preview failed'))
+  api.run = vi.fn(
+    async () =>
+      ({ ...deliveryReceipt, status: 'rejected', result: null, error: 'Check rejected' }) as const
+  )
+  render(
+    <Panel review={review} version={review.versions[0]} readOnly={false} onUpdated={vi.fn()} />
+  )
+  expect(screen.queryByRole('checkbox', { name: /^选择证据:/ })).toBeNull()
+  expect(api.prepare).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: '按这项要求选择材料' }))
+  fireEvent.click(screen.getByRole('checkbox', { name: /^选择证据:/ }))
+  fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Local preview failed')
+  expect(screen.getByRole('checkbox', { name: /^选择证据:/ })).toBeChecked()
+  expect(api.run).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
+  fireEvent.click(await screen.findByRole('button', { name: '将此预览发送至 Jev' }))
+  expect(await screen.findByText('请求被拒绝')).toBeVisible()
+  expect(screen.queryByTestId('jev-result-summary')).toBeNull()
+  expect(screen.getByRole('button', { name: '开始下一次检查' })).toBeEnabled()
+  expect(api.run).toHaveBeenCalledOnce()
+  expect(api.accept).not.toHaveBeenCalled()
+})
+
+it('opens an existing result in its own mode when saved receipts arrive after mounting', async () => {
+  const view = render(
+    <JevAuditPanel
+      review={review}
+      version={review.versions[0]}
+      readOnly
+      onUpdated={vi.fn()}
+      receipts={[]}
+      onReceipt={vi.fn()}
+    />
+  )
+  view.rerender(
+    <JevAuditPanel
+      review={review}
+      version={review.versions[0]}
+      readOnly
+      onUpdated={vi.fn()}
+      receipts={[receipt]}
+      onReceipt={vi.fn()}
+    />
+  )
+  expect(screen.getByRole('tab', { name: '单条检查' })).toHaveAttribute('data-state', 'active')
+  expect(await screen.findByText(/证据是否充分 · 需要补充证据/)).toBeVisible()
+  expect(screen.queryByRole('button', { name: '准备发送预览' })).toBeNull()
+  view.rerender(
+    <JevAuditPanel
+      review={review}
+      version={review.versions[0]}
+      readOnly
+      onUpdated={vi.fn()}
+      receipts={[deliveryReceipt]}
+      onReceipt={vi.fn()}
+    />
+  )
+  expect(screen.getByRole('tab', { name: '交付质量' })).toHaveAttribute('data-state', 'active')
+  expect(screen.getByTestId('jev-result-summary')).toBeVisible()
+  expect(api.run).not.toHaveBeenCalled()
+})
+
+it.each(['selecting materials', 'preparing a preview'] as const)(
+  'keeps the delivery flow when legacy receipts arrive while %s',
+  async (stage) => {
+    let finishPrepare: (() => void) | undefined
+    const originalPrepare = api.prepare
+    if (stage === 'preparing a preview') {
+      api.prepare = vi.fn(async (input) => {
+        await new Promise<void>((resolve) => {
+          finishPrepare = resolve
+        })
+        return originalPrepare(input)
+      })
+    }
+    const props = {
+      review,
+      version: review.versions[0],
+      readOnly: false,
+      onUpdated: vi.fn(),
+      onReceipt: vi.fn()
+    }
+    const view = render(<JevAuditPanel {...props} receipts={[]} />)
+    fireEvent.click(screen.getByRole('button', { name: '按这项要求选择材料' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /^选择证据:/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /^作为交接说明:/ }))
+    if (stage === 'preparing a preview') {
+      fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
+      expect(screen.getByRole('tab', { name: '单条检查' })).toBeDisabled()
+    }
+    view.rerender(<JevAuditPanel {...props} receipts={[receipt]} />)
+    expect(screen.getByRole('tab', { name: '交付质量' })).toHaveAttribute('data-state', 'active')
+    expect(screen.getByRole('tab', { name: '单条检查' })).toHaveAttribute('data-state', 'inactive')
+    expect(screen.getByRole('checkbox', { name: /^选择证据:/ })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: /^作为交接说明:/ })).toBeChecked()
+    if (stage === 'preparing a preview') {
+      await act(async () => finishPrepare?.())
+    } else {
+      fireEvent.click(screen.getByRole('button', { name: '准备发送预览' }))
+    }
+    const send = await screen.findByRole('button', { name: '将此预览发送至 Jev' })
+    const deliveryPanel = screen.getByRole('tabpanel', { name: '交付质量' })
+    expect(deliveryPanel).toHaveAttribute('data-state', 'active')
+    expect(within(deliveryPanel).getByTestId('jev-guide-preview')).toBeVisible()
+    expect(deliveryPanel).toContainElement(send)
+    const recordPanelId = screen
+      .getByRole('tab', { name: '单条检查' })
+      .getAttribute('aria-controls')
+    if (!recordPanelId) {
+      throw new Error('Single-record tab has no panel')
+    }
+    expect(document.getElementById(recordPanelId)).toBeEmptyDOMElement()
+    expect(api.prepare).toHaveBeenCalledExactlyOnceWith({
+      mode: 'delivery',
+      reviewId: review.id,
+      versionId: review.versions[0].id,
+      evidenceKeys: ['evidence'],
+      handoffEvidenceKeys: ['evidence']
+    })
+    expect(api.run).not.toHaveBeenCalled()
+  }
+)
