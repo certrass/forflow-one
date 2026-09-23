@@ -20,11 +20,17 @@ import { WorkspaceReviewSummary } from './WorkspaceReviewSummary'
 import { WorkspaceReviewEvidence } from './WorkspaceReviewEvidence'
 import { WorkspaceReviewChanges } from './WorkspaceReviewChanges'
 import { workspaceReviewCopy } from './workspace-review-copy'
+import {
+  WorkspaceReviewWalkthrough,
+  useReviewWalkthroughAnchors
+} from './WorkspaceReviewWalkthrough'
 
 export function CodexReviewWorkspace({
+  active = true,
   initial,
   onBack
 }: {
+  active?: boolean
   initial: CodexReview
   onBack: () => void
 }): React.JSX.Element {
@@ -34,6 +40,7 @@ export function CodexReviewWorkspace({
   const [review, setReview] = useState(initial)
   const [selected, setSelected] = useState(initial.versions.length - 1)
   const [tab, setTab] = useState('overview')
+  const walkthroughAnchors = useReviewWalkthroughAnchors()
   const [focus, setFocus] = useState(initial.versions.at(-1)?.focus ?? c.defaultFocus)
   const [locateKey, setLocateKey] = useState<string | null>(null)
   const [evidenceKey, setEvidenceKey] = useState<string | null>(null)
@@ -125,7 +132,7 @@ export function CodexReviewWorkspace({
   if (editingScope) {
     return (
       <WorkspaceReviewIntake
-        active
+        active={active}
         initial={review}
         onCancel={() => setEditingScope(false)}
         onOpenReview={(value) => {
@@ -170,24 +177,36 @@ export function CodexReviewWorkspace({
       )}
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList variant="line" className="max-w-full overflow-x-auto">
-          <TabsTrigger value="overview" disabled={locked}>
+          <TabsTrigger ref={walkthroughAnchors.overview} value="overview" disabled={locked}>
             {w.overview}
           </TabsTrigger>
-          <TabsTrigger value="issues" disabled={locked}>
+          <TabsTrigger ref={walkthroughAnchors.issues} value="issues" disabled={locked}>
             {c.issues} ({review.issues.filter((issue) => issue.status === 'open').length})
           </TabsTrigger>
-          <TabsTrigger value="changes" disabled={locked}>
+          <TabsTrigger ref={walkthroughAnchors.changes} value="changes" disabled={locked}>
             {c.changes}
           </TabsTrigger>
-          <TabsTrigger value="records" disabled={locked}>
+          <TabsTrigger ref={walkthroughAnchors.records} value="records" disabled={locked}>
             {c.records}
           </TabsTrigger>
           {window.api?.forflowJevAudit && (
-            <TabsTrigger value="jev" disabled={locked}>
+            <TabsTrigger ref={walkthroughAnchors.jev} value="jev" disabled={locked}>
               Jev · Beta
             </TabsTrigger>
           )}
         </TabsList>
+        {version.workspace && (
+          <WorkspaceReviewWalkthrough
+            active={active}
+            tab={tab}
+            anchors={walkthroughAnchors}
+            disabled={locked}
+            readOnly={readOnly}
+            hasJev={Boolean(window.api?.forflowJevAudit)}
+            singleRecord={jevEvidenceKey !== null}
+            onTab={setTab}
+          />
+        )}
         <TabsContent value="overview">
           <div className="space-y-6 pt-3">
             <section className="space-y-3 border-b border-border pb-5">

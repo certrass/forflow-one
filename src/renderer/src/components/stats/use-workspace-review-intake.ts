@@ -32,6 +32,7 @@ export function useWorkspaceReviewIntake(
   const c = workspaceReviewCopy()
   const r = reviewCopy()
   const snapshot = initial?.versions.at(-1)?.workspace
+  const [step, setStep] = useState<1 | 2 | 3>(initial ? 3 : 1)
   const selectedTarget = useRef(snapshot?.target)
   const [targets, setTargets] = useState<WorkspaceReviewTarget[]>([])
   const [saved, setSaved] = useState<CodexReview[]>([])
@@ -77,6 +78,7 @@ export function useWorkspaceReviewIntake(
           const previous = selectedTarget.current
           const current = available.find((entry) => entry.id === previous?.id)
           if (previous && selectionIdentity(previous) !== selectionIdentity(current)) {
+            setStep(1)
             setFocus('')
             setSelection({
               files: [],
@@ -112,6 +114,7 @@ export function useWorkspaceReviewIntake(
       return
     }
     setWorkspaceId(id)
+    setStep(1)
     selectedTarget.current = targets.find((value) => value.id === id)
     setFocus('')
     setSelection({
@@ -173,6 +176,8 @@ export function useWorkspaceReviewIntake(
     }
   }
   return {
+    step,
+    setStep,
     targets,
     saved,
     target,

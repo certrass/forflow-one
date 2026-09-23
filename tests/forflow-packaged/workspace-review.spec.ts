@@ -1,4 +1,9 @@
-import { selectReviewFiles, captureReviewIntake } from './workspace-review-intake-qa'
+import {
+  selectReviewFiles,
+  captureReviewIntake,
+  captureReviewGuide,
+  enterReviewGoal
+} from './workspace-review-intake-qa'
 import { test, expect, type Page } from '@stablyai/playwright-test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -131,14 +136,22 @@ test('workspace review package: registered targets, local evidence, sensitive di
       hostId: 'ssh:review-ssh'
     })
     await showWorkspaceReviews(page, true)
+    await captureReviewGuide(page, 1, false)
     await chooseTarget(page, remoteName)
     const intake = page.getByTestId('workspace-review-intake')
     await expect(intake).toContainText('远端内容尚未读取')
-    await expect(intake.getByRole('button', { name: '进入审阅', exact: true })).toBeDisabled()
+    await expect(
+      intake.getByRole('button', { name: '继续：确定检查目标', exact: true })
+    ).toBeDisabled()
     await chooseTarget(page, repo)
+    await captureReviewGuide(page, 1)
+    await intake.getByRole('button', { name: '继续：确定检查目标', exact: true }).click()
+    await captureReviewGuide(page, 2, false)
+    await intake.getByRole('button', { name: '验证问题修复', exact: true }).click()
     await intake
       .getByRole('textbox', { name: '检查目标', exact: true })
       .fill('保留原功能，核对选定代码与验收材料；检查敏感线索及其处置依据。')
+    await intake.getByRole('button', { name: '继续：选择材料', exact: true }).click()
     await selectReviewFiles(intake, [
       { path: 'code.ts' },
       { path: 'docs/requirements.md' },
@@ -160,7 +173,16 @@ test('workspace review package: registered targets, local evidence, sensitive di
     expect(initial.versions[0].workspace?.git.status).toBe('ready')
     expect(initial.issues).toHaveLength(1)
     expect(JSON.stringify(initial)).not.toContain(credential)
-    await review.getByRole('tab', { name: '记录', exact: true }).click()
+    const guidance = page.getByRole('dialog', { name: '先核对审阅材料', exact: true })
+    await expect(guidance).toBeVisible()
+    await guidance.getByRole('button', { name: '查看原始记录', exact: true }).click()
+    const sourceGuide = page.getByRole('dialog', { name: '查看原文，再标记缺口', exact: true })
+    await expect(sourceGuide).toContainText('本机查看来源')
+    await page.screenshot({
+      path: path.join(evidence, 'project-review-read-source-guide.png'),
+      animations: 'disabled'
+    })
+    await sourceGuide.getByRole('button', { name: '收起引导', exact: true }).click()
     const files = review.getByTestId('workspace-review-records')
     const code = files.locator('li').filter({ has: page.getByText('code.ts', { exact: true }) })
     await code.getByRole('button', { name: '本机查看来源', exact: true }).click()
@@ -172,6 +194,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await expect(panel.getByTestId('jev-request-preview')).toContainText('export const result = 1')
     await expect(panel.getByTestId('jev-request-preview')).not.toContainText(credential)
     await expect(panel).toContainText('此来源存在覆盖缺口')
+    await expect(page.getByRole('button', { name: '收起引导', exact: true })).toHaveCount(0)
     expect(await app.evaluate(() => process.env.FORFLOW_QA_WORKSPACE_JEV_REQUESTS)).toBe('0')
     expect(await page.evaluate((id) => window.api.forflowJevAudit!.list(id), initial.id)).toEqual(
       []
@@ -209,9 +232,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await expect(review).toContainText('仅验收明确选择的三个文件，测试回执尚待版本关联。')
     await review.getByRole('button', { name: '返回项目审阅', exact: true }).click()
     await chooseTarget(page, 'Folder review fixture')
-    await intake
-      .getByRole('textbox', { name: '检查目标', exact: true })
-      .fill('审阅普通文件夹中的指定说明。')
+    await enterReviewGoal(intake, '审阅普通文件夹中的指定说明。')
     await selectReviewFiles(intake, [{ path: 'notes.md' }])
     await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     await expect(review).toContainText('Folder review fixture')

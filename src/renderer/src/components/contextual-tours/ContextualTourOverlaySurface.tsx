@@ -1,14 +1,5 @@
-import { createPortal } from 'react-dom'
-import {
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type JSX,
-  type KeyboardEvent,
-  type RefObject
-} from 'react'
-import { ArrowLeft, ArrowRight, X } from 'lucide-react'
+import type { CSSProperties, JSX, KeyboardEvent, RefObject } from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
@@ -18,13 +9,8 @@ import type {
   ContextualTourStepControl,
   ContextualTourStepAction
 } from '../../../../shared/contextual-tours'
-import { ContextualTourArrow } from './ContextualTourArrow'
 import { ContextualTourControl } from './ContextualTourControl'
-import { ContextualTourProgressDots } from './ContextualTourProgressDots'
-import {
-  watchContextualTourFloatingPosition,
-  type ContextualTourFloatingPosition
-} from './contextual-tour-floating-position'
+import { ContextualTourCallout } from './ContextualTourCallout'
 import { translate } from '@/i18n/i18n'
 
 const FOCUSABLE_SELECTOR =
@@ -90,11 +76,6 @@ if (import.meta !== undefined && import.meta.hot) {
   import.meta.hot.dispose(disposeContextualTourGlobalKeyGuard)
 }
 
-const PANEL_BASE_CLASSES =
-  'orca-contextual-tour-panel rounded-lg border border-border text-popover-foreground backdrop-blur-[2px]'
-
-const PANEL_ANIMATION_CLASSES = 'animate-in fade-in-0 zoom-in-95 duration-200 ease-out'
-
 export function ContextualTourOverlaySurface({
   activeTourId,
   renderState,
@@ -106,25 +87,6 @@ export function ContextualTourOverlaySurface({
   onStepAction,
   onOverlayKeyDownCapture
 }: ContextualTourOverlaySurfaceProps): JSX.Element {
-  const arrowRef = useRef<SVGSVGElement | null>(null)
-  const [floatingPosition, setFloatingPosition] = useState<ContextualTourFloatingPosition | null>(
-    null
-  )
-  const panelHostSlot = panelHost?.getAttribute('data-slot')
-  const hostedPanelClass = cn(
-    PANEL_BASE_CLASSES,
-    PANEL_ANIMATION_CLASSES,
-    panelHostSlot === 'sheet-content'
-      ? 'absolute z-[80] w-[min(20rem,calc(100%-1.5rem))]'
-      : 'absolute z-[80] w-[min(20rem,calc(100%-2rem))]'
-  )
-  const floatingPanelClass = cn(
-    PANEL_BASE_CLASSES,
-    PANEL_ANIMATION_CLASSES,
-    'fixed w-[min(20rem,calc(100vw-1.5rem))]'
-  )
-
-  const stepKey = `${activeTourId}-${renderState.progress.current}`
   const defaultPrimaryAction = {
     kind: renderState.isLastStep ? 'complete' : 'next',
     label: renderState.isLastStep
@@ -145,139 +107,9 @@ export function ContextualTourOverlaySurface({
         height: renderState.rect.height
       } satisfies CSSProperties)
     : undefined
-  const unresolvedPanelPosition = {
-    left: 0,
-    top: 0,
-    visibility: 'hidden'
-  } satisfies CSSProperties
-
-  useLayoutEffect(() => {
-    const panelElement = panelRef.current
-    const arrowElement = arrowRef.current
-    if (!panelElement || !arrowElement) {
-      setFloatingPosition(null)
-      return
-    }
-
-    // Why: hide only until the new step's first measurement; autoUpdate then
-    // tracks the target continuously, so the panel never blinks mid-step.
-    setFloatingPosition(null)
-    return watchContextualTourFloatingPosition({
-      arrowElement,
-      floatingElement: panelElement,
-      panelHost,
-      preferredPlacement: renderState.preferredPlacement,
-      targetElement: renderState.targetElement,
-      onPosition: setFloatingPosition
-    })
-  }, [panelHost, panelRef, renderState.preferredPlacement, renderState.targetElement])
-
-  const panel = (
-    <section
-      ref={panelRef}
-      aria-live="polite"
-      aria-label={renderState.title}
-      data-contextual-tour-panel=""
-      data-placement={floatingPosition?.panelPlacement ?? undefined}
-      role="dialog"
-      tabIndex={-1}
-      className={panelHost ? hostedPanelClass : floatingPanelClass}
-      style={floatingPosition?.panelPosition ?? unresolvedPanelPosition}
-    >
-      <ContextualTourArrow
-        arrowRef={arrowRef}
-        placement={floatingPosition?.panelPlacement ?? renderState.preferredPlacement ?? 'right'}
-        style={floatingPosition?.arrowPosition ?? { visibility: 'hidden' }}
-      />
-      <div key={stepKey} className="animate-in fade-in-0 duration-150 ease-out p-4">
-        <Button
-          type="button"
-          data-contextual-tour-dismiss=""
-          variant="ghost"
-          size="icon-xs"
-          aria-label={
-            renderState.isLastStep
-              ? translate(
-                  'auto.components.contextual.tours.ContextualTourOverlaySurface.d974f32a83',
-                  'Dismiss tour'
-                )
-              : translate(
-                  'auto.components.contextual.tours.ContextualTourOverlaySurface.4f86e2a10b',
-                  'Skip tour'
-                )
-          }
-          onClick={() => onSkip(activeTourId)}
-          className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
-        >
-          <X />
-        </Button>
-        <h2 className="pr-6 text-sm font-semibold tracking-tight text-foreground">
-          {renderState.title}
-        </h2>
-        <p className="mt-1.5 text-xs leading-5 text-muted-foreground">{renderState.body}</p>
-        {renderState.control ? <ContextualTourControl control={renderState.control} /> : null}
-        <div className="mt-3.5 flex items-center justify-between gap-3">
-          <ContextualTourProgressDots
-            current={renderState.progress.current}
-            total={renderState.progress.total}
-          />
-          <div className="flex items-center gap-1.5">
-            {!renderState.isFirstStep ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                aria-label={translate(
-                  'auto.components.contextual.tours.ContextualTourOverlaySurface.4a9568f773',
-                  'Back'
-                )}
-                onClick={onBack}
-              >
-                <ArrowLeft />
-                {translate(
-                  'auto.components.contextual.tours.ContextualTourOverlaySurface.4a9568f773',
-                  'Back'
-                )}
-              </Button>
-            ) : null}
-            {renderState.secondaryAction ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={() => onStepAction(renderState.secondaryAction!)}
-              >
-                {renderState.secondaryAction.label}
-              </Button>
-            ) : null}
-            {primaryAction ? (
-              <Button
-                type="button"
-                size="xs"
-                onClick={
-                  primaryAction.kind === defaultPrimaryAction.kind &&
-                  primaryAction.label === defaultPrimaryAction.label
-                    ? onNext
-                    : () => onStepAction(primaryAction)
-                }
-              >
-                {primaryAction.label}
-                {primaryAction.kind === 'next' && !renderState.isLastStep ? <ArrowRight /> : null}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-
   return (
     <div
-      className={cn(
-        // Why: tours are callouts, not modality. Let pointer events reach the
-        // underlying surface; only the panel itself captures interaction.
-        'fixed inset-0 z-[70] pointer-events-none'
-      )}
+      className={cn('fixed inset-0 z-[70] pointer-events-none')}
       data-contextual-tour-overlay=""
       role="presentation"
       onKeyDownCapture={onOverlayKeyDownCapture}
@@ -291,7 +123,78 @@ export function ContextualTourOverlaySurface({
         />
       ) : null}
       <div className="pointer-events-auto">
-        {panelHost ? createPortal(panel, panelHost) : panel}
+        <ContextualTourCallout
+          tourPanel
+          panelRef={panelRef}
+          panelHost={panelHost}
+          targetElement={renderState.targetElement}
+          preferredPlacement={renderState.preferredPlacement}
+          stepKey={`${activeTourId}-${renderState.progress.current}`}
+          title={renderState.title}
+          body={renderState.body}
+          progress={renderState.progress}
+          dismissLabel={
+            renderState.isLastStep
+              ? translate(
+                  'auto.components.contextual.tours.ContextualTourOverlaySurface.d974f32a83',
+                  'Dismiss tour'
+                )
+              : translate(
+                  'auto.components.contextual.tours.ContextualTourOverlaySurface.4f86e2a10b',
+                  'Skip tour'
+                )
+          }
+          onDismiss={() => onSkip(activeTourId)}
+          actions={
+            <>
+              {!renderState.isFirstStep ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  aria-label={translate(
+                    'auto.components.contextual.tours.ContextualTourOverlaySurface.4a9568f773',
+                    'Back'
+                  )}
+                  onClick={onBack}
+                >
+                  <ArrowLeft />
+                  {translate(
+                    'auto.components.contextual.tours.ContextualTourOverlaySurface.4a9568f773',
+                    'Back'
+                  )}
+                </Button>
+              ) : null}
+              {renderState.secondaryAction ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => onStepAction(renderState.secondaryAction!)}
+                >
+                  {renderState.secondaryAction.label}
+                </Button>
+              ) : null}
+              {primaryAction ? (
+                <Button
+                  type="button"
+                  size="xs"
+                  onClick={
+                    primaryAction.kind === defaultPrimaryAction.kind &&
+                    primaryAction.label === defaultPrimaryAction.label
+                      ? onNext
+                      : () => onStepAction(primaryAction)
+                  }
+                >
+                  {primaryAction.label}
+                  {primaryAction.kind === 'next' && !renderState.isLastStep ? <ArrowRight /> : null}
+                </Button>
+              ) : null}
+            </>
+          }
+        >
+          {renderState.control ? <ContextualTourControl control={renderState.control} /> : null}
+        </ContextualTourCallout>
       </div>
     </div>
   )

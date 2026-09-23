@@ -281,5 +281,11 @@
   "src/main/forflow/jev-delivery-input.test.ts",
   "src/renderer/src/components/stats/JevAuditResults.test.tsx",
   "src/main/review/workspace-review-directory.test.ts",
-  "src/renderer/src/components/stats/WorkspaceReviewFilePicker.test.tsx"
+  "src/renderer/src/components/stats/WorkspaceReviewFilePicker.test.tsx",
+  "src/renderer/src/components/stats/WorkspaceReviewIntake.editing.test.tsx",
+  "src/renderer/src/components/stats/WorkspaceReviewWalkthrough.test.tsx",
+  "src/renderer/src/components/contextual-tours/contextual-tour-floating-position.test.ts",
+  "src/renderer/src/components/contextual-tours/ContextualTourCallout.test.tsx",
+  "src/renderer/src/components/stats/StatsPane.review-visibility.test.tsx",
+  "src/renderer/src/components/stats/WorkspaceReviewStepHelp.test.tsx"
 ]

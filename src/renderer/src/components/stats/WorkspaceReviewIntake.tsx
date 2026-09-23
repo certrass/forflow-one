@@ -1,10 +1,7 @@
 import type { CodexReview } from '../../../../shared/codex-review-types'
 import { Button } from '../ui/button'
-import { Textarea } from '../ui/textarea'
-import { Label } from '../ui/label'
-import { WorkspaceReviewTargetPicker } from './WorkspaceReviewTargetPicker'
-import { WorkspaceReviewFilePicker } from './WorkspaceReviewFilePicker'
-import { WorkspaceReviewOptions } from './WorkspaceReviewOptions'
+import { WorkspaceReviewGuide } from './WorkspaceReviewGuide'
+import { workspaceReviewGuideCopy } from './workspace-review-guide-copy'
 import { useWorkspaceReviewIntake } from './use-workspace-review-intake'
 import { workspaceReviewCopy } from './workspace-review-copy'
 import { reviewCopy } from './review-copy'
@@ -21,15 +18,16 @@ export function WorkspaceReviewIntake({
   onCancel?: () => void
 }): React.JSX.Element {
   const c = workspaceReviewCopy()
+  const g = workspaceReviewGuideCopy()
   const r = reviewCopy()
   const form = useWorkspaceReviewIntake(active, initial, onOpenReview)
-  const { target, selection, busy, loading } = form
+  const { busy, loading } = form
   return (
     <section className="space-y-6" data-testid="workspace-review-intake">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <h3 className="text-base font-medium">{c.title}</h3>
-          <p className="max-w-2xl text-sm text-muted-foreground">{c.description}</p>
+          <h3 className="text-base font-medium">{g.title}</h3>
+          <p className="max-w-2xl text-sm text-muted-foreground">{g.description}</p>
         </div>
         <Button
           type="button"
@@ -41,89 +39,13 @@ export function WorkspaceReviewIntake({
           {r.refresh}
         </Button>
       </div>
-      <form
-        className="space-y-6"
-        onSubmit={(event) => {
-          event.preventDefault()
-          void form.submit()
-        }}
-      >
-        <section className="space-y-2">
-          <Label>{c.targetStep}</Label>
-          <WorkspaceReviewTargetPicker
-            targets={form.targets}
-            value={form.workspaceId}
-            disabled={loading || busy || Boolean(initial)}
-            onChange={form.chooseTarget}
-          />
-          {target && <p className="break-all text-xs text-muted-foreground">{target.rootPath}</p>}
-          {target && !target.available && (
-            <p role="status" className="text-sm text-muted-foreground">
-              {target.unavailableReason ?? c.unsupported}
-            </p>
-          )}
-          {!loading && form.targets.length === 0 && !form.error && (
-            <p className="text-sm text-muted-foreground">{c.noTargets}</p>
-          )}
-        </section>
-        <section className="space-y-2">
-          <Label htmlFor="workspace-review-focus">{c.focusStep}</Label>
-          <p className="text-xs text-muted-foreground">{c.focusHint}</p>
-          <Textarea
-            id="workspace-review-focus"
-            aria-label={c.focus}
-            value={form.focus}
-            placeholder={c.focusPlaceholder}
-            maxLength={2000}
-            disabled={busy}
-            onChange={(event) => form.setFocus(event.target.value)}
-          />
-        </section>
-        <section className="space-y-3">
-          <h4 className="text-sm font-medium">{c.filesStep}</h4>
-          <p className="text-xs text-muted-foreground">{c.fileNote}</p>
-          <WorkspaceReviewFilePicker
-            key={form.workspaceId}
-            target={active ? target : undefined}
-            selected={selection.files}
-            disabled={busy}
-            onChange={(files) => form.setSelection((current) => ({ ...current, files }))}
-          />
-        </section>
-        <WorkspaceReviewOptions
-          key={form.workspaceId}
-          selection={selection}
-          disabled={busy}
-          onChange={form.setSelection}
-        />
-        {form.error && (
-          <p role="alert" className="text-sm text-destructive">
-            {form.error}
-          </p>
-        )}
-        <div className="space-y-3 border-t border-border pt-4">
-          <p className="text-sm text-muted-foreground">{c.prepareNote}</p>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              disabled={
-                busy ||
-                loading ||
-                !target?.available ||
-                !form.focus.trim() ||
-                !selection.files.length
-              }
-            >
-              {busy ? c.preparing : initial ? c.update : c.prepare}
-            </Button>
-            {onCancel && (
-              <Button type="button" variant="ghost" disabled={busy} onClick={onCancel}>
-                {r.close}
-              </Button>
-            )}
-          </div>
-        </div>
-      </form>
-      {!initial && (
+      <WorkspaceReviewGuide
+        active={active}
+        editing={Boolean(initial)}
+        form={form}
+        onCancel={onCancel}
+      />
+      {!initial && form.saved.length > 0 && (
         <section className="space-y-3 border-t border-border pt-5">
           <h4 className="text-sm font-medium">{c.saved}</h4>
           {form.saved.map((review) => (

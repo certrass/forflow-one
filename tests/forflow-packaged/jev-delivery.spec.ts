@@ -1,4 +1,4 @@
-import { selectReviewFiles } from './workspace-review-intake-qa'
+import { selectReviewFiles, enterReviewGoal } from './workspace-review-intake-qa'
 import { test, expect } from '@stablyai/playwright-test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -116,9 +116,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     await intake.getByRole('combobox', { name: '项目', exact: true }).click()
     await page.getByPlaceholder('搜索项目').fill('交付质量成品验证')
     await page.getByRole('option').filter({ hasText: '交付质量成品验证' }).click()
-    await intake
-      .getByRole('textbox', { name: '检查目标', exact: true })
-      .fill('新增问题后重启，标题和状态保持一致。')
+    await enterReviewGoal(intake, '新增问题后重启，标题和状态保持一致。')
     await selectReviewFiles(intake, [
       { path: 'requirement.md' },
       { path: 'handoff.md' },

@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useState, type RefObject } from 'react'
 import { ArrowUp, File, Folder, Loader2 } from 'lucide-react'
 import type { WorkspaceReviewTarget } from '../../../../shared/workspace-review-types'
 import { Button } from '../ui/button'
@@ -17,6 +17,7 @@ type WorkspaceReviewFilePickerProps = {
   target: WorkspaceReviewTarget | undefined
   selected: WorkspaceReviewFileSelection
   disabled: boolean
+  guideAnchorRef?: RefObject<HTMLDivElement | null>
   onChange: (files: WorkspaceReviewFileSelection) => void
 }
 
@@ -47,6 +48,7 @@ function WorkspaceReviewFileBrowser({
   target,
   selected,
   disabled,
+  guideAnchorRef,
   onChange
 }: WorkspaceReviewFilePickerProps & { target: WorkspaceReviewTarget }): React.JSX.Element {
   const c = workspaceReviewFileCopy()
@@ -80,7 +82,7 @@ function WorkspaceReviewFileBrowser({
     <div className="space-y-3" data-testid="workspace-review-file-picker">
       <p className="text-xs text-muted-foreground">{c.browseNote}</p>
       <div className="rounded-md border border-border">
-        <div className="space-y-2 border-b border-border p-3">
+        <div ref={guideAnchorRef} className="space-y-2 border-b border-border p-3">
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"

@@ -54,6 +54,7 @@ export function StatsPane(): React.JSX.Element {
         {review ? (
           <CodexReviewWorkspace
             key={`${review.id}:${review.revision}:${review.versions.at(-1)?.id}`}
+            active={tab === 'review'}
             initial={review}
             onBack={() => {
               setReview(null)
