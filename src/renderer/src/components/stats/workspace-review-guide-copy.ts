@@ -22,7 +22,7 @@ export function workspaceReviewGuideCopy() {
     goalTitle: translate('forflow.reviewGuide.goalTitle', 'What would you like to find out?'),
     goalHint: translate(
       'forflow.reviewGuide.goalHint',
-      'Describe the expected result, or start with a common review goal below.'
+      'Describe what you want to check in one sentence. Next, clarify what would count as complete, or go straight to materials if that is already clear.'
     ),
     goalHelp: translate(
       'forflow.reviewGuide.goalHelp',

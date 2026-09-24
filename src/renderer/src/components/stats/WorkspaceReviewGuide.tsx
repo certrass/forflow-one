@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { ContextualTourProgressDots } from '../contextual-tours/ContextualTourProgressDots'
 import { Button } from '../ui/button'
-import { Textarea } from '../ui/textarea'
 import { WorkspaceReviewTargetPicker } from './WorkspaceReviewTargetPicker'
 import { WorkspaceReviewFilePicker } from './WorkspaceReviewFilePicker'
 import { WorkspaceReviewOptions } from './WorkspaceReviewOptions'
@@ -11,6 +10,9 @@ import type { useWorkspaceReviewIntake } from './use-workspace-review-intake'
 import { workspaceReviewCopy } from './workspace-review-copy'
 import { workspaceReviewGuideCopy } from './workspace-review-guide-copy'
 import { reviewCopy } from './review-copy'
+import { WorkspaceReviewGoal } from './WorkspaceReviewGoal'
+import { ReviewEvidenceNeeds } from './ReviewEvidenceNeeds'
+import { reviewIntakeCopy } from './review-intake-copy'
 
 export function WorkspaceReviewGuide({
   active,
@@ -26,28 +28,52 @@ export function WorkspaceReviewGuide({
   const c = workspaceReviewCopy()
   const g = workspaceReviewGuideCopy()
   const r = reviewCopy()
+  const q = reviewIntakeCopy()
   const anchorRef = useRef<HTMLDivElement>(null)
   const actionRef = useRef<HTMLButtonElement>(null)
   const { target, selection, busy, loading, focus } = form
   const current = form.step
-  const title = current === 1 ? g.projectTitle : current === 2 ? g.goalTitle : g.filesTitle
-  const hint = current === 1 ? g.projectHint : current === 2 ? g.goalHint : g.filesHint
+  const title =
+    current === 1
+      ? g.projectTitle
+      : current === 2
+        ? form.clarifyingGoal
+          ? q.clarify
+          : g.goalTitle
+        : g.filesTitle
+  const hint =
+    current === 1
+      ? g.projectHint
+      : current === 2
+        ? form.clarifyingGoal
+          ? q.clarifyHint
+          : g.goalHint
+        : g.filesHint
   const ready = Boolean(
     target?.available &&
-    (current === 1 || (focus.trim() && (current === 2 || selection.files.length)))
+    (current === 1 || (focus.trim() && (current === 2 || selection.files.length))) &&
+    (current !== 2 ||
+      !form.clarifyingGoal ||
+      (form.acceptance.trim() && form.preparedFocus.length <= 2000))
   )
   const help = ready
     ? current === 1
       ? g.projectReady
       : current === 2
-        ? g.goalReady
+        ? form.clarifyingGoal
+          ? q.confirmReady
+          : form.goalPrepared
+            ? g.goalReady
+            : q.describeReady
         : editing
           ? g.filesUpdateReady
           : g.filesReady
     : current === 1
       ? g.projectHelp
       : current === 2
-        ? g.goalHelp
+        ? form.clarifyingGoal
+          ? q.clarifyHint
+          : g.goalHelp
         : g.filesHelp
   const continueReview = (): void => {
     if (!ready || busy || loading) {
@@ -55,8 +81,14 @@ export function WorkspaceReviewGuide({
     }
     if (current === 3) {
       void form.submit()
+    } else if (current === 1) {
+      form.setStep(2)
+    } else if (form.goalPrepared) {
+      form.useGoal()
+    } else if (form.clarifyingGoal) {
+      form.useGoal(form.acceptance)
     } else {
-      form.setStep(current === 1 ? 2 : 3)
+      form.setClarifyingGoal(true)
     }
   }
   return (
@@ -120,31 +152,7 @@ export function WorkspaceReviewGuide({
           )}
           {current === 2 && (
             <div ref={anchorRef} className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {g.presets.map((preset) => (
-                  <Button
-                    key={preset.label}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={busy || Boolean(focus.trim())}
-                    onClick={() => form.setFocus(preset.goal)}
-                  >
-                    {preset.label}
-                  </Button>
-                ))}
-              </div>
-              <div>
-                <Textarea
-                  id="workspace-review-focus"
-                  aria-label={c.focus}
-                  value={focus}
-                  placeholder={c.focusPlaceholder}
-                  maxLength={2000}
-                  disabled={busy}
-                  onChange={(event) => form.setFocus(event.target.value)}
-                />
-              </div>
+              <WorkspaceReviewGoal form={form} />
             </div>
           )}
           {current === 3 && (
@@ -152,6 +160,11 @@ export function WorkspaceReviewGuide({
               <p className="break-words text-sm text-muted-foreground">
                 {c.focus}：{focus}
               </p>
+              <ReviewEvidenceNeeds
+                files={selection.files}
+                hasConversations={selection.sessionIds.length > 0}
+                beforeRead
+              />
               <WorkspaceReviewFilePicker
                 key={form.workspaceId}
                 target={active ? target : undefined}
@@ -188,7 +201,13 @@ export function WorkspaceReviewGuide({
               type="button"
               variant="ghost"
               disabled={busy || loading}
-              onClick={() => form.setStep(current === 3 ? 2 : 1)}
+              onClick={() => {
+                if (current === 2 && form.clarifyingGoal) {
+                  form.setClarifyingGoal(false)
+                } else {
+                  form.setStep(current === 3 ? 2 : 1)
+                }
+              }}
             >
               <ArrowLeft />
               {g.back}
@@ -206,7 +225,11 @@ export function WorkspaceReviewGuide({
             : current === 1
               ? g.nextGoal
               : current === 2
-                ? g.nextFiles
+                ? form.clarifyingGoal
+                  ? q.useAnswer
+                  : form.goalPrepared
+                    ? g.nextFiles
+                    : q.ask
                 : editing
                   ? c.update
                   : c.prepare}

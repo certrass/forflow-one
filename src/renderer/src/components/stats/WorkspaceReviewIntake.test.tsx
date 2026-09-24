@@ -102,6 +102,12 @@ function setGoal() {
     target: { value: '重启后问题的标题和状态保持不变' }
   })
 }
+function continueMaterials() {
+  const next =
+    screen.queryByRole('button', { name: '继续：选择材料' }) ??
+    screen.getByRole('button', { name: '已经写清楚，直接选材料' })
+  fireEvent.click(next)
+}
 function click(name: string) {
   fireEvent.click(screen.getByRole('button', { name }))
 }
@@ -109,7 +115,7 @@ async function prepareMaterials() {
   await selectTarget('Local fixture')
   click('继续：确定检查目标')
   setGoal()
-  click('继续：选择材料')
+  continueMaterials()
 }
 
 it('opens a local review from checked files with no required policy or conversation and locks duplicate submits', async () => {
@@ -176,7 +182,7 @@ it('clears the previous project goal and files when choosing another project', a
   click('继续：确定检查目标')
   expect(screen.getByLabelText('检查目标')).toHaveValue('')
   setGoal()
-  click('继续：选择材料')
+  continueMaterials()
   expect(screen.queryByRole('button', { name: '移除 code.ts' })).toBeNull()
   await selectFile('second.md')
   fireEvent.click(screen.getByRole('button', { name: '进入审阅' }))
@@ -226,7 +232,7 @@ it('clears prior materials when the same project id moves to a different folder'
   click('继续：确定检查目标')
   expect(screen.getByLabelText('检查目标')).toHaveValue('')
   expect(screen.queryByRole('button', { name: '移除 code.ts' })).toBeNull()
-  expect(screen.getByRole('button', { name: '继续：选择材料' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: '继续：补充验收条件' })).toBeDisabled()
   expect(open).not.toHaveBeenCalled()
 })
 
@@ -240,7 +246,7 @@ it('shows one step at a time, reads materials only when needed and preserves cho
   setGoal()
   expect(screen.queryByRole('combobox', { name: '项目' })).toBeNull()
   expect(listFiles).not.toHaveBeenCalled()
-  click('继续：选择材料')
+  continueMaterials()
   await selectFile('code.ts')
   expect(screen.queryByLabelText('检查目标')).toBeNull()
   click('上一步')
@@ -248,7 +254,7 @@ it('shows one step at a time, reads materials only when needed and preserves cho
   click('上一步')
   expect(screen.getByRole('combobox', { name: '项目' })).toHaveTextContent('Local fixture')
   click('继续：确定检查目标')
-  click('继续：选择材料')
+  continueMaterials()
   expect(await screen.findByRole('checkbox', { name: 'code.ts' })).toBeChecked()
   expect(analytics).not.toHaveBeenCalled()
   expect(open).not.toHaveBeenCalled()
@@ -266,7 +272,7 @@ it('lets a suggested goal be edited and protects existing input from another pre
   expect(screen.getByRole('button', { name: '检查交付材料' })).toBeDisabled()
   click('检查交付材料')
   expect(screen.getByLabelText('检查目标')).toHaveValue('重启后问题的标题和状态保持不变')
-  click('继续：选择材料')
+  continueMaterials()
   await selectFile('code.ts')
   click('进入审阅')
   await waitFor(() =>
@@ -291,9 +297,72 @@ it('opens contextual guidance, allows dismissal and replay without advancing or 
   expect(screen.getByRole('dialog', { name: '这次想确认什么？' })).toBeVisible()
   expect(input).toHaveFocus()
   setGoal()
-  expect(screen.getByRole('dialog', { name: '接下来，点这里' })).toHaveTextContent('继续：选择材料')
+  expect(screen.getByRole('dialog', { name: '接下来，点这里' })).toHaveTextContent('怎样才算完成')
   fireEvent.keyDown(window, { key: 'Escape' })
   expect(screen.queryByRole('dialog')).toBeNull()
   expect(listFiles).not.toHaveBeenCalled()
   expect(open).not.toHaveBeenCalled()
+})
+
+it('clarifies an expected result, previews it and shows gaps without reading or claiming evidence quality', async () => {
+  render(<WorkspaceReviewIntake active onOpenReview={vi.fn()} />)
+  await selectTarget('Local fixture')
+  click('继续：确定检查目标')
+  fireEvent.change(screen.getByLabelText('检查目标'), { target: { value: '检查保存功能' } })
+  click('继续：补充验收条件')
+  expect(screen.getByLabelText('预期结果')).toHaveValue('')
+  expect(screen.getByRole('button', { name: '使用这项要求，继续选材料' })).toBeDisabled()
+  expect(listFiles).not.toHaveBeenCalled()
+  fireEvent.change(screen.getByLabelText('预期结果'), {
+    target: { value: '重启后标题和状态保持不变' }
+  })
+  click('上一步')
+  expect(screen.getByLabelText('检查目标')).toHaveValue('检查保存功能')
+  click('继续：补充验收条件')
+  expect(screen.getByLabelText('预期结果')).toHaveValue('重启后标题和状态保持不变')
+  expect(
+    screen.getByText(/检查事项：检查保存功能\s+预期结果：重启后标题和状态保持不变/)
+  ).toBeVisible()
+  click('使用这项要求，继续选材料')
+  await selectFile('code.ts')
+  expect(screen.getByTestId('review-evidence-needs')).toHaveTextContent(
+    '测试代码本身不代表已经运行过'
+  )
+  expect(open).not.toHaveBeenCalled()
+  await selectFile('checks.log')
+  expect(screen.getByTestId('review-evidence-needs')).toHaveTextContent(
+    '文件用途标签不代表测试已通过'
+  )
+  click('进入审阅')
+  await waitFor(() =>
+    expect(open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        focus: '检查事项：检查保存功能\n预期结果：重启后标题和状态保持不变'
+      })
+    )
+  )
+})
+
+it('can keep an unknown acceptance condition explicit and rejects an oversized combined requirement', async () => {
+  render(<WorkspaceReviewIntake active onOpenReview={vi.fn()} />)
+  await selectTarget('Local fixture')
+  click('继续：确定检查目标')
+  setGoal()
+  click('继续：补充验收条件')
+  fireEvent.change(screen.getByLabelText('预期结果'), { target: { value: '验'.repeat(1990) } })
+  expect(screen.getByRole('button', { name: '使用这项要求，继续选材料' })).toBeDisabled()
+  expect(screen.getByRole('alert')).toHaveTextContent('超过 2,000 字')
+  expect(open).not.toHaveBeenCalled()
+  fireEvent.change(screen.getByLabelText('预期结果'), { target: { value: '' } })
+  click('还不清楚，先标记待明确')
+  await selectFile('code.ts')
+  expect(screen.getByRole('button', { name: '进入审阅' })).toBeEnabled()
+  click('进入审阅')
+  await waitFor(() =>
+    expect(open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        focus: '检查事项：重启后问题的标题和状态保持不变\n预期结果：待明确，尚未约定验收条件。'
+      })
+    )
+  )
 })

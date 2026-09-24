@@ -289,5 +289,6 @@
   "src/renderer/src/components/stats/StatsPane.review-visibility.test.tsx",
   "src/renderer/src/components/stats/WorkspaceReviewStepHelp.test.tsx",
   "src/renderer/src/components/stats/JevDeliveryResults.test.tsx",
-  "src/renderer/src/components/stats/CodexReviewWorkspace.jev-navigation.test.tsx"
+  "src/renderer/src/components/stats/CodexReviewWorkspace.jev-navigation.test.tsx",
+  "src/renderer/src/components/stats/JevAuditPanel.test.tsx"
 ]

@@ -151,12 +151,31 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await intake
       .getByRole('textbox', { name: '检查目标', exact: true })
       .fill('保留原功能，核对选定代码与验收材料；检查敏感线索及其处置依据。')
-    await intake.getByRole('button', { name: '继续：选择材料', exact: true }).click()
+    await intake.getByRole('button', { name: '继续：补充验收条件', exact: true }).click()
+    await expect(
+      intake.getByRole('button', { name: '使用这项要求，继续选材料', exact: true })
+    ).toBeDisabled()
+    await intake
+      .getByRole('textbox', { name: '预期结果', exact: true })
+      .fill('原功能测试通过，敏感线索有逐项处置记录。')
+    await expect(intake.getByTestId('review-goal-clarification')).toContainText('将保存的检查要求')
+    await expect(intake.getByTestId('review-goal-clarification')).toBeVisible()
+    await page.screenshot({
+      path: path.join(evidence, 'intake-clarified-requirement.png'),
+      animations: 'disabled'
+    })
+    await intake.getByRole('button', { name: '使用这项要求，继续选材料', exact: true }).click()
+    await expect(intake.getByTestId('review-evidence-needs')).toContainText(
+      '先选择相关交付物或需求'
+    )
     await selectReviewFiles(intake, [
       { path: 'code.ts' },
       { path: 'docs/requirements.md' },
       { path: 'checks.txt', verification: true }
     ])
+    await expect(intake.getByTestId('review-evidence-needs')).toContainText(
+      '文件用途标签不代表测试已通过'
+    )
     await captureReviewIntake(app, page)
     await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')

@@ -1,11 +1,12 @@
 import { useId } from 'react'
-import type { CodexReviewVersion } from '../../../../shared/codex-review-types'
+import { codexEvidenceKey, type CodexReviewVersion } from '../../../../shared/codex-review-types'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 import { jevDeliveryCopy } from './jev-delivery-copy'
 import { jevDeliverySources } from './jev-delivery-sources'
 import { reviewCopy } from './review-copy'
+import { ReviewEvidenceNeeds } from './ReviewEvidenceNeeds'
 
 export function JevDeliveryInput({
   version,
@@ -38,6 +39,16 @@ export function JevDeliveryInput({
           {c.sources} · {c.selected} {evidenceKeys.length}/12
         </h4>
         <p className="text-xs text-muted-foreground">{c.sourceHint}</p>
+        {evidenceKeys.length > 0 && (
+          <ReviewEvidenceNeeds
+            files={(version.workspace?.files ?? []).filter(
+              (file) => file.status === 'read' && evidenceKeys.includes(file.evidenceKey)
+            )}
+            hasConversations={version.audit.rows.some((row) =>
+              evidenceKeys.includes(codexEvidenceKey(row))
+            )}
+          />
+        )}
         {sources.length === 0 && <p className="text-sm text-muted-foreground">{c.noSources}</p>}
         <ul className="scrollbar-sleek max-h-80 divide-y divide-border overflow-auto rounded-md border border-border">
           {sources.map((source, index) => {

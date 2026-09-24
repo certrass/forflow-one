@@ -35,7 +35,7 @@ export async function enterReviewGoal(intake: Locator, goal: string): Promise<vo
   await expect(intake.getByRole('combobox', { name: '项目', exact: true })).toHaveCount(0)
   await expect(intake.getByTestId('workspace-review-file-picker')).toHaveCount(0)
   await intake.getByRole('textbox', { name: '检查目标', exact: true }).fill(goal)
-  await intake.getByRole('button', { name: '继续：选择材料', exact: true }).click()
+  await intake.getByRole('button', { name: '已经写清楚，直接选材料', exact: true }).click()
 }
 
 export async function captureReviewGuide(page: Page, step: number, ready = true): Promise<void> {

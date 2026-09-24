@@ -7,6 +7,7 @@ import {
 } from '../../../../shared/workspace-review-types'
 import { workspaceReviewCopy } from './workspace-review-copy'
 import { reviewCopy } from './review-copy'
+import { clarifiedReviewFocus, reviewIntakeCopy } from './review-intake-copy'
 
 function selectionIdentity(target: WorkspaceReviewTarget | undefined): string {
   return (
@@ -37,7 +38,10 @@ export function useWorkspaceReviewIntake(
   const [targets, setTargets] = useState<WorkspaceReviewTarget[]>([])
   const [saved, setSaved] = useState<CodexReview[]>([])
   const [workspaceId, setWorkspaceId] = useState(snapshot?.target.id ?? '')
-  const [focus, setFocus] = useState(initial?.versions.at(-1)?.focus ?? '')
+  const [focus, setFocusValue] = useState(initial?.versions.at(-1)?.focus ?? '')
+  const [acceptance, setAcceptance] = useState('')
+  const [clarifyingGoal, setClarifyingGoal] = useState(false)
+  const [goalPrepared, setGoalPrepared] = useState(Boolean(initial))
   const [selection, setSelection] = useState<WorkspaceReviewQuery['selection']>(
     snapshot?.selection ?? {
       files: [],
@@ -79,7 +83,10 @@ export function useWorkspaceReviewIntake(
           const current = available.find((entry) => entry.id === previous?.id)
           if (previous && selectionIdentity(previous) !== selectionIdentity(current)) {
             setStep(1)
-            setFocus('')
+            setFocusValue('')
+            setAcceptance('')
+            setClarifyingGoal(false)
+            setGoalPrepared(false)
             setSelection({
               files: [],
               sessionIds: [],
@@ -109,6 +116,28 @@ export function useWorkspaceReviewIntake(
     }
   }, [active, revision, c.unavailable, c.targetChanged, r.error])
   const target = targets.find((value) => value.id === workspaceId)
+  const setFocus = (value: string): void => {
+    setFocusValue(value)
+    setAcceptance('')
+    setClarifyingGoal(false)
+    setGoalPrepared(false)
+  }
+  const preparedFocus = clarifiedReviewFocus(focus, acceptance)
+  const useGoal = (answer?: string): void => {
+    if (busy || loading || !focus.trim() || !target?.available) {
+      return
+    }
+    const next = answer === undefined ? focus : clarifiedReviewFocus(focus, answer)
+    if (next.length > 2000) {
+      setError(reviewIntakeCopy().tooLong)
+      return
+    }
+    setFocusValue(next)
+    setGoalPrepared(true)
+    setClarifyingGoal(false)
+    setStep(3)
+    setError(null)
+  }
   const chooseTarget = (id: string): void => {
     if (id === workspaceId) {
       return
@@ -184,6 +213,13 @@ export function useWorkspaceReviewIntake(
     workspaceId,
     focus,
     setFocus,
+    acceptance,
+    setAcceptance,
+    clarifyingGoal,
+    setClarifyingGoal,
+    goalPrepared,
+    preparedFocus,
+    useGoal,
     selection,
     setSelection,
     error,
