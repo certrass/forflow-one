@@ -18,7 +18,7 @@ export async function captureJevGuide(page: Page, step: number, screenshot: stri
   const workflow = page.getByTestId('jev-delivery-workflow')
   await expect(
     workflow.getByRole('list', { name: '审阅步骤' }).locator('[aria-current="step"]')
-  ).toHaveText(guideTitles[step - 1])
+  ).toHaveText(`${step}${guideTitles[step - 1]}`)
   const toggle = workflow.getByRole('button', { name: '操作说明', exact: true })
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
     await toggle.click()
@@ -64,6 +64,7 @@ export async function captureJevGuide(page: Page, step: number, screenshot: stri
   await page.screenshot({ path: path.join(evidence, `${screenshot}.png`), animations: 'disabled' })
   await guide.getByRole('button', { name: '收起 Jev 引导', exact: true }).click()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  await workflow.scrollIntoViewIfNeeded()
   await page.screenshot({
     path: path.join(evidence, `${screenshot}-clean.png`),
     animations: 'disabled'

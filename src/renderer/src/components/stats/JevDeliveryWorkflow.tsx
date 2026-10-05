@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { CodexReviewVersion } from '../../../../shared/codex-review-types'
 import type { JevPreview } from '../../../../shared/jev-audit-types'
 import { Button } from '../ui/button'
@@ -47,6 +47,7 @@ export function JevDeliveryWorkflow({
   const [step, setStep] = useState<Step | undefined>()
   const [keys, setKeys] = useState<string[]>([])
   const [handoff, setHandoff] = useState<string[]>([])
+  const workflowRef = useRef<HTMLElement>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
   const actionRef = useRef<HTMLButtonElement>(null)
   const current = readOnly
@@ -56,6 +57,11 @@ export function JevDeliveryWorkflow({
     : step === 3 && !preview
       ? 2
       : (step ?? (hasResults ? 4 : 1))
+  useEffect(() => {
+    if (active) {
+      workflowRef.current?.scrollIntoView({ block: 'start' })
+    }
+  }, [active, current])
   const title = [g.goal, g.materials, g.preview, g.results][current - 1]
   const hint = [g.goalHint, g.materialsHint, g.previewHint, g.resultHint][current - 1]
   const help = [
@@ -71,7 +77,11 @@ export function JevDeliveryWorkflow({
     }
   }
   return (
-    <section className="space-y-4" data-testid="jev-delivery-workflow">
+    <section
+      ref={workflowRef}
+      className="scroll-mt-4 space-y-4"
+      data-testid="jev-delivery-workflow"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <ReviewStepProgress current={current} steps={[g.goal, g.materials, g.preview, g.results]} />
         <WorkspaceReviewStepHelp

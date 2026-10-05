@@ -42,7 +42,7 @@ export async function captureReviewGuide(page: Page, step: number, ready = true)
   const intake = page.getByTestId('workspace-review-intake')
   await expect(
     intake.getByRole('list', { name: '审阅步骤' }).locator('[aria-current="step"]')
-  ).toHaveText(['选择项目', '检查要求', '选择材料'][step - 1])
+  ).toHaveText(`${step}${['选择项目', '检查要求', '选择材料'][step - 1]}`)
   await intake.getByText('发起项目审阅', { exact: true }).scrollIntoViewIfNeeded()
   const help = page
     .getByRole('dialog')
@@ -116,7 +116,7 @@ export async function captureReviewIntake(app: ElectronApplication, page: Page):
   const intake = page.getByTestId('workspace-review-intake')
   await expect(
     intake.getByRole('list', { name: '审阅步骤' }).locator('[aria-current="step"]')
-  ).toHaveText('选择材料')
+  ).toHaveText('3选择材料')
   await expect(intake.getByRole('textbox', { name: '检查要求', exact: true })).toHaveCount(0)
   await expect(intake.getByRole('combobox', { name: '项目', exact: true })).toHaveCount(0)
   expect(await intake.locator('details').first().getAttribute('open')).toBeNull()

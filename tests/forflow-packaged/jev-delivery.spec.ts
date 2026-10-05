@@ -146,7 +146,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
         .getByTestId('jev-delivery-workflow')
         .getByRole('list', { name: '审阅步骤' })
         .locator('[aria-current="step"]')
-    ).toHaveText('查看结果')
+    ).toHaveText('4查看结果')
     await expect(page.locator('[data-workspace-review-step-help]')).toHaveCount(0)
     await expect(results.getByTestId('jev-result-summary')).toContainText(
       '材料记录了未达到要求的情况'

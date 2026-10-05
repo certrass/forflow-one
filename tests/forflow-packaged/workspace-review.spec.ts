@@ -165,9 +165,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
       animations: 'disabled'
     })
     await intake.getByRole('button', { name: '下一步：选择材料', exact: true }).click()
-    await expect(intake.getByTestId('review-evidence-needs')).toContainText(
-      '先选择相关交付物或需求'
-    )
+    await expect(intake.getByTestId('review-evidence-needs')).toContainText('先选择需求说明')
     await selectReviewFiles(intake, [
       { path: 'code.ts' },
       { path: 'docs/requirements.md' },
