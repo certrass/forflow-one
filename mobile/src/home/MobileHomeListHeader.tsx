@@ -1,78 +1,59 @@
 import { StyleSheet, Text, View } from 'react-native'
-import type { HomeStatsSummary } from '../stats/home-stats-total'
-import { colors, spacing } from '../theme/mobile-theme'
+import { MobileHomeQuickActions } from '../components/MobileHomeQuickActions'
+import { colors, spacing, typography } from '../theme/mobile-theme'
+import type { HostProfile } from '../transport/types'
+import type { HomeResumeCard } from '../worktree/home-resume-card'
+import { MobileHomeResumeCard } from './MobileHomeResumeCard'
 
-function formatDuration(ms: number): string {
-  const totalMinutes = Math.floor(ms / 60_000)
-  const totalHours = Math.floor(totalMinutes / 60)
-  const days = Math.floor(totalHours / 24)
-  const hours = totalHours % 24
-  if (days > 0) {
-    return `${days}d ${hours}h`
-  }
-  const minutes = totalMinutes % 60
-  return totalHours > 0 ? `${totalHours}h ${minutes}m` : `${totalMinutes}m`
-}
-
-export function MobileHomeListHeader({ stats }: { stats: HomeStatsSummary | null }) {
+export function MobileHomeListHeader(props: {
+  connectedHosts: HostProfile[]
+  resumeCard: HomeResumeCard | null
+  onCreateWorkspace: (hostId: string) => void
+  onOpenResume: (card: HomeResumeCard) => void
+  onPairDesktop: () => void
+}) {
   return (
     <View>
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Welcome back</Text>
+        <Text accessibilityRole="header" style={styles.heroTitle}>
+          工作台
+        </Text>
+        <Text style={styles.heroSubtitle}>在手机上接着做，工作留在你的电脑上。</Text>
       </View>
-      {stats ? (
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{stats.totalAgentsSpawned.toLocaleString()}</Text>
-            <Text style={styles.statLabel}>Agents spawned</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{formatDuration(stats.totalAgentTimeMs)}</Text>
-            <Text style={styles.statLabel}>Agent time</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{stats.totalPRsCreated.toLocaleString()}</Text>
-            <Text style={styles.statLabel}>PRs created</Text>
-          </View>
-        </View>
+      {props.resumeCard ? (
+        <>
+          <Text accessibilityRole="header" style={styles.sectionHeading}>
+            继续上次工作
+          </Text>
+          <MobileHomeResumeCard card={props.resumeCard} onOpen={props.onOpenResume} />
+        </>
       ) : null}
-      <Text style={styles.sectionHeading}>Desktops</Text>
+      <MobileHomeQuickActions
+        connectedHosts={props.connectedHosts}
+        onPairDesktop={props.onPairDesktop}
+        onCreateWorkspace={props.onCreateWorkspace}
+      />
+      <Text accessibilityRole="header" style={[styles.sectionHeading, styles.hostHeading]}>
+        我的电脑
+      </Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  hero: { paddingTop: spacing.xs, paddingBottom: spacing.md },
-  heroTitle: {
-    color: colors.textPrimary,
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: -0.3
+  hero: { paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  heroTitle: { color: colors.textPrimary, fontSize: 24, fontWeight: '700' },
+  heroSubtitle: {
+    color: colors.textSecondary,
+    fontSize: typography.bodySize,
+    lineHeight: 22,
+    marginTop: spacing.sm
   },
-  statsRow: { flexDirection: 'row', gap: 10, marginBottom: spacing.lg },
-  statCard: {
-    flex: 1,
-    backgroundColor: 'rgba(26,26,26,0.6)',
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: spacing.md
-  },
-  statValue: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.3
-  },
-  statLabel: { color: colors.textMuted, fontSize: 11, fontWeight: '500', marginTop: 2 },
   sectionHeading: {
-    fontSize: 11,
+    color: colors.textSecondary,
+    fontSize: typography.bodySize,
     fontWeight: '600',
-    color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
-    paddingHorizontal: spacing.xs
-  }
+    marginBottom: spacing.md
+  },
+  hostHeading: { marginTop: spacing.xl }
 })

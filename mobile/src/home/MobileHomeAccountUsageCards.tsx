@@ -8,7 +8,7 @@ import {
   type AccountsSnapshot,
   type ProviderKey
 } from '../components/AccountUsage'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 import type { HostProfile } from '../transport/types'
 
 export function MobileHomeAccountUsageCards(props: {
@@ -20,7 +20,7 @@ export function MobileHomeAccountUsageCards(props: {
   }
   return (
     <>
-      <Text style={styles.sectionHeading}>Account usage</Text>
+      <Text style={styles.sectionHeading}>模型账号用量</Text>
       {props.items.map(({ host, snapshot }) => {
         const claudeActive =
           snapshot.claude.accounts.find(
@@ -33,6 +33,8 @@ export function MobileHomeAccountUsageCards(props: {
         return (
           <Pressable
             key={host.id}
+            accessibilityRole="button"
+            accessibilityLabel={`查看 ${host.name} 的模型账号用量`}
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
             onPress={() => props.onOpen(host.id)}
           >
@@ -62,7 +64,7 @@ export function MobileHomeAccountUsageCards(props: {
                   </View>
                   <View style={styles.info}>
                     <Text style={styles.email} numberOfLines={1}>
-                      {active?.email ?? 'System default'}
+                      {active?.email ?? '系统默认账号'}
                     </Text>
                     <View style={styles.bars}>
                       <UsageBar
@@ -91,11 +93,9 @@ export function MobileHomeAccountUsageCards(props: {
 
 const styles = StyleSheet.create({
   sectionHeading: {
-    fontSize: 11,
+    fontSize: typography.bodySize,
     fontWeight: '600',
     color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
     paddingHorizontal: spacing.xs
@@ -112,11 +112,9 @@ const styles = StyleSheet.create({
   },
   cardPressed: { backgroundColor: colors.bgRaised },
   hostLabel: {
-    fontSize: 11,
+    fontSize: typography.bodySize,
     color: colors.textMuted,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4
+    fontWeight: '500'
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2 },
   icon: {

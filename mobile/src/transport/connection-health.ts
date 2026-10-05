@@ -181,9 +181,24 @@ export function classifyConnection(args: {
 
 // Why: single place that turns a verdict into display text so every screen
 // renders the Tailscale hint the same way.
+const CONNECTION_LABELS: Record<string, string> = {
+  Connected: '已连接',
+  Disconnected: '未连接',
+  'Connecting…': '正在连接…',
+  'Reconnecting…': '正在重新连接…',
+  "Can't connect": '暂时无法连接',
+  "Can't reach desktop": '无法连接电脑',
+  'Pairing invalid — re-pair with your desktop': '配对已失效，请重新配对电脑',
+  'Connecting via Relay…': '正在通过中继连接…',
+  "Can't connect via Relay": '无法通过中继连接',
+  "Can't reach Relay": '无法连接中继'
+}
+
 export function verdictDisplayLabel(verdict: ConnectionVerdict): string {
+  const label = CONNECTION_LABELS[verdict.label] ?? verdict.label
   if ((verdict.kind === 'warning' || verdict.kind === 'unreachable') && verdict.hint) {
-    return `${verdict.label} — ${verdict.hint}`
+    const hint = verdict.hint === 'check Tailscale' ? '请检查 Tailscale' : verdict.hint
+    return `${label} — ${hint}`
   }
-  return verdict.label
+  return label
 }

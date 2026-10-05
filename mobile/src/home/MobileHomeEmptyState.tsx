@@ -1,6 +1,6 @@
 import { QrCode } from 'lucide-react-native'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 
 const ONBOARDING_STEPS = [
   {
@@ -24,23 +24,28 @@ export function MobileHomeEmptyState(props: {
   onPairDesktop: () => void
 }) {
   return (
-    <View
-      style={[
+    <ScrollView
+      contentContainerStyle={[
         styles.emptyContainer,
-        { paddingBottom: props.bottomInset },
+        { paddingBottom: props.bottomInset + spacing.xl },
         props.isWideLayout && {
           maxWidth: props.contentMaxWidth,
           width: '100%',
           alignSelf: 'center'
         }
       ]}
+      showsVerticalScrollIndicator={false}
     >
       <View style={styles.emptyHero}>
         <Text style={styles.emptyTitle}>连接你的 Forflow One</Text>
         <Text style={styles.emptyBody}>
-          通过局域网或已有 VPN 连接电脑，查看任务、继续对话并操作终端，无需登录云账号。
+          通过局域网或已有 VPN 连接电脑，查看任务、继续对话并操作终端，通过配对码授权。
         </Text>
-        <Pressable style={styles.primaryButton} onPress={props.onPairDesktop}>
+        <Pressable
+          accessibilityRole="button"
+          style={styles.primaryButton}
+          onPress={props.onPairDesktop}
+        >
           <QrCode size={17} color={colors.bgBase} />
           <Text style={styles.primaryButtonText}>配对桌面端</Text>
         </Pressable>
@@ -59,18 +64,18 @@ export function MobileHomeEmptyState(props: {
           </View>
         ))}
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  emptyContainer: { flex: 1 },
+  emptyContainer: { flexGrow: 1 },
   emptyHero: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingBottom: 40
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xl
   },
   emptyTitle: {
     fontSize: 22,
@@ -90,7 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.surfaceBright,
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: radii.card
@@ -98,11 +103,9 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: colors.bgBase, fontSize: 15, fontWeight: '700' },
   stepsSection: { paddingHorizontal: spacing.xl },
   sectionHeading: {
-    fontSize: 11,
+    fontSize: typography.bodySize,
     fontWeight: '600',
     color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
     marginBottom: spacing.sm,
     paddingHorizontal: spacing.xs
   },
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: colors.bgRaised,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     alignItems: 'center',
@@ -132,5 +135,5 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: 3
   },
-  stepDesc: { fontSize: 12, color: colors.textMuted, lineHeight: 17 }
+  stepDesc: { fontSize: typography.bodySize, color: colors.textSecondary, lineHeight: 22 }
 })

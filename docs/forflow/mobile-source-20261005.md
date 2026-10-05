@@ -35,10 +35,11 @@ ORCA_BACKGROUND_LAUNCH=1 CI=1 EXPO_NO_TELEMETRY=1 xcodebuild \
   -configuration Release -sdk iphonesimulator \
   -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath build/ios-simulator \
-  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- ARCHS=arm64 ONLY_ACTIVE_ARCH=YES build
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+  HEADER_SEARCH_PATHS="\$(inherited) \"$(pwd)/node_modules/react-native/ReactCommon\"" build
 ```
 
-以上命令适用于 Apple Silicon 模拟器。模拟器也须保留本地签名，否则钥匙串保存可能因缺少应用权限失败。真机安装需要在 Xcode 中选择自己的 Apple Team 和签名配置。
+以上命令适用于 Apple Silicon 模拟器。模拟器也须保留本地签名，否则钥匙串保存可能因缺少应用权限失败。`HEADER_SEARCH_PATHS` 为 React Native 源码构建补充带引号的 ReactCommon 路径，避免含空格的工程目录导致头文件查找失败。真机安装需要在 Xcode 中选择自己的 Apple Team 和签名配置。
 
 `pnpm install` 的 postinstall 会生成终端与 Mermaid WebView 资源；复用依赖目录时须先执行 `pnpm postinstall`，再运行类型检查。生成的 `ios/` 工程和 WebView 资源不提交。
 
@@ -60,4 +61,6 @@ TestFlight 发布配置使用独立 Bundle ID、Apple 签名和仓库变量 `FOR
 
 原生连接测试使用模拟器访问 `127.0.0.1` 的临时桌面运行时；真机签名安装、摄像头扫码、真实 Wi-Fi/VPN 和 Android 尚未验证。空会话首次创建及高速模拟键盘输入仍需复测。模拟器结果不代表这些路径已经通过。
 
-文案修订后的模拟器安装包 SHA-256：`741ac9b99dc03a9350dd28a27754bbe615e64517fbfc82a3808c8e29399d80de`。原生构建对应的源码与 PR 代码逐文件核对；具体提交和本次检查结果见 PR 的 Testing 部分。
+2026-10-05 文案修订版模拟器安装包 SHA-256：`741ac9b99dc03a9350dd28a27754bbe615e64517fbfc82a3808c8e29399d80de`。原生构建对应的源码与 PR 代码逐文件核对；具体提交和本次检查结果见 PR 的 Testing 部分。
+
+2026-10-06 首页和可读性后续改动见 [手机端首页与可读性](./mobile-readability-20261006.md)。上述安装包对应早期文案版本，后续构建及截图以 PR 的当前 Testing 记录为准。

@@ -105,7 +105,7 @@ describe('MobileHomeQuickActions', () => {
 
     expect(callbacks.onCreateWorkspace).not.toHaveBeenCalled()
     expect(picker().props.visible).toBe(true)
-    expect(picker().props.title).toBe('Create Workspace On')
+    expect(picker().props.title).toBe('选择工作区所在电脑')
     expect(picker().props.options).toEqual([
       { value: 'desk', label: 'Desk', subtitle: '192.168.1.2:6768' },
       { value: 'laptop', label: 'Laptop', subtitle: 'relay.example.com' }

@@ -2,7 +2,7 @@ import { ChevronRight, ListTodo } from 'lucide-react-native'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TaskProviderLogo } from '../components/TaskProviderLogo'
 import type { TaskProvider } from '../tasks/mobile-task-providers'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 
 const TASK_PROVIDER_LABELS: Record<TaskProvider, string> = {
   github: 'GitHub',
@@ -15,104 +15,86 @@ export function MobileHomeTasksCard(props: {
   providers: TaskProvider[]
   onOpen: (provider?: TaskProvider) => void
 }) {
+  const subtitle = !props.enabled
+    ? '连接电脑后查看任务列表'
+    : props.providers.length > 0
+      ? props.providers.map((provider) => TASK_PROVIDER_LABELS[provider]).join(' · ')
+      : '在电脑端连接 GitHub、GitLab 或 Linear'
   return (
-    <Pressable
-      disabled={!props.enabled}
-      style={({ pressed }) => [
-        styles.card,
-        !props.enabled && styles.cardDisabled,
-        pressed && styles.cardPressed
-      ]}
-      onPress={() => props.onOpen()}
-    >
-      <View style={styles.icon}>
-        <ListTodo size={18} color={colors.textSecondary} />
-      </View>
-      <View style={styles.main}>
-        <Text style={styles.title}>Tasks</Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
-          {props.providers.length > 0
-            ? props.providers.map((provider) => TASK_PROVIDER_LABELS[provider]).join(' · ')
-            : 'No task sources connected'}
-        </Text>
-      </View>
-      <View style={styles.trailing}>
-        <View
-          style={styles.providerRow}
-          accessibilityLabel={props.providers
-            .map((provider) => TASK_PROVIDER_LABELS[provider])
-            .join(', ')}
-        >
+    <View style={styles.card}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`任务列表，${subtitle}`}
+        accessibilityState={{ disabled: !props.enabled }}
+        disabled={!props.enabled}
+        style={({ pressed }) => [styles.mainButton, pressed && styles.pressed]}
+        onPress={() => props.onOpen()}
+      >
+        <ListTodo size={20} color={colors.textSecondary} />
+        <View style={styles.main}>
+          <Text style={styles.title}>任务列表</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+        </View>
+        {props.enabled ? <ChevronRight size={16} color={colors.textMuted} /> : null}
+      </Pressable>
+      {props.enabled && props.providers.length > 0 ? (
+        <View style={styles.providerRow}>
           {props.providers.map((provider) => (
             <Pressable
               key={provider}
               accessibilityRole="button"
-              accessibilityLabel={`Open ${TASK_PROVIDER_LABELS[provider]} tasks`}
-              hitSlop={8}
-              style={({ pressed }) => [
-                styles.providerButton,
-                pressed && styles.providerButtonPressed
-              ]}
-              onPress={(event) => {
-                event.stopPropagation()
-                props.onOpen(provider)
-              }}
+              accessibilityLabel={`查看 ${TASK_PROVIDER_LABELS[provider]} 任务`}
+              style={({ pressed }) => [styles.providerButton, pressed && styles.pressed]}
+              onPress={() => props.onOpen(provider)}
             >
-              <TaskProviderLogo provider={provider} size={22} color={colors.textSecondary} />
+              <TaskProviderLogo provider={provider} size={18} color={colors.textSecondary} />
+              <Text style={styles.providerLabel}>{TASK_PROVIDER_LABELS[provider]}</Text>
             </Pressable>
           ))}
         </View>
-      </View>
-      <ChevronRight size={16} color={colors.textMuted} />
-    </Pressable>
+      ) : null}
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.bgPanel,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     borderRadius: radii.card,
-    minHeight: 72,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.md,
-    paddingVertical: 12
+    overflow: 'hidden'
   },
-  cardDisabled: { opacity: 0.45 },
-  cardPressed: { backgroundColor: colors.bgRaised },
-  icon: {
-    width: 46,
-    height: 46,
-    borderRadius: 13,
-    backgroundColor: colors.bgRaised,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14
-  },
-  main: { flex: 1, minWidth: 0 },
-  title: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
-  subtitle: { fontSize: 12, color: colors.textSecondary, marginTop: 3 },
-  trailing: {
+  mainButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexShrink: 0,
-    marginLeft: spacing.sm
+    gap: spacing.md,
+    padding: spacing.lg,
+    minHeight: 72
+  },
+  pressed: { backgroundColor: colors.bgRaised },
+  main: { flex: 1, minWidth: 0 },
+  title: { fontSize: typography.bodySize, fontWeight: '600', color: colors.textPrimary },
+  subtitle: {
+    fontSize: typography.bodySize,
+    lineHeight: 22,
+    color: colors.textSecondary,
+    marginTop: spacing.xs
   },
   providerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 2
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md
   },
   providerButton: {
-    width: 34,
-    height: 34,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
     borderRadius: radii.button
   },
-  providerButtonPressed: { backgroundColor: colors.bgRaised }
+  providerLabel: { color: colors.textSecondary, fontSize: typography.bodySize }
 })

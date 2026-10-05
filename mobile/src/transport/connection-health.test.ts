@@ -10,7 +10,7 @@ describe('classifyConnection auth-failed verdict', () => {
       nowMs: 1_000_000
     })
     expect(verdict.kind).toBe('auth-failed')
-    expect(verdictDisplayLabel(verdict)).toBe('Pairing invalid — re-pair with your desktop')
+    expect(verdictDisplayLabel(verdict)).toBe('配对已失效，请重新配对电脑')
   })
 })
 
@@ -25,7 +25,7 @@ describe('classifyConnection pairing-rejected verdict', () => {
       nowMs: 1_000_000
     })
     expect(verdict.kind).toBe('auth-failed')
-    expect(verdictDisplayLabel(verdict)).toBe('Pairing invalid — re-pair with your desktop')
+    expect(verdictDisplayLabel(verdict)).toBe('配对已失效，请重新配对电脑')
   })
 
   it('never overrides a live connection', () => {
@@ -184,7 +184,7 @@ describe('verdictDisplayLabel', () => {
   it('appends the hint to warning and unreachable labels', () => {
     expect(
       verdictDisplayLabel({ kind: 'warning', label: "Can't connect", hint: 'check Tailscale' })
-    ).toBe("Can't connect — check Tailscale")
+    ).toBe('暂时无法连接 — 请检查 Tailscale')
     expect(
       verdictDisplayLabel({
         kind: 'unreachable',
@@ -192,11 +192,11 @@ describe('verdictDisplayLabel', () => {
         reason: 'stale',
         hint: 'check Tailscale'
       })
-    ).toBe("Can't reach desktop — check Tailscale")
+    ).toBe('无法连接电脑 — 请检查 Tailscale')
   })
 
   it('returns the bare label without a hint', () => {
-    expect(verdictDisplayLabel({ kind: 'warning', label: "Can't connect" })).toBe("Can't connect")
-    expect(verdictDisplayLabel({ kind: 'normal', label: 'Connected' })).toBe('Connected')
+    expect(verdictDisplayLabel({ kind: 'warning', label: "Can't connect" })).toBe('暂时无法连接')
+    expect(verdictDisplayLabel({ kind: 'normal', label: 'Connected' })).toBe('已连接')
   })
 })

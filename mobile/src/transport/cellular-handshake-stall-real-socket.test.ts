@@ -12,10 +12,10 @@ import { classifyConnection, verdictDisplayLabel } from './connection-health'
 // high-latency / lossy cellular link produces on a handshake that needs two
 // round trips (e2ee_hello → e2ee_ready → e2ee_auth → e2ee_authenticated).
 //
-// The client must escalate past "Connecting…" and stay escalated. On the parent
+// The client must escalate past "正在连接…" and stay escalated. On the parent
 // commit ws.onopen reset reconnectAttempt to 0 before the handshake succeeded,
 // so getReconnectAttempt() never passed the connection-health gates and the
-// label looped "Connecting…" forever.
+// label looped "正在连接…" forever.
 //
 // Opt-in like rpc-client-live-recovery.test.ts — needs ~22s wall-clock:
 //   ORCA_MOBILE_LIVE_REPRO=1 pnpm vitest run src/transport/cellular-handshake-stall-real-socket.test.ts
@@ -120,11 +120,11 @@ describe.runIf(RUN_LIVE)('issue #10119 — real socket, handshake slower than th
 
     // The failure counter survives ws.onopen, so the warning gate (>= 3) fires.
     expect(maxAttempts).toBeGreaterThanOrEqual(3)
-    const firstEscalated = labels.findIndex((l) => l !== 'Connecting…' && l !== 'Reconnecting…')
+    const firstEscalated = labels.findIndex((l) => l !== '正在连接…' && l !== '正在重新连接…')
     expect(firstEscalated).toBeGreaterThan(0)
 
-    // Once escalated, later redials never revert the label to "Connecting…".
-    expect(labels.slice(firstEscalated).every((l) => l !== 'Connecting…')).toBe(true)
+    // Once escalated, later redials never revert the label to "正在连接…".
+    expect(labels.slice(firstEscalated).every((l) => l !== '正在连接…')).toBe(true)
   }, 60_000)
 })
 

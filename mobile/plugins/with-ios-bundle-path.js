@@ -9,7 +9,15 @@ module.exports = function withIosBundlePath(config) {
       if (!phase || typeof phase !== 'object' || typeof phase.shellScript !== 'string') {
         continue
       }
-      const script = JSON.parse(phase.shellScript)
+      if (!phase.shellScript.includes('react-native-xcode.sh')) {
+        continue
+      }
+      // Config plugins can insert literal control characters before Xcode serializes the phase.
+      const script = JSON.parse(
+        phase.shellScript.replace(/[\n\r\t]/g, (character) =>
+          JSON.stringify(character).slice(1, -1)
+        )
+      )
       if (!script.includes(`\`${resolveBundleScript}\``)) {
         continue
       }

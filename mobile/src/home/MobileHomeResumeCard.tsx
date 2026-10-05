@@ -1,84 +1,70 @@
-import { ChevronRight, Terminal } from 'lucide-react-native'
+import { ArrowUpRight } from 'lucide-react-native'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 import type { HomeResumeCard } from '../worktree/home-resume-card'
-
-const REPO_COLORS = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4']
-
-function homeResumeRepoColor(name: string): string {
-  let hash = 0
-  for (let index = 0; index < name.length; index += 1) {
-    hash = (hash * 31 + name.charCodeAt(index)) | 0
-  }
-  return REPO_COLORS[Math.abs(hash) % REPO_COLORS.length]
-}
 
 export function MobileHomeResumeCard(props: {
   card: HomeResumeCard
   onOpen: (card: HomeResumeCard) => void
 }) {
+  const { worktree, actionable } = props.card
+  const actionLabel = actionable ? '继续工作' : '连接电脑后继续'
   return (
     <Pressable
-      disabled={!props.card.actionable}
-      style={({ pressed }) => [
-        styles.resumeCard,
-        !props.card.actionable && styles.cardDisabled,
-        pressed && styles.cardPressed
-      ]}
+      accessibilityRole="button"
+      accessibilityLabel={`${actionLabel}，${worktree.displayName}，${worktree.repo}`}
+      accessibilityState={{ disabled: !actionable }}
+      disabled={!actionable}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       onPress={() => props.onOpen(props.card)}
     >
-      <View style={styles.resumeIcon}>
-        <Terminal size={18} color={colors.textSecondary} />
-      </View>
-      <View style={styles.resumeMain}>
-        <Text style={styles.resumeTitle} numberOfLines={1}>
-          {props.card.worktree.displayName}
-        </Text>
-        <View style={styles.resumeSub}>
-          <View
-            style={[
-              styles.repoDot,
-              { backgroundColor: homeResumeRepoColor(props.card.worktree.repo) }
-            ]}
-          />
-          <Text style={styles.resumeSubText} numberOfLines={1}>
-            {props.card.worktree.repo}
-            {'  ·  '}
-            {props.card.worktree.branch}
+      <Text style={styles.title} numberOfLines={2}>
+        {worktree.displayName}
+      </Text>
+      <Text style={styles.subtitle} numberOfLines={2}>
+        {worktree.repo}
+        {worktree.branch ? ` · ${worktree.branch}` : ''}
+      </Text>
+      <View style={styles.actionRow}>
+        <View style={[styles.action, actionable && styles.actionReady]}>
+          <Text style={[styles.actionText, actionable && styles.actionTextReady]}>
+            {actionLabel}
           </Text>
+          {actionable ? <ArrowUpRight size={16} color={colors.bgBase} /> : null}
         </View>
       </View>
-      <ChevronRight size={16} color={colors.textMuted} />
     </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  resumeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  card: {
     backgroundColor: colors.bgPanel,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     borderRadius: radii.card,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.md,
-    paddingVertical: 12
+    padding: spacing.lg,
+    gap: spacing.sm
   },
-  cardDisabled: { opacity: 0.45 },
   cardPressed: { backgroundColor: colors.bgRaised },
-  resumeIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 13,
-    backgroundColor: colors.bgRaised,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14
+  title: {
+    fontSize: typography.titleSize,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: colors.textPrimary
   },
-  resumeMain: { flex: 1, minWidth: 0 },
-  resumeTitle: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
-  resumeSub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 3 },
-  repoDot: { width: 7, height: 7, borderRadius: 3.5 },
-  resumeSubText: { fontSize: 12, color: colors.textSecondary, flex: 1 }
+  subtitle: { fontSize: typography.bodySize, lineHeight: 22, color: colors.textSecondary },
+  actionRow: { flexDirection: 'row', marginTop: spacing.sm },
+  action: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    borderRadius: radii.button,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.bgRaised
+  },
+  actionReady: { backgroundColor: colors.surfaceBright },
+  actionText: { fontSize: typography.bodySize, fontWeight: '600', color: colors.textSecondary },
+  actionTextReady: { color: colors.bgBase }
 })

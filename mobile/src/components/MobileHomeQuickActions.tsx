@@ -3,7 +3,7 @@ import { Plus, QrCode } from 'lucide-react-native'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import type { HostProfile } from '../transport/types'
 import { hostEndpointLabel } from '../transport/host-endpoint-label'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 import { PickerModal } from './PickerModal'
 
 type Props = {
@@ -68,38 +68,38 @@ export function MobileHomeQuickActions(props: Props) {
 
   return (
     <>
-      <Text style={styles.sectionHeading}>Quick Actions</Text>
       <View style={styles.quickActions}>
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="配对电脑"
           style={({ pressed }) => [styles.quickAction, pressed && styles.quickActionPressed]}
           onPress={props.onPairDesktop}
         >
           <View style={styles.quickActionIcon}>
             <QrCode size={16} color={colors.textSecondary} />
           </View>
-          <Text style={styles.quickActionLabel}>Pair Desktop</Text>
+          <Text style={styles.quickActionLabel}>配对电脑</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !canCreateWorkspace }}
+          accessibilityLabel="新建工作区"
+          accessibilityHint={!canCreateWorkspace ? '连接电脑后可新建工作区' : undefined}
           disabled={!canCreateWorkspace}
-          style={({ pressed }) => [
-            styles.quickAction,
-            !canCreateWorkspace && styles.quickActionDisabled,
-            pressed && styles.quickActionPressed
-          ]}
+          style={({ pressed }) => [styles.quickAction, pressed && styles.quickActionPressed]}
           onPress={handleCreateWorkspace}
         >
           <View style={styles.quickActionIcon}>
             <Plus size={16} color={colors.textSecondary} />
           </View>
-          <Text style={styles.quickActionLabel}>New Workspace</Text>
+          <Text style={styles.quickActionLabel}>
+            {canCreateWorkspace ? '新建工作区' : '连接后可新建'}
+          </Text>
         </Pressable>
       </View>
       <PickerModal
         visible={hostPickerVisible}
-        title="Create Workspace On"
+        title="选择工作区所在电脑"
         options={hostPickerOptions(props.connectedHosts)}
         selected=""
         onSelect={handleHostSelect}
@@ -111,22 +111,16 @@ export function MobileHomeQuickActions(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  sectionHeading: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6
-  },
   quickActions: {
     flexDirection: 'row',
-    gap: spacing.sm
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.lg
   },
   quickAction: {
     flex: 1,
+    minWidth: 140,
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm + 2,
@@ -140,9 +134,6 @@ const styles = StyleSheet.create({
   quickActionPressed: {
     backgroundColor: colors.bgRaised
   },
-  quickActionDisabled: {
-    opacity: 0.45
-  },
   quickActionIcon: {
     width: 28,
     height: 28,
@@ -153,7 +144,8 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: {
     color: colors.textSecondary,
-    fontSize: 12,
+    fontSize: typography.bodySize,
+    flexShrink: 1,
     fontWeight: '600'
   }
 })

@@ -2,27 +2,25 @@ import { memo, useCallback, type ReactElement } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import type { ListRenderItemInfo } from 'react-native'
 import { MobileHostCard } from '../components/MobileHostCard'
-import type { HomeStatsSummary } from '../stats/home-stats-total'
 import { spacing } from '../theme/mobile-theme'
 import { classifyConnection } from '../transport/connection-health'
 import { resolveHomeHostConnectionState } from '../transport/home-host-auto-connect'
 import type { ConnectionState, HostCatalogEntry } from '../transport/types'
 import type { HostWorktreeInfo } from '../worktree/home-worktree-info'
 import type { HomeHostConnections } from './home-host-connection-projection'
-import { MobileHomeListHeader } from './MobileHomeListHeader'
 
 type MobileHomeHostListProps = {
   autoConnectHostIds: string[]
   bottomInset: number
   contentMaxWidth: number
   footer: ReactElement
+  header: ReactElement
   hostAttempts: Record<string, number>
   hostLastConnected: Record<string, number | null>
   hostConnections: HomeHostConnections
   hosts: HostCatalogEntry[]
   hostStates: Record<string, ConnectionState>
   isWideLayout: boolean
-  stats: HomeStatsSummary | null
   worktreeInfo: Record<string, HostWorktreeInfo>
   onOpen: (host: HostCatalogEntry) => void
   onLongPress: (host: HostCatalogEntry) => void
@@ -71,7 +69,7 @@ export function MobileHomeHostList(props: MobileHomeHostListProps) {
           alignSelf: 'center'
         }
       ]}
-      ListHeaderComponent={<MobileHomeListHeader stats={props.stats} />}
+      ListHeaderComponent={props.header}
       ItemSeparatorComponent={CardGap}
       renderItem={renderHost}
       ListFooterComponent={props.footer}

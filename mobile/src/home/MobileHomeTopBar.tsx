@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
   logoMark: { marginRight: spacing.sm },
   brandName: { color: colors.textPrimary, fontSize: 17, fontWeight: '700' },
   iconButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center'
