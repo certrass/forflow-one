@@ -157,7 +157,7 @@ test('regression: local project, worktree, Chinese terminal, file editing, diff 
       const events: string[] = []
       const dispose = window.api.pty.onData((event) => events.push(event.data))
       const pty = await window.api.pty.spawn({ cols: 80, rows: 24, cwd, shellOverride: '/bin/zsh' })
-      window.api.pty.write(pty.id, "printf '\\u4e2d\\u6587-PTY-%s\\n' 'PASS'\r")
+      window.api.pty.write(pty.id, "printf '\\u4e2d\\u6587-PTY-%s\\n' 'PASS'\r", 'driving')
       const deadline = Date.now() + 20_000
       while (Date.now() < deadline && !events.join('').includes('中文-PTY-PASS')) {
         await new Promise((resolve) => setTimeout(resolve, 100))

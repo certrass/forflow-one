@@ -21,7 +21,7 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     if (!ptyId || !leafId) {
       throw new Error('Missing pane identity')
     }
-    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command), {
+    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command, 'driving'), {
       ptyId,
       command: fixture.command
     })

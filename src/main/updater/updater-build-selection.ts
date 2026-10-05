@@ -13,10 +13,15 @@ import {
 } from '../../shared/release-channel'
 import { compareVersions } from '../updater-fallback'
 import { listReleaseBuilds, resolveTargetBuild } from '../updater-release-builds'
+import { ReleaseBuildListCache, type ReleaseBuildListOptions } from '../updater-release-build-cache'
 import { UpdaterMenuChecks } from './updater-menu-checks'
 
 /** Handles local-build selection and exact release-channel/tag jumps. */
 export abstract class UpdaterBuildSelection extends UpdaterMenuChecks {
+  private readonly releaseBuildCache = new ReleaseBuildListCache((channel) =>
+    listReleaseBuilds(channel)
+  )
+
   protected async checkForLocalBuildFromMenu(): Promise<void> {
     if (process.platform !== 'darwin') {
       this.sendLocalBuildErrorAndRestore(
@@ -68,9 +73,12 @@ export abstract class UpdaterBuildSelection extends UpdaterMenuChecks {
     }
   }
 
-  protected async listAvailableReleaseBuilds(channel: ReleaseChannel): Promise<ReleaseBuild[]> {
+  protected async listAvailableReleaseBuilds(
+    channel: ReleaseChannel,
+    options?: ReleaseBuildListOptions
+  ): Promise<ReleaseBuild[]> {
     assertForflowCloudCapability('updates')
-    return listReleaseBuilds(channel)
+    return this.releaseBuildCache.list(channel, options)
   }
 
   /** Pins the updater at one exact release tag and checks it, so a dev can move to any published build on any channel — including an older one. */

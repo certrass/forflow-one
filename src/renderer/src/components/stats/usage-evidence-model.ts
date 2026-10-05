@@ -3,10 +3,11 @@ import type { UsageOverviewInput, UsageProviderOverview } from './usage-overview
 import {
   createClaudeProvider,
   createCodexProvider,
-  createOpenCodeProvider
+  createOpenCodeProvider,
+  createMuseProvider
 } from './usage-provider-normalization'
 
-export type UsageEvidenceSelection = 'overview' | 'claude' | 'codex' | 'opencode' | 'grok'
+export type UsageEvidenceSelection = 'overview' | 'claude' | 'codex' | 'opencode' | 'muse' | 'grok'
 export type UsageEvidenceSource = UsageProviderOverview & {
   scope: string
   range: string
@@ -52,16 +53,20 @@ function sourceState(source: UsageProviderOverview): string {
   return source.activityCount > 0 ? '局部可见' : '当前范围未发现用量记录'
 }
 
-export function buildUsageEvidence(input: UsageOverviewInput, selection: UsageEvidenceSelection) {
+export function buildUsageEvidence(
+  input: Omit<UsageOverviewInput, 'muse'> & Partial<Pick<UsageOverviewInput, 'muse'>>,
+  selection: UsageEvidenceSelection
+) {
   const all = [
     createClaudeProvider(input.claude),
     createCodexProvider(input.codex),
-    createOpenCodeProvider(input.opencode)
+    createOpenCodeProvider(input.opencode),
+    ...(input.muse ? [createMuseProvider(input.muse)] : [])
   ]
   const sources: UsageEvidenceSource[] = all
     .filter((source) => selection === 'overview' || source.id === selection)
     .map((source) => {
-      const summary = input[source.id].summary
+      const summary = input[source.id]?.summary ?? null
       const available = source.enabled && summary !== null && source.lastScanCompletedAt !== null
       const observedRecords = available ? source.activityCount : 0
       return {

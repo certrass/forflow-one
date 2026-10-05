@@ -34,9 +34,7 @@ export async function buildCodexAnalytics(
     if (exact && daily.length === 0) {
       continue
     }
-    const costs = daily.map((day) =>
-      estimateCostUsd(day.model, day.inputTokens, day.cachedInputTokens, day.outputTokens)
-    )
+    const costs = daily.map((day) => estimateCostUsd(day.model, day))
     const knownCosts = costs.filter((cost) => cost !== null)
     const firstFile = files[0]
     rows.push({

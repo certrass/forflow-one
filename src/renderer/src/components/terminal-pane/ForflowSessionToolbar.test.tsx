@@ -122,19 +122,15 @@ describe('Forflow session toolbar', () => {
     expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
   })
 
-  it('explains an unsupported agent and never offers a fake structured terminal', () => {
+  it('explains an unsupported terminal agent and keeps its terminal view available', () => {
     const controller = fixture({
       activePaneCanToggleChat: false,
       isChatEligibleForLeaf: () => false
     })
-    const view = render(<ForflowSessionToolbar controller={controller} />)
+    render(<ForflowSessionToolbar controller={controller} />)
     expect(screen.getByText('Chat is unavailable for this agent or host')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Chat' }).hasAttribute('disabled')).toBe(true)
-    view.rerender(
-      <ForflowSessionToolbar controller={{ ...controller, structuredSessionId: 'session-1' }} />
-    )
-    expect(screen.queryByRole('button', { name: 'Terminal' })).toBeNull()
-    expect(screen.getByText('Structured conversation')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Terminal' }).hasAttribute('disabled')).toBe(false)
   })
 
   it('opens the existing task composer and file preview without starting a task', () => {

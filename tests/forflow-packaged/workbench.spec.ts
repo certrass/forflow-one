@@ -25,7 +25,7 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     if (!ptyId || !leafId) {
       throw new Error('Missing live pane identity')
     }
-    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command), {
+    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command, 'driving'), {
       ptyId,
       command: fixture.command
     })

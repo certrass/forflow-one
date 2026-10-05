@@ -20,7 +20,7 @@ test('context Beta: opt-in, scoped source receipt, no automatic send, and disabl
     if (!ptyId) {
       throw new Error('Missing PTY identity')
     }
-    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command), {
+    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command, 'driving'), {
       ptyId,
       command: fixture.command
     })

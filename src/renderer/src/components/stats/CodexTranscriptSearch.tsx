@@ -34,7 +34,13 @@ function SearchResults({
 }): React.JSX.Element {
   const c = codexTranscriptSearchCopy()
   const r = reviewCopy()
-  const search = useAiVaultPanelSearch(query, CODEX_AGENTS, undefined, LOCAL_EXECUTION_HOST_ID)
+  const search = useAiVaultPanelSearch(
+    query,
+    CODEX_AGENTS,
+    undefined,
+    LOCAL_EXECUTION_HOST_ID,
+    'relevance'
+  )
   const [opening, setOpening] = useState<string | null>(null)
   const [error, setError] = useState<{ key: string; message: string } | null>(null)
   const busy = useRef(false)

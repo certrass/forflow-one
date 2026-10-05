@@ -1,5 +1,6 @@
 import type { CodexReview } from '../../../../shared/codex-review-types'
 import { Button } from '../ui/button'
+import { SettingsSubsectionHeader } from '../settings/SettingsFormControls'
 import { WorkspaceReviewGuide } from './WorkspaceReviewGuide'
 import { workspaceReviewGuideCopy } from './workspace-review-guide-copy'
 import { useWorkspaceReviewIntake } from './use-workspace-review-intake'
@@ -24,21 +25,21 @@ export function WorkspaceReviewIntake({
   const { busy, loading } = form
   return (
     <section className="space-y-6" data-testid="workspace-review-intake">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h3 className="text-base font-medium">{g.title}</h3>
-          <p className="max-w-2xl text-sm text-muted-foreground">{g.description}</p>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled={loading || busy}
-          onClick={form.refresh}
-        >
-          {r.refresh}
-        </Button>
-      </div>
+      <SettingsSubsectionHeader
+        title={g.title}
+        description={g.description}
+        action={
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={loading || busy}
+            onClick={form.refresh}
+          >
+            {r.refresh}
+          </Button>
+        }
+      />
       <WorkspaceReviewGuide
         active={active}
         editing={Boolean(initial)}

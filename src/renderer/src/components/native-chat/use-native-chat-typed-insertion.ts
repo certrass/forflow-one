@@ -1,16 +1,14 @@
-import type { NativeChatComposerInput } from './native-chat-composer-input'
-import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react'
 import {
-  applyMentionSuggestion,
-  type HistoryState,
-  type ComposerAutocomplete
-} from './native-chat-composer-state'
+  insertNativeChatPastedText,
+  type NativeChatComposerInput
+} from './native-chat-composer-input'
+import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import type { HistoryState } from './native-chat-composer-state'
 
 /** Imperative text insertion and focus for the composer textarea, used by the
  *  paste pipeline and the composer's imperative handle. */
 export function useNativeChatTypedInsertion(args: {
   textareaRef: RefObject<NativeChatComposerInput | null>
-  autocomplete: ComposerAutocomplete
   caret: number
   draft: string
   setDraft: (value: string) => void
@@ -19,19 +17,11 @@ export function useNativeChatTypedInsertion(args: {
   setActiveSuggestion: Dispatch<SetStateAction<number>>
 }): {
   insertTypedText: (text: string) => boolean
+  insertPastedText: (text: string) => boolean
   focus: () => boolean
-  acceptMention: () => void
+  contains: (node: Node | null) => boolean
 } {
-  const {
-    textareaRef,
-    caret,
-    draft,
-    setDraft,
-    setCaret,
-    setHistory,
-    setActiveSuggestion,
-    autocomplete
-  } = args
+  const { textareaRef, caret, draft, setDraft, setCaret, setHistory, setActiveSuggestion } = args
 
   const insertTypedText = useCallback(
     (text: string): boolean => {
@@ -56,6 +46,12 @@ export function useNativeChatTypedInsertion(args: {
     [caret, draft, setActiveSuggestion, setCaret, setDraft, setHistory, textareaRef]
   )
 
+  // Reads the live input when a delayed clipboard read settles.
+  const insertPastedText = useCallback(
+    (text: string): boolean => insertNativeChatPastedText(textareaRef.current, text),
+    [textareaRef]
+  )
+
   const focus = useCallback((): boolean => {
     const textarea = textareaRef.current
     if (!textarea || textarea.disabled) {
@@ -65,17 +61,10 @@ export function useNativeChatTypedInsertion(args: {
     return true
   }, [textareaRef])
 
-  const acceptMention = useCallback(() => {
-    if (autocomplete.mode !== 'mention') {
-      return
-    }
-    const result = applyMentionSuggestion(draft, caret, autocomplete.query)
-    setDraft(result.draft)
-    setCaret(result.caret)
-    const textarea = textareaRef.current
-    textarea?.focus()
-    requestAnimationFrame(() => textarea?.setSelectionRange(result.caret, result.caret))
-  }, [autocomplete, draft, caret, setDraft, setCaret, textareaRef])
+  const contains = useCallback(
+    (node: Node | null): boolean => textareaRef.current?.contains?.(node) === true,
+    [textareaRef]
+  )
 
-  return { insertTypedText, focus, acceptMention }
+  return { insertTypedText, insertPastedText, focus, contains }
 }

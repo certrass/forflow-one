@@ -51,7 +51,6 @@ export function ForflowSessionToolbar({
     activePaneIsChatLeaf,
     effectiveChatViewMode,
     nativeChatEnabled,
-    structuredSessionId,
     resolveAgentForLeaf,
     splitTerminalPaneFromHeader
   } = controller
@@ -59,17 +58,15 @@ export function ForflowSessionToolbar({
   const chatSelected = effectiveChatViewMode && activePaneIsChatLeaf
   const chatSupported = controller.isChatEligibleForLeaf(activePane?.leafId ?? null, true)
   const canOpenChat = activePaneCanToggleChat || chatSupported
-  const status = structuredSessionId
-    ? translate('forflow.workbench.structured', 'Structured conversation')
-    : !canOpenChat
-      ? agent
-        ? translate('forflow.workbench.terminalOnly', 'Chat is unavailable for this agent or host')
-        : translate('forflow.workbench.shell', 'Start a supported agent to use chat')
-      : !nativeChatEnabled
-        ? translate('forflow.workbench.enableHint', 'Choose Chat to enable the conversation view')
-        : agent
-          ? formatAgentTypeLabel(agent)
-          : ''
+  const status = !canOpenChat
+    ? agent
+      ? translate('forflow.workbench.terminalOnly', 'Chat is unavailable for this agent or host')
+      : translate('forflow.workbench.shell', 'Start a supported agent to use chat')
+    : !nativeChatEnabled
+      ? translate('forflow.workbench.enableHint', 'Choose Chat to enable the conversation view')
+      : agent
+        ? formatAgentTypeLabel(agent)
+        : ''
 
   const openChat = async (): Promise<void> => {
     if (chatSelected || !canOpenChat || enabling || !activePane) {
@@ -88,7 +85,6 @@ export function ForflowSessionToolbar({
         current.tabId !== expected.tabId ||
         current.activePane?.leafId !== expected.leafId ||
         current.resolveAgentForLeaf(expected.leafId) !== expected.agent ||
-        current.structuredSessionId ||
         !current.isActive ||
         !current.isChatEligibleForLeaf(expected.leafId, true)
       ) {
@@ -114,39 +110,33 @@ export function ForflowSessionToolbar({
       data-forflow-session-toolbar=""
       data-pane-prevent-terminal-focus=""
     >
-      {structuredSessionId ? (
-        <span className="text-xs text-muted-foreground">{status}</span>
-      ) : (
-        <>
-          <ButtonGroup aria-label={translate('forflow.workbench.view', 'Session view')}>
-            <Button
-              size="xs"
-              variant={chatSelected ? 'secondary' : 'ghost'}
-              aria-pressed={chatSelected}
-              disabled={!activePane || !canOpenChat || enabling}
-              onClick={() => void openChat()}
-            >
-              <MessageSquare />
-              {translate('forflow.workbench.chat', 'Chat')}
-            </Button>
-            <Button
-              size="xs"
-              variant={!chatSelected ? 'secondary' : 'ghost'}
-              aria-pressed={!chatSelected}
-              disabled={!activePane || enabling}
-              onClick={() => {
-                if (chatSelected) {
-                  controller.handleToggleNativeChat()
-                }
-              }}
-            >
-              <SquareTerminal />
-              {translate('forflow.workbench.terminal', 'Terminal')}
-            </Button>
-          </ButtonGroup>
-          <span className="min-w-0 truncate text-xs text-muted-foreground">{status}</span>
-        </>
-      )}
+      <ButtonGroup aria-label={translate('forflow.workbench.view', 'Session view')}>
+        <Button
+          size="xs"
+          variant={chatSelected ? 'secondary' : 'ghost'}
+          aria-pressed={chatSelected}
+          disabled={!activePane || !canOpenChat || enabling}
+          onClick={() => void openChat()}
+        >
+          <MessageSquare />
+          {translate('forflow.workbench.chat', 'Chat')}
+        </Button>
+        <Button
+          size="xs"
+          variant={!chatSelected ? 'secondary' : 'ghost'}
+          aria-pressed={!chatSelected}
+          disabled={!activePane || enabling}
+          onClick={() => {
+            if (chatSelected) {
+              controller.handleToggleNativeChat()
+            }
+          }}
+        >
+          <SquareTerminal />
+          {translate('forflow.workbench.terminal', 'Terminal')}
+        </Button>
+      </ButtonGroup>
+      <span className="min-w-0 truncate text-xs text-muted-foreground">{status}</span>
       <div className="ml-auto flex items-center gap-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

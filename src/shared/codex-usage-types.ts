@@ -25,6 +25,8 @@ export type CodexUsageSummary = {
   totalTokens: number
   estimatedCostUsd: number | null
   costCoverage?: UsageCostCoverage
+  /** A row carried a model name that `MODEL_PRICING` has no entry for, so its tokens are missing from `estimatedCostUsd`. */
+  hasUnpricedModels: boolean
   topModel: string | null
   topProject: string | null
   hasAnyCodexData: boolean

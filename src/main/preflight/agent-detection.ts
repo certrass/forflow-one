@@ -49,6 +49,7 @@ import {
   agentDetectionCommandsWithOverrides,
   type AgentCommandOverrides
 } from './agent-command-overrides'
+import { prunePreflightWslCache } from '../preflight-wsl-cache'
 
 export type PreflightStatus = {
   git: { installed: boolean }
@@ -92,6 +93,7 @@ let cached: PreflightStatus | null = null
 // would report "git not installed" until relaunch; expiring lets it self-heal
 // while still collapsing the burst of calls that made this expensive.
 const WSL_PREFLIGHT_CACHE_TTL_MS = 30_000
+const MAX_WSL_PREFLIGHT_DISTRO_ENTRIES = 128
 const cachedByWslDistro = new Map<string, { result: PreflightStatus; expiresAt: number }>()
 // Collapses concurrent callers (several panes mounting at once) onto one probe
 // set instead of one full set each before the first result lands.
@@ -133,15 +135,8 @@ async function detectCommandRuntime(
   context?: PreflightRuntimeContext
 ): Promise<{ installed: boolean; wslTarget?: WslPreflightTarget }> {
   const wslTarget = getPreflightWslTarget(context)
-  if (wslTarget) {
-    return (await isCommandAvailable(command, wslTarget))
-      ? { installed: true, wslTarget }
-      : { installed: false }
-  }
-  if (await isCommandAvailable(command)) {
-    return { installed: true }
-  }
-  return { installed: false }
+  const installed = await isCommandAvailable(command, wslTarget ?? undefined)
+  return installed && wslTarget ? { installed, wslTarget } : { installed }
 }
 
 export async function detectInstalledAgents(
@@ -300,6 +295,12 @@ export async function runPreflightCheck(
 ): Promise<PreflightStatus> {
   const wslTarget = getPreflightWslTarget(context)
   const cacheKey = preflightCacheKey(wslTarget)
+  prunePreflightWslCache(
+    cachedByWslDistro,
+    latestPreflightRun,
+    Date.now(),
+    MAX_WSL_PREFLIGHT_DISTRO_ENTRIES
+  )
 
   if (!force) {
     if (wslTarget) {
@@ -334,6 +335,12 @@ export async function runPreflightCheck(
           result,
           expiresAt: Date.now() + WSL_PREFLIGHT_CACHE_TTL_MS
         })
+        prunePreflightWslCache(
+          cachedByWslDistro,
+          latestPreflightRun,
+          Date.now(),
+          MAX_WSL_PREFLIGHT_DISTRO_ENTRIES
+        )
       } else {
         cached = result
       }

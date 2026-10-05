@@ -521,6 +521,26 @@
     "auto.components.feature.wall.BrowserAnimatedVisual.73bbb46073": "/pricing",
     "auto.components.feature.wall.BrowserAnimatedVisual.f39be6ca14": "/signup",
     "auto.lib.agent.catalog.opencode2_label": "OpenCode 2",
-    "auto.components.settings.general.search.omp": "OMP"
+    "auto.components.settings.general.search.omp": "OMP",
+    "auto.lib.agent.catalog.freebuff_label": "Freebuff",
+    "auto.lib.agent.catalog.muse_label": "Muse",
+    "auto.lib.agent.catalog.dsh_label": "DeepSeek Harness",
+    "auto.lib.agent.catalog.qoder_label": "Qoder CLI",
+    "auto.lib.agent.catalog.zcode_label": "ZCode",
+    "auto.lib.agent.catalog.codebuddy_label": "CodeBuddy",
+    "auto.components.status.bar.tooltip.zcode.mcp": "MCP",
+    "auto.components.stats.stats.search.museKeyword": "muse",
+    "auto.components.settings.accounts.search.cursor.kw.cursor": "cursor",
+    "auto.components.settings.agents.search.7e15b89f6e": "server",
+    "auto.components.settings.agents.search.ff457e1e7b": "daemon",
+    "auto.components.settings.agents.search.9f3becc4e8": "shared",
+    "auto.components.settings.agents.search.34337ed5c7": "isolate",
+    "auto.components.settings.agents.search.9a84e65118": "agents overview",
+    "auto.components.settings.appearance.search.zcode": "zcode",
+    "auto.components.settings.appearance.search.zai": "zai",
+    "auto.components.settings.appearance.search.glm": "glm",
+    "auto.components.settings.appearance.search.cursor.kw.cursor": "cursor",
+    "auto.components.settings.CursorAccountsSection.source.desktop": "Cursor IDE",
+    "auto.components.settings.CursorAccountsSection.title": "Cursor"
   }
 }

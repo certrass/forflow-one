@@ -1,3 +1,4 @@
+import { codexOpenCodeTokenSessions } from '../usage/agent-token-usage'
 import { app } from 'electron'
 import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
 import { readCodexUsageAudit } from './codex-usage-audit'
@@ -94,6 +95,10 @@ export class CodexUsageStore extends UsageProviderStoreLifecycle<
 
   constructor(private readonly auditStore: Pick<Store, 'getRepos' | 'getAllWorktreeMeta'>) {
     super(auditStore, {
+      tokenUsage: {
+        provider: 'codex',
+        selectSessions: (state) => codexOpenCodeTokenSessions(state.sessions)
+      },
       logTag: '[codex-usage]',
       resolveCacheFile: getCodexUsageFile,
       createDefaultState: getDefaultState,

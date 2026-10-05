@@ -3,6 +3,7 @@ import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import type { BrowserWindow } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import type { ReleaseBuild, ReleaseChannel } from '../../shared/release-channel'
+import type { ReleaseBuildListOptions } from '../updater-release-build-cache'
 import type {
   LinuxPackageInstallInstructions,
   UpdateCheckOptions,
@@ -20,7 +21,7 @@ import { getServeUpdateHandoffFailure } from '../serve-update-handoff'
 import { recordUpdaterLifecycle } from '../updater-lifecycle-diagnostics'
 import { AUTO_UPDATE_CHECK_INTERVAL_MS } from './updater-state'
 import { UpdaterDownloadInstall } from './updater-download-install'
-import type { UpdateInstallMode } from './updater-state'
+import type { PreQuitCleanupFailureMode, UpdateInstallMode } from './updater-state'
 
 export type UpdaterSetupOptions = {
   getLastUpdateCheckAt?: () => number | null
@@ -32,6 +33,7 @@ export type UpdaterSetupOptions = {
   setDismissedUpdateNudgeId?: (id: string | null) => void
   getReleaseChannelOverride?: () => ReleaseChannel | null
   installMode?: UpdateInstallMode
+  onBeforeQuitFailure?: PreQuitCleanupFailureMode
 }
 
 /** Initializes electron-updater and attaches lifecycle/event bridges. */
@@ -95,8 +97,11 @@ export class UpdaterSetup extends UpdaterDownloadInstall {
     return super.showLinuxPackage()
   }
 
-  async listAvailableReleaseBuilds(channel: ReleaseChannel): Promise<ReleaseBuild[]> {
-    return super.listAvailableReleaseBuilds(channel)
+  async listAvailableReleaseBuilds(
+    channel: ReleaseChannel,
+    options?: ReleaseBuildListOptions
+  ): Promise<ReleaseBuild[]> {
+    return super.listAvailableReleaseBuilds(channel, options)
   }
 
   dismissNudge(): void {
@@ -113,6 +118,7 @@ export class UpdaterSetup extends UpdaterDownloadInstall {
       return
     }
     this.onBeforeQuitCleanup = opts?.onBeforeQuit ?? null
+    this.onBeforeQuitFailure = opts?.onBeforeQuitFailure ?? 'continue'
     this.persistLastUpdateCheckAt = opts?.setLastUpdateCheckAt ?? null
     this._getLastUpdateCheckAt = opts?.getLastUpdateCheckAt ?? null
     this._getPendingUpdateNudgeId = opts?.getPendingUpdateNudgeId ?? null

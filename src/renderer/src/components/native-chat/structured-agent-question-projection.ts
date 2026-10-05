@@ -1,9 +1,13 @@
+import type { AskPrompt } from '../../../../shared/native-chat-ask'
 import type {
   AgentJournalRenderItem,
-  AgentJournalQuestionItem
+  AgentJournalQuestionItem,
+  AgentJournalQuestion
 } from '../../../../shared/agent-session-journal-types'
 import { isAskUserQuestionTool } from '../../../../shared/agent-question-answered-intent'
 import { parseAskFromToolInput } from '../../../../shared/native-chat-ask'
+import { agentJournalItemRowOrigin } from '../../../../shared/agent-session-journal-position'
+import { agentJournalLinkageFields } from '../../../../shared/agent-session-journal-producer'
 import type { NativeChatMessage } from '../../../../shared/native-chat-types'
 import { projectStructuredItemToNativeChat } from '../../../../shared/structured-agent-session-projection'
 import { readAgentJournalTurn } from '../../../../shared/agent-session-turn-record'
@@ -69,10 +73,9 @@ function projectItem(item: AgentJournalRenderItem): Projection {
     if (body.resolution.state === 'pending') {
       // A system row preserves question identity through tool folding; the receipt renders its body.
       message = {
-        id: item.itemId,
+        ...agentJournalItemRowOrigin(item),
+        ...agentJournalLinkageFields(item),
         role: 'system',
-        timestamp: item.observedAt,
-        source: 'transcript',
         blocks: [{ type: 'text', text: body.question }]
       }
     }
@@ -184,4 +187,20 @@ export function projectStructuredQuestionMessages(
   items: readonly AgentJournalRenderItem[]
 ): NativeChatMessage[] {
   return structuredQuestionTranscript(items).messages
+}
+
+export function structuredQuestionCardPrompt(
+  questions: readonly AgentJournalQuestion[]
+): AskPrompt {
+  return {
+    questions: questions.map((question) => ({
+      question: question.question,
+      ...(question.header ? { header: question.header } : {}),
+      multiSelect: question.multiSelect,
+      options: question.options.map((option) => ({
+        label: option.label,
+        ...(option.description ? { description: option.description } : {})
+      }))
+    }))
+  }
 }

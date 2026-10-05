@@ -1,3 +1,4 @@
+import { reloadFocusedMenuWindow } from './app-menu-reload'
 import { BrowserWindow, Menu, app } from 'electron'
 import {
   formatKeybindingList,
@@ -72,22 +73,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
     return formatKeybindingList(bindings, process.platform)
   }
 
-  const reloadFocusedWindow = (ignoreCache: boolean): void => {
-    const webContents = BrowserWindow.getFocusedWindow()?.webContents
-    if (!webContents) {
-      return
-    }
-
-    onBeforeReload?.({ ignoreCache, webContentsId: webContents.id })
-
-    if (ignoreCache) {
-      webContents.reloadIgnoringCache()
-      return
-    }
-
-    webContents.reload()
-  }
-
   // Why: modifier-click update checks are hidden power-user affordances.
   // Extracted so the macOS app-menu entry and Windows/Linux Help entry share
   // identical RC/perf channel routing.
@@ -113,8 +98,16 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
     click: checkForUpdatesClick
   }
 
+  const settingsBindings = getEffectiveKeybindingsForAction(
+    'app.settings',
+    process.platform,
+    getKeybindings?.()
+  )
+  const settingsShortcut = settingsBindings.length
+    ? `\t${formatKeybindingList(settingsBindings, process.platform)}`
+    : ''
   const settingsItem: Electron.MenuItemConstructorOptions = {
-    label: `${translateMain('menu.settings', 'Settings')}\t${shortcutLabel('app.settings')}`,
+    label: `${translateMain('menu.settings', 'Settings')}${settingsShortcut}`,
     click: () => onOpenSettings()
   }
 
@@ -274,11 +267,11 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
     submenu: [
       {
         label: translateMain('menu.reload', 'Reload'),
-        click: () => reloadFocusedWindow(false)
+        click: () => reloadFocusedMenuWindow(false, onBeforeReload)
       },
       {
         label: `${translateMain('menu.forceReload', 'Force Reload')}\t${shortcutLabel('app.forceReload')}`,
-        click: () => reloadFocusedWindow(true)
+        click: () => reloadFocusedMenuWindow(true, onBeforeReload)
       },
       { role: 'toggleDevTools' },
       { type: 'separator' },

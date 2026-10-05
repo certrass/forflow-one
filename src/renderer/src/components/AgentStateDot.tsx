@@ -36,6 +36,9 @@ export type AgentDotState =
   // held there, and never rendered as 'done' or 'working' — it asserts nothing about
   // the agent, only about what Orca last heard.
   | 'unverifiable'
+  // Why: the turn ended and Orca cannot prove how. An outcome like 'failed', drawn with the
+  // 'unverifiable' glyph because it too reports missing evidence, never a finish.
+  | 'unconfirmed'
   // Why: the sidebar's title-based status flow (StatusIndicator/WorktreeCard)
   // collapses blocked + waiting into a single "needs attention" state. Keep
   // this as a distinct member so that flow can render without inventing a new
@@ -64,6 +67,8 @@ export function agentStateLabel(state: AgentDotState): string {
       return translate('forflow.desktopCopy.ab0171ca04', 'Idle')
     case 'unverifiable':
       return translate('forflow.desktopCopy.261781f74c', 'No recent update')
+    case 'unconfirmed':
+      return translate('forflow.agentStatus.unconfirmed', 'Couldn’t confirm')
     case 'permission':
       return translate('forflow.desktopCopy.c1ebc78178', 'Needs attention')
   }
@@ -124,7 +129,7 @@ export const AgentStateDot = React.memo(function AgentStateDot({
         <CircleCheck className={cn('text-emerald-500', icon)} aria-hidden="true" />
       </span>
     )
-  } else if (state === 'unverifiable') {
+  } else if (state === 'unverifiable' || state === 'unconfirmed') {
     // Why: a dashed ring reads as "incomplete information" rather than a state claim,
     // and amber carries warning weight without borrowing 'done' green or 'working' yellow.
     indicator = (
@@ -154,9 +159,12 @@ export const AgentStateDot = React.memo(function AgentStateDot({
           className={cn(
             'block rounded-full',
             inner,
-            state === 'blocked' || state === 'interrupted' || state === 'failed'
+            state === 'blocked' || state === 'failed'
               ? 'bg-red-500'
-              : 'bg-neutral-500/40'
+              : // Why: a user's Stop is not news; muted, never the fault red or the finished green.
+                state === 'interrupted'
+                ? 'bg-muted-foreground'
+                : 'bg-neutral-500/40'
           )}
         />
       </span>

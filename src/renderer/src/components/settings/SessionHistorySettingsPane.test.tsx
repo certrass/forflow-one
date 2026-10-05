@@ -23,7 +23,8 @@ const mocks = vi.hoisted(() => {
     environments,
     details,
     closeSettingsPage: vi.fn(),
-    showAiVaultSearch: vi.fn()
+    showAiVaultSearch: vi.fn(),
+    markFeatureTipsSeen: vi.fn()
   }
 })
 vi.mock('./use-runtime-environment-catalog', () => ({
@@ -42,7 +43,8 @@ vi.mock('@/store', () => ({
       openSettingsPage: vi.fn(),
       openSettingsTarget: vi.fn(),
       closeSettingsPage: mocks.closeSettingsPage,
-      showAiVaultSearch: mocks.showAiVaultSearch
+      showAiVaultSearch: mocks.showAiVaultSearch,
+      markFeatureTipsSeen: mocks.markFeatureTipsSeen
     })
 }))
 vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.web }))
@@ -159,7 +161,9 @@ it('turns search on from the switch alone, touching no transcript while it is of
   const confirm = vi.fn().mockResolvedValue(true)
   pane(false, confirm, save)
   expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false')
-  expect(screen.getByText(/Authenticated paired clients can query it and receive search results/)).toBeInTheDocument()
+  expect(
+    screen.getByText(/Authenticated paired clients can query it and receive search results/)
+  ).toBeInTheDocument()
   await act(async () => {
     await vi.advanceTimersByTimeAsync(60_000)
   })
@@ -169,6 +173,7 @@ it('turns search on from the switch alone, touching no transcript while it is of
   })
   expect(confirm).not.toHaveBeenCalled()
   expect(save).toHaveBeenCalledWith({ aiVaultSearch: { enabled: true, historyDays: null } })
+  expect(mocks.markFeatureTipsSeen).toHaveBeenCalledWith(['agent-session-search'])
 })
 
 it('sends the user to the sidebar panel with one click', async () => {
@@ -190,6 +195,7 @@ it('turns search off from the switch alone', async () => {
   })
   expect(confirm).not.toHaveBeenCalled()
   expect(save).toHaveBeenCalledWith({ aiVaultSearch: { enabled: false, historyDays: null } })
+  expect(mocks.markFeatureTipsSeen).toHaveBeenCalledWith(['agent-session-search'])
 })
 
 it('keeps the stored retention window without offering a control for it', async () => {

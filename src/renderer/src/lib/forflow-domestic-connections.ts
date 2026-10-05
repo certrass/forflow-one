@@ -34,7 +34,7 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
         'forflow.domestic.workbuddyDescription',
         'Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations.'
       ),
-      history: translate('forflow.domestic.historyUnavailable', 'History not connected yet'),
+      history: translate('forflow.domestic.codebuddyHistory', 'CodeBuddy CLI history and resume'),
       agentId: 'codebuddy',
       command: 'codebuddy',
       documentation: 'https://www.codebuddy.cn/docs/cli/installation'

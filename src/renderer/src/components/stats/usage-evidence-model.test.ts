@@ -5,6 +5,7 @@ import type { UsageOverviewInput } from './usage-overview-types'
 
 function evidenceFixture(): UsageOverviewInput {
   return {
+    muse: { scanState: null, summary: null, daily: [] },
     claude: { scanState: null, summary: null, daily: [] },
     opencode: { scanState: null, summary: null, daily: [] },
     codex: {
@@ -27,6 +28,7 @@ function evidenceFixture(): UsageOverviewInput {
         reasoningOutputTokens: 10,
         totalTokens: 150,
         estimatedCostUsd: 0.05,
+        hasUnpricedModels: true,
         costCoverage: { pricedRecords: 2, unpricedRecords: 3, unclassifiedRecords: 0 },
         topModel: 'test',
         topProject: 'folder',

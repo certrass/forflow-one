@@ -16,6 +16,7 @@ type ConcreteAgentKind = Exclude<AgentKind, 'other'>
 const TUI_AGENT_KIND_BY_AGENT = {
   claude: 'claude-code',
   'claude-agent-teams': 'claude-agent-teams',
+  codebuddy: 'codebuddy',
   openclaude: 'openclaude',
   codex: 'codex',
   autohand: 'autohand',
@@ -25,6 +26,7 @@ const TUI_AGENT_KIND_BY_AGENT = {
   pi: 'pi',
   omp: 'omp',
   'prime-agent': 'prime-agent',
+  qoder: 'qoder',
   gemini: 'gemini',
   antigravity: 'antigravity',
   aider: 'aider',
@@ -36,6 +38,7 @@ const TUI_AGENT_KIND_BY_AGENT = {
   aug: 'aug',
   cline: 'cline',
   codebuff: 'codebuff',
+  freebuff: 'freebuff',
   'command-code': 'command-code',
   continue: 'continue',
   cursor: 'cursor',
@@ -43,7 +46,6 @@ const TUI_AGENT_KIND_BY_AGENT = {
   kimi: 'kimi',
   'mistral-vibe': 'mistral-vibe',
   'qwen-code': 'qwen-code',
-  codebuddy: 'codebuddy',
   'qoder-cn': 'qoder-cn',
   rovo: 'rovo',
   hermes: 'hermes',
@@ -52,7 +54,10 @@ const TUI_AGENT_KIND_BY_AGENT = {
   grok: 'grok',
   devin: 'devin',
   ante: 'ante',
-  trae: 'trae'
+  trae: 'trae',
+  muse: 'muse',
+  zcode: 'zcode',
+  dsh: 'dsh'
 } satisfies Record<TuiAgent, ConcreteAgentKind>
 
 // Why: `satisfies Record<TuiAgent, …>` makes the lookup exhaustive at compile

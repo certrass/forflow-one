@@ -18,6 +18,7 @@ import type {
   OpenCodeUsageBreakdownKind,
   OpenCodeUsageSnapshot
 } from '../../shared/opencode-usage-types'
+import type { MuseUsageBreakdownKind, MuseUsageSnapshot } from '../../shared/muse-usage-types'
 import type {
   CodexRateLimitResetResult,
   RateLimitRuntimeTarget,
@@ -75,6 +76,8 @@ export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreak
 }
 
 export type OpenCodeUsageApi = UsageProviderApi<OpenCodeUsageSnapshot, OpenCodeUsageBreakdownKind>
+
+export type MuseUsageApi = UsageProviderApi<MuseUsageSnapshot, MuseUsageBreakdownKind>
 
 export type RateLimitsApi = {
   get: () => Promise<RateLimitState>

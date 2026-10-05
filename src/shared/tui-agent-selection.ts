@@ -16,6 +16,10 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'mimo-code',
   'ante',
   'trae',
+  'muse',
+  'dsh',
+  'qoder',
+  'zcode',
   'pi',
   'omp',
   'prime-agent',
@@ -31,6 +35,7 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'autohand',
   'cline',
   'codebuff',
+  'freebuff',
   'command-code',
   'continue',
   'cursor',
@@ -43,7 +48,8 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'rovo',
   'hermes',
   'devin',
-  'openclaw'
+  'openclaw',
+  'codebuddy'
 ] as const satisfies readonly TuiAgent[]
 
 const FORFLOW_AGENT_PRIORITY: readonly TuiAgent[] = [

@@ -30,9 +30,9 @@ describe('Forflow domestic connections', () => {
     expect(connections[0].agentId).toBeNull()
     expect(connections[1].agentId).toBe('codebuddy')
     expect(connections[2].agentId).toBe('qoder-cn')
-    for (const connection of connections) {
-      expect(AI_VAULT_AGENTS).not.toContain(connection.agentId)
-    }
+    expect(AI_VAULT_AGENTS).toContain('codebuddy')
+    expect(AI_VAULT_AGENTS).not.toContain('qoder-cn')
+    expect(AI_VAULT_AGENTS).not.toContain(null)
   })
 
   it('uses execution-host detection and preserves unknown and failed states', () => {

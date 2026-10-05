@@ -6,13 +6,13 @@ import {
   MessageSquare,
   RefreshCw,
   CircleCheck,
-  Folder,
-  CircleDot
+  Folder
 } from 'lucide-react'
 import type { CodexReview, CodexReviewVersion } from '../../../../shared/codex-review-types'
 import { codexReviewStatus } from '../../../../shared/codex-review-types'
 import type { JevReceipt } from '../../../../shared/jev-audit-types'
 import { Button } from '../ui/button'
+import { ButtonGroup } from '../ui/button-group'
 import { Badge } from '../ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { reviewCopy } from './review-copy'
@@ -56,15 +56,26 @@ export function CodexReviewHeader({
   const status = codexReviewStatus(review)
   const checks = summarizeReviewChecks(receipts, version.id)
   return (
-    <header className="space-y-5">
-      <Button variant="ghost" size="sm" disabled={busy} onClick={onBack}>
-        <ArrowLeft />
-        {version.workspace ? p.back : c.back}
-      </Button>
+    <header className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+        <Button variant="ghost" size="sm" disabled={busy} onClick={onBack}>
+          <ArrowLeft />
+          {version.workspace ? p.back : c.back}
+        </Button>
+        <Badge variant="outline">
+          {readOnly
+            ? c.historicBadge
+            : status === 'confirmed'
+              ? c.confirmed
+              : status === 'issues'
+                ? c.hasIssues
+                : c.reviewing}
+        </Badge>
+      </div>
       <h3 className="break-words text-xl font-semibold">
         {version.workspace?.target.name ?? version.usage?.title ?? review.sessionId ?? c.unknown}
       </h3>
-      <dl className="grid grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-4 text-sm">
+      <dl className="grid grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 text-sm">
         <dt className="flex items-center gap-2 text-muted-foreground">
           <Folder className="size-4" />
           {c.source}
@@ -126,21 +137,6 @@ export function CodexReviewHeader({
               : w.noChecks}
           </Button>
         </dd>
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <CircleDot className="size-4" />
-          {w.status}
-        </dt>
-        <dd>
-          <Badge variant="outline">
-            {readOnly
-              ? c.historicBadge
-              : status === 'confirmed'
-                ? c.confirmed
-                : status === 'issues'
-                  ? c.hasIssues
-                  : c.reviewing}
-          </Badge>
-        </dd>
       </dl>
       <p className="text-xs text-muted-foreground">
         {version.workspace
@@ -165,21 +161,23 @@ export function CodexReviewHeader({
             {w.start}
           </Button>
         )}
-        <Button size="sm" variant="outline" disabled={busy || readOnly} onClick={onReread}>
-          <RefreshCw />
-          {c.reread}
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={
-            busy || readOnly || focusChanged || status === 'confirmed' || status === 'issues'
-          }
-          onClick={onConfirm}
-        >
-          <Check />
-          {c.confirm}
-        </Button>
+        <ButtonGroup aria-label={c.version}>
+          <Button size="sm" variant="outline" disabled={busy || readOnly} onClick={onReread}>
+            <RefreshCw />
+            {c.reread}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={
+              busy || readOnly || focusChanged || status === 'confirmed' || status === 'issues'
+            }
+            onClick={onConfirm}
+          >
+            <Check />
+            {c.confirm}
+          </Button>
+        </ButtonGroup>
       </div>
       <p className="text-xs text-muted-foreground">
         {focusChanged ? w.focusChanged : c.confirmationMeaning}

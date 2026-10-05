@@ -1,9 +1,7 @@
 // @vitest-environment happy-dom
-
-import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
+import { act, cleanup, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { setRendererUiLanguage } from '@/i18n/i18n'
-import type { CliInstallStatus } from '../../../../shared/cli-install-types'
 import { useMobileEmulatorAgentSetupState } from './use-mobile-emulator-agent-setup-state'
 
 const mocks = vi.hoisted(() => ({
@@ -12,36 +10,17 @@ const mocks = vi.hoisted(() => ({
   message: vi.fn(),
   getStatus: vi.fn(),
   install: vi.fn(),
-  refresh: vi.fn().mockResolvedValue(false)
+  refresh: vi.fn(),
+  skill: { installed: true, loading: false, error: null }
 }))
 vi.mock('sonner', () => ({ toast: mocks }))
 vi.mock('@/hooks/useInstalledAgentSkills', () => ({
   GLOBAL_AGENT_SKILL_SOURCE_KINDS: ['global'],
-  useInstalledAgentSkill: () => ({
-    installed: false,
-    loading: false,
-    error: null,
-    refresh: mocks.refresh
-  })
+  useInstalledAgentSkill: () => ({ ...mocks.skill, refresh: mocks.refresh })
 }))
-
-const registered: CliInstallStatus = {
-  platform: 'darwin',
-  commandName: 'forflow',
-  commandPath: '/usr/local/bin/forflow',
-  pathDirectory: '/usr/local/bin',
-  pathConfigured: true,
-  launcherPath: '/app/forflow',
-  installMethod: 'symlink',
-  supported: true,
-  state: 'installed',
-  currentTarget: '/app/forflow',
-  unsupportedReason: null,
-  detail: null
-}
-
 beforeEach(async () => {
   vi.clearAllMocks()
+  mocks.refresh.mockResolvedValue(true)
   await setRendererUiLanguage('zh')
   Object.defineProperty(window, 'api', {
     configurable: true,
@@ -53,45 +32,29 @@ afterEach(async () => {
   await setRendererUiLanguage('en')
 })
 
-it('maps permission errors without raw IPC text and blocks registration while status is unknown', async () => {
-  mocks.getStatus.mockRejectedValue(
-    new Error("Error invoking remote method 'cli:getInstallStatus': EACCES: readlink /private/path")
-  )
+it('uses the installed skill with the managed terminal command without a second CLI registration', async () => {
   const { result } = renderHook(() => useMobileEmulatorAgentSetupState())
-  await waitFor(() => expect(result.current.cliLoading).toBe(false))
-  expect(mocks.error).toHaveBeenLastCalledWith(expect.stringContaining('没有权限读取命令路径'))
-  expect(mocks.error.mock.calls.flat().join()).not.toMatch(/EACCES|remote method|private\/path/)
-  expect(result.current.cliInstallStatus).toBeNull()
-  await act(async () => {
-    await result.current.handleEnableCli()
-  })
-  expect(mocks.install).not.toHaveBeenCalled()
-  expect(mocks.getStatus).toHaveBeenCalledTimes(1)
-  mocks.getStatus.mockResolvedValue(registered)
+  expect(result.current.setupComplete).toBe(true)
   await act(async () => {
     await result.current.recheckSetup()
   })
-  expect(result.current.cliEnabled).toBe(true)
+  expect(mocks.refresh).toHaveBeenCalledOnce()
+  expect(mocks.getStatus).not.toHaveBeenCalled()
+  expect(mocks.install).not.toHaveBeenCalled()
 })
 
-it('clears stale CLI readiness when rechecking fails, and recovers on retry', async () => {
-  mocks.getStatus.mockResolvedValue(registered)
+it('withholds stale readiness after a failed skill read and recovers on retry', async () => {
   const { result } = renderHook(() => useMobileEmulatorAgentSetupState())
-  await waitFor(() => expect(result.current.cliEnabled).toBe(true))
-  mocks.getStatus.mockRejectedValue(new Error('IPC unavailable'))
+  mocks.refresh.mockRejectedValueOnce(new Error('EACCES: /private/path'))
   await act(async () => {
     await result.current.recheckSetup()
   })
-  expect(result.current.cliInstallStatus).toBeNull()
-  expect(result.current.cliEnabled).toBe(false)
-  expect(mocks.error).toHaveBeenLastCalledWith(expect.stringContaining('无法读取命令注册状态'))
-  await act(async () => {
-    await result.current.handleEnableCli()
-  })
-  expect(mocks.install).not.toHaveBeenCalled()
-  mocks.getStatus.mockResolvedValue(registered)
+  expect(result.current.setupComplete).toBe(false)
+  expect(result.current.cliSkillError).toBe('无法读取技能状态，请重试。')
+  expect(mocks.error.mock.calls.flat().join()).not.toMatch(/EACCES|private\/path/)
   await act(async () => {
     await result.current.recheckSetup()
   })
-  expect(result.current.cliEnabled).toBe(true)
+  expect(result.current.setupComplete).toBe(true)
+  expect(result.current.cliSkillError).toBeNull()
 })
