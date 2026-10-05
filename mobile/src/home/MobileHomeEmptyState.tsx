@@ -4,16 +4,16 @@ import { colors, radii, spacing } from '../theme/mobile-theme'
 
 const ONBOARDING_STEPS = [
   {
-    title: 'Open Orca desktop',
-    desc: 'Go to Settings → Mobile and generate a pairing QR code.'
+    title: '打开 Forflow One 桌面端',
+    desc: '进入「设置 → 手机」，选择本地网络并生成配对码。'
   },
   {
-    title: 'Scan the code',
-    desc: 'Tap the button above to open the scanner. Point at the QR code on your screen.'
+    title: '扫描配对码',
+    desc: '使用上方按钮扫描电脑上的二维码，也可以粘贴配对码。'
   },
   {
-    title: "You're connected",
-    desc: 'Your desktop will appear here. Everything is encrypted end-to-end.'
+    title: '连接你的电脑',
+    desc: '配对后即可查看任务和会话，连接使用端到端加密。'
   }
 ]
 
@@ -36,18 +36,17 @@ export function MobileHomeEmptyState(props: {
       ]}
     >
       <View style={styles.emptyHero}>
-        <Text style={styles.emptyTitle}>Connect your desktop</Text>
+        <Text style={styles.emptyTitle}>连接你的 Forflow One</Text>
         <Text style={styles.emptyBody}>
-          Pair with Orca on your computer to check on your agents, jump into any terminal, and drive
-          work from your phone.
+          通过局域网或已有 VPN 连接电脑，查看任务、继续对话并操作终端，无需登录云账号。
         </Text>
         <Pressable style={styles.primaryButton} onPress={props.onPairDesktop}>
           <QrCode size={17} color={colors.bgBase} />
-          <Text style={styles.primaryButtonText}>Pair Desktop</Text>
+          <Text style={styles.primaryButtonText}>配对桌面端</Text>
         </Pressable>
       </View>
       <View style={styles.stepsSection}>
-        <Text style={styles.sectionHeading}>How it works</Text>
+        <Text style={styles.sectionHeading}>开始连接</Text>
         {ONBOARDING_STEPS.map((step, index) => (
           <View key={step.title} style={[styles.stepRow, index > 0 && styles.stepRowBorder]}>
             <View style={styles.stepNum}>

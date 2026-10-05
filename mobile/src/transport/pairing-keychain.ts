@@ -7,9 +7,9 @@ const BASE_OPTIONS: SecureStore.SecureStoreOptions = {
   keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
 }
 
-const GENERATION_STORAGE_KEY = 'orca:pairing-keychain-generation'
-const PRESENCE_STORAGE_PREFIX = 'orca:pairing-keychain-presence:'
-const SERVICE_PREFIX = 'orca.pairing.v'
+const GENERATION_STORAGE_KEY = 'forflow-one:pairing-keychain-generation'
+const PRESENCE_STORAGE_PREFIX = 'forflow-one:pairing-keychain-presence:'
+const SERVICE_PREFIX = 'cn.forflow.one.mobile.pairing.v'
 // Why: every generation adds one read probe per miss; bound pathological recovery cost.
 const MAX_GENERATION = 8
 
@@ -19,14 +19,14 @@ const MAX_GENERATION = 8
  * encryption reached expo's null-message GeneralSecurityException branch; a
  * fresh service selects a distinct alias and can recover an alias-local fault.
  */
-function serviceForGeneration(generation: number): string | undefined {
-  // Why: generation 0 must keep expo's default service so existing credentials stay readable.
-  return generation <= 0 ? undefined : `${SERVICE_PREFIX}${generation}`
+function serviceForGeneration(generation: number): string {
+  // Forflow never reads the upstream app's default keychain service.
+  return `${SERVICE_PREFIX}${generation}`
 }
 
 function optionsForGeneration(generation: number): SecureStore.SecureStoreOptions {
   const keychainService = serviceForGeneration(generation)
-  return keychainService ? { ...BASE_OPTIONS, keychainService } : BASE_OPTIONS
+  return { ...BASE_OPTIONS, keychainService }
 }
 
 type LoadedGeneration =

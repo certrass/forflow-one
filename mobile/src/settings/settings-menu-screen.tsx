@@ -24,16 +24,15 @@ export default function SettingsMenuScreen({
         spaced
         items={[
           {
-            label: 'Privacy Policy',
+            label: '账号与隐私',
             icon: Shield,
-            external: true,
-            onPress: () => void openExternal('https://www.onorca.dev/privacy')
+            onPress: () => push('/privacy')
           },
           {
-            label: 'Support',
+            label: '问题反馈',
             icon: LifeBuoy,
             external: true,
-            onPress: () => void openExternal('https://github.com/stablyai/orca/issues')
+            onPress: () => void openExternal('https://github.com/certrass/forflow-one/issues')
           }
         ]}
       />

@@ -1,5 +1,6 @@
 import type { BrowserScreencastFrame } from './browser-screencast-protocol'
 import { DirectRpcClient } from './direct-rpc-client'
+import { assertForflowDirectEndpoint } from '../forflow/mobile-connection-policy'
 import type { ConnectionLogSink, ConnectionState, ForegroundNudgeReason } from './types'
 import type { UnvalidatedRpcRequestPort } from './unvalidated-rpc-request-port'
 
@@ -65,6 +66,7 @@ export function connect(
   serverPublicKeyB64: string,
   optionsOrLegacy?: ConnectOptions | ((state: ConnectionState) => void)
 ): RpcClient {
+  assertForflowDirectEndpoint(endpoint)
   const options: ConnectOptions =
     typeof optionsOrLegacy === 'function'
       ? { onStateChange: optionsOrLegacy }

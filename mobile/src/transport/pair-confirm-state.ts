@@ -7,12 +7,12 @@ export type PairConfirmRouteState =
 
 export function resolvePairConfirmRouteState(code: string | undefined): PairConfirmRouteState {
   if (!code) {
-    return { kind: 'error', offer: null, errorMessage: 'Missing pairing code' }
+    return { kind: 'error', offer: null, errorMessage: '缺少配对码' }
   }
 
   const offer = parsePairingCode(code)
   if (!offer) {
-    return { kind: 'error', offer: null, errorMessage: 'Not a valid pairing code' }
+    return { kind: 'error', offer: null, errorMessage: '配对码无效' }
   }
 
   return { kind: 'ready', offer, errorMessage: '' }

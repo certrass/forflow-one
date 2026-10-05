@@ -27,7 +27,7 @@ import {
 } from '../src/onboarding/mobile-onboarding-plan'
 import { pairScanStyles as styles } from '../src/pair-scan-styles'
 
-// Why: see pair-confirm.tsx — cap initial-pair "Connecting…" so a broken
+// Why: see pair-confirm.tsx — cap initial-pair "正在连接…" so a broken
 // route surfaces as a real error with the log visible instead of a
 // silent infinite spinner.
 const PAIRING_OVERALL_TIMEOUT_MS = 25_000
@@ -82,7 +82,7 @@ export default function PairScanScreen() {
       const offer = decodePairingUrl(data)
       if (!offer) {
         setStatus('error')
-        setErrorMessage('Not a valid Orca QR code')
+        setErrorMessage('不是有效的 Forflow One 配对码')
         processingRef.current = false
         return
       }
@@ -102,7 +102,7 @@ export default function PairScanScreen() {
     const offer = parsePairingCode(input)
     if (!offer) {
       setStatus('error')
-      setErrorMessage('Not a valid pairing code — copy it from your computer and paste again')
+      setErrorMessage('配对码无效，请从电脑重新复制后粘贴')
       processingRef.current = false
       return
     }
@@ -177,8 +177,8 @@ export default function PairScanScreen() {
       setStatus('error')
       setErrorMessage(
         timedOut
-          ? `Couldn't connect within ${PAIRING_OVERALL_TIMEOUT_MS / 1000}s — see log below for where it stalled`
-          : `Pairing failed: ${err instanceof Error ? err.message : String(err)}`
+          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接，请检查网络和下方日志`
+          : `配对失败：${err instanceof Error ? err.message : String(err)}`
       )
       processingRef.current = false
     }
@@ -222,36 +222,32 @@ export default function PairScanScreen() {
           <ChevronLeft size={22} color={colors.textSecondary} />
         </Pressable>
         <View style={styles.centered}>
-          <Text style={styles.title}>
-            {canAskAgain ? 'Pair with desktop' : 'Camera Access Disabled'}
-          </Text>
+          <Text style={styles.title}>{canAskAgain ? '配对桌面端' : '相机访问已关闭'}</Text>
           <Text style={styles.subtitle}>
             {canAskAgain
-              ? 'Scan the QR code from Orca on your desktop, or paste the pairing code instead.'
-              : 'Enable camera access in Settings, or paste the pairing code instead.'}
+              ? '扫描 Forflow One 桌面端的配对码，或直接粘贴配对码。'
+              : '请在系统设置中允许相机访问，也可以直接粘贴配对码。'}
           </Text>
           <Pressable
             style={styles.primaryButton}
             onPress={canAskAgain ? requestPermission : () => void Linking.openSettings()}
           >
             {canAskAgain && <QrCode size={16} color={colors.bgBase} />}
-            <Text style={styles.primaryButtonText}>
-              {canAskAgain ? 'Continue' : 'Open Settings'}
-            </Text>
+            <Text style={styles.primaryButtonText}>{canAskAgain ? '继续' : '打开设置'}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.pasteButton, pressed && styles.pasteButtonPressed]}
             onPress={() => setPasteVisible(true)}
           >
             <ClipboardIcon size={16} color={colors.textSecondary} />
-            <Text style={styles.pasteButtonText}>Paste code instead</Text>
+            <Text style={styles.pasteButtonText}>粘贴配对码</Text>
           </Pressable>
         </View>
         <TextInputModal
           visible={pasteVisible}
-          title="Paste pairing code"
-          message="Copy the code shown under the QR on your computer."
-          placeholder="orca://pair?code=... or paste the code"
+          title="粘贴配对码"
+          message="复制电脑端二维码下方的配对码。"
+          placeholder="forflow-one-mobile://pair?code=... 或粘贴配对码"
           onSubmit={handlePasteSubmit}
           onCancel={() => setPasteVisible(false)}
         />
@@ -266,9 +262,9 @@ export default function PairScanScreen() {
       </Pressable>
 
       <View style={styles.steps}>
-        <Step number={1} text="Open Orca on your computer" />
-        <Step number={2} text="Go to Settings → Mobile" />
-        <Step number={3} text="Scan the QR code" />
+        <Step number={1} text="在电脑上打开 Forflow One" />
+        <Step number={2} text="进入「设置 → 手机」，选择本地网络" />
+        <Step number={3} text="扫描配对码" />
       </View>
 
       {status === 'scanning' && (
@@ -302,7 +298,7 @@ export default function PairScanScreen() {
             onPress={() => setPasteVisible(true)}
           >
             <ClipboardIcon size={16} color={colors.textSecondary} />
-            <Text style={styles.pasteButtonText}>Or paste pairing code</Text>
+            <Text style={styles.pasteButtonText}>或粘贴配对码</Text>
           </Pressable>
         </>
       )}
@@ -310,9 +306,9 @@ export default function PairScanScreen() {
       {status === 'connecting' && (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.textSecondary} />
-          <Text style={styles.connectingText}>Connecting…</Text>
+          <Text style={styles.connectingText}>正在连接…</Text>
           <View style={styles.logSlot}>
-            <ConnectionLog entries={logs} title="Pairing log" />
+            <ConnectionLog entries={logs} title="配对日志" />
           </View>
         </View>
       )}
@@ -322,12 +318,12 @@ export default function PairScanScreen() {
           <Text style={styles.errorText}>{errorMessage}</Text>
           {logs.length > 0 && (
             <View style={styles.logSlot}>
-              <ConnectionLog entries={logs} title="Pairing log" />
+              <ConnectionLog entries={logs} title="配对日志" />
             </View>
           )}
           <View style={styles.errorActions}>
             <Pressable style={styles.primaryButton} onPress={retry}>
-              <Text style={styles.primaryButtonText}>Try Again</Text>
+              <Text style={styles.primaryButtonText}>重试</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [
@@ -339,7 +335,7 @@ export default function PairScanScreen() {
                 setPasteVisible(true)
               }}
             >
-              <Text style={styles.secondaryButtonText}>Paste code instead</Text>
+              <Text style={styles.secondaryButtonText}>粘贴配对码</Text>
             </Pressable>
           </View>
         </View>
@@ -347,9 +343,9 @@ export default function PairScanScreen() {
 
       <TextInputModal
         visible={pasteVisible}
-        title="Paste pairing code"
-        message="Copy the code shown under the QR on your computer."
-        placeholder="orca://pair?code=... or paste the code"
+        title="粘贴配对码"
+        message="复制电脑端二维码下方的配对码。"
+        placeholder="forflow-one-mobile://pair?code=... 或粘贴配对码"
         onSubmit={handlePasteSubmit}
         onCancel={() => setPasteVisible(false)}
       />

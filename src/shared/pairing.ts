@@ -7,6 +7,7 @@ import {
   PAIRING_CODE_MAX_CHARACTERS,
   PAIRING_INPUT_MAX_CHARACTERS
 } from './mobile-pairing-protocol-limits'
+import { isForflowBuild } from './product-branding'
 
 export { PAIRING_OFFER_VERSION, PairingOfferSchema }
 export type { PairingOffer }
@@ -23,7 +24,8 @@ export function encodePairingOffer(offer: PairingOffer): string {
   }
   // Why: Android camera intents and Expo Router preserve query params more
   // reliably than URL fragments when launching a custom-scheme app.
-  return `orca://pair?code=${base64url}`
+  const scheme = isForflowBuild() && offer.scope === 'mobile' ? 'forflow-one-mobile' : 'orca'
+  return `${scheme}://pair?code=${base64url}`
 }
 
 export function decodePairingOffer(url: string): PairingOffer {
@@ -46,7 +48,7 @@ function extractPairingCodeFromUrl(url: string): string | null {
   }
   // Why: prefix checks accepted routes like `orca://pairing?...`; only the
   // pairing deep-link host may carry runtime auth material.
-  if (parsed.protocol !== 'orca:' || parsed.hostname !== 'pair') {
+  if (!['orca:', 'forflow-one-mobile:'].includes(parsed.protocol) || parsed.hostname !== 'pair') {
     return null
   }
   if (parsed.pathname !== '' && parsed.pathname !== '/') {
@@ -71,7 +73,7 @@ export function parsePairingCode(input: string): PairingOffer | null {
     return null
   }
   try {
-    if (trimmed.toLowerCase().startsWith('orca://')) {
+    if (/^(?:orca|forflow-one-mobile):\/\//i.test(trimmed)) {
       return decodePairingOffer(trimmed)
     }
     return decodePairingBase64(trimmed)

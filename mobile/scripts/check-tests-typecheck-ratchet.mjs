@@ -23,6 +23,10 @@ const ERROR_LINE = /^(\S.*?)\(\d+,\d+\): error TS\d+:/
 // disappears from this gate silently.
 export const TESTS_OUTSIDE_PROGRAM = new Map([
   [
+    'src/forflow/desktop-connection.test.ts',
+    'Node-side: starts the real desktop runtime; mobile Vitest covers encrypted pairing and revocation'
+  ],
+  [
     'scripts/rpc-recording-pin-guard.test.ts',
     'Node-side: imports the desktop main process, checked against @types/node rather than RN libs'
   ],

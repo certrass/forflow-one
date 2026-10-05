@@ -84,3 +84,12 @@ it('replaces an in-flight registration with the latest away and sound preference
   expect(calls.some((call) => call.method === 'notifications.unregisterPush')).toBe(true)
   detach()
 })
+
+// Exercise the retained upstream algorithm; Forflow defaults are tested in mobile-cloud-boundary.test.ts.
+vi.mock('../forflow/mobile-connection-policy', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../forflow/mobile-connection-policy')>()),
+  FORFLOW_MOBILE_REMOTE_PUSH_ENABLED: true,
+  FORFLOW_MOBILE_RELAY_ENABLED: true,
+  FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED: true,
+  assertForflowPairingOffer: () => {}
+}))

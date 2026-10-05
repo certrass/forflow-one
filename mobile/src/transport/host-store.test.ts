@@ -53,8 +53,8 @@ import {
 import { resetMobileRelayHostOverlayStoreForTests } from './mobile-relay-host-overlay-store'
 import { writeMobileRelayCredentialBundle } from './mobile-relay-credential-bundle'
 
-const HOSTS_STORAGE_KEY = 'orca:hosts'
-const OVERLAY_STORAGE_KEY = 'orca:mobile-relay:host-overlays:v2'
+const HOSTS_STORAGE_KEY = 'forflow-one:hosts'
+const OVERLAY_STORAGE_KEY = 'forflow-one:mobile-relay:host-overlays:v2'
 const HOST_ONE = {
   id: 'host-1',
   name: 'Host 1',
@@ -327,7 +327,7 @@ describe('host-store list mutations', () => {
     const cleanup = staleCleanup(HOST_ONE.id)
     await vi.waitFor(() => {
       expect(secureStoreMock.deleteItemAsync).toHaveBeenCalledWith(
-        'orca.host-token.host-1',
+        'forflow-one.host-token.host-1',
         expect.anything()
       )
     })
@@ -422,7 +422,7 @@ describe('host-store list mutations', () => {
     expect(secureStoreMock.deleteItemAsync).not.toHaveBeenCalled()
   })
 
-  it('keeps the normal iOS save on the existing default keychain service', async () => {
+  it('keeps the normal iOS save in the independent Forflow keychain', async () => {
     await saveHost({
       id: 'host-new',
       name: 'New Host',
@@ -433,11 +433,9 @@ describe('host-store list mutations', () => {
     })
 
     expect(secureStoreMock.setItemAsync).toHaveBeenCalledWith(
-      'orca.host-token.host-new',
+      'forflow-one.host-token.host-new',
       'new-token',
-      {
-        keychainAccessible: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY'
-      }
+      expect.objectContaining({ keychainService: 'cn.forflow.one.mobile.pairing.v0' })
     )
   })
 
@@ -501,7 +499,7 @@ describe('host-store list mutations', () => {
     await cleanup(HOST_ONE.id)
 
     expect(secureStoreMock.deleteItemAsync).toHaveBeenCalledWith(
-      'orca.host-token.host-1',
+      'forflow-one.host-token.host-1',
       expect.anything()
     )
   })
@@ -830,9 +828,9 @@ describe('host-store pairing save after an Android encryption rejection', () => 
   }
   // Why: the verbatim Android rejection from #6600 — expo maps a null-message GeneralSecurityException to this.
   const ENCRYPT_REJECTION = new Error(
-    "Could not encrypt the value for key 'orca.host-token.host-1782629088232' under keychain 'key_v1'. Caused by: unknown"
+    "Could not encrypt the value for key 'forflow-one.host-token.host-1782629088232' under keychain 'key_v1'. Caused by: unknown"
   )
-  const GENERATION_KEY = 'orca:pairing-keychain-generation'
+  const GENERATION_KEY = 'forflow-one:pairing-keychain-generation'
   let storedHostsRaw: string
   let storedGenerationRaw: string | null
 
@@ -872,7 +870,7 @@ describe('host-store pairing save after an Android encryption rejection', () => 
     // Why: simulate the unverified alias-local case; no affected physical device was available.
     secureStoreMock.setItemAsync.mockImplementation(
       async (_key: string, value: string, options?: { keychainService?: string }) => {
-        if (options?.keychainService === undefined) {
+        if (options?.keychainService === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
         written.set(options.keychainService, value)
@@ -881,7 +879,7 @@ describe('host-store pairing save after an Android encryption rejection', () => 
 
     await expect(saveHost(NEW_HOST)).resolves.toBeUndefined()
 
-    expect(written.get('orca.pairing.v1')).toBe('device-token')
+    expect(written.get('cn.forflow.one.mobile.pairing.v1')).toBe('device-token')
     expect(JSON.parse(storedHostsRaw)).toEqual([
       {
         id: NEW_HOST.id,
@@ -903,7 +901,7 @@ describe('host-store pairing save after an Android encryption rejection', () => 
     const written = new Map<string | undefined, string>()
     secureStoreMock.setItemAsync.mockImplementation(
       async (_key: string, value: string, options?: { keychainService?: string }) => {
-        if (options?.keychainService === undefined) {
+        if (options?.keychainService === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
         written.set(options.keychainService, value)

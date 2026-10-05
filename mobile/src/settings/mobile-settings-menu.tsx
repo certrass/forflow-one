@@ -7,10 +7,12 @@ import { colors, spacing, typography } from '../theme/mobile-theme'
 
 export function MobileSettingsFrame({
   children,
-  onBack
+  onBack,
+  title = '设置'
 }: {
   children: ReactNode
   onBack?: () => void
+  title?: string
 }) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -19,13 +21,13 @@ export function MobileSettingsFrame({
       <View style={styles.topRow}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="返回"
           style={styles.backButton}
           onPress={onBack ?? (() => router.back())}
         >
           <ChevronLeft size={22} color={colors.textSecondary} />
         </Pressable>
-        <Text style={styles.heading}>Settings</Text>
+        <Text style={styles.heading}>{title}</Text>
       </View>
       <ScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}

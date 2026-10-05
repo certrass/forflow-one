@@ -11,6 +11,7 @@ import type {
 } from '../../../../shared/mobile-relay-status'
 import type { MobilePairingConnectionMode } from '../../../../shared/mobile-pairing-connection-mode'
 import { MobilePairingPathOption } from './MobilePairingPathOption'
+import { isForflowBuild } from '../../../../shared/product-branding'
 
 function relayStatusLabel(status: MobileRelayStatus): string {
   if (status === 'registered') {
@@ -50,20 +51,35 @@ function relayCellLabel(cellUrl: string): string | null {
   }
 }
 
-export function MobilePairingConnectionOptions({
+type MobilePairingConnectionOptionsProps = {
+  value: MobilePairingConnectionMode
+  onChange: (value: MobilePairingConnectionMode) => void
+  compact?: boolean
+  relayMintFailed?: boolean
+  relayMintRetrying?: boolean
+}
+
+export function MobilePairingConnectionOptions(
+  props: MobilePairingConnectionOptionsProps
+): React.JSX.Element {
+  if (isForflowBuild()) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        手机通过本地网络或已有 VPN
+        直连此电脑，无需登录云账号。请保持桌面端运行，并确认手机可以访问所选地址。
+      </p>
+    )
+  }
+  return <UpstreamMobilePairingConnectionOptions {...props} />
+}
+
+function UpstreamMobilePairingConnectionOptions({
   value,
   onChange,
   compact = false,
   relayMintFailed = false,
   relayMintRetrying = false
-}: {
-  value: MobilePairingConnectionMode
-  onChange: (value: MobilePairingConnectionMode) => void
-  compact?: boolean
-  /** When true, show Unavailable on the Relay row (mint failed; no QR). */
-  relayMintFailed?: boolean
-  relayMintRetrying?: boolean
-}): React.JSX.Element {
+}: MobilePairingConnectionOptionsProps): React.JSX.Element {
   const authStatus = useAppStore((state) => state.orcaProfileAuthStatus)
   const connect = useAppStore((state) => state.connectCurrentOrcaProfile)
   const [relayStatus, setRelayStatus] = useState<MobileRelayStatus>('offline')

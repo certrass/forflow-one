@@ -1,4 +1,5 @@
 import { app, ipcMain, shell, type IpcMainInvokeEvent } from 'electron'
+import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 import type { RuntimeAccessGrant } from '../../shared/runtime-access-grants'
 import type { MobilePairingConnectionMode } from '../../shared/mobile-pairing-connection-mode'
 import { classifyRemotePairingHostname } from '../../shared/remote-pairing-address'
@@ -90,11 +91,12 @@ export function registerMobileHandlers(
       // embed in the QR code. This supports overlay networks (Tailscale,
       // ZeroTier) where the default LAN IP isn't reachable from the phone.
       const ip = args?.address ?? (await getDefaultPairingAddress(getDefaultRouteInterfaceNames))
+      const connectionMode = isForflowPrivateDeployment() ? 'local-only' : args?.connectionMode
       // Why: the local address is optional under Relay — the QR carries the relay invite, so a host
       // with nothing auto-advertisable (only container bridges, or no interface at all) still pairs.
       // The offer's endpoint then falls back to loopback, which is the phone's own device: the direct
       // candidate loses the race by construction. LAN-only has no relay to fall back on, so it fails closed.
-      if (!ip && args?.connectionMode === 'local-only') {
+      if (!ip && connectionMode === 'local-only') {
         return {
           available: false as const,
           reason: 'invalid_advertised_endpoint',
@@ -112,7 +114,7 @@ export function registerMobileHandlers(
       // one so the new QR carries a different credential.
       const offer = await rpcServer.createMobilePairingOffer({
         address: ip,
-        connectionMode: args?.connectionMode,
+        connectionMode,
         rotate: args?.rotate,
         name: `Mobile ${new Date().toLocaleDateString()}`
       })

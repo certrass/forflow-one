@@ -22,6 +22,20 @@ describe('pairing offer', () => {
     expect(decoded).toEqual(offer)
   })
 
+  it('uses the Forflow mobile scheme while preserving remote runtime pairing links', () => {
+    vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
+    try {
+      const mobileOffer = { ...offer, scope: 'mobile' as const }
+      const mobileUrl = encodePairingOffer(mobileOffer)
+      expect(mobileUrl).toMatch(/^forflow-one-mobile:\/\/pair\?code=/)
+      expect(decodePairingOffer(mobileUrl)).toEqual(mobileOffer)
+      expect(encodePairingOffer({ ...offer, scope: 'runtime' })).toMatch(/^orca:\/\/pair\?code=/)
+      expect(encodePairingOffer(offer)).toMatch(/^orca:\/\/pair\?code=/)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('decodes in browser runtimes without Buffer', () => {
     const url = encodePairingOffer(offer)
     const nodeBuffer = Buffer

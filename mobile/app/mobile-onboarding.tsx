@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Animated, BackHandler, Text, useWindowDimensions, View } from 'react-native'
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { Redirect, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { FORFLOW_MOBILE_REMOTE_PUSH_ENABLED } from '../src/forflow/mobile-connection-policy'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { OrcaLogo } from '../src/components/OrcaLogo'
+import { ForflowLogo } from '../src/components/ForflowLogo'
 import { ensureNotificationPermissions } from '../src/notifications/mobile-notifications'
 import {
   MobileOnboardingPage,
@@ -26,7 +27,13 @@ export default function MobileOnboardingScreen() {
     steps?: string | string[]
   }>()
   const hostId = firstParam(params.hostId)
-  const rawSteps = firstParam(params.steps)
+  const steps = parseMobileOnboardingSteps(firstParam(params.steps)).filter(
+    (step) => FORFLOW_MOBILE_REMOTE_PUSH_ENABLED || step !== 'notifications'
+  )
+  if (steps.length === 0) {
+    return <Redirect href={hostId ? `/h/${hostId}` : '/'} />
+  }
+  const rawSteps = steps.join(',')
 
   return (
     <MobileOnboardingFlow
@@ -137,8 +144,8 @@ function MobileOnboardingFlow({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.brandRow}>
-        <OrcaLogo size={22} />
-        <Text style={styles.brandName}>Orca</Text>
+        <ForflowLogo size={22} />
+        <Text style={styles.brandName}>Forflow One</Text>
         {steps.length > 1 ? (
           <View
             accessible

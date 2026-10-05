@@ -1,22 +1,21 @@
-import { NotificationDisplayTest } from '../src/settings/notification-display-test'
-import { NativeNotificationDeliverySettings } from '../src/settings/native-notification-delivery-settings'
-import { useRouter } from 'expo-router'
-import NotificationsScreen from '../src/settings/notification-settings-screen'
-import { nativeNotificationSettingsOperations } from '../src/settings/native-notification-settings-operations'
+import { StyleSheet, Text } from 'react-native'
+import { MobileSettingsFrame } from '../src/settings/mobile-settings-menu'
+import { colors, spacing, typography } from '../src/theme/mobile-theme'
 export default function NativeNotificationsRoute() {
-  const router = useRouter()
   return (
-    <NotificationsScreen
-      operations={nativeNotificationSettingsOperations}
-      onBack={() => router.back()}
-      description="Get agent alerts even when the app is closed. Delivered through Orca’s push service and Apple or Google."
-    >
-      {(enabled) => (
-        <>
-          <NativeNotificationDeliverySettings enabled={enabled} />
-          <NotificationDisplayTest onTroubleshoot={() => router.push('/troubleshoot')} />
-        </>
-      )}
-    </NotificationsScreen>
+    <MobileSettingsFrame title="通知">
+      <Text style={styles.body}>
+        当前版本通过桌面直连查看任务状态，尚未配置 Forflow One 云推送。请打开应用查看任务进展。
+      </Text>
+    </MobileSettingsFrame>
   )
 }
+
+const styles = StyleSheet.create({
+  body: {
+    color: colors.textSecondary,
+    fontSize: typography.bodySize,
+    lineHeight: 22,
+    marginBottom: spacing.lg
+  }
+})

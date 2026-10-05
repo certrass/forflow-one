@@ -1,4 +1,5 @@
 import { Platform } from 'react-native'
+import { FORFLOW_MOBILE_RELAY_ENABLED } from '../forflow/mobile-connection-policy'
 import type {
   DeviceCredentialInstalled,
   MobileRelayEndpoint,
@@ -69,6 +70,9 @@ let recoveryPromise: Promise<MobileRelayPairingRecoveryResult> | null = null
 export function recoverMobileRelayPairing(
   overrides: Partial<RecoveryDependencies> = {}
 ): Promise<MobileRelayPairingRecoveryResult> {
+  if (!FORFLOW_MOBILE_RELAY_ENABLED) {
+    return Promise.resolve('none')
+  }
   if (recoveryPromise) {
     return recoveryPromise
   }

@@ -193,7 +193,7 @@ describe('MobileHostCard', () => {
 
     const navigationButton = renderer.root.findAllByType('Pressable')[0]
     expect(navigationButton.props.accessibilityLabel).toBe(
-      "Open Desk, Can't reach desktop, Update desktop Orca and sign in to connect from anywhere"
+      "Open Desk, Can't reach desktop, 请确认 Forflow One 桌面端已打开，且手机与电脑处于同一局域网或 VPN。"
     )
   })
 

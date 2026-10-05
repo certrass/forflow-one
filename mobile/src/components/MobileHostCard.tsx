@@ -44,7 +44,7 @@ export function MobileHostCard(props: {
       : null
   const discoveryHint =
     props.verdict.kind === 'unreachable' && !props.host.relay
-      ? 'Update desktop Orca and sign in to connect from anywhere'
+      ? '请确认 Forflow One 桌面端已打开，且手机与电脑处于同一局域网或 VPN。'
       : null
   const credentialHint = credentialMissing
     ? 'Tap to re-pair with your desktop'

@@ -1,6 +1,6 @@
 {
-  "name": "orca-mobile",
-  "version": "0.0.1",
+  "name": "forflow-one-mobile",
+  "version": "0.1.0",
   "private": true,
   "main": "index.js",
   "scripts": {

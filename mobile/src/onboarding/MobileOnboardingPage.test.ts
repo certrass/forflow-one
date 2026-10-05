@@ -41,7 +41,7 @@ vi.mock('lucide-react-native', () => ({
   MessageSquare: 'MessageSquare'
 }))
 
-vi.mock('../components/OrcaLogo', () => ({ OrcaLogo: 'OrcaLogo' }))
+vi.mock('../components/ForflowLogo', () => ({ ForflowLogo: 'ForflowLogo' }))
 
 describe('MobileOnboardingPage', () => {
   let renderer: ReactTestRenderer | null = null
@@ -97,7 +97,7 @@ describe('MobileOnboardingPage', () => {
   it('renders the session choices and sends exactly one selected view', async () => {
     const callbacks = await renderPage('session-view')
 
-    act(() => button('Open sessions in Chat UI').props.onPress())
+    act(() => button('使用聊天界面打开会话').props.onPress())
     expect(callbacks.onSessionChoice).toHaveBeenCalledWith('chat')
     expect(callbacks.onNotificationChoice).not.toHaveBeenCalled()
   })

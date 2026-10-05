@@ -40,7 +40,7 @@ describe('resolvePairConfirmRouteState', () => {
     expect(resolvePairConfirmRouteState(undefined)).toEqual({
       kind: 'error',
       offer: null,
-      errorMessage: 'Missing pairing code'
+      errorMessage: '缺少配对码'
     })
   })
 
@@ -48,7 +48,7 @@ describe('resolvePairConfirmRouteState', () => {
     expect(resolvePairConfirmRouteState('not a pairing code')).toEqual({
       kind: 'error',
       offer: null,
-      errorMessage: 'Not a valid pairing code'
+      errorMessage: '配对码无效'
     })
   })
 })

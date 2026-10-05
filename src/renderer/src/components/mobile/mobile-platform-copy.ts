@@ -1,5 +1,6 @@
 import type { Platform } from './MobileHero'
 import { translate } from '@/i18n/i18n'
+import { isForflowBuild } from '../../../../shared/product-branding'
 
 // iOS ships two App Store tracks: the public App Store build (slower, ~weekly)
 // and the TestFlight preview build (daily). Android only ships one APK track.
@@ -26,6 +27,9 @@ const ANDROID_COPY: InstallCopy = {
 }
 
 export function getInstallCopy(platform: Platform, iosChannel: IosChannel): InstallCopy {
+  if (isForflowBuild()) {
+    return { ctaLabel: '请使用管理员提供的 Forflow One 手机安装包', url: '' }
+  }
   return platform === 'ios' ? IOS_CHANNEL_COPY[iosChannel] : ANDROID_COPY
 }
 

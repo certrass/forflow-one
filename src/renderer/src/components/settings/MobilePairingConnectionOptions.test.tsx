@@ -77,7 +77,19 @@ describe('MobilePairingConnectionOptions', () => {
     }
   })
 
-  afterEach(() => cleanup())
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+  })
+
+  it('shows private direct pairing without reading or offering the upstream account', () => {
+    vi.stubGlobal('FORFLOW_BRAND_ENABLED', true)
+    render(<MobilePairingConnectionOptions value="automatic" onChange={vi.fn()} />)
+    expect(screen.getByText(/通过本地网络或已有 VPN/)).toBeVisible()
+    expect(screen.queryByRole('button', { name: /Sign in/ })).not.toBeInTheDocument()
+    expect(fetchAuthStatus).not.toHaveBeenCalled()
+    expect(connect).not.toHaveBeenCalled()
+  })
 
   it('shows Sign in directly under Orca Relay, above LAN', async () => {
     const user = userEvent.setup()

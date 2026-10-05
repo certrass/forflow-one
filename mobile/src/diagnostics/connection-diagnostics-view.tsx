@@ -1,3 +1,4 @@
+import { FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED } from '../forflow/mobile-connection-policy'
 import type { ReactNode } from 'react'
 import { View, Text, Pressable } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -73,34 +74,35 @@ export function ConnectionDiagnosticsView({
               <Text style={styles.diagnosisHeading}>What this suggests</Text>
               <Text style={styles.diagnosisText}>{diagnosis.likelyCause}</Text>
               <Text style={styles.diagnosisNext}>{diagnosis.nextStep}</Text>
-              {diagnosis.reportability === 'orca-relay' && (
-                <>
-                  <Text style={styles.privacyHint}>
-                    Sends a size-limited redacted report including host name, endpoint, versions,
-                    connection state, and events—never terminal contents or credentials.
-                  </Text>
-                  <Pressable
-                    style={styles.sendButton}
-                    onPress={() => void sendDiagnostics()}
-                    disabled={submissionState === 'sending'}
-                  >
-                    {submissionState === 'sent' ? (
-                      <Check size={14} color={colors.statusGreen} />
-                    ) : (
-                      <Send size={14} color={colors.textPrimary} />
-                    )}
-                    <Text style={styles.sendButtonText}>
-                      {submissionState === 'sending'
-                        ? 'Sending…'
-                        : submissionState === 'sent'
-                          ? 'Diagnostics sent'
-                          : submissionState === 'failed'
-                            ? 'Retry sending'
-                            : 'Send diagnostics to Orca'}
+              {FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED &&
+                diagnosis.reportability === 'orca-relay' && (
+                  <>
+                    <Text style={styles.privacyHint}>
+                      Sends a size-limited redacted report including host name, endpoint, versions,
+                      connection state, and events—never terminal contents or credentials.
                     </Text>
-                  </Pressable>
-                </>
-              )}
+                    <Pressable
+                      style={styles.sendButton}
+                      onPress={() => void sendDiagnostics()}
+                      disabled={submissionState === 'sending'}
+                    >
+                      {submissionState === 'sent' ? (
+                        <Check size={14} color={colors.statusGreen} />
+                      ) : (
+                        <Send size={14} color={colors.textPrimary} />
+                      )}
+                      <Text style={styles.sendButtonText}>
+                        {submissionState === 'sending'
+                          ? 'Sending…'
+                          : submissionState === 'sent'
+                            ? 'Diagnostics sent'
+                            : submissionState === 'failed'
+                              ? 'Retry sending'
+                              : 'Send diagnostics to Orca'}
+                      </Text>
+                    </Pressable>
+                  </>
+                )}
             </View>
           )}
           {entries.length > 0 ? (

@@ -40,7 +40,7 @@ vi.mock('expo-router', () => ({
 }))
 
 vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }))
-vi.mock('../components/OrcaLogo', () => ({ OrcaLogo: 'OrcaLogo' }))
+vi.mock('../components/ForflowLogo', () => ({ ForflowLogo: 'ForflowLogo' }))
 vi.mock('./MobileOnboardingPage', () => ({ MobileOnboardingPage: 'MobileOnboardingPage' }))
 vi.mock('../notifications/mobile-notifications', () => ({
   ensureNotificationPermissions: mocks.ensureNotificationPermissions
@@ -187,3 +187,6 @@ describe('MobileOnboardingScreen', () => {
     expect(pages()[1].props).toMatchObject({ active: true, busyChoice: null })
   })
 })
+
+// Keep carousel coverage for the optional notification step; default suppression has its own test.
+vi.mock('../forflow/mobile-connection-policy', () => ({ FORFLOW_MOBILE_REMOTE_PUSH_ENABLED: true }))

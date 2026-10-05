@@ -1,9 +1,11 @@
 import { PairingOfferSchema, type PairingOffer } from './types'
+import { Buffer } from 'buffer'
+import {
+  PAIRING_CODE_MAX_CHARACTERS,
+  PAIRING_INPUT_MAX_CHARACTERS
+} from '../../../src/shared/mobile-pairing-protocol-limits'
 
-// Why: this file mirrors src/shared/pairing.ts (which is covered by CI
-// vitest) but uses atob/btoa because Metro/Hermes don't ship Node's
-// Buffer. Keep the parsing semantics in sync — when one changes, update
-// the other.
+// The buffer polyfill preserves UTF-8 names in desktop pairing codes on Hermes.
 
 export function decodePairingUrl(url: string): PairingOffer | null {
   try {
@@ -21,8 +23,11 @@ export function decodePairingUrl(url: string): PairingOffer | null {
 // extraction here makes QR scan, paste, and external deep-link flows
 // accept the same URL shapes.
 export function extractPairingCodeFromUrl(url: string): string | null {
+  if (url.length > PAIRING_INPUT_MAX_CHARACTERS) {
+    return null
+  }
   const trimmed = url.trim()
-  const match = /^orca:\/\/([^/?#]*)([^?#]*)?/i.exec(trimmed)
+  const match = /^(?:orca|forflow-one-mobile):\/\/([^/?#]*)([^?#]*)?/i.exec(trimmed)
   if (!match) {
     return null
   }
@@ -53,12 +58,15 @@ export function extractPairingCodeFromUrl(url: string): string | null {
 // string so the paste-pair flow can take whichever the user actually
 // copied from desktop.
 export function parsePairingCode(input: string): PairingOffer | null {
+  if (input.length > PAIRING_INPUT_MAX_CHARACTERS) {
+    return null
+  }
   const trimmed = input.trim()
   if (!trimmed) {
     return null
   }
   try {
-    if (/^orca:\/\//i.test(trimmed)) {
+    if (/^(?:orca|forflow-one-mobile):\/\//i.test(trimmed)) {
       return decodePairingUrl(trimmed)
     }
     return decodePairingBase64(trimmed)
@@ -68,10 +76,17 @@ export function parsePairingCode(input: string): PairingOffer | null {
 }
 
 function decodePairingBase64(base64url: string): PairingOffer {
+  if (
+    base64url.length === 0 ||
+    base64url.length > PAIRING_CODE_MAX_CHARACTERS ||
+    !/^[A-Za-z0-9+/_-]+={0,2}$/.test(base64url)
+  ) {
+    throw new Error('无效的配对码')
+  }
   // Why: desktop intentionally strips base64 padding from QR payloads. Some
   // mobile JS runtimes reject unpadded atob input, so restore it before decode.
   const base64 = padBase64(base64url.replace(/-/g, '+').replace(/_/g, '/'))
-  const json = atob(base64)
+  const json = Buffer.from(base64, 'base64').toString('utf-8')
   return PairingOfferSchema.parse(JSON.parse(json))
 }
 
