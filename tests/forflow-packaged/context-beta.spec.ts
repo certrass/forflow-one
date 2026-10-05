@@ -102,8 +102,10 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
       path: path.join(evidence, 'context-copy-desktop.png'),
       animations: 'disabled'
     })
-    const copy = dialog.getByRole('button', { name: '复制内容', exact: true })
+    const copy = dialog.getByRole('button', { name: '复制到剪贴板', exact: true })
     await expect(copy).toBeEnabled()
+    await expect(dialog.getByRole('button', { name: '更新摘录', exact: true })).toHaveCount(0)
+    await expect(dialog.getByRole('button', { name: '返回对话', exact: true })).toBeVisible()
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1000, 720))
     await expect.poll(() => dialog.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
     const box = await dialog.boundingBox()
@@ -121,7 +123,7 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
     const copiedText =
       '对话摘录\n\n用户\n工作台测试任务\n\nCodex\n已连接原会话，可在对话与终端间切换。'
     await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(copiedText)
-    await dialog.getByRole('button', { name: '来源详情', exact: true }).click()
+    await dialog.getByRole('button', { name: '查看来源详情', exact: true }).click()
     await expect(dialog).toContainText('forflow-gui-fixture-session')
     await expect(copy).toBeInViewport()
     await dialog.getByRole('button', { name: '复制来源回执', exact: true }).click()
@@ -141,7 +143,7 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
       createHash('sha256').update(JSON.stringify(receipt.packet)).digest('hex')
     )
     expect(ledger()).not.toContain('"type":"input"')
-    await dialog.getByRole('button', { name: '来源详情', exact: true }).click()
+    await dialog.getByRole('button', { name: '查看来源详情', exact: true }).click()
     await page.keyboard.press('Escape')
     await expect(dialog).toHaveCount(0)
     await page.getByRole('button', { name: '设置', exact: true }).click()
@@ -161,7 +163,7 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
     const longText = '继续整理原生聊天与项目审阅的交互细节。\n'.repeat(80)
     appendUserText(fixture.transcript, 'long', longText)
     await expect(copy).toBeDisabled()
-    await dialog.getByRole('button', { name: '刷新内容', exact: true }).click()
+    await dialog.getByRole('button', { name: '更新摘录', exact: true }).click()
     await expect(copy).toBeEnabled()
     await expect(copy).toBeInViewport()
     await expect
@@ -182,7 +184,7 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
     const clippedText = '新增要求\n[Orca: output truncated — 90000 bytes total, digest abc123]'
     appendUserText(fixture.transcript, 'clipped', clippedText)
     await expect(copy).toBeDisabled()
-    await dialog.getByRole('button', { name: '刷新内容', exact: true }).click()
+    await dialog.getByRole('button', { name: '更新摘录', exact: true }).click()
     await expect(dialog).toContainText('源记录已被截断')
     await expect(copy).toBeDisabled()
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(

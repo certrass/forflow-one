@@ -16,6 +16,7 @@ import { Button } from '../ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -103,7 +104,10 @@ function ContextPreview(props: Props): React.JSX.Element {
       toast.success(
         format === 'receipt'
           ? translate('forflow.contextBeta.receiptCopied', 'Source receipt copied')
-          : translate('forflow.contextBeta.copied', 'Content copied')
+          : translate(
+              'forflow.contextBeta.copied',
+              'Copied. Paste into a new conversation to continue.'
+            )
       )
     } catch {
       toast.error(translate('forflow.contextBeta.copyFailed', 'Could not copy. Please try again.'))
@@ -148,7 +152,7 @@ function ContextPreview(props: Props): React.JSX.Element {
             <DialogDescription>
               {translate(
                 'forflow.contextBeta.intro',
-                'Copy this excerpt and paste it into a new conversation to continue.'
+                'Take this conversation into a new chat and continue your task.'
               )}
             </DialogDescription>
           </DialogHeader>
@@ -156,8 +160,8 @@ function ContextPreview(props: Props): React.JSX.Element {
             <>
               <div className="min-h-0 space-y-4 overflow-y-auto scrollbar-sleek">
                 <div className="overflow-hidden rounded-lg border border-border">
-                  <div className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-xs text-muted-foreground">
-                    <span>{translate('forflow.contextBeta.excerpt', 'Conversation excerpt')}</span>
+                  <div className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-sm text-muted-foreground">
+                    <span>{translate('forflow.contextBeta.previewLabel', 'Content to copy')}</span>
                     <span>
                       {translate('forflow.contextBeta.count', '{{count}} messages', {
                         count: preview.packet.items.length
@@ -167,7 +171,7 @@ function ContextPreview(props: Props): React.JSX.Element {
                   <div className="divide-y divide-border px-4">
                     {preview.packet.items.map((item) => (
                       <div key={item.messageId} className="space-y-2 py-4">
-                        <p className="text-xs font-medium text-muted-foreground">
+                        <p className="text-sm font-medium">
                           {item.role === 'user'
                             ? translate('forflow.contextBeta.user', 'You')
                             : 'Codex'}
@@ -187,15 +191,23 @@ function ContextPreview(props: Props): React.JSX.Element {
               </div>
               {props.busy ? (
                 <p role="status" className="text-sm text-muted-foreground">
-                  {translate(
-                    'forflow.contextBeta.busy',
-                    'Codex is still working. Refresh when it finishes.'
-                  )}
+                  {translate('forflow.contextBeta.busy', 'Codex is still working. Please wait.')}
                 </p>
               ) : stale ? (
-                <p role="status" className="text-sm text-muted-foreground">
-                  {translate('forflow.contextBeta.changed', 'Refresh the content before copying.')}
-                </p>
+                <div
+                  role="status"
+                  className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                >
+                  <p>
+                    {translate(
+                      'forflow.contextBeta.changed',
+                      'Update the excerpt to include the latest content.'
+                    )}
+                  </p>
+                  <Button variant="outline" size="sm" disabled={copying} onClick={capture}>
+                    {translate('forflow.contextBeta.refresh', 'Update excerpt')}
+                  </Button>
+                </div>
               ) : null}
               {preview.blockingReasons.length > 0 ? (
                 <div role="status" className="space-y-1 text-sm text-muted-foreground">
@@ -205,12 +217,14 @@ function ContextPreview(props: Props): React.JSX.Element {
                 </div>
               ) : null}
               <DialogFooter>
-                <Button variant="ghost" disabled={props.busy || copying} onClick={capture}>
-                  {translate('forflow.contextBeta.refresh', 'Refresh content')}
-                </Button>
+                <DialogClose asChild>
+                  <Button variant="ghost">
+                    {translate('forflow.contextBeta.back', 'Back to conversation')}
+                  </Button>
+                </DialogClose>
                 <Button disabled={copyDisabled} onClick={() => void copy('text')}>
                   <ClipboardCopy />
-                  {translate('forflow.contextBeta.copy', 'Copy content')}
+                  {translate('forflow.contextBeta.copy', 'Copy to clipboard')}
                 </Button>
               </DialogFooter>
             </>

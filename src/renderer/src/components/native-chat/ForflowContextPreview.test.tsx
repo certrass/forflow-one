@@ -43,7 +43,7 @@ const props = {
   busy: false
 }
 const open = () => fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
-const copy = () => screen.getByRole('button', { name: 'Copy content' })
+const copy = () => screen.getByRole('button', { name: 'Copy to clipboard' })
 
 it('is absent unless explicitly enabled, and remains Codex-only', () => {
   mock.enabled = false
@@ -76,7 +76,7 @@ it('invalidates an open preview when messages change and can refresh it', () => 
   ]
   view.rerender(<ForflowContextPreview {...props} messages={updated} />)
   expect(copy().hasAttribute('disabled')).toBe(true)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Update excerpt' }))
   expect(copy().hasAttribute('disabled')).toBe(false)
   expect(screen.getByText('New scope: only read.')).toBeTruthy()
 })
@@ -112,7 +112,7 @@ it.each([
   view.rerender(<ForflowContextPreview {...props} {...change} />)
   view.rerender(<ForflowContextPreview {...props} />)
   expect(copy().hasAttribute('disabled')).toBe(true)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Update excerpt' }))
   expect(copy().hasAttribute('disabled')).toBe(false)
 })
 
@@ -123,7 +123,7 @@ it.each(['close', 'scope', 'busy', 'disable'] as const)(
     vi.spyOn(crypto.subtle, 'digest').mockImplementationOnce(() => deferred.promise)
     const view = render(<ForflowContextPreview {...props} />)
     open()
-    fireEvent.click(screen.getByRole('button', { name: 'Source details' }))
+    fireEvent.click(screen.getByRole('button', { name: 'View source details' }))
     fireEvent.click(screen.getByRole('button', { name: 'Copy source receipt' }))
     if (change === 'close') {
       fireEvent.click(screen.getByRole('button', { name: 'Close' }))
@@ -152,7 +152,7 @@ it('explains a failed read and allows retry after clipboard failure', async () =
   expect(screen.getByText(/Could not read the conversation/)).toBeTruthy()
   expect(copy().hasAttribute('disabled')).toBe(true)
   view.rerender(<ForflowContextPreview {...props} />)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Update excerpt' }))
   mock.writeText.mockRejectedValueOnce(new Error('Denied'))
   fireEvent.click(copy())
   await waitFor(() => expect(toast.error).toHaveBeenCalled())
@@ -166,11 +166,21 @@ it('keeps source metadata in details and offers the original hashed receipt sepa
   open()
   expect(screen.queryByText('s1')).toBeNull()
   expect(screen.queryByRole('button', { name: 'Copy source receipt' })).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: 'Source details' }))
+  fireEvent.click(screen.getByRole('button', { name: 'View source details' }))
   expect(screen.getByText('s1')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: 'Copy source receipt' }))
   await waitFor(() => expect(mock.writeText).toHaveBeenCalledOnce())
   const receipt = JSON.parse(mock.writeText.mock.calls[0][0])
   expect(receipt.packet.scope).toEqual(props.scope)
   expect(receipt.sha256).toMatch(/^[a-f0-9]{64}$/)
+})
+
+it('keeps updating out of the main actions until the conversation changes', () => {
+  render(<ForflowContextPreview {...props} />)
+  open()
+  expect(screen.queryByRole('button', { name: 'Update excerpt' })).toBeNull()
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' })).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Back to conversation' }))
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(mock.writeText).not.toHaveBeenCalled()
 })

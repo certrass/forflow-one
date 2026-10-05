@@ -17,13 +17,13 @@ export function ForflowContextSourceDetails({
   return (
     <Collapsible>
       <CollapsibleTrigger asChild>
-        <Button variant="ghost" size="xs" className="group">
+        <Button variant="ghost" size="sm" className="group">
           <ChevronRight className="transition-transform group-data-[state=open]:rotate-90 motion-reduce:transition-none" />
-          {translate('forflow.contextBeta.details', 'Source details')}
+          {translate('forflow.contextBeta.details', 'View source details')}
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="space-y-3 pt-3 text-xs text-muted-foreground">
+        <div className="space-y-3 pt-3 text-sm text-muted-foreground">
           <p>
             {translate(
               'forflow.contextBeta.selection',
@@ -33,7 +33,9 @@ export function ForflowContextSourceDetails({
           <dl className="space-y-2">
             <div>
               <dt>{translate('forflow.contextBeta.scope', 'Current session')}</dt>
-              <dd className="break-all font-mono">{packet.scope.sessionId || '—'}</dd>
+              <dd className="break-all font-mono text-xs text-foreground">
+                {packet.scope.sessionId || '—'}
+              </dd>
             </div>
             <div className="flex flex-wrap justify-between gap-x-4 gap-y-1">
               <dt>{translate('forflow.contextBeta.size', 'Source data size (UTF-8 bytes)')}</dt>
@@ -65,7 +67,7 @@ export function ForflowContextSourceDetails({
               </dd>
             </div>
           </dl>
-          <Button variant="outline" size="xs" disabled={disabled} onClick={onCopyReceipt}>
+          <Button variant="outline" size="sm" disabled={disabled} onClick={onCopyReceipt}>
             <FileJson />
             {translate('forflow.contextBeta.copyReceipt', 'Copy source receipt')}
           </Button>

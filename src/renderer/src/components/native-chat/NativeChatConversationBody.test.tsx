@@ -45,7 +45,9 @@ it('retains readable history after read failure without allowing it to be copied
   )
   expect(screen.getByText('Retained conversation')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
-  expect(screen.getByRole('button', { name: 'Copy content' }).hasAttribute('disabled')).toBe(true)
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
 })
 
 it('blocks a send awaiting transcript confirmation and retains the source runtime identity', () => {
@@ -63,7 +65,9 @@ it('blocks a send awaiting transcript confirmation and retains the source runtim
   )
   fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
   expect(screen.getByText(/Send or retry the pending messages/)).toBeTruthy()
-  expect(screen.getByRole('button', { name: 'Copy content' }).hasAttribute('disabled')).toBe(true)
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
   view.rerender(
     <NativeChatConversationBody
       session={session}
@@ -91,7 +95,9 @@ it('keeps a handoff unavailable while the host reports background child work', (
     </NativeChatConversationBody>
   )
   fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
-  expect(screen.getByRole('button', { name: 'Copy content' }).hasAttribute('disabled')).toBe(true)
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
 })
 
 it('preserves the structured host read failure and retry notice', () => {
