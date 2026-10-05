@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildForflowContextPreview,
   encodeForflowContextReceipt,
+  formatForflowContextText,
   FORFLOW_CONTEXT_BUDGET_BYTES
 } from './forflow-context-packet'
 import type { NativeChatMessage } from './native-chat-types'
@@ -196,4 +197,30 @@ describe('Forflow context preview', () => {
     expect(result.bytes).toBeLessThanOrEqual(FORFLOW_CONTEXT_BUDGET_BYTES)
     expect(result.packet.sourceMessageCount).toBe(3001)
   })
+})
+
+it('copies the selected original text in order with readable roles', () => {
+  const result = preview([
+    message('u1', 'user', '保留这个要求。\n  缩进也要保留。'),
+    message('a0', 'assistant', 'Old answer'),
+    message('a1', 'assistant', 'First recent answer'),
+    message('a2', 'assistant', 'Second recent answer'),
+    message('u2', 'user', '新增要求'),
+    message('a3', 'assistant', 'Third recent answer')
+  ])
+  expect(
+    formatForflowContextText(result, { title: '对话摘录', user: '用户', assistant: 'Codex' })
+  ).toBe(
+    '对话摘录\n\n用户\n保留这个要求。\n  缩进也要保留。\n\nCodex\nFirst recent answer\n\nCodex\nSecond recent answer\n\n用户\n新增要求\n\nCodex\nThird recent answer'
+  )
+})
+
+it('applies the same completeness check to readable text as to the source receipt', () => {
+  expect(() =>
+    formatForflowContextText(preview([], true), {
+      title: 'Excerpt',
+      user: 'User',
+      assistant: 'Codex'
+    })
+  ).toThrow('Context preview is incomplete')
 })

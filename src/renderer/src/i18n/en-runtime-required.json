@@ -3021,9 +3021,6 @@
       "permission": "Confirm website permission",
       "upload": "Confirm data transfer"
     },
-    "contextBeta": {
-      "incomplete": "Cannot prepare a reliable handoff yet: history is not fully loaded, user text is missing or exceeds the budget. Load earlier messages or narrow the task first."
-    },
     "demoCopy": {
       "093f057fe3": "Splitting auth rewrite into 2 PRs…",
       "122ede91a0": "Sketching withSession middleware…",

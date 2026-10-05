@@ -42,8 +42,8 @@ const props = {
   historyIncomplete: false,
   busy: false
 }
-const open = () => fireEvent.click(screen.getByRole('button', { name: 'Handoff preview · Beta' }))
-const copy = () => screen.getByRole('button', { name: 'Copy handoff with source receipt' })
+const open = () => fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
+const copy = () => screen.getByRole('button', { name: 'Copy content' })
 
 it('is absent unless explicitly enabled, and remains Codex-only', () => {
   mock.enabled = false
@@ -62,7 +62,9 @@ it('prepares a preview on demand and copies only after an explicit click', async
   expect(mock.writeText).not.toHaveBeenCalled()
   fireEvent.click(copy())
   await waitFor(() => expect(mock.writeText).toHaveBeenCalledOnce())
-  expect(JSON.parse(mock.writeText.mock.calls[0][0]).packet.scope).toEqual(props.scope)
+  expect(mock.writeText.mock.calls[0][0]).toBe(
+    'Conversation excerpt\n\nUser\nDo not publish this task.'
+  )
 })
 
 it('invalidates an open preview when messages change and can refresh it', () => {
@@ -74,7 +76,7 @@ it('invalidates an open preview when messages change and can refresh it', () => 
   ]
   view.rerender(<ForflowContextPreview {...props} messages={updated} />)
   expect(copy().hasAttribute('disabled')).toBe(true)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh preview' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
   expect(copy().hasAttribute('disabled')).toBe(false)
   expect(screen.getByText('New scope: only read.')).toBeTruthy()
 })
@@ -110,7 +112,7 @@ it.each([
   view.rerender(<ForflowContextPreview {...props} {...change} />)
   view.rerender(<ForflowContextPreview {...props} />)
   expect(copy().hasAttribute('disabled')).toBe(true)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh preview' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
   expect(copy().hasAttribute('disabled')).toBe(false)
 })
 
@@ -121,7 +123,8 @@ it.each(['close', 'scope', 'busy', 'disable'] as const)(
     vi.spyOn(crypto.subtle, 'digest').mockImplementationOnce(() => deferred.promise)
     const view = render(<ForflowContextPreview {...props} />)
     open()
-    fireEvent.click(copy())
+    fireEvent.click(screen.getByRole('button', { name: 'Source details' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Copy source receipt' }))
     if (change === 'close') {
       fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     } else if (change === 'scope') {
@@ -146,14 +149,28 @@ it.each(['close', 'scope', 'busy', 'disable'] as const)(
 it('explains a failed read and allows retry after clipboard failure', async () => {
   const view = render(<ForflowContextPreview {...props} sourceUnavailable />)
   open()
-  expect(screen.getByText(/latest source read failed/)).toBeTruthy()
+  expect(screen.getByText(/Could not read the conversation/)).toBeTruthy()
   expect(copy().hasAttribute('disabled')).toBe(true)
   view.rerender(<ForflowContextPreview {...props} />)
-  fireEvent.click(screen.getByRole('button', { name: 'Refresh preview' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh content' }))
   mock.writeText.mockRejectedValueOnce(new Error('Denied'))
   fireEvent.click(copy())
   await waitFor(() => expect(toast.error).toHaveBeenCalled())
   expect(copy().hasAttribute('disabled')).toBe(false)
   fireEvent.click(copy())
   await waitFor(() => expect(mock.writeText).toHaveBeenCalledTimes(2))
+})
+
+it('keeps source metadata in details and offers the original hashed receipt separately', async () => {
+  render(<ForflowContextPreview {...props} />)
+  open()
+  expect(screen.queryByText('s1')).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Copy source receipt' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Source details' }))
+  expect(screen.getByText('s1')).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Copy source receipt' }))
+  await waitFor(() => expect(mock.writeText).toHaveBeenCalledOnce())
+  const receipt = JSON.parse(mock.writeText.mock.calls[0][0])
+  expect(receipt.packet.scope).toEqual(props.scope)
+  expect(receipt.sha256).toMatch(/^[a-f0-9]{64}$/)
 })

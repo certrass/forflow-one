@@ -202,6 +202,19 @@ export function buildForflowContextPreview(input: {
   }
 }
 
+export function formatForflowContextText(
+  preview: ForflowContextPreview,
+  labels: { title: string; user: string; assistant: string }
+): string {
+  if (!preview.canCopy) {
+    throw new Error('Context preview is incomplete')
+  }
+  return [
+    labels.title,
+    ...preview.packet.items.map((item) => `${labels[item.role]}\n${item.text}`)
+  ].join('\n\n')
+}
+
 export async function encodeForflowContextReceipt(preview: ForflowContextPreview): Promise<string> {
   if (!preview.canCopy) {
     throw new Error('Context preview is incomplete')

@@ -6,12 +6,12 @@ import { SettingsSwitch } from './SettingsFormControls'
 
 export function getForflowContextBetaSearchEntry() {
   return {
-    title: translate('forflow.contextBeta.title', 'Context handoff preview · Beta'),
+    title: translate('forflow.contextBeta.title', 'Copy conversation'),
     description: translate(
       'forflow.contextBeta.description',
-      'Preview a bounded handoff from the current Codex conversation. No model calls, automatic sending or long-term memory writes.'
+      'Copy an excerpt from your Codex conversation to continue in a new chat.'
     ),
-    keywords: ['Beta', 'memory', 'context', 'handoff', '记忆', '接续', '交接', '审计'],
+    keywords: ['copy', 'conversation', 'context', 'handoff', '复制', '对话', '接续', '交接'],
     targetSectionId: 'forflow-context-beta'
   }
 }
@@ -33,7 +33,7 @@ export function ForflowContextBetaSetting({
           <p className="text-xs text-muted-foreground">
             {translate(
               'forflow.contextBeta.location',
-              'Enable to show “Handoff preview” above the Codex chat composer. Off by default; existing sessions and task states stay unchanged.'
+              'Show “Copy conversation” above the Codex chat composer.'
             )}
           </p>
         </div>
