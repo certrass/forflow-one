@@ -1,12 +1,13 @@
 import { _electron as electron } from '@stablyai/playwright-test'
 import { createHash } from 'node:crypto'
-import { mkdirSync, readFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import {
   createElectronHomeIsolation,
   assertElectronResolvedIsolatedHome
 } from '../e2e/helpers/electron-home-isolation'
+import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 const appPath = process.env.FORFLOW_PACKAGED_APP
 const evidencePath = process.env.FORFLOW_QA_OUTPUT
 if (!appPath || !evidencePath) {
@@ -54,6 +55,20 @@ export async function launch(profile: string, extraEnv: Record<string, string> =
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.waitForLoadState('domcontentloaded')
-  await page.waitForFunction(() => Boolean(window.api))
+  try {
+    await page.waitForFunction(() => Boolean(window.api))
+  } catch (error) {
+    writeFileSync(
+      path.join(evidence, `${path.basename(profile)}-launch-error.json`),
+      JSON.stringify(
+        { url: page.url(), errors, windows: app.windows().map((window) => window.url()) },
+        null,
+        2
+      )
+    )
+    await closeElectronAppForE2E(app)
+    await cleanupE2EDaemons(profile)
+    throw error
+  }
   return { app, page, errors }
 }

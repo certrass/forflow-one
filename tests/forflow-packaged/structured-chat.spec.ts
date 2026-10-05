@@ -50,7 +50,7 @@ test('structured chat: opt-in, host journal, child agent and stop in the package
     expect(created).toMatchObject({ ok: true, result: { ok: true, value: { sessionId } } })
     await expect.poll(ledger).toContain('thread/start')
     await page.reload()
-    await page.getByRole('tab').filter({ hasText: 'Codex' }).last().click()
+    await page.getByText('Codex Chat', { exact: true }).click()
     const chat = page.locator('[data-native-chat-root="true"]:visible')
     const composer = chat.locator('[contenteditable="true"]').first()
     await expect(composer).toBeVisible()
@@ -58,7 +58,15 @@ test('structured chat: opt-in, host journal, child agent and stop in the package
     await chat.getByRole('button', { name: '发送', exact: true }).click()
     await expect.poll(ledger).toContain('turn/start')
     await expect(chat).toContainText('已读取审阅材料，正在检查来源。')
-    await expect(chat).toContainText('review')
+    await expect(chat).toContainText('已启动 1 个子智能体')
+    await expect(page.locator(`[role="option"][data-worktree-id="${workspaceId}"]`)).toContainText(
+      'review'
+    )
+    const notice = page
+      .locator('[data-sonner-toast]')
+      .filter({ hasText: 'Codex 现在使用独立服务运行' })
+    await notice.getByRole('button', { name: 'Close toast', exact: true }).click()
+    await expect(notice).toHaveCount(0)
     await page.screenshot({ path: path.join(evidence, 'structured-chat-child.png') })
     await chat.getByRole('button', { name: '停止智能体', exact: true }).click()
     await expect.poll(ledger).toContain('turn/interrupt')
