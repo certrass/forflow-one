@@ -62,6 +62,9 @@ export type NewWorkspaceComposerCardProps = {
   onNameValueChange: (value: string) => void
   branchNameOverride: string | undefined
   onBranchNameOverrideChange: (value: string | undefined) => void
+  baseBranch?: string
+  onBaseBranchChange?: (value: string | undefined) => void
+  startFromResetHint?: string | null
   parentWorktreeId?: string | null
   onParentWorktreeIdChange?: (value: string | null) => void
   selectedRepoExecutionHostId?: ExecutionHostId | null
@@ -71,6 +74,7 @@ export type NewWorkspaceComposerCardProps = {
   onSmartGitLabItemSelect: (item: GitLabWorkItem) => void
   onSmartBranchSelect: (refName: string, localBranchName: string) => void
   onSmartNameModeChange?: (mode: SmartNameMode) => void
+  smartNameMode?: SmartNameMode
   onSmartLinearIssueSelect: (issue: LinearIssue) => void
   onSmartJiraIssueSelect?: (issue: JiraIssue, sourceContext: TaskSourceContext) => void
   onOpenJiraSettings?: () => void
@@ -93,6 +97,8 @@ export type NewWorkspaceComposerCardProps = {
   projectError: string | null
   creating: boolean
   onCreate: () => void
+  taskPrompt?: string
+  onTaskPromptChange?: (value: string) => void
   note: string
   onNoteChange: (value: string) => void
   setupConfig: SetupConfig | null

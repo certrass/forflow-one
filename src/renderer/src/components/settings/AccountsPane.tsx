@@ -59,6 +59,9 @@ import {
 } from './accounts-pane-provider-setting-sections'
 import { renderMiniMaxAccountsSection } from './accounts-pane-minimax-section'
 import { renderAccountsRemovalDialogs } from './accounts-pane-removal-dialogs'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { ForflowModelAccountsSection } from './ForflowModelAccountsSection'
+import { getForflowModelAccountSearchEntries } from './forflow-model-account-search'
 
 export { getAccountsPaneSearchEntries }
 
@@ -355,6 +358,15 @@ export function AccountsPane({
     clearMiniMaxCookie
   }
   const visibleSections = [
+    isForflowBuild() &&
+    matchesSettingsSearch(searchQuery, getForflowModelAccountSearchEntries()) ? (
+      <ForflowModelAccountsSection
+        key={`domestic-api:${activeRuntimeEnvironmentId ?? 'local'}:${accountRuntime.runtime}`}
+        localHost={
+          !isRemoteAccountScope && accountRuntime.runtime === 'host' && !isWebClientLocation()
+        }
+      />
+    ) : null,
     wslSupportedPlatform &&
     !isRemoteAccountScope &&
     matchesSettingsSearch(searchQuery, getAccountsLocationSearchEntries())

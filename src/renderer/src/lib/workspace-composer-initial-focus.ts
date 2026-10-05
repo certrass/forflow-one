@@ -9,6 +9,7 @@ export function getWorkspaceComposerInitialFocusTarget(root: ParentNode): HTMLEl
   // replaces the input when a linked item or branch is pre-filled. Keep
   // combobox fallbacks for surfaces that omit the smart name field.
   return (
+    root.querySelector<HTMLElement>('[data-workspace-task-prompt="true"]') ??
     root.querySelector<HTMLElement>(WORKSPACE_NAME_INPUT_SELECTOR) ??
     root.querySelector<HTMLElement>(WORKSPACE_SOURCE_PILL_SELECTOR) ??
     root.querySelector<HTMLElement>(PROJECT_COMBOBOX_TRIGGER_SELECTOR) ??

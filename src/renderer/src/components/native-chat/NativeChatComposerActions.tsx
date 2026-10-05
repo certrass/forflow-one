@@ -13,6 +13,8 @@ export type NativeChatComposerActionsProps = {
   attachDisabled: boolean
   dictationDisabled: boolean
   sendDisabled: boolean
+  /** Present only when the running conversation supports a separate send action. */
+  followUpDisabled?: boolean
   isWorking: boolean
   isDictating: boolean
   isDictationHoldMode: boolean
@@ -31,6 +33,7 @@ export function NativeChatComposerActions({
   attachDisabled,
   dictationDisabled,
   sendDisabled,
+  followUpDisabled,
   isWorking,
   isDictating,
   isDictationHoldMode,
@@ -134,6 +137,21 @@ export function NativeChatComposerActions({
             {dictationLabel}
           </TooltipContent>
         </Tooltip>
+        {isWorking && followUpDisabled !== undefined ? (
+          <Button
+            type="button"
+            size="sm"
+            disabled={followUpDisabled}
+            onClick={(event) => {
+              if (event.detail <= 1) {
+                onSend()
+              }
+            }}
+          >
+            <ArrowUp />
+            {translate('forflow.composer.followUp', 'Send follow-up')}
+          </Button>
+        ) : null}
         <Button
           type="button"
           data-native-chat-critical-action={isWorking ? 'stop' : undefined}

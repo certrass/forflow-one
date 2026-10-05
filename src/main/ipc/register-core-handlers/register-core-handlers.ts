@@ -141,8 +141,8 @@ export function registerCoreHandlers(
 
   registerAppHandlers(store, { onBeforeRelaunch: lifecycleOptions.onBeforeRelaunch })
   registerCliHandlers()
-  registerPreflightHandlers()
-  registerUsageProviderHandlers({ claudeUsage, codexUsage, openCodeUsage })
+  registerPreflightHandlers(() => store.getSettings())
+  registerUsageProviderHandlers({ claudeUsage, codexUsage, openCodeUsage }, { store, runtime })
   registerCodexAccountHandlers(codexAccounts, () => store.getSettings())
   registerAgentHookHandlers(runtime, { getPtyIdForPaneKey })
   registerCodexConfigSyncHandlers(codexAccounts.runtimeHomeService)

@@ -42,6 +42,12 @@ test('restored checklist keeps eight interactive steps, progress and local offli
       expect(labels[id]).toMatch(/\p{Script=Han}/u)
     }
     await expect(page.locator('[data-testid="forflow-setup-guide"] section')).toHaveCount(6)
+    const firstTaskGuide = page.locator('[data-testid="forflow-setup-guide"]')
+    await expect(firstTaskGuide).toContainText('2. 准备 Codex')
+    await expect(firstTaskGuide).toContainText('先完成一个小任务')
+    await expect(firstTaskGuide).not.toContainText('安装并认证国内智能体')
+    await firstTaskGuide.scrollIntoViewIfNeeded()
+    await page.screenshot({ path: path.join(evidence, 'first-task-setup-guide.png') })
     const content = await page
       .locator('#settings-section-setup-guide, #setup-guide')
       .allTextContents()

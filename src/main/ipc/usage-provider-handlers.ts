@@ -1,7 +1,9 @@
+import type { WorkspaceReviewDependencies } from './workspace-review-handlers'
 import { ipcMain } from 'electron'
 import type { ClaudeUsageStore } from '../claude-usage/store'
 import type { CodexUsageStore } from '../codex-usage/store'
 import type { OpenCodeUsageStore } from '../opencode-usage/store'
+import { registerCodexReviewHandlers } from './codex-review-handlers'
 
 type UsageProviderStores = {
   claudeUsage: ClaudeUsageStore
@@ -61,8 +63,25 @@ function registerProviderHandlers<Scope, Range, BreakdownKind>(
   )
 }
 
-export function registerUsageProviderHandlers(stores: UsageProviderStores): void {
+export function registerUsageProviderHandlers(
+  stores: UsageProviderStores,
+  reviewDeps?: WorkspaceReviewDependencies
+): void {
   registerProviderHandlers('claudeUsage', stores.claudeUsage)
   registerProviderHandlers('codexUsage', stores.codexUsage)
+  registerCodexReviewHandlers(stores.codexUsage, reviewDeps)
+  ipcMain.handle('codexUsage:getAudit', (_event, args: unknown) => {
+    if (
+      !args ||
+      typeof args !== 'object' ||
+      !('scope' in args) ||
+      !('range' in args) ||
+      (args.scope !== 'all' && args.scope !== 'orca') ||
+      (args.range !== '7d' && args.range !== '30d' && args.range !== '90d' && args.range !== 'all')
+    ) {
+      throw new Error('审计查询范围无效')
+    }
+    return stores.codexUsage.getAudit(args.scope, args.range)
+  })
   registerProviderHandlers('openCodeUsage', stores.openCodeUsage)
 }

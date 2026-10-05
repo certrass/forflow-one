@@ -1,8 +1,10 @@
 # Forflow One
 
-本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；当前本机测试版为 [1.4.205-forflow.8](docs/forflow/release-1.4.205-forflow.8.md)。
+本工程由 `certrass` 维护，私有仓库为 [certrass/forflow-one](https://github.com/certrass/forflow-one)。中文私有化工作台的开发、构建、部署和测试说明以 [Forflow 项目文档](docs/forflow/README.md) 为准；[1.4.205-forflow.23](docs/forflow/release-1.4.205-forflow.23.md) 已安装到本机，保留 `.21` 回退。本版将费用口径切换和审计覆盖 Beta 融入原统计页，2,204 项回归及候选、安装版各 14 项 smoke 通过。
 
 使用请先看 [Forflow One 操作手册](docs/forflow/user-manual.md)；账号服务、权限和内部交付见 [管理员手册](docs/forflow/admin-manual.md)。
+
+此前 `.20` 已完成飞书已有应用配置、个人授权和实际 Forflow 绑定，真实只读验证读取到 2 条未完成任务与 2 个任务清单。`.21` 候选包 13 项 smoke 全过；安装后扩展场景曾出现窗口关闭、差异列表超时和终端关闭 EPERM，专项复测通过，根因仍待定位，原始失败及对照记录均见发布说明。
 
 `origin` 指向本私有仓库。Orca 仅作为 `upstream` 上游源码来源，保留其历史、许可证及以下原始说明；其中的云服务、安装与发布流程不等同于 Forflow 私有版的交付流程。
 
@@ -46,7 +48,7 @@
 
 Monitor and steer your agents from your phone — get notified when an agent finishes and send follow-ups from anywhere.
 
-[iOS App Store](https://apps.apple.com/us/app/orca-ide/id6766130217) · [TestFlight](https://testflight.apple.com/join/YjeGMQBA) · [Android APK 0.0.48](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk) · [Docs →](https://www.onorca.dev/docs/mobile)
+[iOS App Store](https://apps.apple.com/us/app/orca-ide/id6766130217) · [TestFlight](https://testflight.apple.com/join/YjeGMQBA) · [Android APK 0.0.50](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.50/app-release.apk) · [Docs →](https://www.onorca.dev/docs/mobile)
 
 </td>
 <td width="50%">
@@ -240,7 +242,7 @@ yay -S stably-orca-bin
 Pair with your desktop app to monitor and steer your agents from your phone.
 
 - **iOS:** [Download on the App Store](https://apps.apple.com/us/app/orca-ide/id6766130217) or [join TestFlight](https://testflight.apple.com/join/YjeGMQBA)
-- **Android:** [Download APK 0.0.48](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk) · [Install guide](https://www.onorca.dev/docs/android-apk)
+- **Android:** [Download APK 0.0.50](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.50/app-release.apk) · [Install guide](https://www.onorca.dev/docs/android-apk)
 
 ---
 

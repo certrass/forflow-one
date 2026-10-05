@@ -10,6 +10,17 @@ export const FORFLOW_BUNDLED_SKILLS = {
 } as const
 
 export type ForflowBundledSkillResult = { name: string; status: string; path?: string }
+
+export function forflowSkillName(name: string): string {
+  return name.startsWith('orca-') && Object.hasOwn(FORFLOW_BUNDLED_SKILLS, name)
+    ? `forflow-${name.slice(5)}`
+    : name
+}
+
+export function canonicalForflowSkillName(name: string): string {
+  const legacy = name.replace(/^forflow-/, 'orca-')
+  return Object.hasOwn(FORFLOW_BUNDLED_SKILLS, legacy) ? legacy : name
+}
 export type ForflowSkillsApi = {
   installBundled(names: string[]): Promise<ForflowBundledSkillResult[]>
 }

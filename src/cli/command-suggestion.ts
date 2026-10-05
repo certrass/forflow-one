@@ -1,3 +1,4 @@
+import { cliCommandName, isForflowCli } from './cli-product'
 import { specPaths, type CommandSpec } from './command-spec'
 import { levenshtein } from '../shared/edit-distance'
 
@@ -99,7 +100,9 @@ export function suggestCommands(specs: CommandSpec[], commandPath: string[]): st
 export function unknownCommandData(specs: CommandSpec[], commandPath: string[]): CommandErrorData {
   const suggestions = suggestCommands(specs, commandPath)
   const nextSteps = suggestions.length
-    ? [`Did you mean: ${suggestions.map((path) => `orca ${path}`).join(', ')}`]
+    ? [
+        `${isForflowCli() ? '是否想执行：' : 'Did you mean:'} ${suggestions.map((path) => `${cliCommandName()} ${path}`).join(', ')}`
+      ]
     : []
   return { suggestions, nextSteps }
 }
@@ -136,8 +139,12 @@ export function unknownFlagData(flag: string, validFlags: string[]): FlagErrorDa
   const suggestions = suggestFlags(flag, sortedValid)
   const nextSteps: string[] = []
   if (suggestions.length > 0) {
-    nextSteps.push(`Did you mean: ${suggestions.map((name) => `--${name}`).join(', ')}`)
+    nextSteps.push(
+      `${isForflowCli() ? '是否想执行：' : 'Did you mean:'} ${suggestions.map((name) => `--${name}`).join(', ')}`
+    )
   }
-  nextSteps.push(`Valid flags: ${sortedValid.map((name) => `--${name}`).join(', ')}`)
+  nextSteps.push(
+    `${isForflowCli() ? '有效参数：' : 'Valid flags:'} ${sortedValid.map((name) => `--${name}`).join(', ')}`
+  )
   return { validFlags: sortedValid, suggestions, nextSteps }
 }

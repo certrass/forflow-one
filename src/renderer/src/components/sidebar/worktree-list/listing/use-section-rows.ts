@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '@/store'
 import type { AppState } from '@/store/types'
@@ -69,6 +70,8 @@ function collectRenderedSidebarRowKeys(sectionRows: ReturnType<typeof addHostSec
 // Builds the full sidebar row model: grouped worktree rows first, then the host-section
 // tier wrapped around them.
 export function useSidebarSectionRows(args: SectionRowsArgs) {
+  const { i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? i18n.language
   const { repos, worktrees, repoMap, effectiveCollapsedGroups, defaultHostId } = args
   const worktreesByRepo = useAppStore((s) => s.worktreesByRepo)
   const sshTargetLabels = useAppStore((s) => s.sshTargetLabels)
@@ -141,56 +144,56 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
     [hostOptions]
   )
 
-  const rows: Row[] = useMemo(
-    () =>
-      buildRows(
-        args.groupBy,
-        worktrees,
-        repoMap,
-        args.prCache,
-        effectiveCollapsedGroups,
-        repoOrder,
-        args.workspaceStatuses,
-        args.projectOrderBy,
-        args.worktreeLineageById,
-        args.worktreeMap,
-        true,
-        args.settings,
-        args.visibleProjectGroupsForRows,
-        placeholderRepoIds,
-        args.importedWorktreesByRepo,
-        args.newExternalWorktreesInboxByRepo,
-        pendingCreations,
-        args.projectGrouping,
-        args.visibleFolderWorkspacesForRows,
-        hostLabelById,
-        defaultHostId,
-        args.pinnedDisplayPolicy
-      ),
-    [
+  const rows: Row[] = useMemo(() => {
+    void language
+    return buildRows(
       args.groupBy,
       worktrees,
       repoMap,
       args.prCache,
       effectiveCollapsedGroups,
-      defaultHostId,
       repoOrder,
       args.workspaceStatuses,
       args.projectOrderBy,
       args.worktreeLineageById,
       args.worktreeMap,
+      true,
       args.settings,
-      args.projectGrouping,
       args.visibleProjectGroupsForRows,
-      args.visibleFolderWorkspacesForRows,
       placeholderRepoIds,
       args.importedWorktreesByRepo,
       args.newExternalWorktreesInboxByRepo,
       pendingCreations,
+      args.projectGrouping,
+      args.visibleFolderWorkspacesForRows,
       hostLabelById,
+      defaultHostId,
       args.pinnedDisplayPolicy
-    ]
-  )
+    )
+  }, [
+    args.groupBy,
+    language,
+    worktrees,
+    repoMap,
+    args.prCache,
+    effectiveCollapsedGroups,
+    defaultHostId,
+    repoOrder,
+    args.workspaceStatuses,
+    args.projectOrderBy,
+    args.worktreeLineageById,
+    args.worktreeMap,
+    args.settings,
+    args.projectGrouping,
+    args.visibleProjectGroupsForRows,
+    args.visibleFolderWorkspacesForRows,
+    placeholderRepoIds,
+    args.importedWorktreesByRepo,
+    args.newExternalWorktreesInboxByRepo,
+    pendingCreations,
+    hostLabelById,
+    args.pinnedDisplayPolicy
+  ])
   const orderedHostOptions = useMemo(
     () => orderHostSectionOptions(hostOptions, workspaceHostOrder),
     [hostOptions, workspaceHostOrder]

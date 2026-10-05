@@ -65,6 +65,8 @@ export type AgentCatalogRowProps = {
   isDetected: boolean
   isEnabled: boolean
   isDefault: boolean
+  canConfigureCommand?: boolean
+  canSetDefault?: boolean
   cmdOverride: string | undefined
   argsOverride: string
   envOverride: Record<string, string>
@@ -86,6 +88,8 @@ export function AgentCatalogRow({
   isDetected,
   isEnabled,
   isDefault,
+  canConfigureCommand = true,
+  canSetDefault = true,
   cmdOverride,
   argsOverride,
   envOverride,
@@ -144,6 +148,7 @@ export function AgentCatalogRow({
                 variant={isDefault ? 'secondary' : 'ghost'}
                 size="xs"
                 onClick={onSetDefault}
+                disabled={!canSetDefault}
                 title={
                   isDefault
                     ? translate('auto.components.settings.AgentsPane.d7625cf8b2', 'Default agent')
@@ -172,7 +177,7 @@ export function AgentCatalogRow({
             <ExternalLink className="size-3.5" />
           </a>
           <div className="flex size-7 items-center justify-center">
-            {isDetected && (
+            {canConfigureCommand && (
               <Button
                 type="button"
                 variant="ghost"
@@ -200,7 +205,7 @@ export function AgentCatalogRow({
         </div>
       </div>
 
-      {isDetected && cmdOpen && (
+      {canConfigureCommand && cmdOpen && (
         <div className="mt-3 pl-10">
           <AgentCommandOverrideInput
             key={cmdOverride ?? defaultCmd}
@@ -216,16 +221,14 @@ export function AgentCatalogRow({
               onSaveArgs={onSaveArgs}
             />
           </div>
-          {(defaultEnvSummary || envSummary) && (
-            <div className="mt-2">
-              <AgentDefaultEnvInput
-                key={`${agentId}:${envSummary}`}
-                defaultEnv={defaultEnv}
-                envOverride={envOverride}
-                onSaveEnv={onSaveEnv}
-              />
-            </div>
-          )}
+          <div className="mt-2">
+            <AgentDefaultEnvInput
+              key={`${agentId}:${envSummary}`}
+              defaultEnv={defaultEnv}
+              envOverride={envOverride}
+              onSaveEnv={onSaveEnv}
+            />
+          </div>
           {sessionSourceHome && (
             <div className="mt-2">
               <AgentSessionSourceHomeInput
@@ -242,6 +245,14 @@ export function AgentCatalogRow({
               'Override the binary path or name, and edit the default launch arguments or environment for this agent.'
             )}
           </p>
+          {!isDetected && (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {translate(
+                'settings.agentCommand.undetectedHelp',
+                'Set an installed executable path, then wait for detection before choosing this agent. Paths containing spaces must be quoted.'
+              )}
+            </p>
+          )}
         </div>
       )}
     </div>

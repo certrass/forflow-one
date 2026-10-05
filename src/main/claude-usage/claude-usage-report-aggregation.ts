@@ -29,6 +29,7 @@ export function buildSummary(
   const byProject = new Map<string, number>()
   let estimatedCostUsd = 0
   let hasAnyBillableCost = false
+  const costCoverage = { pricedRecords: 0, unpricedRecords: 0, unclassifiedRecords: 0 }
 
   for (const row of filteredDaily) {
     inputTokens += row.inputTokens
@@ -54,6 +55,9 @@ export function buildSummary(
     if (cost !== null) {
       hasAnyBillableCost = true
       estimatedCostUsd += cost
+      costCoverage.pricedRecords += row.turnCount
+    } else {
+      costCoverage.unpricedRecords += row.turnCount
     }
   }
 
@@ -73,6 +77,7 @@ export function buildSummary(
     cacheReuseRate:
       inputTokens + cacheReadTokens > 0 ? cacheReadTokens / (inputTokens + cacheReadTokens) : null,
     estimatedCostUsd: hasAnyBillableCost ? estimatedCostUsd : null,
+    costCoverage,
     topModel,
     topProject,
     // Why: the empty-state UX is scope/range specific. Using global persisted

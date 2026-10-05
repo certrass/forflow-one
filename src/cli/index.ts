@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { brandCliDocumentation } from './cli-product'
 import {
   findCommandSpec,
   isCommandGroup,
@@ -8,6 +9,7 @@ import {
   specPaths,
   validateCommandAndFlags
 } from './args'
+import { applyForflowCliEnvironment, isForflowCli } from './cli-product'
 import { readOrcaCliVersion } from './cli-version'
 import { dispatch } from './dispatch'
 import {
@@ -23,6 +25,8 @@ import { resolveOrchestrationCliExecutable } from './runtime/orchestration-recov
 
 export { COMMAND_SPECS } from './specs'
 export { buildCurrentWorktreeSelector, normalizeWorktreeSelector } from './selectors'
+
+applyForflowCliEnvironment()
 
 const COMMAND_PATHS = COMMAND_SPECS.flatMap((spec) => specPaths(spec))
 
@@ -68,7 +72,11 @@ export async function main(
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
     const version = readOrcaCliVersion()
     if (!version) {
-      process.stderr.write('Could not determine the Orca version for this build.\n')
+      process.stderr.write(
+        isForflowCli()
+          ? '无法读取此 Forflow One 构建的版本。\n'
+          : brandCliDocumentation('Could not determine the Orca version for this build.\n')
+      )
       process.exitCode = 1
       return
     }
@@ -83,14 +91,17 @@ export async function main(
     await runClaudeTeams(argv.slice(1), cwd)
     return
   }
-  const parsed = normalizeCommandPositionals(COMMAND_SPECS, parseArgs(argv, COMMAND_PATHS))
+  const parsed = normalizeCommandPositionals(
+    COMMAND_SPECS,
+    parseArgs(argv, COMMAND_PATHS, COMMAND_SPECS)
+  )
   const helpPath = resolveHelpPath(parsed)
   if (helpPath !== null) {
     printHelp(COMMAND_SPECS, helpPath)
     if (
       helpPath.length > 0 &&
       !findCommandSpec(COMMAND_SPECS, helpPath) &&
-      !isCommandGroup(helpPath)
+      !isCommandGroup(COMMAND_SPECS, helpPath)
     ) {
       process.exitCode = 1
     }

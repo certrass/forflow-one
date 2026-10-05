@@ -260,6 +260,7 @@ function mergeScannedSkill(seen: Map<string, DiscoveredSkill>, skill: ScannedSki
 }
 
 export async function discoverSkills(args: {
+  log?: (message: string) => void
   repos?: Repo[]
   homeDir?: string
   cwd?: string
@@ -322,7 +323,7 @@ export async function discoverSkills(args: {
     // the shape that says the root set, not the tree, is what costs. The id list
     // is capped because roots grow with the repo count.
     const present = sources.filter((source) => source.exists).length
-    console.info(
+    ;(args.log ?? console.info)(
       `[skills] scan roots=${roots.length} present=${present} walked=${walked.length} skills=${skills.length} ms=${Date.now() - startedAt} ids=${walked.slice(0, MAX_LOGGED_ROOT_IDS).join(',')}`
     )
   }

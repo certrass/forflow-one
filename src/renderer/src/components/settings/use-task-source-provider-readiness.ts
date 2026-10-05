@@ -1,3 +1,4 @@
+import { useForflowFeishuReadiness } from './use-forflow-feishu-readiness'
 import { useMemo } from 'react'
 import type { TaskProvider } from '../../../../shared/task-providers'
 import {
@@ -16,6 +17,7 @@ export function useTaskSourceProviderReadiness(
   visibleProviders: readonly TaskProvider[]
 ): Record<TaskProvider, TaskProviderReadiness> {
   const settings = useAppStore((s) => s.settings)
+  const feishuReadiness = useForflowFeishuReadiness(settings?.activeRuntimeEnvironmentId)
   const preflightStatus = useAppStore((s) => s.preflightStatus)
   const preflightStatusChecked = useAppStore((s) => s.preflightStatusChecked)
   const preflightStatusContextKey = useAppStore((s) => s.preflightStatusContextKey)
@@ -36,7 +38,8 @@ export function useTaskSourceProviderReadiness(
   const {
     installed: linearSkillInstalled,
     loading: linearSkillLoading,
-    settled: linearSkillSettled
+    settled: linearSkillSettled,
+    installedUnverifiable: linearSkillUnverifiable
   } = useInstalledAgentSkillNames(LINEAR_AGENT_SKILL_NAMES, {
     discoveryTarget: activeSkillRuntime.discoveryTarget,
     sourceKinds: GLOBAL_AGENT_SKILL_SOURCE_KINDS
@@ -66,6 +69,7 @@ export function useTaskSourceProviderReadiness(
   return useMemo(() => {
     const visible = new Set(visibleProvidersKey.split(',') as TaskProvider[])
     return {
+      feishu: { ...feishuReadiness, visible: visible.has('feishu') },
       github: {
         connected: githubConnected,
         checking: reviewChecking,
@@ -83,6 +87,7 @@ export function useTaskSourceProviderReadiness(
         checking: linearChecking,
         skillInstalled: linearSkillInstalled,
         skillChecking: linearSkillLoading && !linearSkillSettled,
+        skillUnverifiable: linearSkillUnverifiable,
         visible: visible.has('linear')
       },
       jira: {
@@ -92,6 +97,7 @@ export function useTaskSourceProviderReadiness(
       }
     }
   }, [
+    feishuReadiness,
     githubConnected,
     gitlabConnected,
     jiraChecking,
@@ -101,6 +107,7 @@ export function useTaskSourceProviderReadiness(
     linearSkillInstalled,
     linearSkillLoading,
     linearSkillSettled,
+    linearSkillUnverifiable,
     reviewChecking,
     reviewUnavailable,
     visibleProvidersKey

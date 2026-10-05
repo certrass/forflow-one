@@ -1,12 +1,14 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vitest/config'
 import TimingSequencer from './scripts/ci-unit-sequencer.mjs'
+import { jevEvaluatorFingerprint } from './build-plugins/jev-evaluator-fingerprint'
 
 const windowsTestWorkerOptions = process.platform === 'win32' ? { maxWorkers: 4 } : {}
 
 export default defineConfig({
   define: {
-    ORCA_FEATURE_WALL_ENABLED: 'true'
+    ORCA_FEATURE_WALL_ENABLED: 'true',
+    __FORFLOW_JEV_EVALUATOR_HASH__: JSON.stringify(jevEvaluatorFingerprint())
   },
   resolve: {
     alias: {

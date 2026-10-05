@@ -21,6 +21,7 @@ type OutputChunk = Rollup.OutputChunk
 // agent-hooks entry. require("electron") throws MODULE_NOT_FOUND in all of them.
 const PLAIN_NODE_ENTRY_NAMES = [
   'daemon-entry',
+  'forflow/bundled-skill-install',
   'parcel-watcher-process-entry',
   'computer-sidecar',
   'wsl-transcript-fs-process-entry',
@@ -40,7 +41,8 @@ const WORKER_THREAD_ENTRY_NAMES = [
   'session-scanner-opencode-sqlite-worker-entry',
   'session-scanner-worker-entry',
   'main-thread-hang-watchdog-entry',
-  'port-scan-command-worker-entry'
+  'port-scan-command-worker-entry',
+  'usage-scan-worker-entry'
 ] as const
 
 export const GUARDED_ENTRY_NAMES = [

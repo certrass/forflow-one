@@ -1,4 +1,5 @@
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
+import { mapCodexAccountMetadata } from './codex-account-metadata'
 import { extractCodexAuthError } from '../../shared/codex-auth-errors'
 import {
   excerptAgentFailureOutput,
@@ -30,6 +31,7 @@ type RpcResponse = {
 
 type RpcRateLimitsResponse = {
   rateLimits?: CodexRateLimitWindowsSnapshot | null
+  rateLimitsByLimitId?: Record<string, CodexRateLimitWindowsSnapshot> | null
   rateLimitResetCredits?: RpcRateLimitResetCredits
 }
 
@@ -242,13 +244,15 @@ export function readCodexRateLimitsViaRpc(
             return
           }
           const wrapper = message.result as RpcRateLimitsResponse | undefined
-          const classified = classifyCodexRateLimitWindows(wrapper?.rateLimits)
+          const snapshot = wrapper?.rateLimitsByLimitId?.codex ?? wrapper?.rateLimits
+          const classified = classifyCodexRateLimitWindows(snapshot)
           const credits = mapRpcRateLimitResetCredits(wrapper?.rateLimitResetCredits)
           settle(
             {
               provider: 'codex',
               session: mapCodexRateLimitWindow(classified.session, CODEX_SESSION_WINDOW_MINUTES),
               weekly: mapCodexRateLimitWindow(classified.weekly, CODEX_WEEKLY_WINDOW_MINUTES),
+              ...mapCodexAccountMetadata(snapshot),
               ...(credits !== undefined ? { rateLimitResetCredits: credits } : {}),
               updatedAt: Date.now(),
               error: null,

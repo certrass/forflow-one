@@ -27,7 +27,16 @@ function makeRpcChild(): CodexRpcRateLimitChild {
             Buffer.from(
               `${JSON.stringify({
                 id: message.id,
-                result: { rateLimits: { primary: { usedPercent: 17 } } }
+                result: {
+                  rateLimits: { primary: { usedPercent: 99 } },
+                  rateLimitsByLimitId: {
+                    codex: {
+                      primary: { usedPercent: 17 },
+                      planType: 'pro',
+                      credits: { hasCredits: true, unlimited: false, balance: '25.5' }
+                    }
+                  }
+                }
               })}\n`
             )
           )
@@ -69,6 +78,8 @@ describe('Codex RPC rate-limit probe cleanup boundary', () => {
     finishTermination()
     await expect(result).resolves.toMatchObject({
       provider: 'codex',
+      planType: 'pro',
+      credits: { hasCredits: true, unlimited: false, balance: '25.5' },
       session: { usedPercent: 17 },
       status: 'ok'
     })

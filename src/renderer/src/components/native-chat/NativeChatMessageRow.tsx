@@ -4,9 +4,10 @@ import CommentMarkdown, {
 } from '@/components/sidebar/CommentMarkdown'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
-import type {
-  NativeChatMessage,
-  NativeChatToolCallBlock
+import {
+  NATIVE_CHAT_INTERRUPTED_STATUS_TEXT,
+  type NativeChatMessage,
+  type NativeChatToolCallBlock
 } from '../../../../shared/native-chat-types'
 import { deriveNativeChatRowContent } from './native-chat-row-content'
 import { NativeChatToolRun } from './NativeChatToolRun'
@@ -59,12 +60,15 @@ export const MessageRow = memo(function MessageRow({
   const rowRef = useRef<HTMLDivElement | null>(null)
   // One pass per block set, shared with the list that decides whether this row
   // occupies a slot — so "draws nothing" means the same thing to both.
-  const { hasImages, markdown, prose, subagentGroups, tools } = deriveNativeChatRowContent(
-    message.blocks
-  )
+  const { backgroundTasks, hasImages, markdown, prose, subagentGroups, tools } =
+    deriveNativeChatRowContent(message.blocks)
   const isUser = message.role === 'user'
   const isReasoning = message.role === 'reasoning'
   const isSystem = message.role === 'system'
+  const displayMarkdown =
+    isSystem && markdown === NATIVE_CHAT_INTERRUPTED_STATUS_TEXT
+      ? translate('components.native-chat.interrupted', 'Conversation interrupted')
+      : markdown
   const providerFrame = message.blocks.find((block) => block.type === 'text' && block.providerFrame)
 
   const scrollToTop = useCallback(() => {
@@ -76,7 +80,13 @@ export const MessageRow = memo(function MessageRow({
   // Skip rows with nothing renderable so the transcript shows no empty/ghost
   // bubble.
   // After all hooks, so hook order stays unconditional.
-  if (markdown.length === 0 && !hasImages && tools.length === 0 && subagentGroups.length === 0) {
+  if (
+    markdown.length === 0 &&
+    !hasImages &&
+    tools.length === 0 &&
+    subagentGroups.length === 0 &&
+    backgroundTasks.length === 0
+  ) {
     return null
   }
 
@@ -174,7 +184,7 @@ export const MessageRow = memo(function MessageRow({
       />
       {markdown ? (
         <CommentMarkdown
-          content={markdown}
+          content={displayMarkdown}
           variant="document"
           className="text-sm"
           renderCodeBlock={NativeChatCodeBlock}
@@ -183,7 +193,7 @@ export const MessageRow = memo(function MessageRow({
           linkifyFilePaths={onLinkClick !== undefined}
         />
       ) : null}
-      {tools.length > 0 || subagentGroups.length > 0 ? (
+      {tools.length > 0 || subagentGroups.length > 0 || backgroundTasks.length > 0 ? (
         <NativeChatToolRun
           blocks={tools}
           previousTodoWrite={previousTodoWrite}
@@ -192,6 +202,7 @@ export const MessageRow = memo(function MessageRow({
           onRevealDiff={onScrollMessageToTop}
           onLinkClick={onLinkClick}
           subagentGroups={subagentGroups}
+          backgroundTasks={backgroundTasks}
           expandSignal={expandSignal}
           expandOverride={activityExpandOverride}
           activeTurnIsWorking={activeTurnIsWorking}

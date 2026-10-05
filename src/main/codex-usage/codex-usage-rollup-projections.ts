@@ -31,6 +31,7 @@ export function buildSummary(
   let events = 0
   let estimatedCostUsd = 0
   let hasAnyBillableCost = false
+  const costCoverage = { pricedRecords: 0, unpricedRecords: 0, unclassifiedRecords: 0 }
   const byModel = new Map<string, number>()
   const byProject = new Map<string, number>()
 
@@ -55,6 +56,9 @@ export function buildSummary(
     if (cost !== null) {
       hasAnyBillableCost = true
       estimatedCostUsd += cost
+      costCoverage.pricedRecords += row.eventCount
+    } else {
+      costCoverage.unpricedRecords += row.eventCount
     }
   }
 
@@ -72,6 +76,7 @@ export function buildSummary(
     reasoningOutputTokens,
     totalTokens,
     estimatedCostUsd: hasAnyBillableCost ? estimatedCostUsd : null,
+    costCoverage,
     topModel,
     topProject,
     hasAnyCodexData: filteredSessions.length > 0 || filteredDaily.length > 0

@@ -7,6 +7,7 @@ import type { Repo } from '../../../../shared/repo-types'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { serializeWorkspaceLaneFullIds } from './workspace-kanban-filtered-drop-index'
 import WorkspaceKanbanStatusLane from './WorkspaceKanbanStatusLane'
+import { setRendererUiLanguage } from '@/i18n/i18n'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -93,14 +94,26 @@ beforeEach(() => {
   root = createRoot(container)
 })
 
-afterEach(() => {
+afterEach(async () => {
   act(() => {
     root.unmount()
   })
   container.remove()
+  await setRendererUiLanguage('en')
 })
 
 describe('WorkspaceKanbanStatusLane', () => {
+  it('updates the visible default label and accessible create action when language changes', async () => {
+    renderLane({ items: [], totalCount: 0, hasQuery: false })
+    expect(container.textContent).toContain('Todo')
+    await act(async () => {
+      await setRendererUiLanguage('zh')
+    })
+    expect(container.textContent).toContain('待办')
+    expect(container.textContent).not.toContain('Todo')
+    expect(container.querySelector('button[aria-label*="待办"]')).not.toBeNull()
+    expect(status).toEqual({ id: 'todo', label: 'Todo' })
+  })
   it('shows a plain count without a query and a matches/total count with one', () => {
     renderLane({ items: [worktree('a'), worktree('b')], totalCount: 2, hasQuery: false })
     expect(container.textContent).toContain('2')

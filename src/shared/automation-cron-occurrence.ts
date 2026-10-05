@@ -10,9 +10,7 @@ export function startOfLocalDay(timestamp: number): number {
 }
 
 export function floorToMinute(timestamp: number): number {
-  const date = new Date(timestamp)
-  date.setSeconds(0, 0)
-  return date.getTime()
+  return Math.floor(timestamp / 60_000) * 60_000
 }
 
 export function cronMatches(rule: ParsedCron, timestamp: number): boolean {
@@ -23,13 +21,13 @@ export function cronMatches(rule: ParsedCron, timestamp: number): boolean {
   return rule.hours.has(date.getHours()) && rule.minutes.has(date.getMinutes())
 }
 
-export function cronDateMatches(rule: ParsedCron, timestamp: number): boolean {
+export function cronDateMatches(rule: ParsedCron, timestamp: number, utc = false): boolean {
   const date = new Date(timestamp)
-  if (!rule.months.has(date.getMonth() + 1)) {
+  if (!rule.months.has((utc ? date.getUTCMonth() : date.getMonth()) + 1)) {
     return false
   }
-  const dayOfMonthMatches = rule.daysOfMonth.has(date.getDate())
-  const dayOfWeekMatches = rule.daysOfWeek.has(date.getDay())
+  const dayOfMonthMatches = rule.daysOfMonth.has(utc ? date.getUTCDate() : date.getDate())
+  const dayOfWeekMatches = rule.daysOfWeek.has(utc ? date.getUTCDay() : date.getDay())
   // Dialect rule; the flags are lexical (`isCronDayFieldRestricted`), not set sizes.
   if (rule.dayOfMonthRestricted && rule.dayOfWeekRestricted) {
     return dayOfMonthMatches || dayOfWeekMatches

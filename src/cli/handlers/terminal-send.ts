@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../cli-product'
 import type { RuntimeTerminalSend } from '../../shared/runtime-types'
 import { TERMINAL_PROMPT_DELIVERY_RUNTIME_CAPABILITY } from '../../shared/protocol-version'
 import type { CommandHandler } from '../dispatch'
@@ -34,7 +35,9 @@ export const terminalSendHandler: CommandHandler = async ({ flags, client, cwd, 
     if (!status.result.runtime.reachable) {
       throw new RuntimeClientError(
         'runtime_unavailable',
-        'Orca could not verify prompt-delivery support, so no input was sent. Wait for the execution host to become reachable and retry.'
+        brandCliDocumentation(
+          'Orca could not verify prompt-delivery support, so no input was sent. Wait for the execution host to become reachable and retry.'
+        )
       )
     }
     promptDeliverySupported =
@@ -45,13 +48,17 @@ export const terminalSendHandler: CommandHandler = async ({ flags, client, cwd, 
   if (retryRequest && !promptDeliverySupported) {
     throw new RuntimeClientError(
       'incompatible_runtime',
-      'This Orca host cannot honor --retry-request and never recorded this request ID. This attempt sent no input, but an earlier prompt may have been delivered; inspect the terminal and do not resend unless you independently prove it was not delivered, because updating the host cannot make this specific retry idempotent.'
+      brandCliDocumentation(
+        'This Orca host cannot honor --retry-request and never recorded this request ID. This attempt sent no input, but an earlier prompt may have been delivered; inspect the terminal and do not resend unless you independently prove it was not delivered, because updating the host cannot make this specific retry idempotent.'
+      )
     )
   }
   if (waitSubmitMs && !promptDeliverySupported) {
     throw new RuntimeClientError(
       'incompatible_runtime',
-      'This Orca host does not support --wait-submit. No input was sent; update Orca on the execution host, or omit only --wait-submit for a legacy prompt whose delivery cannot be observed or retried safely.'
+      brandCliDocumentation(
+        'This Orca host does not support --wait-submit. No input was sent; update Orca on the execution host, or omit only --wait-submit for a legacy prompt whose delivery cannot be observed or retried safely.'
+      )
     )
   }
   const params = {
@@ -85,7 +92,9 @@ export const terminalSendHandler: CommandHandler = async ({ flags, client, cwd, 
     throw attachUnverifiedTerminalPromptRecovery(
       new RuntimeClientError(
         'incompatible_runtime',
-        'The Orca host changed after prompt-delivery support was verified and accepted input without returning a durable prompt receipt.'
+        brandCliDocumentation(
+          'The Orca host changed after prompt-delivery support was verified and accepted input without returning a durable prompt receipt.'
+        )
       )
     )
   }

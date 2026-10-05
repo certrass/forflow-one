@@ -96,6 +96,7 @@ function placementIsDiscovered(
 }
 
 async function discoverInstalledSkill(input: {
+  log?: (message: string) => void
   scope: 'global' | 'workspace'
   homeDirectory: string
   workspaceDirectory?: string
@@ -120,6 +121,7 @@ async function discoverInstalledSkill(input: {
     })
   }
   return discoverSkills({
+    log: input.log,
     homeDir: input.homeDirectory,
     repos: [],
     refresh: true,
@@ -132,6 +134,7 @@ async function discoverInstalledSkill(input: {
 
 export async function verifySkillInstallDiscovery(input: {
   result: SkillInstallResult
+  log?: (message: string) => void
   scope: 'global' | 'workspace'
   homeDirectory: string
   workspaceDirectory?: string

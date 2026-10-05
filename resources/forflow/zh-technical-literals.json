@@ -519,6 +519,8 @@
     "auto.components.feature.wall.EditorAnimatedVisual.cda56c5915": "notes / launch-plan.md",
     "auto.components.feature.wall.ReviewPRViewAnimatedVisual.c2062da7ec": "stderr",
     "auto.components.feature.wall.BrowserAnimatedVisual.73bbb46073": "/pricing",
-    "auto.components.feature.wall.BrowserAnimatedVisual.f39be6ca14": "/signup"
+    "auto.components.feature.wall.BrowserAnimatedVisual.f39be6ca14": "/signup",
+    "auto.lib.agent.catalog.opencode2_label": "OpenCode 2",
+    "auto.components.settings.general.search.omp": "OMP"
   }
 }

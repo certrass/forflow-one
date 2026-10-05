@@ -1,3 +1,4 @@
+import { cliProductName, brandCliDocumentation } from './cli-product'
 // Why: the runtime answers an unresolvable `--worktree` with a bare
 // `selector_not_found` — no offending value and no grammar — so a caller who passed
 // a repo id where a worktree id belongs cannot tell what was wrong (#16904). The CLI
@@ -46,10 +47,12 @@ export function worktreeSelectorRecovery(selector: string): WorktreeSelectorReco
     validSelectorForms: WORKTREE_SELECTOR_FORMS,
     suggestions,
     nextSteps: [
-      `No Orca workspace matched the worktree selector "${selector}".`,
+      `No ${cliProductName()} workspace matched the worktree selector "${selector}".`,
       ...(suggestions.length > 0 ? [`Did you mean: ${suggestions.join(', ')}`] : []),
       `Valid selector forms: ${WORKTREE_SELECTOR_FORMS.join(', ')}.`,
-      'List the exact values with `orca worktree list --json`; a bare repository id is not a worktree id.'
+      brandCliDocumentation(
+        'List the exact values with `orca worktree list --json`; a bare repository id is not a worktree id.'
+      )
     ]
   }
 }

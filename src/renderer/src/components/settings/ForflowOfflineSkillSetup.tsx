@@ -60,7 +60,7 @@ export function ForflowOfflineSkillSetup({
       <p className="text-xs text-muted-foreground">
         {translate(
           'forflow.skills.offline',
-          '将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。'
+          'Install bundled skills into ~/.agents/skills for agents to read according to their configuration. Existing changes are preserved. Administrators distribute skills to remote environments offline.'
         )}
       </p>
       {preInstallNotice ? (

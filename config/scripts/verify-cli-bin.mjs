@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url'
 // Electron packaging restamps the channel-specific version after compilation.
 function buildOutPackageJson(version) {
   return `${JSON.stringify(
-    { name: 'orca-compiled-output', type: 'commonjs', private: true, version },
+    { name: process.env.FORFLOW_BUILD === '1' ? 'forflow-one-compiled-output' : 'orca-compiled-output', type: 'commonjs', private: true, version },
     null,
     2
   )}\n`

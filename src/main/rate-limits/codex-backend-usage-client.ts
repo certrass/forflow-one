@@ -1,4 +1,5 @@
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
+import { mapCodexAccountMetadata } from './codex-account-metadata'
 import { cancelUnreadResponseBody } from '../lib/unread-response-body'
 import {
   classifyCodexRateLimitWindows,
@@ -88,7 +89,7 @@ export async function fetchCodexRateLimitsViaBackend(
       classified.weekly,
       snapshotWindowMinutes(classified.weekly, CODEX_WEEKLY_WINDOW_MINUTES)
     ),
-    planType: payload.plan_type,
+    ...mapCodexAccountMetadata(payload),
     ...(payload.rate_limit_reset_credits !== undefined
       ? {
           rateLimitResetCredits:
@@ -115,17 +116,19 @@ export async function supplementCodexSessionWindow(
       return limits
     }
     const rateLimitResetCredits = backend.rateLimitResetCredits ?? limits.rateLimitResetCredits
+    const metadata = {
+      planType: backend.planType ?? limits.planType,
+      ...(backend.credits !== undefined ? { credits: backend.credits } : {}),
+      ...(rateLimitResetCredits !== undefined ? { rateLimitResetCredits } : {})
+    }
     if (!backend.session) {
-      return rateLimitResetCredits === limits.rateLimitResetCredits
-        ? limits
-        : { ...limits, rateLimitResetCredits }
+      return { ...limits, ...metadata }
     }
     return {
       ...limits,
       session: backend.session,
       weekly: backend.weekly ?? limits.weekly,
-      planType: backend.planType ?? limits.planType,
-      ...(rateLimitResetCredits !== undefined ? { rateLimitResetCredits } : {}),
+      ...metadata,
       updatedAt: backend.updatedAt
     }
   } catch {

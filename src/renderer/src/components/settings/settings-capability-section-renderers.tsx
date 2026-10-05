@@ -7,6 +7,7 @@ import { VoicePane } from './VoicePane'
 import { SettingsSection } from './SettingsSection'
 import { translate } from '@/i18n/i18n'
 import type { SettingsRenderContext } from './settings-render-context'
+import { isForflowBuild } from '../../../../shared/product-branding'
 
 export function renderAgentsSettingsSection(context: SettingsRenderContext): React.JSX.Element {
   const { model, navigation, terminal, view } = context
@@ -22,6 +23,7 @@ export function renderAgentsSettingsSection(context: SettingsRenderContext): Rea
     >
       {view.isSectionMounted('agents') ? (
         <AgentsPane
+          updateSettingsOrThrow={model.updateSettingsOrThrow}
           settings={model.settings}
           updateSettings={model.updateSettings}
           wslSupportedPlatform={terminal.localWslSupportedPlatform}
@@ -40,10 +42,17 @@ export function renderAccountsSettingsSection(context: SettingsRenderContext): R
     <SettingsSection
       id="accounts"
       title={translate('auto.components.settings.Settings.ad6c529693', 'AI Provider Accounts')}
-      description={translate(
-        'auto.components.settings.Settings.21f09426ea',
-        'Optional. Orca works with your existing provider logins; add accounts only if you want Orca to help switch between them.'
-      )}
+      description={
+        isForflowBuild()
+          ? translate(
+              'forflow.modelAccounts.accountsDescription',
+              '管理国内模型 API 配置及智能体登录账户。API 充值余额与 CLI 订阅额度分别管理。'
+            )
+          : translate(
+              'auto.components.settings.Settings.21f09426ea',
+              'Optional. Orca works with your existing provider logins; add accounts only if you want Orca to help switch between them.'
+            )
+      }
       badge={translate('auto.hooks.useSettingsNavigationMetadata.7c79d3b7bf', 'Optional')}
       searchEntries={navigation.getSectionSearchEntries('accounts')}
     >

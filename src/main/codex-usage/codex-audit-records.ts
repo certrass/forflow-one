@@ -1,0 +1,200 @@
+import { createHash } from 'node:crypto'
+import type { CodexAuditRow, CodexUsageAudit } from '../../shared/codex-usage-audit-types'
+import { getLocalUsageDay } from '../usage/usage-calendar-range'
+import type { UsageWorktreeResolver } from '../usage/usage-worktree-resolver'
+import { readCodexAuditMessage } from './codex-audit-message'
+
+function record(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+function text(value: unknown): string | null {
+  return typeof value === 'string' && value.length <= 256 ? value : null
+}
+
+export type AuditCursor = { sessionId: string | null; cwd: string | null; turnId?: string | null }
+export type AuditAccumulator = {
+  audit: CodexUsageAudit
+  cutoff: string | null
+  resolveWorktree: UsageWorktreeResolver
+  seen: Set<string>
+  calls: Map<string, CodexAuditRow>
+  results: Set<string>
+  resultSources: Map<string, NonNullable<CodexAuditRow['resultSource']>>
+  identities: Map<string, string>
+  sessionId?: string
+  rowLimit?: number
+}
+
+export function collectCodexAuditLine(
+  line: string,
+  sourcePath: string,
+  byteOffset: number,
+  cursor: AuditCursor,
+  accumulator: AuditAccumulator
+): void {
+  const { audit, cutoff, seen, calls, results } = accumulator
+  let row: unknown
+  try {
+    row = JSON.parse(line)
+  } catch {
+    audit.malformedLines++
+    return
+  }
+  if (!record(row) || !record(row.payload)) {
+    return
+  }
+  const payload = row.payload
+  if (row.type === 'session_meta') {
+    cursor.sessionId = text(payload.id)
+    cursor.cwd = typeof payload.cwd === 'string' ? payload.cwd : null
+    cursor.turnId = null
+    return
+  }
+  if (row.type === 'turn_context') {
+    cursor.cwd = typeof payload.cwd === 'string' ? payload.cwd : cursor.cwd
+    cursor.turnId = text(payload.turn_id)
+  }
+  const sessionId = text(payload.session_id) ?? cursor.sessionId
+  if (accumulator.sessionId && sessionId !== accumulator.sessionId) {
+    return
+  }
+  const timestamp = text(row.timestamp)
+  const day = timestamp ? getLocalUsageDay(timestamp) : null
+  if (!timestamp || !day || (cutoff && day < cutoff)) {
+    return
+  }
+  if (audit.scope === 'orca') {
+    if (!cursor.cwd) {
+      audit.skippedUnknownScope++
+      return
+    }
+    if (!accumulator.resolveWorktree(cursor.cwd)) {
+      return
+    }
+  }
+  const identity = createHash('sha256').update(line).digest('hex')
+  const callId = text(payload.call_id)
+  const namespace = JSON.stringify([sessionId ?? sourcePath, cursor.turnId ?? null])
+  const scopedCallId = `${namespace}:tool:${callId}`
+  if (
+    row.type === 'response_item' &&
+    (payload.type === 'function_call_output' || payload.type === 'custom_tool_call_output')
+  ) {
+    if (callId) {
+      const outputKey = `${scopedCallId}:output`
+      const previous = accumulator.identities.get(outputKey)
+      if (previous && previous !== identity) {
+        audit.conflictingRecords = (audit.conflictingRecords ?? 0) + 1
+      }
+      accumulator.identities.set(outputKey, identity)
+      accumulator.resultSources.set(scopedCallId, { sourcePath, byteOffset, contentHash: identity })
+      results.add(scopedCallId)
+    }
+    return
+  }
+  let kind: CodexAuditRow['kind']
+  let name: string
+  let recordId: string | null = null
+  let tokens: number | null = null
+  let recordFormat: CodexAuditRow['recordFormat']
+  const message = row.type === 'response_item' ? readCodexAuditMessage(payload) : null
+  let key = `${namespace}:${identity}`
+  if (message) {
+    kind = 'context'
+    name = message.role === 'user' ? '用户消息' : '助手消息'
+    recordFormat = 'response_message'
+    recordId = text(payload.id)
+    if (recordId) {
+      key = `${namespace}:message:${recordId}`
+    }
+  } else if (
+    row.type === 'turn_context' ||
+    row.type === 'compacted' ||
+    (row.type === 'event_msg' && payload.type === 'context_compacted')
+  ) {
+    kind = 'context'
+    name =
+      row.type === 'turn_context'
+        ? `回合上下文 · ${text(payload.model) ?? '模型未记录'}`
+        : '上下文压缩记录'
+    recordId = text(payload.turn_id)
+    recordFormat = row.type === 'turn_context' ? 'turn_context' : 'compaction'
+  } else if (row.type === 'token_usage_record' && text(payload.response_id)) {
+    kind = 'request'
+    name = '模型响应用量'
+    recordId = text(payload.response_id)
+    key = `${namespace}:request:${recordId}`
+    tokens =
+      record(payload.usage) &&
+      typeof payload.usage.total_tokens === 'number' &&
+      Number.isSafeInteger(payload.usage.total_tokens) &&
+      payload.usage.total_tokens >= 0
+        ? payload.usage.total_tokens
+        : null
+  } else if (
+    row.type === 'response_item' &&
+    (payload.type === 'function_call' || payload.type === 'custom_tool_call') &&
+    callId
+  ) {
+    kind = 'tool'
+    name = text(payload.name) ?? '未命名工具'
+    recordId = callId
+    key = scopedCallId
+  } else {
+    return
+  }
+  if (seen.has(key)) {
+    if (accumulator.identities.get(key) !== identity) {
+      audit.conflictingRecords = (audit.conflictingRecords ?? 0) + 1
+    }
+    return
+  }
+  seen.add(key)
+  accumulator.identities.set(key, identity)
+  const entry: CodexAuditRow = {
+    kind,
+    name,
+    recordId,
+    timestamp,
+    sourcePath,
+    byteOffset,
+    sessionId,
+    tokens,
+    hasResult: kind === 'tool' ? false : null,
+    evidenceKey: createHash('sha256').update(key).digest('hex'),
+    contentHash: identity,
+    ...(recordFormat ? { recordFormat } : {}),
+    ...(message
+      ? {
+          messageRole: message.role,
+          messageTextChars: message.text.length,
+          unsupportedContentBlocks: message.unsupportedContentBlocks
+        }
+      : {})
+  }
+  if (message && audit.messageCounts) {
+    audit.messageCounts[message.role]++
+  }
+  audit.counts[kind]++
+  audit.rows.push(entry)
+  if (kind === 'tool' && callId) {
+    calls.set(scopedCallId, entry)
+  }
+}
+
+export function finishCodexAudit(accumulator: AuditAccumulator): void {
+  for (const [callId, row] of accumulator.calls) {
+    row.hasResult = accumulator.results.has(callId)
+    row.resultSource = accumulator.resultSources.get(callId)
+    if (row.hasResult) {
+      accumulator.audit.toolResults++
+    }
+  }
+  // Keep metadata only; command arguments and result bodies never enter the audit snapshot.
+  const counts = { context: 0, request: 0, tool: 0, data: 0 }
+  const totalRows = accumulator.audit.rows.length
+  accumulator.audit.rows = accumulator.audit.rows
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .filter((row) => ++counts[row.kind] <= (accumulator.rowLimit ?? 12))
+  accumulator.audit.omittedRows = totalRows - accumulator.audit.rows.length
+}

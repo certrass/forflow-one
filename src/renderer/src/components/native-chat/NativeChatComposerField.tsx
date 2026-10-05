@@ -16,6 +16,8 @@ import type {
 } from '../../../../shared/native-chat-session-options'
 import type { NativeChatOptionPickerRequest } from './native-chat-composer-types'
 import { NativeChatImageAttachmentPreview } from './NativeChatImageAttachmentPreview'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { translate } from '@/i18n/i18n'
 
 export type NativeChatComposerFieldProps = {
   /** Pane identity published to the drop pipeline so a native file drop lands
@@ -31,6 +33,7 @@ export type NativeChatComposerFieldProps = {
   notice: string | null
   imageAttachments: readonly NativeChatComposerImageAttachment[]
   sendButtonDisabled: boolean
+  followUpDisabled?: boolean
   isWorking: boolean
   attachDisabled: boolean
   dictationDisabled: boolean
@@ -103,6 +106,7 @@ export function NativeChatComposerField({
   notice,
   imageAttachments,
   sendButtonDisabled,
+  followUpDisabled,
   isWorking,
   attachDisabled,
   dictationDisabled,
@@ -179,7 +183,10 @@ export function NativeChatComposerField({
             <NativeChatMentionHint query={autocomplete.query} onAccept={onAcceptMention} />
           ) : null}
           {notice ? (
-            <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div
+              role="status"
+              className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground"
+            >
               <ImageOff className="size-3.5 shrink-0" />
               <span>{notice}</span>
             </div>
@@ -222,6 +229,13 @@ export function NativeChatComposerField({
               disabled={disabled}
               onChange={(input) => onDraftChange(input.value, input)}
               onKeyDownCapture={(event) => {
+                // Enter on an attachment's remove button must not submit the draft.
+                if (
+                  event.target instanceof Element &&
+                  event.target.closest('[data-native-chat-file-reference] button')
+                ) {
+                  return
+                }
                 if (!imeEnterGesture.ownsKeyDown(event)) {
                   onKeyDown(event)
                 }
@@ -271,6 +285,7 @@ export function NativeChatComposerField({
                 attachDisabled={attachDisabled}
                 dictationDisabled={dictationDisabled}
                 sendDisabled={sendButtonDisabled}
+                followUpDisabled={followUpDisabled}
                 isWorking={isWorking}
                 isDictating={isDictating}
                 isDictationHoldMode={isDictationHoldMode}
@@ -286,6 +301,14 @@ export function NativeChatComposerField({
               />
             </div>
           </div>
+          {isForflowBuild() && !disabled ? (
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              {translate(
+                'forflow.composer.inputHint',
+                'Drop files to reference them · Enter to send, Shift+Enter for a new line'
+              )}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

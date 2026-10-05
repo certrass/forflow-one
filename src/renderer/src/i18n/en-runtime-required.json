@@ -73,6 +73,21 @@
         "af6e02c44a": "page",
         "f5a6b38a14": "sheet"
       },
+      "NativeChatResumeOnRestartModal": {
+        "continueRefused_one": "{{value0}} chat could not be continued. Open it to continue manually.",
+        "continueRefused_other": "{{value0}} chats could not be continued. Open them to continue manually.",
+        "continueUnconfirmed_one": "Continuation delivery is unconfirmed for {{value0}} chat. Open it to check before sending another message.",
+        "continueUnconfirmed_other": "Continuation delivery is unconfirmed for {{value0}} chats. Open them to check before sending another message.",
+        "manyAgents": "{{value0}} agents",
+        "oneAgent": "1 agent",
+        "projects": "Folder workspaces",
+        "reconnectAgent": "Reconnect {{value0}} chat",
+        "reconnectRefused_one": "{{value0}} chat could not be reconnected. You can still open it normally.",
+        "reconnectRefused_other": "{{value0}} chats could not be reconnected. You can still open them normally.",
+        "reconnectUnconfirmed_one": "Reconnection is unconfirmed for {{value0}} chat. You can still open it normally.",
+        "reconnectUnconfirmed_other": "Reconnection is unconfirmed for {{value0}} chats. You can still open them normally.",
+        "resume": "Reconnect"
+      },
       "NewWorkspaceComposerCard": {
         "0e587e31fb": "yaml",
         "2132b670da": "both",
@@ -325,6 +340,16 @@
           "BrowserToolbarMenu": {
             "6aa42813e4": "Imported {{value0}} cookies from {{value1}}{{value2}}."
           }
+        },
+        "profile": {
+          "user": {
+            "agent": {
+              "option": {
+                "04af3dc12b": "Use unmodified user agent",
+                "5bf47a3c91": "May improve Google sign-in, but can reduce compatibility with bot-protected sites."
+              }
+            }
+          }
         }
       },
       "contextual": {
@@ -424,6 +449,20 @@
               "pane": {
                 "b2c268a0b9": "Mobile Emulator is macOS only",
                 "f630b9ca9f": "Mobile Emulator requires a Mac with Xcode and the iOS Simulator runtime. On Linux or Windows, use a physical device or a remote Mac build host."
+              }
+            }
+          },
+          "use": {
+            "mobile": {
+              "emulator": {
+                "agent": {
+                  "setup": {
+                    "state": {
+                      "51074ccb05": "Failed to load CLI status.",
+                      "c94ff11e91": "Could not re-check setup status."
+                    }
+                  }
+                }
               }
             }
           }
@@ -805,7 +844,10 @@
             "c57eda6822": "edit"
           },
           "Search": {
-            "1ec640c9c7": "match"
+            "0b8104eaf2": "file",
+            "1ec640c9c7": "match",
+            "4107975b3a": "in",
+            "6aeda362ed": "result"
           },
           "SourceControl": {
             "03d238218c": "Details",
@@ -1130,6 +1172,7 @@
         },
         "BrowserProfileRow": {
           "7df818977e": "From",
+          "b5c0479e21": "Unmodified user agent",
           "d420c43729": "Imported {{value0}} cookies from {{value1}}{{value2}} into {{value3}}."
         },
         "BrowserUsePane": {
@@ -1138,9 +1181,12 @@
         "CliSection": {
           "4c7e3e4c5f": "install",
           "5d432fe44d": "installed",
+          "6f894ef9c2": "Show in Finder",
           "7baec27029": "Failed to load CLI status.",
           "8a9b784c60": "stale",
           "8d96213669": "remove",
+          "9fd4023db0": "Show in File Manager",
+          "cbe55e4d48": "Show in Explorer",
           "cliSkillTerminalAria": "CLI skill install terminal",
           "cliSkillTerminalTitle": "CLI skill setup"
         },
@@ -1382,6 +1428,9 @@
           "restartWarning": "Updating restarts these servers. {{value0}} live tabs and {{value1}} terminal panes may briefly disconnect.",
           "updateOne": "Update server",
           "updating": "Updating servers…"
+        },
+        "RepositoryGitHubAccountSection": {
+          "retry": "Retry"
         },
         "RepositoryHooksSection": {
           "0e0dd5b9a5": "loaded",
@@ -2161,15 +2210,37 @@
       "stats": {
         "ClaudeUsagePane": {
           "02a046792e": "sessions •",
-          "32176e1d44": "turns"
+          "32176e1d44": "turns",
+          "b26d4ddb58": "Est. API-equivalent cost"
+        },
+        "CodexUsageDailyChart": {
+          "1e6f62d7e3": "Reasoning",
+          "609aa96e8b": "Daily usage",
+          "7b596a88b2": "Output",
+          "99a91d3143": "Input",
+          "c646e1783c": "Cached input",
+          "c756cda6a8": "Input, cached input, output, and reasoning totals by day.",
+          "e4bdcf0071": "tokens"
         },
         "CodexUsagePane": {
+          "0bd8655475": "Most recent local Codex sessions in this scope.",
+          "0c36b100be": "Last active",
+          "0cb0983c07": "Recent sessions",
+          "1a18fbd56b": "Est. API-equivalent cost",
+          "1a65900aea": "Project",
           "247c93ca92": "• inferred pricing",
+          "3acc582214": "Input",
           "79a69522a5": "events",
           "ae255c3dba": "n/a",
-          "bf1bf2f674": "sessions •"
+          "bbd20344b8": "Output",
+          "bd0822ca47": "Events",
+          "bf1bf2f674": "sessions •",
+          "bf6cf2d4dd": "Unknown",
+          "c2478bcc3c": "Model",
+          "e0b988599d": "Total"
         },
         "OpenCodeUsagePane": {
+          "15c34d4b08": "Recorded cost",
           "1e5d410df0": "events",
           "8095a63426": "n/a",
           "bc0cb89901": "sessions •"
@@ -2178,6 +2249,10 @@
           "908c470587": "codex",
           "eb6a066185": "claude",
           "eee19cfade": "overview"
+        },
+        "UsageOverviewPane": {
+          "0eaf937335": "Est. cost",
+          "55c910f4f1": "- some model prices are unavailable"
         },
         "UsageSessionsTable": {
           "01476891c7": "Last active",
@@ -2573,6 +2648,15 @@
         }
       },
       "worktree": {
+        "creation": {
+          "flow": {
+            "structured": {
+              "launch": {
+                "unknown": "Could not confirm whether {{value0}} chat opened. Retry to check again."
+              }
+            }
+          }
+        },
         "palette": {
           "search": {
             "0b01ff98d2": "Port",
@@ -2620,8 +2704,14 @@
   },
   "components": {
     "native-chat": {
+      "ask": {
+        "asked": "Asked:",
+        "awaiting": "Awaiting user input:",
+        "questionCount": "{{value0}} questions"
+      },
       "composer": {
-        "effort": "Effort"
+        "effort": "Effort",
+        "imageUnsupported": "Image paste is not supported for this agent."
       },
       "question": {
         "other": "Other…"
@@ -2654,6 +2744,8 @@
       "tool": {
         "countN": "{{value0}} tool calls",
         "countOne": "1 tool call",
+        "failedCallsLabel": "Failed tool calls: {{value0}}",
+        "failedCount": "{{value0}} failed",
         "moreCalls": "+{{value0}} more",
         "ranCommandManyToolsSummary": "Ran {{commandCount}} command and used {{toolCount}} tools",
         "ranCommandOneToolSummary": "Ran {{commandCount}} command and used {{toolCount}} tool",
@@ -2708,6 +2800,19 @@
       }
     }
   },
+  "contextualTour": {
+    "steps": {
+      "creation-project": {
+        "body": "Choose a Git repository or an ordinary folder. Git worktrees isolate branches; folder workspaces use the selected directory."
+      },
+      "session-parallel": {
+        "body": "A Git worktree gives another task its own branch. Ordinary folder workspaces do not isolate file changes."
+      },
+      "session-split": {
+        "body": "Open a second pane with {terminal.splitRight}, or right-click for split options. Both panes share this workspace’s files."
+      }
+    }
+  },
   "dashboard": {
     "sidebar": {
       "closeActivity": "Turn off activity view",
@@ -2720,28 +2825,9 @@
       "subagents_one": "{{count}} subagent",
       "subagents_other": "{{count}} subagents"
     },
-    "map": {
-      "agentCount": "{{count}} agents",
-      "agentCount_one": "{{count}} agent",
-      "agentCount_other": "{{count}} agents",
-      "host": {
-        "local": "Local",
-        "remote": "Remote",
-        "ssh": "SSH",
-        "wsl": "WSL"
-      },
-      "liveContainmentMap": "Live containment map",
-      "worktreeSummary_one": "{{total}} agent · {{active}} active · {{done}} done",
-      "worktreeSummary_other": "{{total}} agents · {{active}} active · {{done}} done"
-    },
     "placeholder": {
       "description": "This is where all your agents will show up at a glance. The board is coming soon.",
       "title": "Agent dashboard"
-    },
-    "view": {
-      "board": "Dashboard",
-      "label": "Dashboard view",
-      "map": "Agent Map"
     }
   },
   "forflow": {
@@ -2752,6 +2838,9 @@
       "failed": "Could not submit the decision. Retry or cancel.",
       "permission": "Confirm website permission",
       "upload": "Confirm data transfer"
+    },
+    "contextBeta": {
+      "incomplete": "Cannot prepare a reliable handoff yet: history is not fully loaded, user text is missing or exceeds the budget. Load earlier messages or narrow the task first."
     },
     "demoCopy": {
       "093f057fe3": "Splitting auth rewrite into 2 PRs…",
@@ -2816,6 +2905,37 @@
     },
     "guide": {
       "addProjectFirst": "First add a project you'd like to work on."
+    },
+    "modelAccounts": {
+      "accountsDescription": "Manage domestic model API settings and agent logins. API credit and CLI subscription quotas are managed separately.",
+      "actionFailed": "The operation could not finish. Check that the keychain is unlocked and the model and credentials are correct, then retry.",
+      "busy": "Working…",
+      "configured": "API configuration saved",
+      "description": "Configure official Kimi, Zhipu GLM and DeepSeek APIs. Website memberships, Kimi Code and Coding Plan use separate logins and quotas.",
+      "docs": "Official setup guide",
+      "enterKey": "Enter your platform API key",
+      "keepKey": "Leave blank to keep the saved key",
+      "loadFailed": "Could not read account settings. Please retry.",
+      "loading": "Reading API settings…",
+      "localOnly": "A remote host or WSL is selected. Switch to the local host to manage local API keys. Remote accounts are not read or changed here.",
+      "locked": "Keychain locked or configuration unreadable",
+      "missing": "Not configured",
+      "model": "Model name",
+      "remove": "Remove configuration",
+      "removed": "API configuration removed.",
+      "retry": "Retry",
+      "save": "Save configuration",
+      "saved": "Saved. Connection has not been verified.",
+      "scope": "Keys are encrypted on this device. Saving sends no request. Connection tests send only fixed test text and may use a small amount of API credit. These settings do not automatically change agent CLI logins or model configuration.",
+      "test": "Test connection",
+      "title": "Domestic model API accounts",
+      "unavailable": "This client does not support these settings. Update the desktop client."
+    },
+    "searchSummary": {
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files",
+      "matches_one": "{{count}} result",
+      "matches_other": "{{count}} results"
     },
     "shortcuts": {
       "actions": {
@@ -2982,7 +3102,7 @@
     "skills": {
       "installed": "Installed",
       "missing": "Not detected yet",
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "Install bundled skills into ~/.agents/skills for agents to read according to their configuration. Existing changes are preserved. Administrators distribute skills to remote environments offline.",
       "recheck": "Check local skills again",
       "recheckFailed": "Could not check local skills. Check the local skill folders.",
       "registerCli": "Orca needs to register its CLI on PATH.",
@@ -3163,6 +3283,9 @@
           "title": "Workspaces"
         }
       }
+    },
+    "workbench": {
+      "files": "Files and results"
     }
   },
   "runtimeRpc": {

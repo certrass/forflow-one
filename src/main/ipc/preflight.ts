@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import type { AgentCommandOverrides } from '../preflight/agent-command-overrides'
 import {
   detectInstalledAgentsWithShellPathHydration,
   detectRemoteAgents,
@@ -17,7 +18,9 @@ import type {
 // Re-exported here so existing importers of `ipc/preflight` keep working.
 export * from '../preflight/agent-detection'
 
-export function registerPreflightHandlers(): void {
+export function registerPreflightHandlers(
+  getSettings?: () => { agentCmdOverrides?: AgentCommandOverrides }
+): void {
   ipcMain.handle(
     'preflight:check',
     async (
@@ -29,11 +32,11 @@ export function registerPreflightHandlers(): void {
   )
 
   ipcMain.handle('preflight:detectAgents', async (_event, args?: PreflightRuntimeContext) =>
-    detectInstalledAgentsWithShellPathHydration(args)
+    detectInstalledAgentsWithShellPathHydration(args, getSettings?.().agentCmdOverrides)
   )
 
   ipcMain.handle('preflight:refreshAgents', async (_event, args?: PreflightRuntimeContext) => {
-    return refreshShellPathAndDetectAgents(args)
+    return refreshShellPathAndDetectAgents(args, getSettings?.().agentCmdOverrides)
   })
 
   // Why: remote worktrees need agent detection on the SSH host, not the local

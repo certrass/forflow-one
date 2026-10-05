@@ -1,5 +1,19 @@
+import type {
+  WorkspaceReviewDirectory,
+  WorkspaceReviewDirectoryQuery,
+  WorkspaceReviewQuery,
+  WorkspaceReviewTarget
+} from '../../shared/workspace-review-types'
 import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared/claude-usage-types'
 import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
+import type { CodexUsageAudit } from '../../shared/codex-usage-audit-types'
+import type {
+  CodexAnalyticsQuery,
+  CodexAnalyticsResult,
+  CodexReview,
+  CodexReviewSourceQuery,
+  CodexReviewMutation
+} from '../../shared/codex-review-types'
 import type {
   OpenCodeUsageBreakdownKind,
   OpenCodeUsageSnapshot
@@ -40,7 +54,25 @@ export type UsageProviderApi<Snapshot extends UsageProviderSnapshot, BreakdownKi
 
 export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBreakdownKind>
 
-export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind>
+export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind> & {
+  listWorkspaceReviewTargets?: () => Promise<WorkspaceReviewTarget[]>
+  listWorkspaceReviewFiles?: (
+    args: WorkspaceReviewDirectoryQuery
+  ) => Promise<WorkspaceReviewDirectory>
+  listWorkspaceReviews?: () => Promise<CodexReview[]>
+  openWorkspaceReview?: (args: WorkspaceReviewQuery) => Promise<CodexReview>
+  getAudit?: (args: UsageQueryArgs<CodexUsageSnapshot>) => Promise<CodexUsageAudit>
+  getAnalytics?: (args: CodexAnalyticsQuery) => Promise<CodexAnalyticsResult>
+  openReview?: (args: CodexReviewSourceQuery) => Promise<CodexReview>
+  getReview?: (id: string) => Promise<CodexReview>
+  updateReview?: (args: CodexReviewMutation) => Promise<CodexReview>
+  readReviewEvidence?: (args: {
+    id: string
+    versionId: string
+    evidenceKey: string
+    part?: 'record' | 'result'
+  }) => Promise<{ text: string; truncated: boolean; sourcePath: string; byteOffset: number }>
+}
 
 export type OpenCodeUsageApi = UsageProviderApi<OpenCodeUsageSnapshot, OpenCodeUsageBreakdownKind>
 

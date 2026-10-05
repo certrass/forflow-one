@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../shared/product-branding'
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '@/store'
 import { lazyWithRetry } from '@/lib/lazy-with-retry'
@@ -35,6 +36,7 @@ const HostedAddRepoDialog = lazyWithRetry(() => import('@/components/sidebar/Add
 })
 
 type ComposerModalData = {
+  prefilledPrompt?: string
   prefilledName?: string
   initialRepoId?: string
   initialEphemeralVmRecipeId?: string
@@ -123,13 +125,11 @@ function QuickTabBody({
     onComposerNodeChange,
     nameInputRef,
     submitQuick,
-    createDisabled,
+    createDisabled: baseCreateDisabled,
     selectAddedProjectRepo
   } = useComposerState({
     initialName: modalData.prefilledName ?? '',
-    // Why: the modal is quick-create only now, so prompt-prefill state is
-    // intentionally ignored even if older callers still send it.
-    initialPrompt: '',
+    initialPrompt: isForflowBuild() ? (modalData.prefilledPrompt ?? '') : '',
     initialLinkedWorkItem: modalData.linkedWorkItem ?? null,
     initialGitHubWorkItem: modalData.initialGitHubWorkItem ?? null,
     initialTaskSourceContext: modalData.taskSourceContext ?? null,
@@ -178,14 +178,19 @@ function QuickTabBody({
     setQuickAgentOverride(resolvedQuickAgentSelection.quickAgentOverride)
   }
   const quickAgent = resolvedQuickAgentSelection.quickAgent
+  const createDisabled =
+    baseCreateDisabled ||
+    (isForflowBuild() && Boolean(cardProps.agentPrompt.trim()) && quickAgent === null)
 
   const handleQuickAgentChange = useCallback((agent: TuiAgent | null) => {
     setQuickAgentOverride(agent)
   }, [])
 
   const handleCreate = useCallback(async (): Promise<void> => {
-    await submitQuick(quickAgent)
-  }, [quickAgent, submitQuick])
+    if (!createDisabled) {
+      await submitQuick(quickAgent)
+    }
+  }, [createDisabled, quickAgent, submitQuick])
   // Why: Add Project layers over the composer as a nested dialog instead of
   // replacing it in the activeModal slot — closing the composer mid-flow (and
   // losing the typed name/prompt) was the old, abrupt behavior. Once opened it
@@ -302,7 +307,14 @@ function QuickTabBody({
         quickAgent={quickAgent}
         onQuickAgentChange={handleQuickAgentChange}
         {...cardProps}
-        primaryActionLabel={primaryActionLabel}
+        createDisabled={createDisabled}
+        taskPrompt={isForflowBuild() ? cardProps.agentPrompt : undefined}
+        onTaskPromptChange={cardProps.onAgentPromptChange}
+        primaryActionLabel={
+          isForflowBuild() && cardProps.agentPrompt.trim() && quickAgent
+            ? '创建并准备对话'
+            : primaryActionLabel
+        }
         onOpenAgentSettings={() => setAgentSettingsOpen(true)}
         onCreate={() => void handleCreate()}
         onAddProjectOverride={handleOpenAddProject}

@@ -1,3 +1,4 @@
+import { cliMessage } from '../cli-product'
 import type { ChildProcess, SpawnOptions, spawn } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { readFile, rename, unlink, writeFile } from 'node:fs/promises'
@@ -39,7 +40,7 @@ export async function resumeInterruptedServeUpdate(
     await recordServeUpdateHandoffFailure(
       args.handoffPath,
       args.handoff,
-      `Timed out waiting for Orca ${args.handoff.targetVersion} to be installed.`
+      cliMessage`Timed out waiting for Orca ${args.handoff.targetVersion} to be installed.`
     )
   }
   const child = args.spawnChild(args.executable, args.childArgs, args.spawnOptions)
@@ -97,7 +98,7 @@ export async function superviseForegroundServe(
       await recordServeUpdateHandoffFailure(
         args.handoffPath!,
         handoff,
-        `Timed out waiting for Orca ${handoff.targetVersion} to be installed.`
+        cliMessage`Timed out waiting for Orca ${handoff.targetVersion} to be installed.`
       )
       expectedHandoff = null
     } else {

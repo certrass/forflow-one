@@ -1,8 +1,18 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { translate } from '@/i18n/i18n'
 import { translateSearchKeyword } from './settings-search-keywords'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 
 export const getIntegrationsPaneSearchEntries = createLocalizedCatalog(() => [
+  ...(isForflowBuild()
+    ? [
+        {
+          title: '飞书任务与任务清单',
+          description: '连接本机飞书个人授权，读取任务并带入工作区。',
+          keywords: ['飞书', 'feishu', 'lark', '任务清单', '授权']
+        }
+      ]
+    : []),
   {
     title: translate(
       'auto.components.settings.integrations.search.f16e41cc72',

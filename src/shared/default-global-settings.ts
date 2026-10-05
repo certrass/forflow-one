@@ -3,7 +3,7 @@ import type { NotificationSettings } from './notification-settings-types'
 import type { VoiceSettings } from './speech-types'
 import { DEFAULT_TERMINAL_FONT_WEIGHT, DEFAULT_TERMINAL_FONT_WEIGHT_BOLD } from './terminal-fonts'
 import { getDefaultTerminalQuickCommands } from './terminal-quick-commands'
-import { TASK_PROVIDERS } from './task-providers'
+import { normalizeVisibleTaskProviders } from './task-providers'
 import { getDefaultSourceControlAiSettings } from './source-control-ai'
 import { DEFAULT_APP_ICON_ID } from './app-icon'
 import { DEFAULT_OPEN_IN_APPLICATIONS } from './open-in-applications'
@@ -72,6 +72,9 @@ export function buildDefaultSettings(args: {
     terminalGpuAcceleration: 'auto',
     // Why 'auto': enable ligatures only for known ligature fonts, never forced. Resolver in shared/terminal-ligatures.ts.
     terminalLigatures: 'auto',
+    // Why on: the addon is lazy-loaded off the critical path and only creates
+    // canvas layers once a pane receives an image; parser/decoder setup still has overhead.
+    terminalInlineImages: true,
     terminalCursorStyle: 'block',
     terminalCursorStyleDefaultedToBlock: true,
     terminalCursorBlink: true,
@@ -89,6 +92,7 @@ export function buildDefaultSettings(args: {
     terminalRightClickToPaste: args.terminalRightClickToPaste,
     terminalRightClickToPasteDefaultedForPlatform: true,
     terminalWindowsShell: 'powershell.exe',
+    terminalDefaultShell: '',
     terminalWindowsWslDistro: null,
     localAccountRuntime: 'auto',
     localAccountRuntimeDefaultedToAutoForAllUsers: true,
@@ -126,9 +130,12 @@ export function buildDefaultSettings(args: {
     openLinksInAppPreferencePrompted: false,
     openLinksInAppModifierInverts: false,
     terminalLinkActionPopoverEnabled: true,
+    terminalLinkClickBehavior: 'actions',
+    terminalUrlMiddleClickBehavior: 'open',
     openAgentTabsInChatByDefault: false,
     experimentalNativeChat: false,
     experimentalStructuredNativeChat: false,
+    nativeChatResumeWorkOnRestart: false,
     nativeChatSessionOptions: {},
     openInApplications: [...DEFAULT_OPEN_IN_APPLICATIONS],
     rightSidebarOpenByDefault: true,
@@ -161,6 +168,7 @@ export function buildDefaultSettings(args: {
     diffDefaultView: 'inline',
     diffWordWrap: false,
     diffShowWhitespace: false,
+    diffCollapseUnchangedRegions: false,
     combinedDiffFileTreeVisibleByDefault: false,
     prBotAuthorOverrides: [],
     promptCacheTimerEnabled: false,
@@ -194,7 +202,7 @@ export function buildDefaultSettings(args: {
     skipCodexRateLimitResetConfirm: false,
     defaultTaskViewPreset: 'all',
     defaultTaskSource: 'github',
-    visibleTaskProviders: [...TASK_PROVIDERS],
+    visibleTaskProviders: normalizeVisibleTaskProviders(undefined),
     visibleTaskProvidersDefaultedForJira: true,
     defaultRepoSelection: null,
     defaultLinearTeamSelection: null,
@@ -228,6 +236,7 @@ export function buildDefaultSettings(args: {
     mobilePairingCustomAddresses: [],
     // Why: off keeps the cosmetic overlay unmounted for users who never opt in.
     experimentalPet: false,
+    forflowContextPreviewBeta: false,
     experimentalActivity: false,
     experimentalActivityDefaultedOffForAllUsers: true,
     experimentalTerminalAttention: false,

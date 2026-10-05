@@ -1,4 +1,6 @@
 import { ipcMain } from 'electron'
+import { readCodexAutomations } from '../automations/codex-automation-reader'
+import { isTrustedUIRenderer } from './ui'
 import type { Store } from '../persistence'
 import type { AutomationService } from '../automations/service'
 import type {
@@ -61,6 +63,12 @@ function underOrcaPriority<T>(scheduler: ExternalAutomationProbeScheduler, run: 
 }
 
 export function registerAutomationHandlers(store: Store, service: AutomationService): void {
+  ipcMain.handle('automations:listLocalCodex', (event) => {
+    if (event.senderFrame !== event.sender.mainFrame || !isTrustedUIRenderer(event.sender)) {
+      throw new Error('此调用不属于 Forflow 桌面主界面。')
+    }
+    return readCodexAutomations()
+  })
   // One long-lived pair per registration: the cache TTL and the probe pool's
   // concurrency ceiling only mean anything if they outlive a single request.
   const probeScheduler = new ExternalAutomationProbeScheduler()

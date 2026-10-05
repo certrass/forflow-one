@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from './cli-product'
 import { PTY_LIVE_NOTE, describeUnconfirmedStop } from '../shared/pty-liveness-verdict'
 import { structuredChatPtyWriteRefusalCopy } from '../shared/agent-session-pty-write-refusal-copy'
 import { describeTerminalWaitBlockedReason } from '../shared/terminal-wait-blocked-reason-legacy-alias'
@@ -222,7 +223,9 @@ function promptObservationWarning(
   }
   if (prompt.observation === 'unsupported') {
     return prompt.provider === 'old-host'
-      ? 'this host predates durable prompt receipts. Update Orca on the execution host, and inspect the terminal before retrying an ambiguous send.'
+      ? brandCliDocumentation(
+          'this host predates durable prompt receipts. Update Orca on the execution host, and inspect the terminal before retrying an ambiguous send.'
+        )
       : 'input was accepted, but this provider cannot report delivery. Inspect the terminal before retrying.'
   }
   return null

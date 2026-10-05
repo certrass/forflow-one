@@ -26,7 +26,7 @@ export function OpenCodeUsageDetails({
 }: OpenCodeUsageDetailsProps): React.JSX.Element {
   return (
     <>
-      <CodexUsageDailyChart daily={daily} />
+      <CodexUsageDailyChart daily={daily} range={summary?.range} reportedTotals />
 
       <div className="grid gap-4 xl:grid-cols-2">
         <UsageBreakdownSection

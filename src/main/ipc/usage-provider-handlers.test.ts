@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const { handle } = vi.hoisted(() => ({ handle: vi.fn() }))
 
+vi.mock('./codex-review-handlers', () => ({ registerCodexReviewHandlers: vi.fn() }))
 vi.mock('electron', () => ({ ipcMain: { handle } }))
 
 import { registerUsageProviderHandlers } from './usage-provider-handlers'
@@ -30,7 +31,10 @@ describe('usage provider IPC handlers', () => {
     const prefixes = ['claudeUsage', 'codexUsage', 'openCodeUsage']
     const suffixes = Object.keys(claudeUsage)
     expect(handle.mock.calls.map(([channel]) => channel)).toEqual(
-      prefixes.flatMap((prefix) => suffixes.map((suffix) => `${prefix}:${suffix}`))
+      prefixes.flatMap((prefix) => [
+        ...suffixes.map((suffix) => `${prefix}:${suffix}`),
+        ...(prefix === 'codexUsage' ? ['codexUsage:getAudit'] : [])
+      ])
     )
 
     const call = (prefix: string, suffix: string, args?: unknown): unknown => {

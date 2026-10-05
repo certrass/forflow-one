@@ -1,3 +1,6 @@
+import { cliMessage } from '../cli-product'
+import { brandCliDocumentation } from '../cli-product'
+import { cliCommandName, isForflowCli } from '../cli-product'
 import { spawn } from 'node:child_process'
 import type { CommandHandler } from '../dispatch'
 import { RuntimeClientError } from '../runtime-client'
@@ -171,9 +174,9 @@ function resolveInstallAgentKeys(flags: Map<string, string | boolean>): string[]
   // agents this host does not have. Say so instead.
   throw new RuntimeClientError(
     'invalid_environment',
-    'No coding agent detected on this host, so there is no install target. Pass ' +
-      '--agent <name>[,<name>...] to choose targets explicitly — --agent universal ' +
-      'writes only the shared .agents/skills directory that Orca reads.'
+    brandCliDocumentation(
+      'No coding agent detected on this host, so there is no install target. Pass --agent <name>[,<name>...] to choose targets explicitly — --agent universal writes only the shared .agents/skills directory that Orca reads.'
+    )
   )
 }
 
@@ -199,16 +202,17 @@ function formatNpxCommand(args: string[]): string {
 
 function formatSkillSelectionHelp(verb: SkillMutationVerb, skillNames: string[]): string {
   return [
-    `Choose one or more skills to ${verb}:`,
+    isForflowCli() ? '选择要安装或更新的技能：' : `Choose one or more skills to ${verb}:`,
     ...skillNames.map((name) => `  ${name}`),
     '',
-    `Usage: orca skills ${verb} --skill <name> [--skill <name> ...]`,
-    `   or: orca skills ${verb} --all`
+    `${isForflowCli() ? '用法：' : 'Usage:'} ${cliCommandName()} skills ${verb} --skill <name> [--skill <name> ...]`,
+    `${isForflowCli() ? '或者：' : '   or:'} ${cliCommandName()} skills ${verb} --all`
   ].join('\n')
 }
 
 function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
-  return async ({ flags, json }) => {
+  return async (context) => {
+    const { flags, json } = context
     const guides = await loadCanonicalGuides()
     const skillNames = resolveSelectedSkillNames(flags, guides)
 
@@ -228,10 +232,16 @@ function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
     if (process.env.ORCA_CLI_CWD) {
       throw new RuntimeClientError(
         'invalid_environment',
-        `orca skills ${verb} writes to the machine that runs it, but this shell forwards ` +
-          `orca to the Orca host. Run the same orca skills ${verb} command on the machine ` +
+        `${cliCommandName()} skills ${verb} writes to the machine that runs it, but this shell forwards ` +
+          `${cliCommandName()} to the ${isForflowCli() ? 'Forflow One' : 'Orca'} host. Run the same ${cliCommandName()} skills ${verb} command on the machine ` +
           "you want it on, where it can detect that host's agents."
       )
+    }
+
+    if (isForflowCli()) {
+      const { installForflowCliSkills } = await import('./forflow-skill-install.js')
+      await installForflowCliSkills(verb, skillNames, context)
+      return
     }
 
     const global = flags.get('local') !== true
@@ -255,8 +265,7 @@ function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
       // that stream is not JSON, so --json can't be honored here.
       throw new RuntimeClientError(
         'invalid_argument',
-        `orca skills ${verb} --json only supports --dry-run. Real ${verb}s stream ` +
-          "npx's own output, which isn't JSON."
+        cliMessage`orca skills ${verb} --json only supports --dry-run. Real ${verb}s stream npx's own output, which isn't JSON.`
       )
     }
 

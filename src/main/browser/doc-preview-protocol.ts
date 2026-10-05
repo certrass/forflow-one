@@ -135,8 +135,7 @@ export function installDocPreviewProtocolHandler(): void {
       scope: 'isolated',
       partition: DOC_PREVIEW_PARTITION,
       label: translateMain('forflow.nativeCopy.7009e4afe3', 'Document preview'),
-      source: null,
-      userAgentMode: 'clean'
+      source: null
     },
     // Why downloads are the one policy that does not carry over: the browser download flow needs a
     // page to attribute the file to, and a previewed document is not one. Routed here it would

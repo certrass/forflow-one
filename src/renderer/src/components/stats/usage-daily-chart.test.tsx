@@ -1,3 +1,5 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { ClaudeUsageDailyPoint } from '../../../../shared/claude-usage-types'
 import type { CodexUsageDailyPoint } from '../../../../shared/codex-usage-types'
@@ -19,7 +21,9 @@ describe('usage daily charts', () => {
       totalTokens: index + 1
     }))
 
-    expect(() => CodexUsageDailyChart({ daily })).not.toThrow()
+    expect(() =>
+      renderToStaticMarkup(createElement(CodexUsageDailyChart, { daily, range: 'all' }))
+    ).not.toThrow()
   })
 
   it('renders Claude daily charts for very large histories', () => {

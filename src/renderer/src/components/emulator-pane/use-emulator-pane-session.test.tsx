@@ -11,6 +11,7 @@ import {
 import { cancelPendingSimulatorPaneShutdown } from '@/lib/simulator-pane-shutdown-scheduler'
 import { useEmulatorPaneSession } from './use-emulator-pane-session'
 import type { SimulatorDeviceRow } from './emulator-pane-types'
+import { setRendererUiLanguage } from '@/i18n/i18n'
 
 type RuntimeCallRequest = {
   method: string
@@ -151,7 +152,7 @@ describe('useEmulatorPaneSession', () => {
     root = createRoot(container)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     act(() => {
       root.unmount()
     })
@@ -160,6 +161,7 @@ describe('useEmulatorPaneSession', () => {
     consumePrelaunchedSimulatorSession(WORKTREE_ID)
     delete (window as { api?: unknown }).api
     vi.restoreAllMocks()
+    await setRendererUiLanguage('en')
   })
 
   it('shows a connecting state instead of the old live preview while switching devices', async () => {
@@ -270,5 +272,35 @@ describe('useEmulatorPaneSession', () => {
     expect(runtimeCall).not.toHaveBeenCalledWith(
       expect.objectContaining({ method: 'emulator.attach' })
     )
+  })
+
+  it('explains missing devices in Chinese and allows retry after adding a device', async () => {
+    await setRendererUiLanguage('zh')
+    consumePrelaunchedSimulatorSession(WORKTREE_ID)
+    let available = false
+    const runtimeCall = vi.fn(async ({ method }: RuntimeCallRequest) => {
+      if (method === 'emulator.listDevices') {
+        return runtimeSuccess(available ? deviceList : [])
+      }
+      if (method === 'emulator.attach') {
+        return runtimeSuccess({ attached: true, info: { deviceUdid: 'device-a' } })
+      }
+      throw new Error(`Unexpected RPC method: ${method}`)
+    })
+    Object.defineProperty(window, 'api', {
+      configurable: true,
+      value: { runtime: { call: runtimeCall } }
+    })
+    await act(async () => root.render(<AutoAttachProbe />))
+    expect(latest?.error).toContain('未找到模拟器设备')
+    expect(runtimeCall).not.toHaveBeenCalledWith(
+      expect.objectContaining({ method: 'emulator.attach' })
+    )
+    available = true
+    await act(async () => {
+      await latest?.attach()
+    })
+    expect(latest?.error).toBeNull()
+    expect(latest?.session?.attached).toBe(true)
   })
 })

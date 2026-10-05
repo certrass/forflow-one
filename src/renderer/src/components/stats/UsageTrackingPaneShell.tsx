@@ -45,6 +45,7 @@ export function UsageFilterRadioGroup<Value extends string>({
 
 type UsageTrackingPaneShellProps = {
   title: ReactNode
+  summaryContent?: ReactNode
   enableLabel: string
   onEnabledChange: (enabled: boolean) => void
 } & (
@@ -85,6 +86,7 @@ export function UsageTrackingPaneShell(props: UsageTrackingPaneShellProps): Reac
             onCheckedChange={props.onEnabledChange}
           />
         </div>
+        {props.summaryContent}
       </div>
     )
   }
@@ -147,6 +149,8 @@ export function UsageTrackingPaneShell(props: UsageTrackingPaneShellProps): Reac
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">{props.selectionSummary}</p>
       </div>
+
+      {props.summaryContent}
 
       {!props.hasData ? (
         <div className="rounded-lg border border-dashed border-border/60 bg-card/30 px-4 py-6 text-sm text-muted-foreground">

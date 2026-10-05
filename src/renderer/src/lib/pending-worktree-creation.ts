@@ -139,8 +139,6 @@ export type PendingWorktreeCreation = {
   loaderVisible: boolean
   error?: string
   provisioningLog?: string
-  /** Existing worktree whose uncertain structured launch must be reconciled instead of recreated. */
-  structuredLaunchRecoveryWorktreeId?: string
   request: WorktreeCreationRequest
 }
 
@@ -171,7 +169,7 @@ export function findPendingLinkedWorkItemCreationId(
  *  loader and the sidebar row so the two never drift. Caller handles the error
  *  case; this only covers the in-progress states. */
 export function getCreationProgressLabel(
-  entry: Pick<PendingWorktreeCreation, 'phase' | 'indeterminate'>
+  entry: Pick<PendingWorktreeCreation, 'phase' | 'indeterminate' | 'request'>
 ): string {
   if (entry.phase === 'provisioning-vm') {
     return translate('forflow.desktopCopy.5539b1ba30', 'Provisioning VM…')

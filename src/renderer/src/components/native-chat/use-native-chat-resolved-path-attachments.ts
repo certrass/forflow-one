@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react'
 import { translate } from '@/i18n/i18n'
 import { NATIVE_FILE_DROP_MAX_PATHS } from '../../../../shared/native-file-drop'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { formatNativeChatFileReference } from './native-chat-composer-target'
 import type { NativeChatComposerInput } from './native-chat-composer-input'
 import { isNativeChatImageAttachmentPath } from './native-chat-image-paste'
@@ -62,6 +63,10 @@ export function useNativeChatResolvedPathAttachments({
 
   const insertFileReferences = useCallback(
     (paths: string[]) => {
+      if (isForflowBuild() && textareaRef.current?.insertFileReferences) {
+        textareaRef.current.insertFileReferences(paths)
+        return
+      }
       const references = paths.map(formatNativeChatFileReference).join(' ')
       if (references.length === 0) {
         return

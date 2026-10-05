@@ -10,6 +10,8 @@ import {
   getWorkspaceStatusVisualMeta
 } from './workspace-status'
 import { translate } from '@/i18n/i18n'
+import { workspaceStatusDisplayLabel } from '@/i18n/workspace-status-label'
+import { useTranslation } from 'react-i18next'
 
 type WorkspaceStatusAppearancePopoverProps = {
   status: WorkspaceStatusDefinition
@@ -22,6 +24,8 @@ export default function WorkspaceStatusAppearancePopover({
   onChangeColor,
   onChangeIcon
 }: WorkspaceStatusAppearancePopoverProps): React.JSX.Element {
+  useTranslation()
+  const statusLabel = workspaceStatusDisplayLabel(status)
   const meta = getWorkspaceStatusVisualMeta(status)
 
   return (
@@ -37,7 +41,7 @@ export default function WorkspaceStatusAppearancePopover({
               aria-label={translate(
                 'auto.components.sidebar.WorkspaceStatusAppearancePopover.ccbd1e2c69',
                 'Customize {{value0}} appearance',
-                { value0: status.label }
+                { value0: statusLabel }
               )}
             >
               <span className={cn('absolute size-4 rounded-full opacity-20', meta.swatch)} />
@@ -81,7 +85,7 @@ export default function WorkspaceStatusAppearancePopover({
                   aria-label={translate(
                     'auto.components.sidebar.WorkspaceStatusAppearancePopover.514be2f569',
                     'Set {{value0}} color to {{value1}}',
-                    { value0: status.label, value1: color.label }
+                    { value0: statusLabel, value1: color.label }
                   )}
                 >
                   <span className={cn('size-3.5 rounded-full', color.swatch)} />
@@ -110,7 +114,7 @@ export default function WorkspaceStatusAppearancePopover({
                   aria-label={translate(
                     'auto.components.sidebar.WorkspaceStatusAppearancePopover.514be2f569',
                     'Set {{value0}} icon to {{value1}}',
-                    { value0: status.label, value1: icon.label }
+                    { value0: statusLabel, value1: icon.label }
                   )}
                 >
                   <icon.icon className="size-3.5" />

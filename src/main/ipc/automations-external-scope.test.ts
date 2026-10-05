@@ -6,6 +6,12 @@ import type { AutomationOwnerRef } from '../../shared/automation-owner-ref'
 import type { SshTarget } from '../../shared/ssh-types'
 import type { AutomationService } from '../automations/service'
 import type { Store } from '../persistence'
+import { readCodexAutomations } from '../automations/codex-automation-reader'
+import { setTrustedUIRendererWebContentsId } from './ui'
+
+vi.mock('../automations/codex-automation-reader', () => ({
+  readCodexAutomations: vi.fn(async () => ({ status: 'ready', automations: [] }))
+}))
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown
 
@@ -81,7 +87,32 @@ beforeEach(async () => {
 })
 
 afterEach(() => {
+  setTrustedUIRendererWebContentsId(null)
   vi.clearAllMocks()
+})
+
+describe('local Codex automation IPC', () => {
+  it('reads only from the trusted desktop main frame', async () => {
+    setTrustedUIRendererWebContentsId(41)
+    const frame = {}
+    const sender = { id: 41, mainFrame: frame, isDestroyed: () => false, getType: () => 'window' }
+    const handler = ipcHandlers.get('automations:listLocalCodex')!
+    await expect(handler({ sender, senderFrame: frame })).resolves.toMatchObject({
+      status: 'ready'
+    })
+    expect(readCodexAutomations).toHaveBeenCalledExactlyOnceWith()
+  })
+  it('rejects browser guests and subframes before reading any task', () => {
+    setTrustedUIRendererWebContentsId(41)
+    const frame = {}
+    const sender = { id: 41, mainFrame: frame, isDestroyed: () => false, getType: () => 'window' }
+    const handler = ipcHandlers.get('automations:listLocalCodex')!
+    expect(() => handler({ sender, senderFrame: {} })).toThrow('桌面主界面')
+    expect(() => handler({ sender: { ...sender, id: 42 }, senderFrame: frame })).toThrow(
+      '桌面主界面'
+    )
+    expect(readCodexAutomations).not.toHaveBeenCalled()
+  })
 })
 
 describe('scoped external-manager IPC', () => {

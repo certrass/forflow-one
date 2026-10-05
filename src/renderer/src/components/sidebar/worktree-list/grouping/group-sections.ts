@@ -1,3 +1,4 @@
+import { workspaceStatusDisplayLabel } from '@/i18n/workspace-status-label'
 import type { Repo } from '../../../../../../shared/repo-types'
 import type { WorktreeLineage } from '../../../../../../shared/worktree/lineage-types'
 import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shared/worktree/types'
@@ -102,7 +103,7 @@ export function appendOrderedGroups(
               return {
                 type: 'header' as const,
                 key,
-                label: definition?.label ?? workspaceStatus,
+                label: definition ? workspaceStatusDisplayLabel(definition) : workspaceStatus,
                 count: group.items.length + folderPairs.length,
                 tone: meta.tone,
                 icon: meta.icon,

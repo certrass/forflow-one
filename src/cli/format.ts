@@ -1,3 +1,4 @@
+import { isForflowCli } from './cli-product'
 import type { CliStatusResult } from '../shared/runtime-types'
 import { prepareComputerCliJsonResult } from './computer-format'
 import type { RuntimeRpcSuccess } from './runtime-client'
@@ -91,7 +92,7 @@ export function formatHostList(result: { hosts: HostListEntry[] }): string {
   const kindLabel: Record<HostListEntry['kind'], string> = {
     local: 'local',
     ssh: 'ssh target',
-    environment: 'orca server'
+    environment: isForflowCli() ? 'Forflow One 服务' : 'orca server'
   }
   return result.hosts
     .map(

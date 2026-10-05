@@ -48,6 +48,7 @@ import { AgentDefaultSetting } from './AgentDefaultSetting'
 import { AgentDetectionCatalog } from './AgentDetectionCatalog'
 import { isForflowBuild } from '../../../../shared/product-branding'
 import { ForflowDomesticConnections } from './ForflowDomesticConnections'
+import { useAgentCommandSettings } from './use-agent-command-settings'
 
 export {
   buildAgentAvailabilitySettingsUpdate,
@@ -59,6 +60,7 @@ export {
 type AgentsPaneProps = {
   settings: GlobalSettings
   updateSettings: (updates: Partial<GlobalSettings>) => void | Promise<void>
+  updateSettingsOrThrow?: (updates: Partial<GlobalSettings>) => Promise<void>
   wslSupportedPlatform?: boolean
   wslAvailable?: boolean
   wslDistros?: string[]
@@ -143,6 +145,7 @@ export function AgentPermissionsSetting({
 export function AgentsPane({
   settings,
   updateSettings,
+  updateSettingsOrThrow,
   wslSupportedPlatform,
   wslAvailable,
   wslDistros,
@@ -162,6 +165,12 @@ export function AgentsPane({
     isRefreshing,
     refresh: refreshTargetAgents
   } = useDetectedAgents(agentDetectionTarget)
+  const { isSaving, saveCommand } = useAgentCommandSettings(
+    settings,
+    updateSettingsOrThrow ?? updateSettings,
+    refreshTargetAgents,
+    activeServerEnvironmentId
+  )
   const refreshLocalAgents = useAppStore((state) => state.refreshDetectedAgents)
   const activeServerName = useAppStore((state) =>
     activeServerEnvironmentId
@@ -211,22 +220,14 @@ export function AgentsPane({
     isDetected,
     isEnabled: isTuiAgentEnabled(agent.id, disabledAgents),
     isDefault: isDetected && defaultAgent === agent.id,
-    cmdOverride: isDetected ? cmdOverrides[agent.id] : undefined,
+    cmdOverride: cmdOverrides[agent.id],
+    canConfigureCommand: isDetected || !activeServerEnvironmentId,
+    canSetDefault: !isSaving && !isRefreshing && !detectionFailed,
     argsOverride: resolveTuiAgentLaunchArgs(agent.id, agentDefaultArgs),
     envOverride: resolveTuiAgentLaunchEnv(agent.id, agentDefaultEnv),
     onSetDefault: isDetected ? () => updateSettings({ defaultTuiAgent: agent.id }) : () => {},
     onSetEnabled: (enabled) => setAgentEnabled(agent.id, enabled),
-    onSaveOverride: isDetected
-      ? (value) => {
-          const next = { ...cmdOverrides }
-          if (value) {
-            next[agent.id] = value
-          } else {
-            delete next[agent.id]
-          }
-          updateSettings({ agentCmdOverrides: next })
-        }
-      : () => {},
+    onSaveOverride: (value) => saveCommand(agent.id, value),
     onSaveArgs: (value) =>
       updateSettings({ agentDefaultArgs: { ...agentDefaultArgs, [agent.id]: value } }),
     onSaveEnv: (value) =>
@@ -247,6 +248,7 @@ export function AgentsPane({
         />
       ) : null}
       <AgentDefaultSetting
+        detectionBusy={isSaving || isRefreshing || detectionFailed || detectedIds === null}
         defaultAgent={defaultAgent}
         detectedIds={detectedIds}
         enabledDetectedAgents={enabledDetectedAgents}

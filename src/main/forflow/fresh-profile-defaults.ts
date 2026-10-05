@@ -39,6 +39,9 @@ export function applyForflowFreshProfileDefaults(
       workspaceDir: join(homeDirectory, 'Forflow One', 'workspaces'),
       minimaxEndpoint: 'cn',
       uiLanguage: 'zh',
+      experimentalNativeChat: true,
+      openAgentTabsInChatByDefault: true,
+      experimentalStructuredNativeChat: false,
       artifactSharingEnabled: false,
       agentSkillSharingEnabled: false,
       showMobileButton: false

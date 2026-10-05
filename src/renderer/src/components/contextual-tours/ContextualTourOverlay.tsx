@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/store'
 import {
   getContextualTour,
@@ -31,6 +32,8 @@ import { openWorkspaceCreationComposerWithTourHandoff } from './workspace-creati
 import { BROWSER_CLIENT_HOSTED_REMOTE_SETTINGS_TARGET_ID } from '@/lib/settings-navigation-types'
 
 export function ContextualTourOverlay(): JSX.Element | null {
+  const { i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? i18n.language
   const activeTourId = useAppStore((s) => s.activeContextualTourId)
   const activeStepIndex = useAppStore((s) => s.activeContextualTourStepIndex)
   const activeTourSource = useAppStore((s) => s.activeContextualTourSource)
@@ -248,7 +251,7 @@ export function ContextualTourOverlay(): JSX.Element | null {
 
   useLayoutEffect(() => {
     measureTourOverlay()
-  }, [measureTourOverlay])
+  }, [measureTourOverlay, language])
 
   useEffect(() => {
     if (!activeTourId || !renderState || markedTourIdRef.current === activeTourId) {

@@ -19,7 +19,7 @@ export const packageFingerprint = createHash('sha256')
   .update(readFileSync(path.join(appPath, 'Contents/Resources/app.asar')))
   .digest('hex')
 
-export async function launch(profile: string) {
+export async function launch(profile: string, extraEnv: Record<string, string> = {}) {
   const isolation = createElectronHomeIsolation({
     userDataDir: profile,
     inheritedEnv: {
@@ -29,7 +29,12 @@ export async function launch(profile: string) {
       TMPDIR: process.env.TMPDIR
     },
     launchEnv: {},
-    extraEnv: { ORCA_BACKGROUND_LAUNCH: '1', ORCA_E2E_HEADLESS: '1', NODE_ENV: 'production' }
+    extraEnv: {
+      ...extraEnv,
+      ORCA_BACKGROUND_LAUNCH: '1',
+      ORCA_E2E_HEADLESS: '1',
+      NODE_ENV: 'production'
+    }
   })
   const app = await electron.launch({
     executablePath,

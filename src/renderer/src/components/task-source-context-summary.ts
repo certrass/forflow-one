@@ -50,16 +50,15 @@ export function getTaskSourceContextSummary(args: {
     case 'github':
     case 'gitlab':
       return getRepoBackedTaskSourceSummary(args)
+    case 'feishu':
+      return {
+        label: '飞书 · 本机个人授权',
+        title: '从当前桌面的飞书连接读取任务；远程运行环境需切回本机后读取。'
+      }
     case 'linear':
-      return getAccountBackedTaskSourceSummary(args.providerLabel, {
-        accountLabel: args.linearWorkspaceName,
-        accountHostId: args.accountHostId,
-        hostLabelById: args.hostLabelById,
-        hostAvailability: args.hostAvailability
-      })
     case 'jira':
       return getAccountBackedTaskSourceSummary(args.providerLabel, {
-        accountLabel: args.jiraSiteName,
+        accountLabel: args.provider === 'linear' ? args.linearWorkspaceName : args.jiraSiteName,
         accountHostId: args.accountHostId,
         hostLabelById: args.hostLabelById,
         hostAvailability: args.hostAvailability
@@ -196,6 +195,8 @@ function getProviderIdentityLabel(
         : (identity.projectId ?? null)
     case 'linear':
       return identity.workspaceName ?? identity.workspaceId ?? null
+    case 'feishu':
+      return identity.appId ?? null
     case 'jira':
       return identity.siteUrl ?? identity.siteId ?? null
   }

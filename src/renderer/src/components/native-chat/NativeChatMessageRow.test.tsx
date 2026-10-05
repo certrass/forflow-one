@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { NativeChatMessage } from '../../../../shared/native-chat-types'
 import { MessageRow } from './NativeChatMessageRow'
+import { setRendererUiLanguage } from '@/i18n/i18n'
 
 afterEach(cleanup)
 
@@ -24,6 +25,36 @@ function renderMessage(role: NativeChatMessage['role'], timestamp: number | null
 }
 
 describe('MessageRow control visibility', () => {
+  it('localizes the interruption status without rewriting user content or transcript data', async () => {
+    const message: NativeChatMessage = {
+      id: 'interrupted',
+      role: 'system',
+      timestamp: 0,
+      source: 'transcript',
+      blocks: [{ type: 'text', text: 'Conversation interrupted' }]
+    }
+    await setRendererUiLanguage('zh')
+    try {
+      const { rerender } = render(
+        <MessageRow message={message} expandSignal={false} onScrollMessageToTop={vi.fn()} />
+      )
+      expect(screen.getByText('本轮已中断')).toBeInTheDocument()
+      expect(screen.queryByText('Conversation interrupted')).toBeNull()
+      expect(message.blocks).toEqual([{ type: 'text', text: 'Conversation interrupted' }])
+      rerender(
+        <MessageRow
+          message={{ ...message, role: 'user' }}
+          expandSignal={false}
+          onScrollMessageToTop={vi.fn()}
+        />
+      )
+      expect(screen.getByText('Conversation interrupted')).toBeInTheDocument()
+      expect(screen.queryByText('本轮已中断')).toBeNull()
+    } finally {
+      await setRendererUiLanguage('en')
+    }
+  })
+
   it('renders and copies a fenced code block through the markdown path', async () => {
     const writeClipboardText = vi.fn().mockResolvedValue(undefined)
     Object.assign(window, { api: { ui: { writeClipboardText } } })

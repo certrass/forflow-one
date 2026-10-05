@@ -81,7 +81,7 @@ export const CONTEXTUAL_TOURS = [
       {
         id: 'session-split',
         title: 'Split a terminal pane',
-        body: 'Open a second terminal pane with {terminal.splitRight}, or right-click the pane for split options.',
+        body: 'Open a second pane with {terminal.splitRight}, or right-click for split options. Both panes share this workspace’s files.',
         targetSelector:
           '[data-contextual-tour-target="terminal-pane-split-target"], [data-contextual-tour-target="workspace-agent-terminal-tip"]',
         requiredForStart: true,
@@ -92,7 +92,7 @@ export const CONTEXTUAL_TOURS = [
       {
         id: 'session-parallel',
         title: 'Start another task in parallel',
-        body: 'Each worktree gets its own branch, so parallel work stays separate.',
+        body: 'A Git worktree gives another task its own branch. Ordinary folder workspaces do not isolate file changes.',
         targetSelector: '[data-contextual-tour-target="workspace-create-control"]',
         preferredPlacement: 'right',
         targetPulse: true,
@@ -220,7 +220,7 @@ export const CONTEXTUAL_TOURS = [
       {
         id: 'creation-project',
         title: 'Pick a project',
-        body: 'Orca isolates each task in its own worktree, branched off your base.',
+        body: 'Choose a Git repository or an ordinary folder. Git worktrees isolate branches; folder workspaces use the selected directory.',
         targetSelector: '[data-contextual-tour-target="workspace-creation-project"]',
         requiredForStart: true
       },

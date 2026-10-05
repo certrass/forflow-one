@@ -1,3 +1,4 @@
+import type { ForflowFeishuApi } from '../shared/forflow-feishu'
 import type {
   ClaudeAccountsApi,
   CodexAccountsApi,
@@ -27,6 +28,7 @@ import type { EphemeralVmApi } from './api/ephemeral-vm-api'
 import type { ExportApi, FilesystemApi } from './api/filesystem-api'
 import type { GitInspectionApi } from './api/git-inspection-api'
 import type { GitOperationApi } from './api/git-operation-api'
+import type { GithubAccountApi } from './api/github-account-api'
 import type { GithubPullRequestApi } from './api/github-pull-request-api'
 import type { GithubWorkItemApi } from './api/github-work-item-api'
 import type { GitLabApi } from './api/gitlab-api'
@@ -38,6 +40,8 @@ import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
 import type { ForflowIdentityApi } from '../shared/forflow-identity'
+import type { ForflowModelAccountsApi } from '../shared/forflow-model-accounts'
+import type { JevAuditApi } from '../shared/jev-audit-types'
 import type { ForflowApprovalApi } from '../shared/forflow-approval'
 import type { ForflowSkillsApi } from '../shared/forflow-bundled-skills'
 import type {
@@ -70,6 +74,9 @@ type Merged<T> = { [K in keyof T]: T[K] }
 
 export type PreloadApi = {
   forflowIdentity?: ForflowIdentityApi
+  forflowModelAccounts?: ForflowModelAccountsApi
+  forflowJevAudit?: JevAuditApi
+  forflowFeishu?: ForflowFeishuApi
   forflowApproval?: ForflowApprovalApi
   forflowSkills?: ForflowSkillsApi
   app: AppApi
@@ -89,7 +96,7 @@ export type PreloadApi = {
   feedback: FeedbackApi
   crashReports: CrashReportsApi
   export: ExportApi
-  gh: Merged<GithubPullRequestApi & GithubWorkItemApi>
+  gh: Merged<GithubPullRequestApi & GithubWorkItemApi & GithubAccountApi>
   hostedReview: HostedReviewApi
   gl: GitLabApi
   bitbucket: BitbucketApi

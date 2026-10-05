@@ -1,3 +1,4 @@
+import { brandCliDocumentation } from '../../cli-product'
 import { RuntimeClientError } from '../../runtime-client'
 
 export function resolveCompatibilityCliCommand(): 'orca' | 'orca-ide' | 'orca-dev' {
@@ -18,7 +19,9 @@ export function resolvePackagedWindowsCompatibilityCommand(): 'orca' | 'orca-ide
   }
   throw new RuntimeClientError(
     'invalid_argument',
-    'The packaged Orca launcher did not provide a valid resume command. No question was created.'
+    brandCliDocumentation(
+      'The packaged Orca launcher did not provide a valid resume command. No question was created.'
+    )
   )
 }
 

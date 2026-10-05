@@ -7,7 +7,7 @@
 仓库根目录 LICENSE 保持原文；交付包含该软件的副本或实质部分时保留许可证及版权声明。
 
 Forflow One 是本项目的产品品牌。品牌映射不改变开源代码来源、第三方组件许可、模型服务运营主体或供应链事实。
-本机 macOS arm64 中文测试版使用 `cn.forflow.one`、独立 Forflow One 数据目录及 `forflow` 命令入口；未注册 URL 协议，避免接管已有 Orca 链接。底层兼容协议和 CLI 帮助中的上游标识仍按迁移计划保留。其他平台及正式签名、公证和升级路径尚未验收。
+本机 macOS arm64 中文测试版使用 `cn.forflow.one`、独立 Forflow One 数据目录及 `forflow` 命令入口；未注册 URL 协议，避免接管已有 Orca 链接。CLI 帮助、示例和技能指令使用 Forflow 品牌；底层兼容协议、旧技能目录和 ORCA_* 环境变量保留兼容映射。其他平台及正式签名、公证和升级路径尚未验收。
 
 应用图标复用现有 Forflow 官网工程的品牌素材，来源及 SHA-256 见 `brand-source.json`；`icon.icns` 为原 PNG 的尺寸/格式导出，未重绘品牌。
 

@@ -1,4 +1,6 @@
 import { RuntimeClientError } from '../runtime-client'
+import { brandCliDocumentation, isForflowCli } from '../cli-product'
+import { FORFLOW_BUNDLED_SKILLS, forflowSkillName } from '../../shared/forflow-bundled-skills'
 
 export type BundledSkillGuideReference = {
   name: string
@@ -26,7 +28,34 @@ function canonicalGuides(guides: readonly BundledSkillGuide[]): BundledSkillGuid
  */
 export async function loadCanonicalGuides(): Promise<BundledSkillGuide[]> {
   const { BUNDLED_SKILL_GUIDES } = await import('../bundled-skill-guides.js')
-  return canonicalGuides(BUNDLED_SKILL_GUIDES)
+  const guides = canonicalGuides(BUNDLED_SKILL_GUIDES)
+  if (!isForflowCli()) {
+    return guides
+  }
+  return guides.map((guide) => ({
+    ...guide,
+    name: forflowSkillName(guide.name),
+    aliases: [...guide.aliases, guide.name],
+    description:
+      Object.entries(FORFLOW_BUNDLED_SKILLS).find(([name]) => name === guide.name)?.[1] ??
+      brandCliDocumentation(guide.description),
+    markdown: brandGuide(guide.markdown),
+    fullMarkdown: brandGuide(guide.fullMarkdown),
+    references: guide.references.map((reference) => ({
+      ...reference,
+      markdown: brandGuide(reference.markdown)
+    }))
+  }))
+}
+
+function brandGuide(markdown: string): string {
+  let result = brandCliDocumentation(markdown)
+  for (const name of Object.keys(FORFLOW_BUNDLED_SKILLS)) {
+    result = result
+      .replaceAll(`\`${name}\``, `\`${forflowSkillName(name)}\``)
+      .replaceAll(`name: ${name}\n`, `name: ${forflowSkillName(name)}\n`)
+  }
+  return result
 }
 
 export function requireTopic(

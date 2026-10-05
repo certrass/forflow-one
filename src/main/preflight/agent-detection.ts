@@ -45,6 +45,10 @@ import {
   resolveDetectedTuiAgentIds
 } from '../ipc/tui-agent-detection-commands'
 import { invalidateWslGuestEnvironment } from '../wsl/wsl-guest-environment'
+import {
+  agentDetectionCommandsWithOverrides,
+  type AgentCommandOverrides
+} from './agent-command-overrides'
 
 export type PreflightStatus = {
   git: { installed: boolean }
@@ -140,20 +144,24 @@ async function detectCommandRuntime(
   return { installed: false }
 }
 
-export async function detectInstalledAgents(context?: PreflightRuntimeContext): Promise<string[]> {
+export async function detectInstalledAgents(
+  context?: PreflightRuntimeContext,
+  overrides: AgentCommandOverrides = {}
+): Promise<string[]> {
   const wslTarget = getPreflightWslTarget(context)
+  const { commands, overrideCommands } = agentDetectionCommandsWithOverrides(
+    overrides,
+    wslTarget ? 'linux' : process.platform
+  )
   if (wslTarget) {
     const foundCommands = await detectWslCommandsOnPath(
       wslTarget,
-      getTuiAgentDetectionProbeCommands(KNOWN_TUI_AGENT_DETECTION_COMMANDS, 'wsl')
+      getTuiAgentDetectionProbeCommands(commands, 'wsl')
     )
-    return resolveDetectedTuiAgentIds(KNOWN_TUI_AGENT_DETECTION_COMMANDS, foundCommands, 'wsl')
+    return resolveDetectedTuiAgentIds(commands, foundCommands, 'wsl')
   }
 
-  const probeCommands = getTuiAgentDetectionProbeCommands(
-    KNOWN_TUI_AGENT_DETECTION_COMMANDS,
-    process.platform
-  )
+  const probeCommands = getTuiAgentDetectionProbeCommands(commands, process.platform)
   const pathChecks = await Promise.all(
     probeCommands.map(async (cmd) => ({
       cmd,
@@ -163,24 +171,23 @@ export async function detectInstalledAgents(context?: PreflightRuntimeContext): 
   const missedCommands = pathChecks.filter((check) => !check.installedOnPath).map(({ cmd }) => cmd)
   // Why: PATH may still be unhydrated on a cold GUI launch; bulk resolution
   // computes user install dirs once instead of blocking once per missed CLI.
-  const installDirCommands = detectCommandsInInstallDirs(missedCommands)
+  const installDirCommands = detectCommandsInInstallDirs(
+    missedCommands.filter((command) => !overrideCommands.has(command))
+  )
   const foundCommands = new Set(
     pathChecks
       .filter(({ cmd, installedOnPath }) => installedOnPath || installDirCommands.has(cmd))
       .map(({ cmd }) => cmd)
   )
-  return resolveDetectedTuiAgentIds(
-    KNOWN_TUI_AGENT_DETECTION_COMMANDS,
-    foundCommands,
-    process.platform
-  )
+  return resolveDetectedTuiAgentIds(commands, foundCommands, process.platform)
 }
 
 export async function detectInstalledAgentsWithShellPathHydration(
-  context?: PreflightRuntimeContext
+  context?: PreflightRuntimeContext,
+  overrides: AgentCommandOverrides = {}
 ): Promise<string[]> {
   await hydrateShellPathForAgentDetection(context)
-  return detectInstalledAgents(context)
+  return detectInstalledAgents(context, overrides)
 }
 
 export type RefreshAgentsResult = {
@@ -207,7 +214,8 @@ export type RefreshAgentsResult = {
  * without requiring an app restart.
  */
 export async function refreshShellPathAndDetectAgents(
-  context?: PreflightRuntimeContext
+  context?: PreflightRuntimeContext,
+  overrides: AgentCommandOverrides = {}
 ): Promise<RefreshAgentsResult> {
   const wslTarget = getPreflightWslTarget(context)
   if (wslTarget) {
@@ -216,7 +224,7 @@ export async function refreshShellPathAndDetectAgents(
     // keep reporting a just-installed CLI as absent -- the exact case this
     // function exists to handle.
     invalidateWslGuestEnvironment(wslTarget.distro)
-    const agents = await detectInstalledAgents(context)
+    const agents = await detectInstalledAgents(context, overrides)
     return {
       agents,
       addedPathSegments: [],
@@ -228,7 +236,7 @@ export async function refreshShellPathAndDetectAgents(
 
   const hydration = await hydrateShellPath({ force: true })
   const added = hydration.ok ? mergePathSegments(hydration.segments) : []
-  const agents = await detectInstalledAgents(context)
+  const agents = await detectInstalledAgents(context, overrides)
   return {
     agents,
     addedPathSegments: added,

@@ -84,6 +84,10 @@ flowchart LR
 
 Q2Q 当前本机工程 commit 为 `14373a175e4466dbede4ebcfd07806005141214f`。`q2q_project_service.py / assessment / repository` 为项目生命周期，`q2q_claim_judgment.py` 为 Claim 内核，workspace application service 为消费入口。其当前 README 明确多用户身份与客户签章未接入。因此复用判断机制，同时补企业身份和证据合同；旧工程的某项本机验证不继承为 Forflow 的验证结论。
 
+## 用量与审计的分开呈现
+
+费用须区分估算、已结算、套餐分摊、不可计量；上下文、模型调用、工具调用、数据读取各自声明已采集范围与缺口。当前 Beta 的实现与后续合同见 [费用口径与审计覆盖](usage-audit-beta.md)，不能将用量扫描等同于统一审计链。
+
 ## 176 号令对应的建设边界
 
 官方文本为《公安机关网络空间安全监督检查办法》，2026-10-01 施行。第 7 条列重点检查义务，第 8 条涉及特定任务专项检查，第 12、15、16 条分别涉及检查措施、记录和整改；第 20 条涉及检查材料保密与用途。第 14 条不允许指定购买产品。适用对象与义务应结合客户身份、数据与服务方式确认。它不是“装上 Forflow 即取得认证”的标准。[官方原文](https://gaj.linxia.gov.cn/gaj/gaxw/gsgg/art/2026/art_5f125ac64d52498d9a50ffe4f2407bd5.html)

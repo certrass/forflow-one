@@ -1,5 +1,6 @@
+import { isForflowBuild } from '../../../shared/product-branding'
 import React from 'react'
-import { Github, Gitlab, LayoutGrid, List } from 'lucide-react'
+import { Github, Gitlab, LayoutGrid, List, ListChecks } from 'lucide-react'
 
 import { JiraIcon } from '@/components/icons/JiraIcon'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
@@ -112,6 +113,15 @@ export function getGitHubTaskKindPresets(kind: GitHubTaskKind): TaskQueryPreset[
 }
 
 export const getSourceOptions = createLocalizedCatalog((): SourceOption[] => [
+  ...(isForflowBuild()
+    ? [
+        {
+          id: 'feishu' as const,
+          label: '飞书',
+          Icon: ({ className }: { className?: string }) => <ListChecks className={className} />
+        }
+      ]
+    : []),
   {
     id: 'github',
     label: translate('auto.components.TaskPage.acef77f7ca', 'GitHub'),

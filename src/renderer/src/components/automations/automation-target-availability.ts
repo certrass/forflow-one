@@ -1,3 +1,4 @@
+import { getAutomationSourceProviderLabel } from './automation-source-provider-label'
 import type { Automation } from '../../../../shared/automations-types'
 import { getRepoExecutionHostId, parseExecutionHostId } from '../../../../shared/execution-host'
 import {
@@ -11,9 +12,9 @@ import {
 import type { AutomationHostTarget } from './automation-host-client'
 import type { SshConnectionState } from '../../../../shared/ssh-types'
 import type { TaskSourceContext } from '../../../../shared/task-source-context'
-import type { RuntimeStatus } from '../../../../shared/runtime-types'
 import type { ProjectHostSetup } from '../../../../shared/project-types'
 import type { Repo } from '../../../../shared/repo-types'
+import type { RuntimeEnvironmentStatus } from '../../../../shared/runtime-host-status'
 import type { Worktree } from '../../../../shared/worktree/types'
 import type { TaskSourceHostAvailability } from '../task-source-context-summary'
 
@@ -51,10 +52,7 @@ type AutomationTargetAvailabilityArgs = {
   workspace: Worktree | null | undefined
   projectHostSetups: readonly ProjectHostSetup[]
   sshConnectionStates: ReadonlyMap<string, Pick<SshConnectionState, 'status'>>
-  runtimeStatusByEnvironmentId?: ReadonlyMap<
-    string,
-    { status: RuntimeStatus | null; checkedAt: number }
-  >
+  runtimeStatusByEnvironmentId?: ReadonlyMap<string, RuntimeEnvironmentStatus>
   automationHostTarget?: AutomationHostTarget | null
   sourceHostAvailability?: readonly TaskSourceHostAvailability[]
 }
@@ -192,6 +190,12 @@ function getAutomationSourceAvailability(
   if (!sourceContext) {
     return null
   }
+  if (sourceContext.provider === 'feishu') {
+    return unavailable(
+      'source-provider-unsupported',
+      '飞书任务暂支持手动读取和导入，请在任务页操作。'
+    )
+  }
   const availability = sourceHostAvailability?.find(
     (entry) => entry.hostId === sourceContext.hostId
   )
@@ -252,24 +256,9 @@ function getAutomationSourceAvailability(
   return null
 }
 
-function getAutomationSourceProviderLabel(provider: TaskSourceContext['provider']): string {
-  switch (provider) {
-    case 'github':
-      return 'GitHub'
-    case 'gitlab':
-      return 'GitLab'
-    case 'linear':
-      return 'Linear'
-    case 'jira':
-      return 'Jira'
-  }
-}
-
 export function getRuntimeAutomationAvailability(
   environmentId: string,
-  runtimeStatusByEnvironmentId:
-    | ReadonlyMap<string, { status: RuntimeStatus | null; checkedAt: number }>
-    | undefined
+  runtimeStatusByEnvironmentId: ReadonlyMap<string, RuntimeEnvironmentStatus> | undefined
 ): AutomationTargetAvailability {
   const entry = runtimeStatusByEnvironmentId?.get(environmentId)
   if (!entry) {

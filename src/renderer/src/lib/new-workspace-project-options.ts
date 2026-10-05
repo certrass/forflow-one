@@ -93,7 +93,7 @@ function getProjectDetail(project: Project, readySetupCount: number): string {
       value0: readySetupCount
     })
   }
-  return 'Project'
+  return translate('auto.components.WorktreeJumpPalette.projectBadge', 'Project')
 }
 
 export function buildNewWorkspaceProjectOptions(
@@ -171,7 +171,10 @@ export function getProjectGroupIdFromNewWorkspaceOptionId(optionId: string): str
 }
 
 function getProjectGroupDetail(group: ProjectGroup): string {
-  return group.parentPath?.trim() || 'Repo group'
+  return (
+    group.parentPath?.trim() ||
+    translate('auto.components.WorktreeJumpPalette.repoGroupBadge', 'Repo group')
+  )
 }
 
 export function getNewWorkspaceProjectGroupHostId(group: ProjectGroup): ExecutionHostId {

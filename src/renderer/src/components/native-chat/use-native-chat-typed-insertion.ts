@@ -1,19 +1,37 @@
 import type { NativeChatComposerInput } from './native-chat-composer-input'
 import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react'
-import type { HistoryState } from './native-chat-composer-state'
+import {
+  applyMentionSuggestion,
+  type HistoryState,
+  type ComposerAutocomplete
+} from './native-chat-composer-state'
 
 /** Imperative text insertion and focus for the composer textarea, used by the
  *  paste pipeline and the composer's imperative handle. */
 export function useNativeChatTypedInsertion(args: {
   textareaRef: RefObject<NativeChatComposerInput | null>
+  autocomplete: ComposerAutocomplete
   caret: number
   draft: string
   setDraft: (value: string) => void
   setCaret: Dispatch<SetStateAction<number>>
   setHistory: Dispatch<SetStateAction<HistoryState>>
   setActiveSuggestion: Dispatch<SetStateAction<number>>
-}): { insertTypedText: (text: string) => boolean; focus: () => boolean } {
-  const { textareaRef, caret, draft, setDraft, setCaret, setHistory, setActiveSuggestion } = args
+}): {
+  insertTypedText: (text: string) => boolean
+  focus: () => boolean
+  acceptMention: () => void
+} {
+  const {
+    textareaRef,
+    caret,
+    draft,
+    setDraft,
+    setCaret,
+    setHistory,
+    setActiveSuggestion,
+    autocomplete
+  } = args
 
   const insertTypedText = useCallback(
     (text: string): boolean => {
@@ -47,5 +65,17 @@ export function useNativeChatTypedInsertion(args: {
     return true
   }, [textareaRef])
 
-  return { insertTypedText, focus }
+  const acceptMention = useCallback(() => {
+    if (autocomplete.mode !== 'mention') {
+      return
+    }
+    const result = applyMentionSuggestion(draft, caret, autocomplete.query)
+    setDraft(result.draft)
+    setCaret(result.caret)
+    const textarea = textareaRef.current
+    textarea?.focus()
+    requestAnimationFrame(() => textarea?.setSelectionRange(result.caret, result.caret))
+  }, [autocomplete, draft, caret, setDraft, setCaret, textareaRef])
+
+  return { insertTypedText, focus, acceptMention }
 }

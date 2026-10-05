@@ -1,3 +1,4 @@
+import { cliMessage } from './cli-product'
 /**
  * Windows PowerShell 5.1 does not escape inner quotes when it builds a native command line, so
  * `--payload '{"a":"b"}'` reaches the exe as `--payload {a:b}` (#16706). The value is correct when
@@ -56,11 +57,5 @@ export function describeQuoteStrippedJsonFlag(flagName: string, raw: string): st
   }
   // Why conditional wording: this inspects only the value's shape, so it also fires when someone
   // types an unquoted `[a,b]` on macOS or Linux, where PowerShell is not involved.
-  return (
-    `--${flagName} is not valid JSON: its quotes are missing.\n` +
-    'If you ran this from Windows PowerShell 5.1, it strips inner quotes when building a native ' +
-    'command line, so a correct value can still arrive damaged.\n' +
-    `Pass it through a variable instead: $v = '<json>'; orca ... --${flagName} $v — or run the ` +
-    'command from cmd.exe, Git Bash, or PowerShell 7+.'
-  )
+  return cliMessage`--${flagName} is not valid JSON: its quotes are missing.\nIf you ran this from Windows PowerShell 5.1, it strips inner quotes when building a native command line, so a correct value can still arrive damaged.\nPass it through a variable instead: $v = '<json>'; orca ... --${flagName} $v — or run the command from cmd.exe, Git Bash, or PowerShell 7+.`
 }

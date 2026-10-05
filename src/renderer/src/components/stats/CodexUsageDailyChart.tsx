@@ -1,143 +1,175 @@
+import { useMemo, useState } from 'react'
+import type { CodexUsageDailyPoint, CodexUsageRange } from '../../../../shared/codex-usage-types'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
-import type { CodexUsageDailyPoint } from '../../../../shared/codex-usage-types'
-import { translate } from '@/i18n/i18n'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { buildCodexUsageChart } from './codex-usage-chart-series'
+import { formatTokens } from './usage-formatters'
+import { usageWorkspaceCopy } from './usage-workspace-copy'
 
-function formatTokens(value: number): string {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(1)}M`
-  }
-  if (value >= 1_000) {
-    return `${(value / 1_000).toFixed(1)}k`
-  }
-  return value.toLocaleString()
-}
-
-function getMaxDailyTotal(daily: CodexUsageDailyPoint[]): number {
-  let max = 1
-  // Why: all-time usage histories can exceed V8's argument limit if spread
-  // into Math.max, even though the chart only renders the last 10 days.
-  for (const entry of daily) {
-    max = Math.max(max, entry.totalTokens)
-  }
-  return max
-}
-
-type CodexUsageDailyChartProps = {
+export function CodexUsageDailyChart({
+  daily,
+  range = '30d',
+  reportedTotals = false
+}: {
   daily: CodexUsageDailyPoint[]
-}
-
-export function CodexUsageDailyChart({ daily }: CodexUsageDailyChartProps): React.JSX.Element {
-  const maxDailyTotal = getMaxDailyTotal(daily)
-
+  range?: CodexUsageRange
+  reportedTotals?: boolean
+}): React.JSX.Element {
+  const c = usageWorkspaceCopy()
+  const [group, setGroup] = useState('types')
+  const points = useMemo(
+    () => buildCodexUsageChart(daily, range, new Date(), reportedTotals),
+    [daily, range, reportedTotals]
+  )
+  const max = Math.max(1, ...points.map((point) => point.total))
+  const totals = points.reduce(
+    (sum, point) => ({
+      input: sum.input + point.input,
+      cached: sum.cached + point.cached,
+      output: sum.output + point.output,
+      total: sum.total + point.total
+    }),
+    { input: 0, cached: 0, output: 0, total: 0 }
+  )
+  const segments =
+    reportedTotals || group === 'total'
+      ? ([{ key: 'total', label: c.tokens, color: 'bg-chart-2', value: totals.total }] as const)
+      : ([
+          { key: 'input', label: c.input, color: 'bg-chart-2', value: totals.input },
+          { key: 'cached', label: c.cached, color: 'bg-chart-1', value: totals.cached },
+          { key: 'output', label: c.output, color: 'bg-chart-4', value: totals.output }
+        ] as const)
+  const first = points[0]
+  const middle = points[Math.floor(points.length / 2)]
+  const last = points.at(-1)
   return (
-    <section className="rounded-lg border border-border/60 bg-card/40 p-4">
-      <div className="mb-3">
-        <h4 className="text-sm font-semibold text-foreground">
-          {translate('auto.components.stats.CodexUsageDailyChart.609aa96e8b', 'Daily usage')}
-        </h4>
-        <p className="text-xs text-muted-foreground">
-          {translate(
-            'auto.components.stats.CodexUsageDailyChart.c756cda6a8',
-            'Input, cached input, output, and reasoning totals by day.'
-          )}
-        </p>
+    <div
+      className="space-y-5 rounded-xl border border-border bg-card p-5 text-card-foreground"
+      data-testid="codex-usage-history"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground">{c.tokens}</p>
+          <p className="mt-1 text-2xl font-medium tabular-nums">{formatTokens(totals.total)}</p>
+        </div>
+        {!reportedTotals && (
+          <Select value={group} onValueChange={setGroup}>
+            <SelectTrigger size="sm" aria-label={c.chartGrouping}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="types">{c.tokenTypes}</SelectItem>
+              <SelectItem value="total">{c.dailyTotal}</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
-      <div className="grid h-56 grid-cols-10 items-end gap-3">
-        {daily.slice(-10).map((entry) => {
-          const segments = [
-            {
-              key: 'input',
-              label: translate('auto.components.stats.CodexUsageDailyChart.99a91d3143', 'Input'),
-              value: entry.inputTokens,
-              className: 'bg-sky-500/80'
-            },
-            {
-              key: 'output',
-              label: translate('auto.components.stats.CodexUsageDailyChart.7b596a88b2', 'Output'),
-              value: entry.outputTokens,
-              className: 'bg-emerald-500/80'
-            },
-            {
-              key: 'cached-input',
-              label: translate(
-                'auto.components.stats.CodexUsageDailyChart.c646e1783c',
-                'Cached input'
-              ),
-              value: entry.cachedInputTokens,
-              className: 'bg-amber-500/70'
-            },
-            {
-              key: 'reasoning',
-              label: translate(
-                'auto.components.stats.CodexUsageDailyChart.1e6f62d7e3',
-                'Reasoning'
-              ),
-              value: entry.reasoningOutputTokens,
-              className: 'bg-fuchsia-500/70'
-            }
-          ]
-          return (
-            <div key={entry.day} className="flex h-full min-w-0 flex-col justify-end gap-2">
-              <span className="text-center text-[11px] text-muted-foreground">
-                {formatTokens(entry.totalTokens)}
-              </span>
-              <div className="flex min-h-0 flex-1 items-end justify-center">
-                <div className="flex h-full w-full max-w-12 overflow-hidden rounded-t-sm bg-muted/60">
-                  <div className="flex h-full w-full flex-col justify-end">
-                    {segments.map((segment) =>
-                      segment.value > 0 ? (
-                        <TooltipProvider key={segment.key} delayDuration={120}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div
-                                className={segment.className}
-                                style={{ height: `${(segment.value / maxDailyTotal) * 100}%` }}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" sideOffset={8}>
-                              <div className="text-xs">
-                                <div>{entry.day}</div>
-                                <div>
-                                  {segment.label}: {segment.value.toLocaleString()}{' '}
-                                  {translate(
-                                    'auto.components.stats.CodexUsageDailyChart.e4bdcf0071',
-                                    'tokens'
-                                  )}
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      ) : null
-                    )}
-                  </div>
-                </div>
-              </div>
-              <span className="text-center text-[11px] text-muted-foreground">
-                {entry.day.slice(5)}
-              </span>
+      <div className="flex gap-3">
+        <div
+          aria-hidden
+          className="flex w-10 shrink-0 flex-col justify-between pb-7 text-right text-xs tabular-nums text-muted-foreground"
+        >
+          <span>{formatTokens(max)}</span>
+          <span>{formatTokens(max / 2)}</span>
+          <span>0</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="relative h-48">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 flex flex-col justify-between"
+            >
+              <div className="border-t border-border/60" />
+              <div className="border-t border-border/60" />
+              <div className="border-t border-border/60" />
+              <div className="border-t border-border/60" />
+              <div className="border-t border-border/60" />
             </div>
-          )
-        })}
+            <TooltipProvider delayDuration={120}>
+              <div
+                className="relative grid h-full items-end gap-1"
+                style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}
+              >
+                {points.map((point) => {
+                  const label =
+                    point.start === point.end ? point.start : `${point.start} – ${point.end}`
+                  return (
+                    <Tooltip key={point.start}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="group flex h-full min-w-0 items-end justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={`${label}: ${point.total.toLocaleString()} tokens`}
+                        >
+                          <span
+                            className="flex w-full max-w-12 flex-col-reverse overflow-hidden rounded-t-sm transition-opacity group-hover:opacity-80"
+                            style={{ height: `${(point.total / max) * 100}%` }}
+                          >
+                            {segments.map((segment) => (
+                              <span
+                                key={segment.key}
+                                className={segment.color}
+                                style={{
+                                  height: `${point.total ? (point[segment.key] / point.total) * 100 : 0}%`
+                                }}
+                              />
+                            ))}
+                          </span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{label}</p>
+                        {segments.map((segment) => (
+                          <p key={segment.key}>
+                            {segment.label}: {point[segment.key].toLocaleString()}
+                          </p>
+                        ))}
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+              </div>
+            </TooltipProvider>
+            {totals.total === 0 && (
+              <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+                {c.chartEmpty}
+              </p>
+            )}
+          </div>
+          <div
+            aria-hidden
+            className="mt-3 flex justify-between gap-2 text-xs tabular-nums text-muted-foreground"
+          >
+            <span>{first?.start.slice(5)}</span>
+            <span>{middle?.start.slice(5)}</span>
+            <span>{last?.end.slice(5)}</span>
+          </div>
+        </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-sky-500/80" />
-          {translate('auto.components.stats.CodexUsageDailyChart.99a91d3143', 'Input')}
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-emerald-500/80" />
-          {translate('auto.components.stats.CodexUsageDailyChart.7b596a88b2', 'Output')}
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-amber-500/70" />
-          {translate('auto.components.stats.CodexUsageDailyChart.c646e1783c', 'Cached input')}
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-fuchsia-500/70" />
-          {translate('auto.components.stats.CodexUsageDailyChart.1e6f62d7e3', 'Reasoning')}
-        </span>
-      </div>
-    </section>
+      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {segments.map((segment) => (
+          <div key={segment.key} className="flex gap-3">
+            <span className={segment.color} style={{ width: 3, borderRadius: 2 }} />
+            <div>
+              <dt className="text-xs text-muted-foreground">{segment.label}</dt>
+              <dd className="mt-1 text-sm font-medium tabular-nums">
+                {totals.total
+                  ? ((segment.value / totals.total) * 100).toLocaleString(undefined, {
+                      maximumFractionDigits: 1
+                    })
+                  : '0'}
+                %{' '}
+                <span className="ml-2 font-normal text-muted-foreground">
+                  {formatTokens(segment.value)}
+                </span>
+              </dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+      <p className="text-xs text-muted-foreground">
+        {reportedTotals ? c.reportedTotalsNote : c.chartNote}
+      </p>
+    </div>
   )
 }

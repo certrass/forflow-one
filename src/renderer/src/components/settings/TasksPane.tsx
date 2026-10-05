@@ -1,5 +1,7 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { TaskSourceShowInTasksStep } from './TaskSourceShowInTasksStep'
 import { useState } from 'react'
-import { Github, Gitlab } from 'lucide-react'
+import { Github, Gitlab, ListChecks } from 'lucide-react'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { TaskProvider } from '../../../../shared/task-providers'
 import {
@@ -42,6 +44,11 @@ const PROVIDER_META: Record<
     Icon: (props: { className?: string }) => React.JSX.Element
   }
 > = {
+  feishu: {
+    label: '飞书',
+    description: '使用本机个人授权，只读获取任务与清单，导入为会话草稿。',
+    Icon: ({ className }) => <ListChecks className={className} />
+  },
   github: {
     get label() {
       return translate('auto.components.settings.TasksPane.e14063e727', 'GitHub')
@@ -93,6 +100,7 @@ const PROVIDER_META: Record<
 }
 
 export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.JSX.Element {
+  const providers = TASK_PROVIDERS.filter((provider) => provider !== 'feishu' || isForflowBuild())
   const visibleProviders = normalizeVisibleTaskProviders(settings.visibleTaskProviders)
   const openSettingsPage = useAppStore((s) => s.openSettingsPage)
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
@@ -102,14 +110,14 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
   useIntegrationProviderStatusRefresh()
 
   // Warn only about started-then-stalled setup; untouched providers are the default.
-  const stalledVisible = getStalledVisibleTaskProviders(TASK_PROVIDERS, readinessByProvider)
+  const stalledVisible = getStalledVisibleTaskProviders(providers, readinessByProvider)
   // Sticky across rechecks so expanded Linear install terminals are not unmounted.
   // Claim during render (not an effect): a layout effect elsewhere can force a
   // sync re-render before passive effects flush and collapse the open card.
   // useState (not a ref write) keeps render pure for React Doctor.
   const [previousAutoExpanded, setPreviousAutoExpanded] = useState<TaskProvider | null>(null)
   const autoExpandedProvider = resolveStickyAutoExpandedTaskProvider({
-    providers: TASK_PROVIDERS,
+    providers,
     readinessByProvider,
     previousAutoExpanded
   })
@@ -189,7 +197,7 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
           keywords={getTasksPaneSearchKeywords()}
           className="space-y-3 py-2"
         >
-          {TASK_PROVIDERS.map((provider) => {
+          {providers.map((provider) => {
             const meta = PROVIDER_META[provider]
             const readiness = readinessByProvider[provider]
             const Icon = meta.Icon
@@ -208,7 +216,27 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
                 defaultExpanded={autoExpandedProvider === provider}
                 onToggleVisible={() => toggleProvider(provider)}
               >
-                {provider === 'linear' ? (
+                {provider === 'feishu' ? (
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground">
+                      在集成页配置个人授权。绑定状态不代替实际任务读取验证；暂不支持定时抓取或自动回写。
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openIntegrations('forflow-feishu')}
+                    >
+                      管理飞书连接
+                    </Button>
+                    <TaskSourceShowInTasksStep
+                      index={2}
+                      providerLabel="飞书"
+                      visible={visible}
+                      canHide={canHide}
+                      onToggleVisible={() => toggleProvider('feishu')}
+                    />
+                  </div>
+                ) : provider === 'linear' ? (
                   <TaskSourceLinearSetup
                     connected={readiness.connected}
                     checking={readiness.checking}

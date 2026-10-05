@@ -1,3 +1,5 @@
+import type { UsageCostCoverage } from './usage-cost-coverage'
+
 export type ClaudeUsageScope = 'orca' | 'all'
 export type ClaudeUsageRange = '7d' | '30d' | '90d' | 'all'
 export type ClaudeUsageBreakdownKind = 'model' | 'project'
@@ -23,6 +25,7 @@ export type ClaudeUsageSummary = {
   cacheWriteTokens: number
   cacheReuseRate: number | null
   estimatedCostUsd: number | null
+  costCoverage?: UsageCostCoverage
   topModel: string | null
   topProject: string | null
   hasAnyClaudeData: boolean

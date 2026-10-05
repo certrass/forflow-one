@@ -100,6 +100,7 @@ export function renderStatsSettingsSection(context: SettingsRenderContext): Reac
   return (
     <SettingsSection
       id="stats"
+      bodyClassName="rounded-none border-0 bg-transparent p-0 shadow-none"
       title={translate('auto.components.settings.Settings.954a8f5aef', 'Stats & Usage')}
       description={translate(
         'auto.components.settings.Settings.8acf3f22e0',

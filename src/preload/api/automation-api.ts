@@ -15,6 +15,7 @@ import type {
   ScopedExternalManagerUpdateRequest
 } from '../../shared/external-automation-scope'
 import type { AutomationsChangedPayload } from '../../shared/runtime-client-events'
+import type { CodexAutomationList } from '../../shared/codex-automations'
 
 export type ExternalAutomationManagerResult = {
   /** Null once a probe succeeded and found no manager configured for this scope. */
@@ -29,6 +30,7 @@ export type ExternalAutomationManagerResult = {
  * scope (probes run on this computer) and the dispatch-loop plumbing.
  */
 export type AutomationsApi = {
+  listLocalCodex: () => Promise<CodexAutomationList>
   listExternalManagerForOwner: (
     request: ScopedExternalManagerListRequest
   ) => Promise<ExternalAutomationManagerResult>

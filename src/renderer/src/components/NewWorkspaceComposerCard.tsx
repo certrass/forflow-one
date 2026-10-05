@@ -1,3 +1,4 @@
+import { ForflowTaskPrompt } from './new-workspace/ForflowTaskPrompt'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -314,6 +315,13 @@ export default function NewWorkspaceComposerCard(
           connectButtonLabel={connectButtonLabel}
           selectedProjectName={selectedProjectName}
         />
+        {props.taskPrompt !== undefined ? (
+          <ForflowTaskPrompt
+            value={props.taskPrompt}
+            onChange={props.onTaskPromptChange}
+            creating={props.creating}
+          />
+        ) : null}
         <NewWorkspaceComposerNameSection {...props} onNamePlainEnter={handleNamePlainEnter} />
         <NewWorkspaceComposerAgentSection
           {...props}

@@ -26,6 +26,10 @@ export async function readCliStatusForSmoke(page: Page) {
       /Forflow One\.app\/Contents\/Resources\/bin\/forflow$/
     )
   } else {
+    expect(
+      process.env.FORFLOW_QA_ALLOW_CLI_PERMISSION_DENIED,
+      'Normal smoke requires a readable CLI registration; permission recovery is an explicit fixture.'
+    ).toBe('1')
     expect(result.message).toMatch(
       /\b(?:EACCES|EPERM):[^\n]*\breadlink '\/usr\/local\/bin\/forflow'/
     )
@@ -81,6 +85,9 @@ export async function verifyCliSettingsRecovery(): Promise<void> {
       await expect(section).not.toContainText('invoking remote method')
       await expect(section.getByRole('switch', { name: 'Shell 命令', exact: true })).toBeDisabled()
     } else {
+      await refresh.click()
+      await expect(refresh).toBeEnabled()
+      expect((await readCliStatusForSmoke(page)).kind).toBe('status')
       await expect(section.getByRole('alert')).toHaveCount(0)
     }
     expect(errors).toEqual([])
