@@ -123,7 +123,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
       { path: 'handoff.md' },
       { path: 'receipt.txt', verification: true }
     ])
-    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
+    await intake.getByRole('button', { name: '开始审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')
     await page.getByRole('button', { name: '收起引导', exact: true }).click()
     await expect(review.getByRole('button', { name: '带我审阅', exact: true })).toHaveAttribute(
@@ -138,18 +138,21 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     await expect(preview).toContainText('问题为空；测试失败')
     await expect(preview).not.toContainText('synthetic-secret-00000000')
     expect(await app.evaluate(() => process.env.FORFLOW_QA_DELIVERY_SENDS)).toBe('0')
-    await panel.getByRole('button', { name: '将此预览发送至 Jev', exact: true }).click()
+    await panel.getByRole('button', { name: '发送给 Jev', exact: true }).click()
     const results = panel.getByTestId('jev-delivery-results')
-    await expect(results).toContainText('待人工复核')
+    await expect(results).toContainText('待核对')
     await expect(
-      panel.getByTestId('jev-delivery-workflow').getByRole('progressbar')
-    ).toHaveAttribute('aria-valuenow', '4')
+      panel
+        .getByTestId('jev-delivery-workflow')
+        .getByRole('list', { name: '审阅步骤' })
+        .locator('[aria-current="step"]')
+    ).toHaveText('查看结果')
     await expect(page.locator('[data-workspace-review-step-help]')).toHaveCount(0)
     await expect(results.getByTestId('jev-result-summary')).toContainText(
       '材料记录了未达到要求的情况'
     )
     const checks = results.locator('details').filter({
-      has: page.locator('summary').filter({ hasText: '五项检查分别在看什么' })
+      has: page.locator('summary').filter({ hasText: '检查详情' })
     })
     await expect(checks).toHaveCount(1)
     expect(await checks.getAttribute('open')).toBeNull()
@@ -169,7 +172,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
       receipt
     )
     expect(await app.evaluate(() => process.env.FORFLOW_QA_DELIVERY_SENDS)).toBe('1')
-    await results.getByRole('button', { name: '记录为待处理问题', exact: true }).first().click()
+    await results.getByRole('button', { name: '记录问题', exact: true }).first().click()
     await expect(results.getByRole('button', { name: '已记录为问题', exact: true })).toBeDisabled()
     const stored = await page.evaluate(
       (id) => window.api.codexUsage.getReview!(id),
@@ -180,7 +183,7 @@ test('delivery quality: explicit multi-source preview, native answers, adoption 
     ).toHaveLength(3)
     expect(stored.confirmations).toHaveLength(0)
     writeFileSync(path.join(folder, 'receipt.txt'), '版本 r2：复测通过，原结果已变化。\n')
-    await results.getByRole('button', { name: '记录为待处理问题', exact: true }).click()
+    await results.getByRole('button', { name: '记录问题', exact: true }).click()
     await expect(panel.getByRole('alert')).toContainText('变化')
     await page.screenshot({
       path: path.join(evidence, 'jev-delivery-results.png'),

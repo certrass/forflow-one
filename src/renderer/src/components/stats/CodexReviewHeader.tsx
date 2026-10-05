@@ -5,8 +5,7 @@ import {
   GitBranch,
   MessageSquare,
   RefreshCw,
-  CircleCheck,
-  Folder
+  CircleCheck
 } from 'lucide-react'
 import type { CodexReview, CodexReviewVersion } from '../../../../shared/codex-review-types'
 import { codexReviewStatus } from '../../../../shared/codex-review-types'
@@ -75,22 +74,9 @@ export function CodexReviewHeader({
       <h3 className="break-words text-xl font-semibold">
         {version.workspace?.target.name ?? version.usage?.title ?? review.sessionId ?? c.unknown}
       </h3>
-      <dl className="grid grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 text-sm">
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <Folder className="size-4" />
-          {c.source}
-        </dt>
-        <dd className="min-w-0 break-words">
-          {version.workspace
-            ? `${p.local} · ${version.workspace.target.rootPath}`
-            : `Codex · ${version.usage?.projectLabels.join(' · ') || review.sessionId || c.unknown}`}
-        </dd>
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <GitBranch className="size-4" />
-          {c.version}
-        </dt>
-        <dd className="flex min-w-0 flex-wrap items-center gap-2">
-          {selected > 0 && <span className="text-muted-foreground">v{selected} →</span>}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <GitBranch className="size-4 shrink-0 text-muted-foreground" />
           <Select
             value={String(selected)}
             disabled={busy}
@@ -108,42 +94,40 @@ export function CodexReviewHeader({
               ))}
             </SelectContent>
           </Select>
-        </dd>
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <Bot className="size-4" />
-          {w.reviewers}
-        </dt>
-        <dd>
-          {c.localReviewer}
-          {checks.total > 0 ? ' · Jev · Beta' : ''}
-        </dd>
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <MessageSquare className="size-4" />
-          {c.comments}
-        </dt>
-        <dd>
-          <Button variant="link" size="xs" disabled={busy} onClick={onOverview}>
-            {review.comments.length} {c.comments}
-          </Button>
-        </dd>
-        <dt className="flex items-center gap-2 text-muted-foreground">
-          <CircleCheck className="size-4" />
-          {w.checks}
-        </dt>
-        <dd>
-          <Button variant="link" size="xs" disabled={busy} onClick={onChecks}>
-            {checks.total
-              ? `${w.checked} ${checks.completed} · ${w.attention} ${checks.attention}`
-              : w.noChecks}
-          </Button>
-        </dd>
-      </dl>
-      <p className="text-xs text-muted-foreground">
-        {version.workspace
-          ? p.snapshot
-          : `${SCOPE_OPTIONS.find((option) => option.value === review.scope)?.label} · ${RANGE_LABELS[review.range]}`}{' '}
-        · {c.frozen}
-      </p>
+        </div>
+        <Button variant="ghost" size="sm" disabled={busy} onClick={onOverview}>
+          <MessageSquare />
+          {review.comments.length} {c.comments}
+        </Button>
+        <Button variant="ghost" size="sm" disabled={busy} onClick={onChecks}>
+          <CircleCheck />
+          {checks.total
+            ? `${w.checked} ${checks.completed} · ${w.attention} ${checks.attention}`
+            : w.noChecks}
+        </Button>
+      </div>
+      <details className="space-y-3 text-sm text-muted-foreground">
+        <summary className="cursor-pointer">{c.details}</summary>
+        <dl className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-4 gap-y-2">
+          <dt>{c.source}</dt>
+          <dd className="min-w-0 break-all font-mono text-xs">
+            {version.workspace
+              ? version.workspace.target.rootPath
+              : version.usage?.projectLabels.join(' · ') || review.sessionId || c.unknown}
+          </dd>
+          <dt>{w.reviewers}</dt>
+          <dd>
+            {c.localReviewer}
+            {checks.total > 0 ? ' · Jev · Beta' : ''}
+          </dd>
+        </dl>
+        <p>
+          {version.workspace
+            ? p.snapshot
+            : `${SCOPE_OPTIONS.find((option) => option.value === review.scope)?.label} · ${RANGE_LABELS[review.range]}`}{' '}
+          · {c.frozen}
+        </p>
+      </details>
       <div className="flex flex-wrap gap-2">
         {window.api?.forflowJevAudit && (
           <Button

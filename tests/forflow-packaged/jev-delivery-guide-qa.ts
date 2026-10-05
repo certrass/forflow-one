@@ -7,12 +7,7 @@ import {
 import path from 'node:path'
 import { evidence } from './harness'
 
-const guideTitles = [
-  '1. 明确这次查什么',
-  '2. 选择交给 Jev 的材料',
-  '3. 核对预览并发送',
-  '4. 看判断，处理下一步'
-]
+const guideTitles = ['检查要求', '选择材料', '确认发送', '查看结果']
 const sourceNames = ['requirement.md', 'receipt.txt', 'handoff.md']
 
 export async function expectNoDeliverySend(app: ElectronApplication): Promise<void> {
@@ -21,15 +16,17 @@ export async function expectNoDeliverySend(app: ElectronApplication): Promise<vo
 
 export async function captureJevGuide(page: Page, step: number, screenshot: string): Promise<void> {
   const workflow = page.getByTestId('jev-delivery-workflow')
-  await expect(workflow.getByRole('progressbar')).toHaveAttribute('aria-valuenow', String(step))
-  const toggle = workflow.getByRole('button', { name: '教我使用 Jev', exact: true })
+  await expect(
+    workflow.getByRole('list', { name: '审阅步骤' }).locator('[aria-current="step"]')
+  ).toHaveText(guideTitles[step - 1])
+  const toggle = workflow.getByRole('button', { name: '操作说明', exact: true })
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
     await toggle.click()
   }
   const target =
     step < 3
       ? workflow.getByRole('button', {
-          name: step === 1 ? '按这项要求选择材料' : '准备发送预览',
+          name: step === 1 ? '下一步：选择材料' : '下一步：预览材料',
           exact: true
         })
       : workflow.getByRole('heading', { name: guideTitles[step - 1], exact: true })
@@ -67,6 +64,10 @@ export async function captureJevGuide(page: Page, step: number, screenshot: stri
   await page.screenshot({ path: path.join(evidence, `${screenshot}.png`), animations: 'disabled' })
   await guide.getByRole('button', { name: '收起 Jev 引导', exact: true }).click()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  await page.screenshot({
+    path: path.join(evidence, `${screenshot}-clean.png`),
+    animations: 'disabled'
+  })
   await expect(page.locator('[data-workspace-review-step-help]')).toHaveCount(0)
 }
 
@@ -77,7 +78,7 @@ async function expectSelection(input: Locator): Promise<void> {
     ).toBeChecked()
   }
   await expect(
-    input.getByRole('checkbox', { name: '作为交接说明: handoff.md', exact: true })
+    input.getByRole('checkbox', { name: '交付说明: handoff.md', exact: true })
   ).toBeChecked()
 }
 
@@ -91,19 +92,21 @@ export async function prepareGuidedDelivery(app: ElectronApplication, page: Page
   await expect(input).toHaveCount(0)
   await expectNoDeliverySend(app)
   await captureJevGuide(page, 1, 'jev-guide-goal')
-  await workflow.getByRole('button', { name: '按这项要求选择材料', exact: true }).click()
+  await workflow.getByRole('button', { name: '下一步：选择材料', exact: true }).click()
   await expect(input).toBeVisible()
   await expect(help).toHaveCount(0)
-  await expect(workflow.getByRole('button', { name: '准备发送预览', exact: true })).toBeDisabled()
+  await expect(
+    workflow.getByRole('button', { name: '下一步：预览材料', exact: true })
+  ).toBeDisabled()
   for (const file of sourceNames) {
     await input.getByRole('checkbox', { name: `选择证据: ${file}`, exact: true }).check()
   }
-  await input.getByRole('checkbox', { name: '作为交接说明: handoff.md', exact: true }).check()
+  await input.getByRole('checkbox', { name: '交付说明: handoff.md', exact: true }).check()
   await expectNoDeliverySend(app)
   const handoff = input.locator('li').filter({
     has: page.getByRole('checkbox', { name: '选择证据: handoff.md', exact: true })
   })
-  await handoff.getByRole('button', { name: '定位关联记录', exact: true }).click()
+  await handoff.getByRole('button', { name: '查看材料', exact: true }).click()
   await expect(review.getByRole('tab', { name: '记录', exact: true })).toHaveAttribute(
     'aria-selected',
     'true'
@@ -128,7 +131,7 @@ export async function prepareGuidedDelivery(app: ElectronApplication, page: Page
   await expectSelection(input)
   await expect(help).toHaveCount(0)
   await captureJevGuide(page, 2, 'jev-guide-materials')
-  await workflow.getByRole('button', { name: '教我使用 Jev', exact: true }).click()
+  await workflow.getByRole('button', { name: '操作说明', exact: true }).click()
   await expect(help).toHaveCount(1)
   await page.getByRole('tab', { name: '使用分析', exact: true }).click()
   await expect(help).toHaveCount(0)
@@ -138,7 +141,7 @@ export async function prepareGuidedDelivery(app: ElectronApplication, page: Page
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1000, 850))
   await captureJevGuide(page, 2, 'jev-guide-narrow')
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1450, 1100))
-  await workflow.getByRole('button', { name: '准备发送预览', exact: true }).click()
+  await workflow.getByRole('button', { name: '下一步：预览材料', exact: true }).click()
   const preview = panel.getByTestId('jev-request-preview')
   await expect(preview).toContainText('问题为空；测试失败')
   await expect(input).toHaveCount(0)
@@ -147,12 +150,10 @@ export async function prepareGuidedDelivery(app: ElectronApplication, page: Page
   await workflow.getByRole('button', { name: '上一步', exact: true }).click()
   await expectSelection(input)
   await expect(preview).toHaveCount(0)
-  await expect(
-    workflow.getByRole('button', { name: '将此预览发送至 Jev', exact: true })
-  ).toHaveCount(0)
+  await expect(workflow.getByRole('button', { name: '发送给 Jev', exact: true })).toHaveCount(0)
   await expect(help).toHaveCount(0)
   await expectNoDeliverySend(app)
-  await workflow.getByRole('button', { name: '准备发送预览', exact: true }).click()
+  await workflow.getByRole('button', { name: '下一步：预览材料', exact: true }).click()
   await expect(preview).toContainText('标题和状态保持一致')
   await expect(preview).not.toContainText('synthetic-secret-00000000')
   await expect(input).toHaveCount(0)

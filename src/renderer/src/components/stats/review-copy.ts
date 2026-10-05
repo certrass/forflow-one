@@ -2,11 +2,12 @@ import { translate } from '@/i18n/i18n'
 
 export function reviewCopy() {
   return {
+    details: translate('forflow.review.details', 'Source details'),
     historicBadge: translate('forflow.review.historicBadge', 'Historical source snapshot'),
-    viewResult: translate('forflow.review.viewResult', 'Read return record'),
+    viewResult: translate('forflow.review.viewResult', 'View result'),
 
     range: translate('forflow.review.range', 'Time range'),
-    locate: translate('forflow.review.locate', 'Locate linked record'),
+    locate: translate('forflow.review.locate', 'View material'),
 
     analytics: translate('forflow.review.analytics', 'Analytics · Codex'),
     history: translate('forflow.review.history', 'Usage history'),
@@ -54,21 +55,15 @@ export function reviewCopy() {
       'forflow.review.defaultFocus',
       'Inspect model and tool records, unmatched results and source coverage. Draw conclusions only from visible evidence.'
     ),
-    reread: translate('forflow.review.reread', 'Read current records'),
+    reread: translate('forflow.review.reread', 'Refresh materials'),
     confirm: translate('forflow.review.confirm', 'Confirm this version'),
     version: translate('forflow.review.version', 'Version'),
-    frozen: translate('forflow.review.frozen', 'Saved snapshot · source logs remain unchanged'),
-    manual: translate(
-      'forflow.review.manual',
-      'Findings and comments are local review records. No external evaluator has been run.'
-    ),
+    frozen: translate('forflow.review.frozen', 'Saved material version'),
+    manual: translate('forflow.review.manual', 'Review decisions are saved locally.'),
     comments: translate('forflow.review.comments', 'Comments'),
     changes: translate('forflow.review.changes', 'Changes'),
     records: translate('forflow.review.records', 'Records'),
-    noIssues: translate(
-      'forflow.review.noIssues',
-      'No issues have been recorded. This is not a clean audit verdict.'
-    ),
+    noIssues: translate('forflow.review.noIssues', 'No issues recorded yet.'),
     issueTitle: translate('forflow.review.issueTitle', 'Issue title'),
     issueDetail: translate('forflow.review.issueDetail', 'Evidence and next step'),
     addIssue: translate('forflow.review.addIssue', 'Add issue'),
@@ -144,7 +139,7 @@ export function reviewCopy() {
     pendingEvidence: translate('forflow.review.pendingEvidence', 'Evidence to follow up'),
     confirmationMeaning: translate(
       'forflow.review.confirmationMeaning',
-      'Confirms only this saved scope and version, not the entire task or unseen activity.'
+      'Confirm after reviewing the materials and recorded issues.'
     )
   }
 }

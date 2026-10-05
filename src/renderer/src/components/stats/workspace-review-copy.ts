@@ -17,7 +17,7 @@ export function workspaceReviewCopy() {
     ),
     optionalSessions: translate(
       'forflow.workspaceReview.optionalSessions',
-      'Add development conversations (optional)'
+      'Link conversations (optional)'
     ),
     focusPlaceholder: translate(
       'forflow.workspaceReview.focusPlaceholder',
@@ -60,7 +60,7 @@ export function workspaceReviewCopy() {
     code: translate('forflow.workspaceReview.code', 'Code'),
     document: translate('forflow.workspaceReview.document', 'Documents and requirements'),
     verification: translate('forflow.workspaceReview.verification', 'Test and build receipts'),
-    focus: translate('forflow.workspaceReview.focus', 'Review goal'),
+    focus: translate('forflow.workspaceReview.focus', 'Review requirement'),
     focusHint: translate(
       'forflow.workspaceReview.focusHint',
       'Describe one specific expected result for this review.'
@@ -68,7 +68,7 @@ export function workspaceReviewCopy() {
     sessions: translate('forflow.workspaceReview.sessions', 'Development conversations'),
     sessionNote: translate(
       'forflow.workspaceReview.sessionNote',
-      'Add conversations that explain the requirements or implementation. Optional, up to 12.'
+      'Link up to 12 conversations for reference. Only their identifiers are saved here.'
     ),
     searchSessions: translate('forflow.workspaceReview.searchSessions', 'Search conversations'),
     noSessions: translate(
@@ -90,11 +90,11 @@ export function workspaceReviewCopy() {
       'forflow.workspaceReview.applicabilityReason',
       'Applicability basis and reason'
     ),
-    prepare: translate('forflow.workspaceReview.prepare', 'Open review'),
-    preparing: translate('forflow.workspaceReview.preparing', 'Preparing review materials…'),
+    prepare: translate('forflow.workspaceReview.prepare', 'Start review'),
+    preparing: translate('forflow.workspaceReview.preparing', 'Reading selected materials\u2026'),
     prepareNote: translate(
       'forflow.workspaceReview.prepareNote',
-      'Next, inspect materials, record issues and use Jev for additional judgments. You will see the exact text before sending it.'
+      'Starting saves the selected file contents and opens the review workspace.'
     ),
     fileLimit: translate('forflow.workspaceReview.fileLimit', 'Select 1–40 files.'),
     required: translate(
@@ -140,7 +140,7 @@ export function workspaceReviewCopy() {
     ),
     signalNote: translate(
       'forflow.workspaceReview.signalNote',
-      'These are content signals, not findings of unauthorized disclosure. Destination, transfer outcome and authorization remain unknown.'
+      'Check each match in context, including its use and authorization.'
     ),
     flowUnknown: translate('forflow.workspaceReview.flowUnknown', 'Transfer: unknown'),
     authorizationUnknown: translate(
@@ -166,18 +166,18 @@ export function workspaceReviewCopy() {
     ),
     readOnlyNote: translate(
       'forflow.workspaceReview.readOnlyNote',
-      'Verification files are saved evidence. Their presence does not prove that checks cover this snapshot.'
+      'Compare test records with the version being reviewed.'
     ),
     jevScope: translate(
       'forflow.workspaceReview.jevScope',
-      'Jev checks cover selected readable text, not the entire workspace or a compliance determination.'
+      'Jev reviews the selected readable material against your requirement.'
     ),
     fileChanges: translate('forflow.workspaceReview.fileChanges', 'Selected file changes'),
     unchanged: translate('forflow.workspaceReview.unchanged', 'Same observed content'),
     unverified: translate('forflow.workspaceReview.unverified', 'Unable to compare contents'),
     ruleVersion: translate('forflow.workspaceReview.ruleVersion', 'Detection rule version'),
     emptyPolicy: translate('forflow.workspaceReview.emptyPolicy', 'No policy source recorded'),
-    editScope: translate('forflow.workspaceReview.editScope', 'Edit selected evidence'),
+    editScope: translate('forflow.workspaceReview.editScope', 'Change materials'),
     unknown: translate('forflow.workspaceReview.unknown', 'Unknown')
   }
 }

@@ -9,27 +9,24 @@ export function jevDeliveryCopy() {
       'forflow.jevDelivery.scope',
       'Review one requirement against explicitly selected evidence. Every result requires human review.'
     ),
-    criterion: translate('forflow.jevDelivery.criterion', 'Requirement for this check'),
+    criterion: translate('forflow.jevDelivery.criterion', 'Review requirement'),
     criterionHint: translate(
       'forflow.jevDelivery.criterionHint',
       'Uses this review version’s goal. To change it, edit the goal and reread the review first.'
     ),
-    sources: translate('forflow.jevDelivery.sources', 'Select evidence (1–12 sources)'),
+    sources: translate('forflow.jevDelivery.sources', 'Review materials'),
     sourceHint: translate(
       'forflow.jevDelivery.sourceHint',
-      'Include the requirement and its supporting or contradictory evidence. Mark handoff instructions separately; no instructions is also a valid input.'
+      'Choose up to 12 materials. Mark verification instructions as handoff instructions.'
     ),
     select: translate('forflow.jevDelivery.select', 'Select evidence'),
-    handoff: translate('forflow.jevDelivery.handoff', 'Use as handoff instructions'),
+    handoff: translate('forflow.jevDelivery.handoff', 'Handoff instructions'),
     noSources: translate(
       'forflow.jevDelivery.noSources',
       'No readable evidence in this version. Reread the review or adjust its input scope.'
     ),
     selected: translate('forflow.jevDelivery.selected', 'Selected'),
-    reviewRequired: translate(
-      'forflow.jevDelivery.reviewRequired',
-      'Awaiting human review · does not confirm acceptance'
-    ),
+    reviewRequired: translate('forflow.jevDelivery.reviewRequired', 'Awaiting review'),
     stale: translate(
       'forflow.jevDelivery.stale',
       'Historical question or evaluator version · rerun before adopting'

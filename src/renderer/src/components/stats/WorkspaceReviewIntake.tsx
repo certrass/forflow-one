@@ -36,7 +36,7 @@ export function WorkspaceReviewIntake({
             disabled={loading || busy}
             onClick={form.refresh}
           >
-            {r.refresh}
+            {g.refresh}
           </Button>
         }
       />

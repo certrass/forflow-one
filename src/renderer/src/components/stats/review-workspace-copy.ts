@@ -13,7 +13,7 @@ export function reviewWorkspaceCopy() {
     noChecks: translate('forflow.reviewWorkspace.noChecks', 'No Jev checks for this version'),
     checkScope: translate(
       'forflow.reviewWorkspace.checkScope',
-      'Checks cover selected records, not the whole session.'
+      'Checks use the selected materials in this version.'
     ),
     checked: translate('forflow.reviewWorkspace.checked', 'Completed checks'),
     attention: translate('forflow.reviewWorkspace.attention', 'Suggestions to inspect'),
@@ -41,7 +41,7 @@ export function reviewWorkspaceCopy() {
     partial: translate('forflow.reviewWorkspace.partial', 'This source has coverage gaps'),
     local: translate(
       'forflow.reviewWorkspace.local',
-      'Review decisions are saved locally. Jev checks retain their model, source version and usage.'
+      'Review decisions, Jev results and usage records are saved locally.'
     ),
     goIssues: translate('forflow.reviewWorkspace.goIssues', 'View recorded issues')
   }

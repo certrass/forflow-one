@@ -2,73 +2,68 @@ import { translate } from '@/i18n/i18n'
 
 export function workspaceReviewGuideCopy() {
   return {
-    title: translate('forflow.reviewGuide.title', 'Project review guide'),
+    refresh: translate('forflow.reviewGuide.refresh', 'Refresh projects'),
+    title: translate('forflow.reviewGuide.title', 'Start a project review'),
     description: translate(
       'forflow.reviewGuide.description',
-      'Take one step at a time to prepare your review.'
+      'Choose a project, describe the requirement, then select materials.'
     ),
-    projectTitle: translate(
-      'forflow.reviewGuide.projectTitle',
-      'Which project would you like to check?'
-    ),
+    projectTitle: translate('forflow.reviewGuide.projectTitle', 'Choose project'),
     projectHint: translate(
       'forflow.reviewGuide.projectHint',
       'Choose a project already open in Forflow One.'
     ),
     projectHelp: translate(
       'forflow.reviewGuide.projectHelp',
-      'Click the project selector and choose the folder containing your delivery. If it is missing, open the project from the sidebar and refresh this list. After choosing, the Continue button becomes available.'
+      'Choose an open project. If it is missing, open it from the sidebar and refresh the list.'
     ),
-    goalTitle: translate('forflow.reviewGuide.goalTitle', 'What would you like to find out?'),
+    goalTitle: translate('forflow.reviewGuide.goalTitle', 'Review requirement'),
     goalHint: translate(
       'forflow.reviewGuide.goalHint',
-      'Describe what you want to check in one sentence. Next, clarify what would count as complete, or go straight to materials if that is already clear.'
+      'Describe what to check and the result you expect.'
     ),
     goalHelp: translate(
       'forflow.reviewGuide.goalHelp',
-      'Choose a common goal above, then edit the text here. For example: after restarting, the issue title and status should stay unchanged. Describe what success looks like; you do not need to write an audit prompt.'
+      'Use a template or describe the expected behavior. For example: the issue title and status remain unchanged after restarting.'
     ),
-    filesTitle: translate(
-      'forflow.reviewGuide.filesTitle',
-      'Which materials help answer that question?'
-    ),
+    filesTitle: translate('forflow.reviewGuide.filesTitle', 'Choose materials'),
     filesHint: translate(
       'forflow.reviewGuide.filesHint',
-      'Start with the relevant requirements, implementation and test records.'
+      'Select requirements, implementation files and test records. Up to 40 files.'
     ),
     filesHelp: translate(
       'forflow.reviewGuide.filesHelp',
-      'Click a folder name to open it, then check the boxes beside relevant files. Start with a README or requirements document, the implementation being checked, and any existing test record. Selected files appear below.'
+      'Open a folder and select relevant files. Adjust each file purpose in the selected list below.'
     ),
     projectReady: translate(
       'forflow.reviewGuide.projectReady',
-      'The project is selected. Check its folder path, then click Continue: choose a goal here. Next you will describe what you want to verify.'
+      'Project selected. Continue to describe the review requirement.'
     ),
     goalReady: translate(
       'forflow.reviewGuide.goalReady',
-      'Your goal is filled in and can still be edited. When it matches what you want to check, click Continue: choose materials. The next step lets you browse and select files.'
+      'Check the requirement, then continue to choose materials.'
     ),
     filesReady: translate(
       'forflow.reviewGuide.filesReady',
-      'Check the selected-file list and each file purpose. Test outputs should be marked as test or build records. Click Enter review here to save a local copy and inspect the evidence. Jev is optional and asks you to preview before sending.'
+      'Check the file list and purposes, then start the review.'
     ),
     filesUpdateReady: translate(
       'forflow.reviewGuide.filesUpdateReady',
-      'Check the selected files and their purpose, then click Update review materials. This rereads the chosen sources into a new saved version, so you can compare changes with the previous review.'
+      'Save the selected materials as a new review version.'
     ),
-    nextAction: translate('forflow.reviewGuide.nextAction', 'Next, click here'),
+    nextAction: translate('forflow.reviewGuide.nextAction', 'Ready to continue'),
     projectUnavailable: translate(
       'forflow.reviewGuide.projectUnavailable',
       'This project cannot be read here yet. Choose an available local project from this list to continue.'
     ),
-    help: translate('forflow.reviewGuide.help', 'Show me this step'),
+    help: translate('forflow.reviewGuide.help', 'Step help'),
     closeHelp: translate('forflow.reviewGuide.closeHelp', 'Close this tip'),
-    back: translate('forflow.reviewGuide.back', 'Previous step'),
-    nextGoal: translate('forflow.reviewGuide.nextGoal', 'Continue: choose a goal'),
-    nextFiles: translate('forflow.reviewGuide.nextFiles', 'Continue: choose materials'),
+    back: translate('forflow.reviewGuide.back', 'Back'),
+    nextGoal: translate('forflow.reviewGuide.nextGoal', 'Next: requirement'),
+    nextFiles: translate('forflow.reviewGuide.nextFiles', 'Next: materials'),
     options: translate(
       'forflow.reviewGuide.options',
-      'Add conversations or policy requirements (optional)'
+      'Conversations and policy requirements (optional)'
     ),
     selectedProject: translate('forflow.reviewGuide.selectedProject', 'Project'),
     presets: [

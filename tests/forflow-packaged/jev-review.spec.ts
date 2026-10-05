@@ -90,7 +90,7 @@ test('Jev packaged review: explicit preview, one send, adoption, source, restart
     await row.getByRole('button', { name: '审阅这条记录', exact: true }).click()
     const panel = page.getByTestId('jev-audit-panel')
     await panel.getByRole('textbox', { name: '待核实的主张（可选）' }).fill('全部测试已经通过。')
-    await panel.getByRole('button', { name: '准备发送预览', exact: true }).click()
+    await panel.getByRole('button', { name: '下一步：预览材料', exact: true }).click()
     const preview = panel.getByTestId('jev-request-preview')
     await expect(preview).toContainText('2 项通过，1 项失败')
     await expect(preview).not.toContainText('qa@example.invalid')
@@ -100,7 +100,7 @@ test('Jev packaged review: explicit preview, one send, adoption, source, restart
       path: path.join(evidence, 'jev-request-preview.png'),
       animations: 'disabled'
     })
-    await panel.getByRole('button', { name: '将此预览发送至 Jev', exact: true }).click()
+    await panel.getByRole('button', { name: '发送给 Jev', exact: true }).click()
     await expect(panel).toContainText('主张与所选证据冲突')
     expect(await app.evaluate(() => process.env.FORFLOW_QA_JEV_COUNT)).toBe('1')
     const first = JSON.parse(readFileSync(path.join(profile, 'forflow-jev-audit.json'), 'utf8'))
@@ -111,13 +111,13 @@ test('Jev packaged review: explicit preview, one send, adoption, source, restart
       first
     )
     expect(await app.evaluate(() => process.env.FORFLOW_QA_JEV_COUNT)).toBe('1')
-    await panel.getByRole('button', { name: '记录为待处理问题', exact: true }).last().click()
+    await panel.getByRole('button', { name: '记录问题', exact: true }).last().click()
     await expect(panel.getByRole('button', { name: '已记录为问题', exact: true })).toBeDisabled()
     await panel.getByRole('button', { name: '查看已登记的问题', exact: true }).click()
     await expect(review).toContainText('Jev：主张与所选记录冲突')
     await expect(review.getByRole('button', { name: '确认此版本', exact: true })).toBeDisabled()
-    await review.getByRole('button', { name: '定位关联记录', exact: true }).click()
-    await row.getByRole('button', { name: '查看返回记录', exact: true }).click()
+    await review.getByRole('button', { name: '查看材料', exact: true }).click()
+    await row.getByRole('button', { name: '查看结果', exact: true }).click()
     await expect(review.getByTestId('review-records').locator('pre')).toContainText('退出码 1')
     await review.getByRole('tab', { name: '概览与活动', exact: true }).click()
     await expect(review.getByTestId('review-check-summary')).toContainText('已完成检查 1')
@@ -158,7 +158,7 @@ test('Jev packaged review: explicit preview, one send, adoption, source, restart
       source,
       `${JSON.stringify({ timestamp: new Date().toISOString(), type: 'response_item', payload: { type: 'function_call_output', call_id: 'qa-missing-return', output: '重试通过，退出码 0。' } })}\n`
     )
-    await resumedReview.getByRole('button', { name: '重新读取当前记录', exact: true }).click()
+    await resumedReview.getByRole('button', { name: '更新材料内容', exact: true }).click()
     await expect(resumedReview.getByRole('combobox', { name: '版本', exact: true })).toContainText(
       'v2'
     )
@@ -170,7 +170,7 @@ test('Jev packaged review: explicit preview, one send, adoption, source, restart
     await resumedReview.getByRole('tab', { name: 'Jev · Beta', exact: true }).click()
     await expect(running.page.getByTestId('jev-audit-panel')).toContainText('主张与所选证据冲突')
     await expect(
-      running.page.getByRole('button', { name: '准备发送预览', exact: true })
+      running.page.getByRole('button', { name: '下一步：预览材料', exact: true })
     ).toHaveCount(0)
     await running.app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(1000, 850)

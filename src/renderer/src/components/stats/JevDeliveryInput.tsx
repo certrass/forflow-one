@@ -29,32 +29,25 @@ export function JevDeliveryInput({
   const sources = jevDeliverySources(version)
   return (
     <div className="space-y-4" data-testid="jev-delivery-input">
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium">{c.criterion}</h4>
-        <p className="whitespace-pre-wrap break-words text-sm">{version.focus}</p>
-        <p className="text-xs text-muted-foreground">{c.criterionHint}</p>
-      </div>
+      <details className="space-y-2 text-sm">
+        <summary className="cursor-pointer font-medium">{c.criterion}</summary>
+        <p className="whitespace-pre-wrap break-words text-muted-foreground">{version.focus}</p>
+      </details>
       <div className="space-y-2">
         <h4 className="text-sm font-medium">
           {c.sources} · {c.selected} {evidenceKeys.length}/12
         </h4>
-        <p className="text-xs text-muted-foreground">{c.sourceHint}</p>
-        {evidenceKeys.length > 0 && (
-          <ReviewEvidenceNeeds
-            files={(version.workspace?.files ?? []).filter(
-              (file) => file.status === 'read' && evidenceKeys.includes(file.evidenceKey)
-            )}
-            hasConversations={version.audit.rows.some((row) =>
-              evidenceKeys.includes(codexEvidenceKey(row))
-            )}
-          />
-        )}
+        <p className="text-sm text-muted-foreground">{c.sourceHint}</p>
         {sources.length === 0 && <p className="text-sm text-muted-foreground">{c.noSources}</p>}
         <ul className="scrollbar-sleek max-h-80 divide-y divide-border overflow-auto rounded-md border border-border">
           {sources.map((source, index) => {
             const checked = evidenceKeys.includes(source.key)
             return (
-              <li key={source.key} className="space-y-2 p-3">
+              <li
+                key={source.key}
+                data-current={checked}
+                className="space-y-3 p-3 data-[current=true]:bg-accent"
+              >
                 <div className="flex items-start gap-2">
                   <Checkbox
                     id={`${id}-${index}`}
@@ -74,31 +67,36 @@ export function JevDeliveryInput({
                     {source.label}
                   </Label>
                 </div>
-                <p className="break-all font-mono text-xs text-muted-foreground">
-                  {source.location}
-                </p>
+                {source.location !== source.label && (
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer">{r.source}</summary>
+                    <p className="break-all font-mono">{source.location}</p>
+                  </details>
+                )}
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id={`${id}-${index}-handoff`}
-                      checked={handoffEvidenceKeys.includes(source.key)}
-                      disabled={busy || !checked}
-                      aria-label={`${c.handoff}: ${source.label}`}
-                      onCheckedChange={(value) =>
-                        onChange(
-                          evidenceKeys,
-                          value === true
-                            ? [...handoffEvidenceKeys, source.key]
-                            : handoffEvidenceKeys.filter((key) => key !== source.key)
-                        )
-                      }
-                    />
-                    <Label htmlFor={`${id}-${index}-handoff`}>{c.handoff}</Label>
-                  </div>
+                  {checked && (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`${id}-${index}-handoff`}
+                        checked={handoffEvidenceKeys.includes(source.key)}
+                        disabled={busy || !checked}
+                        aria-label={`${c.handoff}: ${source.label}`}
+                        onCheckedChange={(value) =>
+                          onChange(
+                            evidenceKeys,
+                            value === true
+                              ? [...handoffEvidenceKeys, source.key]
+                              : handoffEvidenceKeys.filter((key) => key !== source.key)
+                          )
+                        }
+                      />
+                      <Label htmlFor={`${id}-${index}-handoff`}>{c.handoff}</Label>
+                    </div>
+                  )}
                   {onLocate && (
                     <Button
                       variant="ghost"
-                      size="xs"
+                      size="sm"
                       disabled={busy}
                       onClick={() => onLocate(source.key)}
                     >
@@ -110,6 +108,16 @@ export function JevDeliveryInput({
             )
           })}
         </ul>
+        {evidenceKeys.length > 0 && (
+          <ReviewEvidenceNeeds
+            files={(version.workspace?.files ?? []).filter(
+              (file) => file.status === 'read' && evidenceKeys.includes(file.evidenceKey)
+            )}
+            hasConversations={version.audit.rows.some((row) =>
+              evidenceKeys.includes(codexEvidenceKey(row))
+            )}
+          />
+        )}
       </div>
     </div>
   )

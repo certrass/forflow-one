@@ -141,30 +141,30 @@ test('workspace review package: registered targets, local evidence, sensitive di
     const intake = page.getByTestId('workspace-review-intake')
     await expect(intake).toContainText('远端内容尚未读取')
     await expect(
-      intake.getByRole('button', { name: '继续：确定检查目标', exact: true })
+      intake.getByRole('button', { name: '下一步：检查要求', exact: true })
     ).toBeDisabled()
     await chooseTarget(page, repo)
     await captureReviewGuide(page, 1)
-    await intake.getByRole('button', { name: '继续：确定检查目标', exact: true }).click()
+    await intake.getByRole('button', { name: '下一步：检查要求', exact: true }).click()
     await captureReviewGuide(page, 2, false)
     await intake.getByRole('button', { name: '验证问题修复', exact: true }).click()
     await intake
-      .getByRole('textbox', { name: '检查目标', exact: true })
+      .getByRole('textbox', { name: '检查要求', exact: true })
       .fill('保留原功能，核对选定代码与验收材料；检查敏感线索及其处置依据。')
-    await intake.getByRole('button', { name: '继续：补充验收条件', exact: true }).click()
+    await intake.getByRole('button', { name: '补充预期结果', exact: true }).click()
     await expect(
-      intake.getByRole('button', { name: '使用这项要求，继续选材料', exact: true })
+      intake.getByRole('button', { name: '下一步：选择材料', exact: true })
     ).toBeDisabled()
     await intake
       .getByRole('textbox', { name: '预期结果', exact: true })
       .fill('原功能测试通过，敏感线索有逐项处置记录。')
-    await expect(intake.getByTestId('review-goal-clarification')).toContainText('将保存的检查要求')
+    await expect(intake.getByTestId('review-goal-clarification')).toContainText('检查要求')
     await expect(intake.getByTestId('review-goal-clarification')).toBeVisible()
     await page.screenshot({
       path: path.join(evidence, 'intake-clarified-requirement.png'),
       animations: 'disabled'
     })
-    await intake.getByRole('button', { name: '使用这项要求，继续选材料', exact: true }).click()
+    await intake.getByRole('button', { name: '下一步：选择材料', exact: true }).click()
     await expect(intake.getByTestId('review-evidence-needs')).toContainText(
       '先选择相关交付物或需求'
     )
@@ -174,10 +174,10 @@ test('workspace review package: registered targets, local evidence, sensitive di
       { path: 'checks.txt', verification: true }
     ])
     await expect(intake.getByTestId('review-evidence-needs')).toContainText(
-      '文件用途标签不代表测试已通过'
+      '审阅时可对照具体结果与版本'
     )
     await captureReviewIntake(app, page)
-    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
+    await intake.getByRole('button', { name: '开始审阅', exact: true }).click()
     const review = page.getByTestId('codex-review')
     await expect(review.getByTestId('workspace-review-summary')).toContainText('流向：未知')
     await expect(review.getByRole('button', { name: '确认此版本', exact: true })).toBeDisabled()
@@ -209,7 +209,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await expect(files.locator('pre')).not.toContainText(credential)
     await code.getByRole('button', { name: '审阅这条记录', exact: true }).click()
     const panel = review.getByTestId('jev-audit-panel')
-    await panel.getByRole('button', { name: '准备发送预览', exact: true }).click()
+    await panel.getByRole('button', { name: '下一步：预览材料', exact: true }).click()
     await expect(panel.getByTestId('jev-request-preview')).toContainText('export const result = 1')
     await expect(panel.getByTestId('jev-request-preview')).not.toContainText(credential)
     await expect(panel).toContainText('此来源存在覆盖缺口')
@@ -226,7 +226,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await review.getByRole('tab', { name: '记录', exact: true }).click()
     await code.getByRole('button', { name: '本机查看来源', exact: true }).click()
     await expect(files.getByRole('alert')).toContainText('原始文件已变化')
-    await review.getByRole('button', { name: '重新读取当前记录', exact: true }).click()
+    await review.getByRole('button', { name: '更新材料内容', exact: true }).click()
     await expect(review.getByRole('combobox', { name: '版本', exact: true })).toContainText('v2')
     await review.getByRole('tab', { name: '版本变化', exact: true }).click()
     await expect(review.getByTestId('workspace-review-changes')).toContainText('变化记录 · 1')
@@ -253,7 +253,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     await chooseTarget(page, 'Folder review fixture')
     await enterReviewGoal(intake, '审阅普通文件夹中的指定说明。')
     await selectReviewFiles(intake, [{ path: 'notes.md' }])
-    await intake.getByRole('button', { name: '进入审阅', exact: true }).click()
+    await intake.getByRole('button', { name: '开始审阅', exact: true }).click()
     await expect(review).toContainText('Folder review fixture')
     const all = await page.evaluate(() => window.api.codexUsage.listWorkspaceReviews!())
     expect(all).toHaveLength(2)
@@ -294,9 +294,7 @@ test('workspace review package: registered targets, local evidence, sensitive di
     expect(persisted.confirmations).toHaveLength(0)
     await resumed.getByRole('combobox', { name: '版本', exact: true }).click()
     await running.page.getByRole('option', { name: /^v1/ }).click()
-    await expect(
-      resumed.getByRole('button', { name: '重新读取当前记录', exact: true })
-    ).toBeDisabled()
+    await expect(resumed.getByRole('button', { name: '更新材料内容', exact: true })).toBeDisabled()
     await running.app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(1000, 850)
     )

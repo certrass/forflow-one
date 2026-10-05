@@ -9,7 +9,7 @@ export function jevAuditCopy() {
     ),
     external: translate(
       'forflow.jev.external',
-      'Sending transmits the preview to Typesafe’s cloud API and may incur charges. Automatic redaction covers common secrets and email addresses; inspect the content before sending.'
+      'Sending submits this text to the Typesafe cloud API and may incur charges. Check the redacted text before sending.'
     ),
     record: translate('forflow.jev.record', 'Record to review'),
     claim: translate('forflow.jev.claim', 'Claim to verify (optional)'),
@@ -17,10 +17,10 @@ export function jevAuditCopy() {
       'forflow.jev.claimHint',
       'For example: this tool call completed successfully.'
     ),
-    prepare: translate('forflow.jev.prepare', 'Prepare send preview'),
+    prepare: translate('forflow.jev.prepare', 'Next: preview'),
     preview: translate('forflow.jev.preview', 'Exact request preview · expires after 10 minutes'),
-    send: translate('forflow.jev.send', 'Send this preview to Jev'),
-    cancel: translate('forflow.jev.cancel', 'Discard preview'),
+    send: translate('forflow.jev.send', 'Send to Jev'),
+    cancel: translate('forflow.jev.cancel', 'Back to materials'),
     busy: translate('forflow.jev.busy', 'Processing…'),
     history: translate('forflow.jev.history', 'Recent calls for this version (up to 20)'),
     noCalls: translate('forflow.jev.noCalls', 'No calls in this check mode for this version.'),
@@ -32,11 +32,11 @@ export function jevAuditCopy() {
       'forflow.jev.error',
       'The operation did not complete. Refresh the review and try again.'
     ),
-    accept: translate('forflow.jev.accept', 'Record an issue'),
+    accept: translate('forflow.jev.accept', 'Record issue'),
     accepted: translate('forflow.jev.accepted', 'Issue recorded'),
     calibration: translate(
       'forflow.jev.calibration',
-      'Probabilities are model outputs, not calibrated audit accuracy. No visible issue does not confirm the review.'
+      'Model probabilities are included for reference when checking the sources.'
     ),
     probabilities: translate('forflow.jev.probabilities', 'Model details and probabilities'),
     outcome: translate('forflow.jev.outcome', 'Visible exceptions'),

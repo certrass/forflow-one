@@ -80,14 +80,13 @@ function WorkspaceReviewFileBrowser({
   }
   return (
     <div className="space-y-3" data-testid="workspace-review-file-picker">
-      <p className="text-xs text-muted-foreground">{c.browseNote}</p>
       <div className="rounded-md border border-border">
         <div ref={guideAnchorRef} className="space-y-2 border-b border-border p-3">
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               variant="ghost"
-              size="xs"
+              size="sm"
               disabled={disabled || !directory}
               onClick={() => navigate('')}
             >
@@ -96,7 +95,7 @@ function WorkspaceReviewFileBrowser({
             <Button
               type="button"
               variant="ghost"
-              size="xs"
+              size="sm"
               disabled={disabled || !directory}
               onClick={() => navigate(directory.split('/').slice(0, -1).join('/'))}
             >
@@ -108,7 +107,7 @@ function WorkspaceReviewFileBrowser({
             aria-label={c.currentFolder}
             className="break-all font-mono text-xs text-muted-foreground"
           >
-            {directory || c.root}
+            {directory || `${target.name} · ${c.root}`}
           </p>
           <Input
             aria-label={c.search}
@@ -130,7 +129,7 @@ function WorkspaceReviewFileBrowser({
               <p role="alert" className="text-sm text-destructive">
                 {error}
               </p>
-              <Button type="button" variant="outline" size="xs" disabled={disabled} onClick={retry}>
+              <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={retry}>
                 {c.retry}
               </Button>
             </div>
@@ -159,7 +158,10 @@ function WorkspaceReviewFileBrowser({
                       <span className="min-w-0 truncate">{entry.name}</span>
                     </Button>
                   ) : (
-                    <div className="flex items-center gap-3 py-2">
+                    <div
+                      data-current={checked}
+                      className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-accent data-[current=true]:bg-accent"
+                    >
                       <Checkbox
                         id={`${id}-${index}`}
                         aria-label={entry.path}
@@ -170,7 +172,10 @@ function WorkspaceReviewFileBrowser({
                       <span className="shrink-0 text-muted-foreground">
                         <File className="size-4" />
                       </span>
-                      <Label htmlFor={`${id}-${index}`} className="min-w-0 break-all">
+                      <Label
+                        htmlFor={`${id}-${index}`}
+                        className="min-w-0 flex-1 cursor-pointer break-all"
+                      >
                         {entry.name}
                       </Label>
                     </div>

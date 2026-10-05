@@ -82,7 +82,7 @@ it('preserves explicit choices across directories and allows changing their purp
   expect(screen.getByRole('combobox', { name: 'File purpose: src/main.ts' })).toHaveTextContent(
     'Code'
   )
-  expect(screen.getByText('Selected files · 2/40')).toBeVisible()
+  expect(screen.getByText('Selected materials · 2/40')).toBeVisible()
   fireEvent.click(screen.getByRole('combobox', { name: 'File purpose: src/main.ts' }))
   fireEvent.click(await screen.findByRole('option', { name: 'Test or build records' }))
   expect(screen.getByRole('combobox', { name: 'File purpose: src/main.ts' })).toHaveTextContent(
@@ -93,7 +93,7 @@ it('preserves explicit choices across directories and allows changing their purp
   fireEvent.click(screen.getByRole('checkbox', { name: 'README.md' }))
   expect(screen.queryByRole('button', { name: 'Remove README.md' })).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Remove src/main.ts' }))
-  expect(screen.getByText('No files selected yet.')).toBeVisible()
+  expect(screen.getByText('Select at least one file from the list above.')).toBeVisible()
   expect(list.mock.calls.map(([query]) => query)).toEqual([
     { workspaceId: target.id, directory: '' },
     { workspaceId: target.id, directory: 'src' },
@@ -130,7 +130,7 @@ it('enforces 40 files while allowing an existing choice to be removed', async ()
   fireEvent.click(screen.getByRole('checkbox', { name: 'README.md' }))
   expect(extra).not.toBeDisabled()
   fireEvent.click(extra)
-  expect(screen.getByText('Selected files · 40/40')).toBeVisible()
+  expect(screen.getByText('Selected materials · 40/40')).toBeVisible()
   expect(screen.getByRole('checkbox', { name: 'README.md' })).toBeDisabled()
 })
 
