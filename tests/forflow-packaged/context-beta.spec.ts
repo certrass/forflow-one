@@ -65,6 +65,11 @@ test('copy conversation: readable excerpt, optional source receipt, compact layo
       page.getByText('已连接原会话，可在对话与终端间切换。', { exact: true })
     ).toBeVisible()
     await expect(page.locator('[data-forflow-context-beta]')).toHaveCount(0)
+    const notice = page
+      .locator('[data-sonner-toast]')
+      .filter({ hasText: 'Codex 现在使用独立服务运行' })
+    await notice.getByRole('button', { name: 'Close toast', exact: true }).click()
+    await expect(notice).toHaveCount(0)
     await page.getByRole('button', { name: '设置', exact: true }).click()
     await page.getByRole('button', { name: '实验性', exact: true }).click()
     const toggle = page.getByRole('switch', { name: '复制对话内容', exact: true })

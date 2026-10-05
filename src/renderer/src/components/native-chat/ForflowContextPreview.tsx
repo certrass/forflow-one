@@ -194,10 +194,7 @@ function ContextPreview(props: Props): React.JSX.Element {
                 </p>
               ) : stale ? (
                 <p role="status" className="text-sm text-muted-foreground">
-                  {translate(
-                    'forflow.contextBeta.changed',
-                    'There are new messages. Refresh before copying.'
-                  )}
+                  {translate('forflow.contextBeta.changed', 'Refresh the content before copying.')}
                 </p>
               ) : null}
               {preview.blockingReasons.length > 0 ? (

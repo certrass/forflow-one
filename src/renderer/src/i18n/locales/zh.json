@@ -19653,7 +19653,7 @@
   "forflow.contextBeta.ambiguousSource": "请重新加载对话记录后再复制。",
   "forflow.contextBeta.budgetExceeded": "对话文字超过复制容量，请在原对话中选取所需片段。",
   "forflow.contextBeta.busy": "Codex 仍在处理，完成后刷新内容。",
-  "forflow.contextBeta.changed": "对话有新消息，刷新后再复制。",
+  "forflow.contextBeta.changed": "请刷新内容后再复制。",
   "forflow.contextBeta.copied": "内容已复制",
   "forflow.contextBeta.copy": "复制内容",
   "forflow.contextBeta.copyFailed": "复制失败，请重试。",

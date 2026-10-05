@@ -19653,7 +19653,7 @@
   "forflow.contextBeta.ambiguousSource": "Reload the conversation to restore its message records.",
   "forflow.contextBeta.budgetExceeded": "This conversation exceeds the copy limit. Select the passages you need in the conversation.",
   "forflow.contextBeta.busy": "Codex is still working. Refresh when it finishes.",
-  "forflow.contextBeta.changed": "There are new messages. Refresh before copying.",
+  "forflow.contextBeta.changed": "Refresh the content before copying.",
   "forflow.contextBeta.copied": "Content copied",
   "forflow.contextBeta.copy": "Copy content",
   "forflow.contextBeta.copyFailed": "Could not copy. Please try again.",
