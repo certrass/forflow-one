@@ -1,9 +1,10 @@
 import { useEffect, useState, type JSX } from 'react'
-import { Mic, Square } from 'lucide-react'
+import { Check, Mic, Square } from 'lucide-react'
 import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
 import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
 import { useShortcutKeyDetails } from '@/hooks/useShortcutLabel'
 import { translate } from '@/i18n/i18n'
+import { cn } from '@/lib/utils'
 
 const TYPE_START_DELAY_MS = 650
 const TYPE_INTERVAL_MS = 36
@@ -50,29 +51,25 @@ export function VoiceDictationFeatureTipVisual(): JSX.Element {
 
   return (
     <div
-      className="relative flex h-full min-h-[23rem] flex-col items-center justify-center overflow-hidden px-6 py-7"
+      className="relative flex h-full flex-col items-center justify-center px-6 py-10"
       aria-hidden="true"
     >
       {shortcut.keys.length > 0 ? (
         <div className="flex items-center gap-2.5">
-          <ShortcutKeyCombo
-            keys={shortcut.keys}
-            doubleTap={shortcut.doubleTap}
-            keyCapClassName="h-7 min-w-7 bg-foreground/[0.08] px-2 font-semibold shadow-xs"
-          />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+          <ShortcutKeyCombo keys={shortcut.keys} doubleTap={shortcut.doubleTap} />
+          <span className="text-xs text-muted-foreground">
             {translate('featureTips.voice.startDictation', 'Start dictation')}
           </span>
         </div>
       ) : null}
 
-      <div className="relative mt-4 h-56 w-full max-w-[21rem] overflow-hidden rounded-xl border border-border/80 bg-card text-left shadow-xs">
-        <div className="flex h-10 items-center gap-2 border-b border-border px-3 text-[11px] text-muted-foreground">
-          <span className="size-2 rounded-full bg-foreground/35" />
+      <div className="relative mt-4 w-full max-w-[22rem] overflow-hidden rounded-xl border border-border bg-card text-left shadow-xs">
+        <div className="flex items-center gap-2 border-b border-border px-4 py-3 text-[13px] font-medium">
+          <Mic className="size-4 text-muted-foreground" />
           <span>{translate('featureTips.voice.agentPromptTitle', 'Agent prompt')}</span>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 top-10 bg-[var(--editor-surface)] px-4 py-5 font-mono text-xs leading-relaxed">
+        <div className="min-h-36 px-4 py-5 text-sm leading-relaxed">
           <div className="flex min-w-0 gap-2.5">
             <span className="shrink-0 text-muted-foreground">›</span>
             <span
@@ -87,21 +84,31 @@ export function VoiceDictationFeatureTipVisual(): JSX.Element {
           </div>
         </div>
 
-        <div className="absolute inset-x-3 bottom-3 flex h-10 items-center gap-2 rounded-lg bg-foreground/90 px-3 text-xs font-medium text-background shadow-lg">
-          <Mic className="size-4 shrink-0" />
-          <span className="flex h-4 items-center gap-0.5" aria-hidden="true">
+        <div className="flex h-12 items-center gap-2 border-t border-border bg-muted/50 px-4 text-xs text-muted-foreground">
+          {typing ? (
+            <Mic className="size-4 shrink-0" />
+          ) : (
+            <Check className="size-4 shrink-0 text-status-success" />
+          )}
+          <span
+            data-recording={typing}
+            className="hidden h-4 items-center gap-0.5 data-[recording=true]:flex"
+            aria-hidden="true"
+          >
             {WAVEFORM_BAR_HEIGHTS.map((height, index) => (
               <span
                 key={height}
-                className={`block w-0.5 rounded-full bg-current ${typing ? 'animate-waveform' : ''}`}
+                className={cn('block w-0.5 rounded-full bg-current', typing && 'animate-waveform')}
                 style={{ height: `${height}%`, animationDelay: `${index * 0.1}s` }}
               />
             ))}
           </span>
           <span className="min-w-0 flex-1 truncate">
-            {translate('featureTips.voice.listening', 'Listening...')}
+            {typing
+              ? translate('featureTips.voice.listening', 'Listening...')
+              : translate('featureTips.voice.transcribed', 'Ready to edit')}
           </span>
-          <Square className="size-2.5 shrink-0 fill-current opacity-55" />
+          {typing ? <Square className="size-2.5 shrink-0 fill-current" /> : null}
         </div>
       </div>
     </div>

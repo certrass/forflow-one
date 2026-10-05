@@ -1,8 +1,10 @@
-import { Fragment, useEffect, useState, type JSX } from 'react'
+import { useEffect, useState, type JSX } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
 import { formatShortcutKeyComboDetails, useShortcutKeyDetails } from '@/hooks/useShortcutLabel'
 import { translate } from '@/i18n/i18n'
+import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
+import { cn } from '@/lib/utils'
 
 const TYPED_QUERY = 'auth'
 // Why: the real palette lists recent worktrees on open; typing only narrows the
@@ -130,41 +132,31 @@ export function CmdJPaletteFeatureTipVisual(): JSX.Element {
 
   return (
     <div
-      className="relative flex h-full min-h-[23rem] flex-col items-center justify-center overflow-hidden px-6 py-7"
+      className="relative flex h-full flex-col items-center justify-center px-6 py-10"
       aria-hidden="true"
     >
       {displayShortcutKeys.length > 0 ? (
-        <div className="inline-flex items-center gap-1.5">
-          {displayShortcutKeys.map((key, index) => (
-            <Fragment key={`${key}-${index}`}>
-              {index > 0 && !displayShortcutDoubleTap ? (
-                <span className="text-xs text-muted-foreground" aria-hidden="true">
-                  +
-                </span>
-              ) : null}
-              <span
-                className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border border-border/80 px-2 text-xs font-semibold text-muted-foreground shadow-xs transition-[transform,background-color] duration-150 ease-out ${
-                  isPressed
-                    ? 'translate-y-[1.5px] bg-foreground/[0.18]'
-                    : 'translate-y-0 bg-foreground/[0.08]'
-                }`}
-                style={isPressed ? { transitionDelay: `${index * 40}ms` } : undefined}
-              >
-                {key}
-              </span>
-            </Fragment>
-          ))}
+        <div
+          data-pressed={isPressed}
+          className="inline-flex items-center gap-2.5 transition-transform data-[pressed=true]:translate-y-px"
+        >
+          <ShortcutKeyCombo keys={displayShortcutKeys} doubleTap={displayShortcutDoubleTap} />
+          <span className="text-xs text-muted-foreground">
+            {translate('featureTips.palette.open', 'Quick switch')}
+          </span>
         </div>
       ) : null}
 
       <div
-        className={`relative mt-3 h-[12.75rem] w-full max-w-[21rem] overflow-hidden rounded-xl border border-border bg-card text-left shadow-lg transition-opacity duration-300 ease-out ${
+        data-filtered={currentQuery.length > 0}
+        className={cn(
+          'relative mt-4 h-72 w-full max-w-[22rem] overflow-hidden rounded-xl border border-border bg-card text-left shadow-xs transition-opacity duration-300 ease-out data-[filtered=true]:h-60',
           !paletteMounted
             ? 'pointer-events-none invisible opacity-0'
             : paletteOpaque
               ? 'opacity-100'
               : 'opacity-0'
-        }`}
+        )}
       >
         {/* Why: search and results are absolutely positioned so row content
             changes during the demo never reflow the input bar mid-animation. */}
@@ -184,25 +176,31 @@ export function CmdJPaletteFeatureTipVisual(): JSX.Element {
 
         {showWorktreeList ? (
           <div className="absolute inset-x-0 top-11 bottom-0 flex flex-col gap-0.5 overflow-hidden p-1.5">
-            {renderWorktrees.map((result) => (
+            {renderWorktrees.map((result, index) => (
               <div
                 key={result.key}
-                className={`flex shrink-0 items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-1.5 ${resultEnterClass}`}
+                role="option"
+                aria-selected={currentQuery.length > 0 && index === 0}
+                data-selected={currentQuery.length > 0 && index === 0}
+                className={cn(
+                  'jump-palette-item flex shrink-0 items-center gap-2.5 rounded-md px-3 py-2',
+                  resultEnterClass
+                )}
               >
                 <span className="flex w-4 shrink-0 items-center justify-center">
                   {result.status === 'done' ? (
-                    <span className="size-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                    <span className="size-2.5 rounded-full bg-status-success" aria-hidden="true" />
                   ) : (
                     // Why: this tip can stay mounted while Orca is idle; mirror
                     // the sidebar's static working ring instead of spinning.
-                    <span className="block size-2.5 rounded-full border-[1.5px] border-yellow-500 bg-yellow-500/15" />
+                    <span className="block size-2.5 rounded-full border border-status-warning bg-status-warning-background" />
                   )}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate text-[12.5px] font-semibold tracking-[-0.01em] text-foreground">
+                  <span className="block truncate text-[13px] font-medium text-foreground">
                     {result.name}
                   </span>
-                  <span className="block truncate text-[10px] text-muted-foreground/70">
+                  <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                     {result.branch}
                   </span>
                 </div>
@@ -210,12 +208,15 @@ export function CmdJPaletteFeatureTipVisual(): JSX.Element {
             ))}
             {renderShowCreate ? (
               <div
-                className={`mt-0.5 flex shrink-0 items-center gap-2.5 rounded-lg border border-dashed border-border/60 bg-muted/10 px-2.5 py-1.5 ${resultEnterClass}`}
+                className={cn(
+                  'mt-1 flex shrink-0 items-center gap-2.5 border-t border-border px-3 py-3',
+                  resultEnterClass
+                )}
               >
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-dashed border-border/60 bg-muted/25 text-muted-foreground/70">
+                <div className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
                   <Plus size={13} aria-hidden="true" />
                 </div>
-                <div className="min-w-0 flex-1 truncate text-[12.5px] font-semibold tracking-[-0.01em] text-foreground">
+                <div className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
                   {translate(
                     'auto.components.feature.tips.CmdJPaletteFeatureTipVisual.ab94e16d44',
                     'Create worktree "{{value0}}"',

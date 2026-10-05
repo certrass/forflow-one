@@ -11,6 +11,7 @@ import { CliSetupTipDialog } from './CliSetupTipDialog'
 import { CmdJPaletteTipDialog } from './CmdJPaletteTipDialog'
 import { installCliFromFeatureTip } from './feature-tip-cli-install-action'
 import { getFeatureTipForModal } from './feature-tip-modal-state'
+import { localizeFeatureTip } from './feature-tip-copy'
 import {
   getOrcaCliFeatureTipTelemetrySource,
   trackCmdJPaletteFeatureTipAcknowledged,
@@ -42,14 +43,16 @@ export default function FeatureTipsModal(): JSX.Element | null {
   const [primaryBusy, setPrimaryBusy] = useState(false)
   const [skillTerminalOpen, setSkillTerminalOpen] = useState(false)
   const isOpen = activeModal === 'feature-tips'
-  const currentTip = getFeatureTipForModal({
-    cliInstalled: true,
-    modalData,
-    seenTipIds,
-    featureInteractions,
-    settings,
-    webClient: isWebClientLocation()
-  })
+  const currentTip = localizeFeatureTip(
+    getFeatureTipForModal({
+      cliInstalled: true,
+      modalData,
+      seenTipIds,
+      featureInteractions,
+      settings,
+      webClient: isWebClientLocation()
+    })
+  )
   const sessionSearchSetup = useSessionSearchTipSetup({
     dialogOpen: isOpen && currentTip?.id === 'agent-session-search'
   })

@@ -18381,7 +18381,42 @@
       "startDictation": "开始听写",
       "startInstruction": "开始语音输入。再次按",
       "stopInstruction": "即可停止。",
-      "unassignedInstruction": "请先设置听写快捷键，再在聚焦的面板中启动语音输入。"
+      "unassignedInstruction": "请先设置听写快捷键，再在聚焦的面板中启动语音输入。",
+      "transcribed": "已转成文字，可继续编辑"
+    },
+    "copy": {
+      "eyebrow": {
+        "new": "新功能",
+        "tip": "使用技巧"
+      },
+      "agent-session-search": {
+        "title": "找回智能体的历史对话",
+        "description": "按对话内容搜索历史会话，找到之前的讨论，接着往下做。",
+        "ctaLabel": "开启会话搜索"
+      },
+      "orca-cli": {
+        "title": "让智能体通过 CLI 协作",
+        "description": "让智能体创建工作区、分配任务，并在工作区之间交流进展。",
+        "ctaLabel": "安装 CLI 与技能"
+      },
+      "cmd-j-palette": {
+        "title": "用 <shortcut> 快速切换工作区",
+        "description": "搜索工作区、切换标签页、调整设置或创建新工作区，都可以通过键盘完成。",
+        "ctaLabel": "知道了"
+      },
+      "voice-dictation": {
+        "title": "在任意面板中使用语音输入",
+        "description": "聚焦输入位置后启动语音输入，再次按快捷键即可停止。",
+        "ctaLabel": "设置语音输入"
+      }
+    },
+    "palette": {
+      "open": "快速切换工作区"
+    },
+    "actions": {
+      "installing": "正在安装…",
+      "turningOn": "正在开启…",
+      "working": "正在处理…"
     }
   },
   "fileExplorer": {

@@ -18335,7 +18335,8 @@
       "stopInstruction": "again to stop.",
       "unassignedInstruction": "Assign a dictation shortcut before starting voice dictation in a focused pane.",
       "settingsInstruction": "Change the model, dictation mode, or shortcut anytime in",
-      "settingsLink": "Settings → Voice"
+      "settingsLink": "Settings → Voice",
+      "transcribed": "Ready to edit"
     },
     "sessionSearch": {
       "enableFailed": "Could not turn on session search. Try again.",
@@ -18382,6 +18383,40 @@
       "demoHit6Age": "1mo",
       "readyToast": "Session search is ready",
       "readyToastOpen": "Open"
+    },
+    "copy": {
+      "eyebrow": {
+        "new": "New",
+        "tip": "Tip"
+      },
+      "agent-session-search": {
+        "title": "Search every agent session",
+        "description": "Find any past conversation by what was said in it, then pick up where the agent left off.",
+        "ctaLabel": "Turn on session search"
+      },
+      "orca-cli": {
+        "title": "Let agents drive Orca with the Orca CLI",
+        "description": "Enable agents to coordinate child worktrees and communicate between worktrees.",
+        "ctaLabel": "Install CLI & Skills"
+      },
+      "cmd-j-palette": {
+        "title": "Jump to a worktree with <shortcut>",
+        "description": "Search worktrees, switch tabs, tweak settings, or spin up a new worktree, all without leaving the keyboard.",
+        "ctaLabel": "Got it"
+      },
+      "voice-dictation": {
+        "title": "Dictate into any pane",
+        "description": "Start voice dictation in any focused pane, then use the shortcut again to stop.",
+        "ctaLabel": "Set up voice dictation"
+      }
+    },
+    "palette": {
+      "open": "Quick switch"
+    },
+    "actions": {
+      "installing": "Installing...",
+      "turningOn": "Turning on...",
+      "working": "Working..."
     }
   },
   "fileExplorer": {

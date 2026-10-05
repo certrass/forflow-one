@@ -6,12 +6,15 @@ import {
 } from '@/components/feature-wall/agents-orchestration/orchestration-types'
 import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
 import { translate } from '@/i18n/i18n'
+import { isForflowBuild } from '../../../../shared/product-branding'
+import { cn } from '@/lib/utils'
 
+const command = isForflowBuild() ? 'forflow' : 'orca'
 const CLI_AGENT_COMMANDS = [
-  'orca worktree create --name auth-pr-1',
-  'orca worktree create --name auth-pr-2',
-  'orca orchestration dispatch --task pr1 --to w1',
-  'orca orchestration dispatch --task pr2 --to w2'
+  `${command} worktree create --name auth-pr-1`,
+  `${command} worktree create --name auth-pr-2`,
+  `${command} orchestration dispatch --task pr1 --to w1`,
+  `${command} orchestration dispatch --task pr2 --to w2`
 ]
 
 export function CliFeatureTipVisual(): JSX.Element {
@@ -53,16 +56,11 @@ export function CliFeatureTipVisual(): JSX.Element {
 
   return (
     <div
-      className="relative flex min-h-[27rem] flex-col overflow-hidden bg-muted/60 px-6 py-7"
+      className="relative flex h-full flex-col items-center justify-center px-6 py-6"
       aria-hidden="true"
     >
-      <div className="relative rounded-lg border border-border/70 bg-card/95 shadow-xs">
-        <div className="flex items-center gap-2 border-b border-border/70 px-3 py-2">
-          <span className="size-2 rounded-full bg-muted-foreground/35" />
-          <span className="size-2 rounded-full bg-muted-foreground/25" />
-          <span className="size-2 rounded-full bg-muted-foreground/20" />
-        </div>
-        <div className="space-y-1.5 px-3 py-3 font-mono text-[10.5px] leading-[1.35] text-foreground">
+      <div className="relative w-full overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+        <div className="space-y-1.5 px-3 py-3 font-mono text-[11px] leading-4 text-foreground">
           <div className="truncate text-muted-foreground">
             <span className="mr-1.5 text-foreground">●</span>
             {translate(
@@ -76,7 +74,10 @@ export function CliFeatureTipVisual(): JSX.Element {
             return (
               <div
                 key={command}
-                className={`truncate ${isVisible ? 'animate-cli-tip-command-line' : 'invisible'}`}
+                className={cn(
+                  'break-words',
+                  isVisible ? 'animate-cli-tip-command-line' : 'invisible'
+                )}
               >
                 <span className="text-foreground">
                   {translate('auto.components.feature.tips.CliFeatureTipVisual.badb4fc342', '>')}
@@ -91,13 +92,13 @@ export function CliFeatureTipVisual(): JSX.Element {
         </div>
       </div>
 
-      <div className="cli-tip-orchestration-frame relative mt-5 flex h-[17rem] items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-background/80 px-5 shadow-xs">
+      <div className="cli-tip-orchestration-frame relative mt-3 flex h-56 w-full max-w-[22rem] items-center justify-center">
         <div className="origin-center">
           <AgentsOrchestrationVisual
             activeStepId="orchestration"
             reducedMotion={reducedMotion}
             widthPx={350}
-            heightPx={252}
+            heightPx={224}
             orchestrationCreatedChildCount={Math.min(visibleCommandCount, 2)}
             orchestrationLoopMs={ORCHESTRATION_CLI_COMMAND_LOOP_MS}
             orchestrationShowResponseBeats={false}

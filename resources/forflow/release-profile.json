@@ -1,5 +1,5 @@
 {
-  "version": "1.4.220-forflow.2",
+  "version": "1.4.220-forflow.3",
   "node": "24.14.0",
   "packageManager": "pnpm@11.19.0",
   "platform": "darwin",

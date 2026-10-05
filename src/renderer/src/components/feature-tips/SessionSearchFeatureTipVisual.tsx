@@ -1,19 +1,9 @@
-import { useEffect, useState, type JSX, type ReactNode } from 'react'
-import { Files, GitBranch, ListChecks, PanelRight } from 'lucide-react'
-import { AI_VAULT_AGENT_LABELS, AI_VAULT_AGENTS } from '../../../../shared/ai-vault-types'
-import {
-  getLocalExecutionHostLabel,
-  LOCAL_EXECUTION_HOST_ID
-} from '../../../../shared/execution-host'
+import { useEffect, useState, type JSX } from 'react'
+import { Search } from 'lucide-react'
+import { AI_VAULT_AGENT_LABELS } from '../../../../shared/ai-vault-types'
 import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
 import { AgentSessionHistoryIcon } from '@/components/right-sidebar/agent-session-history-icon'
-import { AiVaultPanelHeader } from '@/components/right-sidebar/AiVaultPanelHeader'
 import { highlightedSearchSnippet } from '@/components/right-sidebar/AiVaultSearchEvidence'
-import { DEFAULT_AI_VAULT_SESSION_LIMIT } from '@/components/right-sidebar/ai-vault-session-limit'
-import {
-  DEFAULT_AI_VAULT_GROUP,
-  DEFAULT_AI_VAULT_HIDE_EMPTY_SESSIONS
-} from '@/components/right-sidebar/ai-vault-view-defaults'
 import { AgentIcon } from '@/lib/agent-catalog'
 import { translate } from '@/i18n/i18n'
 import {
@@ -22,48 +12,20 @@ import {
   type SessionSearchDemoRow
 } from './session-search-feature-tip-demo'
 
-type DemoPhase = 'idle' | 'typing' | 'searching' | 'results' | 'focused' | 'erasing'
+type DemoPhase = 'idle' | 'typing' | 'searching' | 'results' | 'focused'
 type DemoState = { scene: number; phase: DemoPhase; chars: number }
 
-// Per-step delay; typing and erasing advance one character per step.
+// Typing advances one character per step.
 const PHASE_MS: Record<DemoPhase, number> = {
   idle: 1100,
   typing: 65,
   searching: 550,
   results: 1300,
-  focused: 2200,
-  erasing: 24
+  focused: 0
 }
 const ROW_STAGGER_MS = 90
 
-function noop(): void {}
-
-// The real panel header, inert, with everything but the query held still.
-const DEMO_HEADER_PROPS = {
-  hasScanResult: true,
-  activeWorktreePath: '/demo',
-  activeProjectKey: 'demo',
-  scope: 'all',
-  executionHostScope: LOCAL_EXECUTION_HOST_ID,
-  hostScopeOptions: [{ id: LOCAL_EXECUTION_HOST_ID, label: getLocalExecutionHostLabel() }],
-  agents: AI_VAULT_AGENTS,
-  group: DEFAULT_AI_VAULT_GROUP,
-  hideEmptySessions: DEFAULT_AI_VAULT_HIDE_EMPTY_SESSIONS,
-  sessionLimit: DEFAULT_AI_VAULT_SESSION_LIMIT,
-  adjustmentCount: 0,
-  onQueryChange: noop,
-  onScopeChange: noop,
-  onExecutionHostScopeChange: noop,
-  onAgentEnabledChange: noop,
-  onAllAgentsEnabledChange: noop,
-  onGroupChange: noop,
-  onHideEmptySessionsChange: noop,
-  onSessionLimitChange: noop,
-  onReset: noop,
-  onRefresh: noop
-} as const
-
-function nextDemoState(state: DemoState, queryLength: number, sceneCount: number): DemoState {
+function nextDemoState(state: DemoState, queryLength: number): DemoState {
   switch (state.phase) {
     case 'idle':
       return { ...state, phase: 'typing', chars: 0 }
@@ -76,53 +38,8 @@ function nextDemoState(state: DemoState, queryLength: number, sceneCount: number
     case 'results':
       return { ...state, phase: 'focused' }
     case 'focused':
-      return { ...state, phase: 'erasing' }
-    case 'erasing':
-      return state.chars > 0
-        ? { ...state, chars: state.chars - 1 }
-        : { scene: (state.scene + 1) % sceneCount, phase: 'idle', chars: 0 }
+      return state
   }
-}
-
-function DemoActivityTab({
-  active = false,
-  children
-}: {
-  active?: boolean
-  children: ReactNode
-}): JSX.Element {
-  return (
-    <span
-      data-active={active}
-      className="flex size-7 items-center justify-center rounded-md text-muted-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-foreground"
-    >
-      {children}
-    </span>
-  )
-}
-
-// Mirrors the right sidebar's tab row so the tip shows where the panel lives.
-function DemoActivityStrip(): JSX.Element {
-  return (
-    <div className="flex h-10 items-center gap-1 border-b border-sidebar-border px-2">
-      <DemoActivityTab>
-        <Files className="size-4" />
-      </DemoActivityTab>
-      <DemoActivityTab active>
-        <AgentSessionHistoryIcon size={16} />
-      </DemoActivityTab>
-      <DemoActivityTab>
-        <GitBranch className="size-4" />
-      </DemoActivityTab>
-      <DemoActivityTab>
-        <ListChecks className="size-4" />
-      </DemoActivityTab>
-      <span className="flex-1" />
-      <DemoActivityTab>
-        <PanelRight className="size-4" />
-      </DemoActivityTab>
-    </div>
-  )
 }
 
 function DemoSessionRow({
@@ -139,17 +56,15 @@ function DemoSessionRow({
   return (
     <div
       data-focused={focused}
-      className="flex flex-col border-b border-sidebar-border px-3 py-2 transition-colors duration-300 animate-in fade-in-0 slide-in-from-bottom-1 [animation-fill-mode:both] data-[focused=true]:bg-sidebar-accent/55 motion-reduce:animate-none"
+      className="flex flex-col border-b border-sidebar-border px-4 py-3 last:border-b-0 transition-colors duration-300 animate-in fade-in-0 slide-in-from-bottom-1 [animation-fill-mode:both] data-[focused=true]:bg-sidebar-accent motion-reduce:animate-none"
       style={{ animationDelay: `${index * ROW_STAGGER_MS}ms` }}
     >
-      <div className="line-clamp-1 text-[13px] font-medium leading-5 text-foreground">
-        {row.title}
-      </div>
-      <div className="mt-0.5 line-clamp-2 text-[12px] leading-4 text-muted-foreground">
+      <div className="text-[13px] font-medium leading-5 text-foreground">{row.title}</div>
+      <div className="mt-1 text-xs leading-5 text-muted-foreground">
         <span className="font-medium text-foreground/80">{row.role}</span>
         <span>: {isHit ? highlightedSearchSnippet(row.text) : row.text}</span>
       </div>
-      <div className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] leading-4 text-muted-foreground">
+      <div className="mt-2 flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground">
         <AgentIcon agent={row.agent} size={14} />
         <span className="truncate">{AI_VAULT_AGENT_LABELS[row.agent]}</span>
         <span className="shrink-0 tabular-nums">
@@ -171,53 +86,63 @@ export function SessionSearchFeatureTipVisual(): JSX.Element {
   const scenes = getSessionSearchDemoScenes()
   const recentRows = getSessionSearchDemoRecentRows()
   const [state, setState] = useState<DemoState>({ scene: 0, phase: 'idle', chars: 0 })
-  // Why: reduced motion freezes on the first answered search instead of looping.
+  // Keep the completed search visible so readers can inspect the matches.
   const shown: DemoState = reducedMotion
-    ? { scene: 0, phase: 'results', chars: scenes[0].query.length }
+    ? { scene: 0, phase: 'focused', chars: scenes[0].query.length }
     : state
   const scene = scenes[shown.scene]
   const queryLength = scene.query.length
 
   useEffect(() => {
-    if (reducedMotion) {
+    if (reducedMotion || state.phase === 'focused') {
       return
     }
     const timeoutId = window.setTimeout(
-      () => setState((current) => nextDemoState(current, queryLength, scenes.length)),
+      () => setState((current) => nextDemoState(current, queryLength)),
       // Why: a beat after the last keystroke before the search starts.
       state.phase === 'typing' && state.chars === queryLength
         ? PHASE_MS.typing * 2
         : PHASE_MS[state.phase]
     )
     return () => window.clearTimeout(timeoutId)
-  }, [queryLength, reducedMotion, scenes.length, state])
+  }, [queryLength, reducedMotion, state])
 
-  const showingHits =
-    shown.phase === 'results' || shown.phase === 'focused' || shown.phase === 'erasing'
-  const rows = showingHits ? scene.hits : recentRows
-  const dimmed =
-    shown.phase === 'typing' || shown.phase === 'searching' || shown.phase === 'erasing'
+  const showingHits = shown.phase === 'results' || shown.phase === 'focused'
+  const rows = (showingHits ? scene.hits : recentRows).slice(0, 2)
+  const dimmed = shown.phase === 'typing' || shown.phase === 'searching'
 
   return (
     <div
-      className="relative flex h-full min-h-[23rem] flex-col items-center justify-center overflow-hidden px-6 py-7"
+      className="relative flex h-full flex-col items-center justify-center px-6 py-10"
       aria-hidden="true"
     >
-      {/* Why: the real panel header is interactive; inert keeps its controls out of the tab order. */}
       <div
         inert
-        className="@container/ai-vault relative flex h-[22rem] w-full max-w-[22rem] flex-col overflow-hidden rounded-xl border border-border/80 bg-sidebar text-left shadow-xs"
+        className="relative w-full max-w-[22rem] overflow-hidden rounded-xl border border-border bg-sidebar text-left shadow-xs"
       >
-        <DemoActivityStrip />
-        <AiVaultPanelHeader
-          {...DEMO_HEADER_PROPS}
-          query={scene.query.slice(0, shown.chars)}
-          searching={shown.chars > 0}
-          loading={shown.phase === 'searching'}
-        />
+        <div className="flex items-center gap-2 border-b border-sidebar-border px-4 py-3 text-[13px] font-medium">
+          <AgentSessionHistoryIcon size={16} />
+          {translate(
+            'auto.components.right.sidebar.AiVaultPanel.sessionHistory',
+            'Agent Session History'
+          )}
+        </div>
+        <div className="border-b border-sidebar-border p-3">
+          <div className="flex h-10 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm">
+            <Search className="size-4 shrink-0 text-muted-foreground" />
+            <span className="truncate">
+              {shown.chars > 0
+                ? scene.query.slice(0, shown.chars)
+                : translate(
+                    'auto.components.right.sidebar.AiVaultPanel.searchSessions',
+                    'Search sessions'
+                  )}
+            </span>
+          </div>
+        </div>
         <div
           data-dimmed={dimmed}
-          className="min-h-0 flex-1 overflow-hidden transition-opacity duration-200 data-[dimmed=true]:opacity-45"
+          className="transition-opacity duration-200 data-[dimmed=true]:opacity-50"
         >
           {rows.map((row, index) => (
             <DemoSessionRow
@@ -229,7 +154,6 @@ export function SessionSearchFeatureTipVisual(): JSX.Element {
             />
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-sidebar to-transparent" />
       </div>
     </div>
   )

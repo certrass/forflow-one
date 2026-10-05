@@ -13,6 +13,7 @@ import { translate } from '@/i18n/i18n'
 import { CliFeatureTipVisual } from './CliFeatureTipVisual'
 import { CliSkillSetupTerminal } from './CliSkillSetupTerminal'
 import { FeatureTipActions } from './FeatureTipActions'
+import { cn } from '@/lib/utils'
 
 function WorktreePromptTerm({ children }: { children: string }): JSX.Element {
   return (
@@ -132,16 +133,18 @@ export function CliSetupTipDialog({
           </DialogFooter>
         </div>
         <div
-          className={`min-h-0 min-w-0 shrink-0 overflow-hidden transition-[flex-basis,max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          className={cn(
+            'scrollbar-sleek hidden min-h-0 min-w-0 shrink-0 overflow-y-auto bg-muted/60 transition-[flex-basis,max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:block',
             skillTerminalOpen
               ? 'pointer-events-none max-h-0 basis-0 md:max-h-none md:basis-0'
               : 'max-h-[40rem] basis-auto md:basis-[52.5%]'
-          }`}
+          )}
         >
           <div
-            className={`h-full transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:w-[29.4rem] ${
+            className={cn(
+              'h-full w-full transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
               skillTerminalOpen ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'
-            }`}
+            )}
           >
             {skillTerminalOpen ? null : <CliFeatureTipVisual />}
           </div>

@@ -26,8 +26,8 @@ export function FeatureTipDialogFrame({
         <div className="scrollbar-sleek flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-y-auto px-8 py-9 md:shrink-0 md:basis-1/2">
           {children}
         </div>
-        <div className="flex min-h-0 min-w-0 shrink-0 self-stretch overflow-hidden bg-muted/60 md:basis-1/2 md:border-l md:border-border/70">
-          <div className="h-full min-h-[23rem] w-full md:w-[29.4rem]">{visual}</div>
+        <div className="scrollbar-sleek hidden min-h-0 min-w-0 flex-1 self-stretch overflow-y-auto bg-muted/60 md:flex md:basis-1/2 md:border-l md:border-border/70">
+          <div className="min-h-full w-full">{visual}</div>
         </div>
       </DialogContent>
     </Dialog>
