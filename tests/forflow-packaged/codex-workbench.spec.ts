@@ -43,6 +43,11 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     const file = page.locator('[data-file-explorer-row]').filter({ hasText: 'README.md' }).first()
     await file.dragTo(composer)
     await expect(composer.locator('[data-native-chat-file-reference]')).toHaveCount(1)
+    const notice = page.locator('[data-sonner-toast]').filter({
+      hasText: 'Codex 现在使用独立服务运行'
+    })
+    await notice.getByRole('button', { name: 'Close toast', exact: true }).click()
+    await expect(notice).toHaveCount(0)
     await chat.getByRole('button', { name: '发送', exact: true }).click()
     await expect.poll(ledger).toContain('并保留原始结论')
     const followUp = chat.getByRole('button', { name: '补充消息', exact: true })

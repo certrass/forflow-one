@@ -1,8 +1,10 @@
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { expect, it } from 'vitest'
 import { jevEvaluatorFingerprint } from '../build-plugins/jev-evaluator-fingerprint'
+import { electronViteConfig } from '../../electron.vite.config'
+import browserConfig from '../../vite.web.config'
 
 it('binds evaluator code while excluding tests, duplicate copies and unrelated app code', () => {
   const root = mkdtempSync(join(tmpdir(), 'jev-fingerprint-'))
@@ -38,8 +40,15 @@ it('binds evaluator code while excluding tests, duplicate copies and unrelated a
 })
 
 it('injects the evaluator fingerprint into all bundled desktop and browser targets', () => {
-  for (const file of ['electron.vite.config.ts', 'vite.web.config.ts']) {
-    expect(readFileSync(resolve(file), 'utf8')).toContain('__FORFLOW_JEV_EVALUATOR_HASH__')
-  }
+  const fingerprint = JSON.stringify(jevEvaluatorFingerprint())
+  expect(electronViteConfig).toHaveProperty(
+    'main.define.__FORFLOW_JEV_EVALUATOR_HASH__',
+    fingerprint
+  )
+  expect(electronViteConfig).toHaveProperty(
+    'renderer.define.__FORFLOW_JEV_EVALUATOR_HASH__',
+    fingerprint
+  )
+  expect(browserConfig).toHaveProperty('define.__FORFLOW_JEV_EVALUATOR_HASH__', fingerprint)
   expect(jevEvaluatorFingerprint()).toMatch(/^[a-f0-9]{64}$/)
 })

@@ -42,7 +42,7 @@ test('smoke: production app starts in Chinese with independent identity and priv
     await expect(page.getByRole('button', { name: /^继续/ })).toBeVisible()
     await expect(page.locator('body')).not.toContainText('No workspaces found')
     await expect(page.locator('vite-error-overlay')).toHaveCount(0)
-    await expect(page.getByRole('checkbox', { name: /跳过权限检查/ })).not.toBeChecked()
+    await expect(page.getByRole('switch', { name: /^Yolo 模式/ })).not.toBeChecked()
     const more = page.getByRole('button', { name: /显示另外.*智能体/ })
     if (await more.isVisible()) {
       await more.click()

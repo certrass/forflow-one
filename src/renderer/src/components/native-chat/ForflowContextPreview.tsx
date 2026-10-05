@@ -106,7 +106,7 @@ function ContextPreview(props: Props): React.JSX.Element {
   }
   return (
     <div
-      className="flex shrink-0 justify-end border-b border-border px-2 py-1"
+      className="flex shrink-0 justify-end border-t border-border px-2 py-1"
       data-forflow-context-beta=""
       data-pane-prevent-terminal-focus=""
     >
