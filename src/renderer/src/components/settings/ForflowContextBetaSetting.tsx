@@ -33,7 +33,7 @@ export function ForflowContextBetaSetting({
           <p className="text-xs text-muted-foreground">
             {translate(
               'forflow.contextBeta.location',
-              'Enable to show “Handoff preview” above Codex chat. Off by default; existing sessions and task states stay unchanged.'
+              'Enable to show “Handoff preview” above the Codex chat composer. Off by default; existing sessions and task states stay unchanged.'
             )}
           </p>
         </div>

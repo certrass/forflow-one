@@ -19663,7 +19663,7 @@
   "forflow.contextBeta.historyIncomplete": "较早历史缺失或仍在加载，请加载较早消息后刷新预览。",
   "forflow.contextBeta.incomplete": "暂不能准备可靠交接：历史尚未加载完整、用户原文缺失或超出预算。请先加载较早消息，或缩小任务范围。",
   "forflow.contextBeta.intro": "提取整条用户原文与最多三条近期智能体答复。这是原文摘录，不是语义摘要或已确认记忆。",
-  "forflow.contextBeta.location": "开启后，在 Codex 对话上方显示“接续预检”。默认关闭，原有会话和任务状态不变。",
+  "forflow.contextBeta.location": "开启后，在 Codex 对话输入框上方显示“接续预检”。默认关闭，原有会话和任务状态不变。",
   "forflow.contextBeta.missingScope": "会话身份尚未就绪，请重新打开会话后重试。",
   "forflow.contextBeta.noUserText": "没有可用于交接的已保存用户文字。",
   "forflow.contextBeta.omitted": "省略的用户／智能体／工具或系统消息",

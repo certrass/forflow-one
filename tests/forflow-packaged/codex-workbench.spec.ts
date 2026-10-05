@@ -67,6 +67,7 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     await chat.getByRole('button', { name: '停止智能体', exact: true }).click()
     await expect.poll(ledger).toContain('"type":"stop"')
     await expect(page.getByText('本轮已停止，可以继续输入。', { exact: true })).toBeVisible()
+    await chat.getByRole('button', { name: '切换本轮详情', exact: true }).last().click()
     await expect(chat.getByText('本轮已中断', { exact: true })).toBeVisible()
     await expect(chat.getByText('Conversation interrupted', { exact: true })).toHaveCount(0)
     await expect(followUp).toHaveCount(0)
@@ -119,6 +120,12 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
       )
     )
   } catch (error) {
+    const session = await page.evaluate(
+      (file) =>
+        window.api.nativeChat.readSession('codex', 'forflow-gui-fixture-session', 100, file),
+      fixture.transcript
+    )
+    writeFileSync(path.join(evidence, 'codex-error-session.json'), JSON.stringify(session, null, 2))
     writeFileSync(
       path.join(evidence, 'codex-error-text.txt'),
       await page.locator('body').innerText()

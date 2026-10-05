@@ -47,10 +47,8 @@ test('smoke: production app starts in Chinese with independent identity and priv
     if (await more.isVisible()) {
       await more.click()
     }
-    await expect(
-      page.getByRole('button', { name: 'CodeBuddy codebuddy', exact: true })
-    ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Qoder CN qodercn', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'CodeBuddy', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Qoder CN', exact: true })).toBeVisible()
     await expect(page.locator('img[src*="google.com/s2/favicons"]')).toHaveCount(0)
     expect(
       await page

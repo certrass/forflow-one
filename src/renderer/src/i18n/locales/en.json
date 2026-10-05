@@ -19663,7 +19663,7 @@
   "forflow.contextBeta.historyIncomplete": "Earlier history is missing or still loading. Load earlier messages, then refresh.",
   "forflow.contextBeta.incomplete": "Cannot prepare a reliable handoff yet: history is not fully loaded, user text is missing or exceeds the budget. Load earlier messages or narrow the task first.",
   "forflow.contextBeta.intro": "Extracts whole user messages and up to three recent assistant replies from this conversation. This is an excerpt, not a semantic summary or approved memory.",
-  "forflow.contextBeta.location": "Enable to show “Handoff preview” above Codex chat. Off by default; existing sessions and task states stay unchanged.",
+  "forflow.contextBeta.location": "Enable to show “Handoff preview” above the Codex chat composer. Off by default; existing sessions and task states stay unchanged.",
   "forflow.contextBeta.missingScope": "Session identity is not ready. Reopen the conversation before retrying.",
   "forflow.contextBeta.noUserText": "No persisted user text is available to hand off.",
   "forflow.contextBeta.omitted": "Omitted user / assistant / tool or system messages",

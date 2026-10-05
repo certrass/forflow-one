@@ -93,7 +93,7 @@ if (agent === 'codex') {
       if (char === '\\x03') process.exit(0)
       if (char === '\\x1b' && !pasted) {
         working = false
-        record('event_msg', {type:'turn_aborted',turn_id:'turn-fixture'})
+        record('event_msg', {type:'turn_aborted',reason:'interrupted',turn_id:'turn-fixture'})
         message('assistant', '本轮已停止，可以继续输入。')
         fs.appendFileSync(ledger, JSON.stringify({type:'stop',pid:process.pid})+'\\n')
         hook().catch(e => console.error(e.message))
