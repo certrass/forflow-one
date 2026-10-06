@@ -1,12 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import {
-  Columns2,
-  FileDiff,
-  FolderOpen,
-  GitBranch,
-  MessageSquare,
-  SquareTerminal
-} from 'lucide-react'
+import { Columns2, FileDiff, FolderOpen, MessageSquare, SquareTerminal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -23,6 +16,7 @@ import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 import { ForflowSessionGuide } from './ForflowSessionGuide'
+import { ForflowParallelGuide } from './ForflowParallelGuide'
 
 export function ForflowSessionToolbar({
   controller
@@ -137,7 +131,7 @@ export function ForflowSessionToolbar({
         </Button>
       </ButtonGroup>
       <span className="min-w-0 truncate text-xs text-muted-foreground">{status}</span>
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex flex-wrap items-center gap-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="xs" variant="ghost" disabled={!activePane}>
@@ -166,22 +160,7 @@ export function ForflowSessionToolbar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button
-          size="xs"
-          variant="ghost"
-          onClick={() =>
-            useAppStore
-              .getState()
-              .openModal('new-workspace-composer', { telemetrySource: 'unknown' })
-          }
-          title={translate(
-            'forflow.workbench.parallelHint',
-            'Create a separate workspace for another task'
-          )}
-        >
-          <GitBranch />
-          {translate('forflow.workbench.parallel', 'Parallel task')}
-        </Button>
+        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} />
         <Button
           size="xs"
           variant="ghost"

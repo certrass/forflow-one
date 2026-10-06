@@ -1,4 +1,5 @@
 import { isForflowBuild } from '../../../shared/product-branding'
+import { forflowParallelPrompts } from './new-workspace/forflow-parallel-prompts'
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '@/store'
 import { lazyWithRetry } from '@/lib/lazy-with-retry'
@@ -36,6 +37,7 @@ const HostedAddRepoDialog = lazyWithRetry(() => import('@/components/sidebar/Add
 })
 
 type ComposerModalData = {
+  forflowTaskIntent?: 'alternative' | 'comparison'
   prefilledPrompt?: string
   prefilledName?: string
   initialRepoId?: string
@@ -246,6 +248,7 @@ function QuickTabBody({
     : cardProps.selectedRepoIsGit
       ? translate('auto.components.NewWorkspaceComposerModal.createWorktree', 'Create worktree')
       : translate('auto.components.NewWorkspaceComposerModal.createWorkspace', 'Create workspace')
+  const forflowIntent = isForflowBuild() ? modalData.forflowTaskIntent : undefined
 
   // Cmd/Ctrl+Enter submits. Escape belongs to the dialog's dismissable layer:
   // the page-style "blur the focused field first" rule assumes the user chose
@@ -287,18 +290,30 @@ function QuickTabBody({
     <>
       <DialogHeader className="gap-1">
         <DialogTitle className="text-base font-semibold">
-          {isFolderWorkspaceTarget
-            ? translate(
-                'auto.components.sidebar.FolderWorkspaceComposerDialog.title',
-                'Create Folder Workspace'
-              )
-            : primaryActionLabel}
+          {forflowIntent
+            ? forflowParallelPrompts()[forflowIntent].label
+            : isFolderWorkspaceTarget
+              ? translate(
+                  'auto.components.sidebar.FolderWorkspaceComposerDialog.title',
+                  'Create Folder Workspace'
+                )
+              : primaryActionLabel}
         </DialogTitle>
-        <DialogDescription className="sr-only">
-          {translate(
-            'auto.components.NewWorkspaceComposerModal.fa90f739a5',
-            'Choose the project, workspace name, and agent before creating the workspace.'
-          )}
+        <DialogDescription className={forflowIntent ? undefined : 'sr-only'}>
+          {forflowIntent === 'alternative'
+            ? translate(
+                'forflow.parallel.alternativeHint',
+                'Fill in the shared goal and choose an agent. Send the draft in the new conversation when ready.'
+              )
+            : forflowIntent === 'comparison'
+              ? translate(
+                  'forflow.parallel.comparisonHint',
+                  'Prepare the instructions here, then add both outputs in the new conversation.'
+                )
+              : translate(
+                  'auto.components.NewWorkspaceComposerModal.fa90f739a5',
+                  'Choose the project, workspace name, and agent before creating the workspace.'
+                )}
         </DialogDescription>
       </DialogHeader>
       <NewWorkspaceComposerCard

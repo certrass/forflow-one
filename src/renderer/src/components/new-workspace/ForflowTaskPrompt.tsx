@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { translate } from '@/i18n/i18n'
+import { forflowParallelPrompts } from './forflow-parallel-prompts'
 
 export function ForflowTaskPrompt({
   value,
@@ -15,6 +16,7 @@ export function ForflowTaskPrompt({
 }): React.JSX.Element {
   useTranslation()
   const id = useId()
+  const parallelPrompts = forflowParallelPrompts()
   const examples = [
     {
       label: translate('forflow.taskPrompt.explore', 'Understand this project'),
@@ -43,6 +45,26 @@ export function ForflowTaskPrompt({
       <label htmlFor={id} className="text-sm font-medium">
         {translate('forflow.taskPrompt.label', 'What do you want to accomplish?')}
       </label>
+      {!value.trim() && (
+        <div className="flex flex-wrap gap-2">
+          {Object.values(parallelPrompts).map((example) => (
+            <Button
+              key={example.label}
+              type="button"
+              size="xs"
+              variant="outline"
+              disabled={creating || Boolean(value.trim()) || !onChange}
+              onClick={() => {
+                if (!value.trim() && !creating) {
+                  onChange?.(example.prompt)
+                }
+              }}
+            >
+              {example.label}
+            </Button>
+          ))}
+        </div>
+      )}
       <Textarea
         id={id}
         aria-describedby={`${id}-hint`}

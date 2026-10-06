@@ -3541,6 +3541,8 @@
     },
     "workbench": {
       "files": "Files and results",
+      "parallel": "Parallel task",
+      "parallelHint": "Create a separate workspace for another task",
       "structured": "Structured conversation"
     }
   },

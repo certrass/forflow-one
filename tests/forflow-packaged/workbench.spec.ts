@@ -114,7 +114,9 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     expect(await page.locator(`.pane[data-leaf-id="${leafId}"]`).getAttribute('data-pty-id')).toBe(
       ptyId
     )
-    await toolbar.getByRole('button', { name: '并行任务', exact: true }).click()
+    await toolbar.getByRole('button', { name: '并行与对比', exact: true }).click()
+    await page.getByText('想分工处理不同任务？', { exact: true }).click()
+    await page.getByRole('button', { name: '另开一个任务', exact: true }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
     await expect(page.getByRole('dialog')).toContainText('测试项目')
     await page.screenshot({ path: path.join(evidence, 'workbench-new-task.png') })

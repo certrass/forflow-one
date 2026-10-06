@@ -135,9 +135,13 @@ describe('Forflow session toolbar', () => {
 
   it('opens the existing task composer and file preview without starting a task', () => {
     render(<ForflowSessionToolbar controller={fixture()} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Parallel task' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Parallel work & comparison' }))
+    expect(mocks.openModal).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Working on different tasks?'))
+    fireEvent.click(screen.getByRole('button', { name: 'Start a different task' }))
     expect(mocks.openModal).toHaveBeenCalledExactlyOnceWith('new-workspace-composer', {
-      telemetrySource: 'unknown'
+      telemetrySource: 'unknown',
+      initialRepoId: 'repo-1'
     })
     fireEvent.click(screen.getByRole('button', { name: 'Files' }))
     expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
@@ -152,4 +156,35 @@ describe('Forflow session toolbar', () => {
     expect(screen.queryByRole('button', { name: 'Review changes' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Files' })).toBeTruthy()
   })
+})
+
+it.each(['Make another version', 'Prepare comparison draft'])(
+  'prepares %s in the current project without starting an agent',
+  (action) => {
+    render(<ForflowSessionToolbar controller={fixture()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Parallel work & comparison' }))
+    fireEvent.click(screen.getByRole('button', { name: action }))
+    expect(mocks.openModal).toHaveBeenCalledOnce()
+    expect(mocks.openModal).toHaveBeenCalledWith('new-workspace-composer', {
+      telemetrySource: 'unknown',
+      initialRepoId: 'repo-1',
+      forflowTaskIntent: action === 'Make another version' ? 'alternative' : 'comparison',
+      prefilledPrompt: expect.stringContaining(
+        action === 'Make another version' ? 'Success criteria:' : 'Version B:'
+      )
+    })
+    expect(mocks.updateSettingsOrThrow).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog', { name: 'One task, more than one approach' })).toBeNull()
+  }
+)
+
+it('explains shared folder outputs and opens files without creating another task', () => {
+  mocks.repos[0].kind = 'folder'
+  render(<ForflowSessionToolbar controller={fixture()} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Parallel work & comparison' }))
+  fireEvent.click(screen.getByText('Working on different tasks?'))
+  expect(screen.getByText(/Folder tasks share files/)).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'View current task files' }))
+  expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
+  expect(mocks.openModal).not.toHaveBeenCalled()
 })

@@ -33,17 +33,14 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
     },
     {
       id: 'parallel',
-      title: translate(
-        'forflow.sessionGuide.parallelTitle',
-        '3. Split a view or start parallel work'
-      ),
+      title: translate('forflow.sessionGuide.parallelTitle', '3. Run tasks, then compare outputs'),
       body: translate(
         'forflow.sessionGuide.parallelBody',
-        'Split view opens another terminal in this workspace, sharing its files. For an independent Git task, use Parallel task to create a new worktree and branch.'
+        'Open Parallel work & comparison above. Give each agent the same goal and success criteria. When the outputs are ready, use Prepare comparison draft and add the materials.'
       ),
       next: translate(
         'forflow.sessionGuide.parallelNext',
-        'Ordinary folder workspaces do not isolate branches. Check the project and execution location before starting another task.'
+        'Use a separate Git workspace for each version. Split view shares files; folder tasks should save outputs to different files or folders.'
       )
     },
     {

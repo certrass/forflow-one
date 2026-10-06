@@ -41,3 +41,19 @@ it('does not overwrite imported task material or change an in-flight draft', () 
   fireEvent.click(screen.getByRole('button', { name: 'Understand this project' }))
   expect(onChange).not.toHaveBeenCalled()
 })
+
+it.each(['Make another version', 'Compare outputs'])(
+  'offers %s directly and preserves an existing draft',
+  (label) => {
+    const onChange = vi.fn()
+    const view = render(<ForflowTaskPrompt value="" onChange={onChange} creating={false} />)
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    expect(onChange).toHaveBeenCalledOnce()
+    view.rerender(<ForflowTaskPrompt value="my task" onChange={onChange} creating={false} />)
+    expect(screen.queryByRole('button', { name: label })).toBeNull()
+    expect(onChange).toHaveBeenCalledOnce()
+    view.rerender(<ForflowTaskPrompt value="" onChange={onChange} creating />)
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    expect(onChange).toHaveBeenCalledOnce()
+  }
+)
