@@ -2,6 +2,7 @@ import type { CommitMessagePlan } from '../../shared/commit-message-plan'
 import { isSshRequestOutcomeUnverifiable } from '../ssh/ssh-channel-multiplexer'
 import { WINDOWS_BATCH_UNSAFE_ARGUMENTS_ERROR } from '../win32-utils'
 import {
+  finalizeAgentTimeout,
   finalizeFromAgentOutput,
   userFacingUnsafeWindowsBatchArgs
 } from './source-control-agent-failure'
@@ -56,10 +57,13 @@ export async function runRemoteSourceControlPlan(input: {
     return { success: false, error: 'Generation canceled.', canceled: true }
   }
   if (result.timedOut) {
-    return {
-      success: false,
-      error: `Generation timed out after ${SOURCE_CONTROL_GENERATION_TIMEOUT_MS / 1000}s.`
-    }
+    return finalizeAgentTimeout({
+      label: plan.label,
+      stdout: result.stdout,
+      stderr: result.stderr,
+      includeLocalMacDnsHint: false,
+      includeStdoutDetail: operation !== 'branch-name'
+    })
   }
   return finalizeFromAgentOutput({
     code: result.exitCode,

@@ -94,8 +94,7 @@ export function buildPrimaryCommitMessageAgentSpecs({
         '--skip-git-repo-check',
         '-s',
         'read-only',
-        '--model',
-        model,
+        ...(model === 'default' ? [] : ['--model', model]),
         ...(thinkingLevel ? ['-c', `model_reasoning_effort=${thinkingLevel}`] : [])
       ],
       // `-c` is intentionally absent: Codex accepts repeated overrides.

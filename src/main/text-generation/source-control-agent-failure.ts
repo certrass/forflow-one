@@ -9,6 +9,28 @@ import {
   type AgentGenerationFailureOutput
 } from './agent-failure-output'
 import type { InternalTextGenerationResult } from './source-control-text-generation-types'
+import { SOURCE_CONTROL_GENERATION_TIMEOUT_MS } from './source-control-generation-limits'
+
+export function finalizeAgentTimeout(args: {
+  label: string
+  stdout: string
+  stderr: string
+  includeLocalMacDnsHint?: boolean
+  includeStdoutDetail?: boolean
+}): InternalTextGenerationResult {
+  const { label, stdout, stderr } = args
+  const detail = sanitizeAgentFailureDetail(
+    excerptAgentFailureOutput(args.includeStdoutDetail === false ? '' : stdout, stderr)
+  )
+  const headline = `${label} generation timed out after ${SOURCE_CONTROL_GENERATION_TIMEOUT_MS / 1000}s.`
+  const message = detail ? `${headline} CLI output: ${detail}` : headline
+  return {
+    success: false,
+    error:
+      args.includeLocalMacDnsHint === false ? message : withMacTailscaleDnsHint(message, detail),
+    failureOutput: captureFailureOutput(label, null, stdout, stderr)
+  }
+}
 
 export function formatAgentCliFailureMessage(
   label: string,
