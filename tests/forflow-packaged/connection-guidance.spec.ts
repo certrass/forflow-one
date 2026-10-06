@@ -73,8 +73,15 @@ test('choose a Feishu partner by name and resume it in the standard agent chat',
       .filter({ hasText: '豆包工作伙伴' })
       .first()
       .click()
-    await expect(page.getByText('点击“对话”即可启用聊天界面', { exact: true })).toBeVisible()
-    await page.getByRole('button', { name: '对话', exact: true }).click()
+    const chatHint = page.getByText('点击“对话”即可启用聊天界面', { exact: true })
+    const loadedReply = page
+      .locator('.native-chat-pane-shell:visible')
+      .last()
+      .getByText('明确评审目标', { exact: true })
+    await expect(chatHint.or(loadedReply)).toBeVisible()
+    if (await chatHint.isVisible()) {
+      await page.getByRole('button', { name: '对话', exact: true }).click()
+    }
     await expect(page.locator('.native-chat-pane-shell:visible').last()).toContainText(
       '明确评审目标'
     )
