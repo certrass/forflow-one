@@ -33,7 +33,11 @@ export class CompanionJournal {
         }
       })
     } catch {
-      throw new Error('这段会话已在另一个任务中打开，请回到原任务继续。')
+      throw new Error(
+        this.agent === 'aily'
+          ? '豆包已在另一个任务中打开。回到原任务继续；要同时做另一项任务，可选择 Codex、Claude 或 WorkBuddy。'
+          : '这段会话已在另一个任务中打开，请回到原任务继续。'
+      )
     }
   }
 

@@ -44,6 +44,7 @@ function NativeChatBridgeView({
       resolvedAgent={resolvedAgent}
       agentStatusEntry={agentStatusEntry}
       ptyId={targetPtyId}
+      onSwitchToTerminal={onSwitchToTerminal}
     >
       {(resolution) => (
         <NativeChatResolvedView

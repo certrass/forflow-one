@@ -11,8 +11,10 @@ export class AilyConversation {
   journal: CompanionJournal | null = null
   private readonly seen = new Set<string>()
   private stopped = false
+  private closed = false
 
   async open(resume?: string): Promise<CompanionJournal> {
+    process.stdout.write('正在连接豆包工作伙伴…\n')
     let { connection } = await this.client.status()
     if (!connection) {
       const { partners } = await this.client.discover()
@@ -37,6 +39,7 @@ export class AilyConversation {
     }
     this.journal = new CompanionJournal('aily', id)
     await this.journal.acquire()
+    await this.client.verifyConnection()
     for (const line of readFileSync(this.journal.path, 'utf8').split('\n')) {
       try {
         const result = companionTranscriptSchema.safeParse(JSON.parse(line))
@@ -48,15 +51,17 @@ export class AilyConversation {
       }
     }
     process.stdout.write(
-      `豆包工作伙伴 · ${connection.partner.name}\n继续飞书里的同一段对话。输入 /exit 退出。\n`
+      `豆包工作伙伴 · ${connection.partner.name}\n继续飞书里的同一段对话。输入 /refresh 刷新，/exit 退出。\n`
     )
-    await this.refresh()
-    this.journal.status('done')
     return this.journal
   }
 
   private async refresh(): Promise<boolean> {
     const page = await this.client.messages()
+    if (this.closed) {
+      return false
+    }
+    this.journal?.assertOwned()
     let reply = false
     for (const message of page.messages) {
       if (this.seen.has(message.id)) {
@@ -78,9 +83,14 @@ export class AilyConversation {
     }
     this.journal.assertOwned()
     this.stopped = false
+    this.journal.status('working')
     await this.refresh()
+    if (this.closed) {
+      return
+    }
     const turnId = randomUUID()
     const result = await this.client.send({ text, requestId: turnId })
+    this.journal.assertOwned()
     this.seen.add(result.messageId)
     this.journal.message('user', text, result.messageId)
     this.journal.turn('working', turnId)
@@ -98,18 +108,30 @@ export class AilyConversation {
         return
       }
     }
+    if (this.closed) {
+      return
+    }
     this.journal.turn('interrupted', turnId)
     this.journal.message('system', '已停止等待。消息已发到飞书，可输入 /refresh 查看后续回复。')
     this.journal.status('done')
   }
 
   async refreshHistory(): Promise<void> {
-    await this.refresh()
+    this.journal?.status('working')
+    process.stdout.write('正在同步飞书消息，可以先写好任务…\n')
+    try {
+      await this.refresh()
+    } finally {
+      if (!this.closed) {
+        this.journal?.status('done')
+      }
+    }
   }
   cancel(): void {
     this.stopped = true
   }
   async close(): Promise<void> {
+    this.closed = true
     this.cancel()
     await this.journal?.close()
   }

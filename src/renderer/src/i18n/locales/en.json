@@ -20740,5 +20740,8 @@
   "forflow.parallel.folderHint": "Folder tasks share files. Give each task a separate output file or folder, then review the results together.",
   "forflow.parallel.blankTask": "Start a different task",
   "forflow.parallel.alternativeHint": "Fill in the shared goal and choose an agent. Send the draft in the new conversation when ready.",
-  "forflow.parallel.comparisonHint": "Prepare the instructions here, then add both outputs in the new conversation."
+  "forflow.parallel.comparisonHint": "Prepare the instructions here, then add both outputs in the new conversation.",
+  "forflow.aily.singleConversation": "Doubao continues the same Feishu conversation in one task at a time. For parallel work, run Codex, Claude or WorkBuddy alongside it.",
+  "forflow.companion.connecting": "Connect your work partner",
+  "forflow.companion.connectionProgress": "View connection details"
 }

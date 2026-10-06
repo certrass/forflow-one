@@ -5,14 +5,18 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
+import { ailySessionHint } from '@/lib/forflow-companion-catalog'
+import type { AgentType } from '../../../../shared/agent-status-types'
 import { forflowParallelPrompts } from '../new-workspace/forflow-parallel-prompts'
 
 export function ForflowParallelGuide({
   worktreeId,
-  isGit
+  isGit,
+  agent
 }: {
   worktreeId: string
   isGit: boolean
+  agent?: AgentType | null
 }): React.JSX.Element {
   useTranslation()
   const [open, setOpen] = useState(false)
@@ -56,6 +60,9 @@ export function ForflowParallelGuide({
               )}
             </p>
           </div>
+          {agent === 'aily' ? (
+            <p className="rounded-md border border-border p-3 text-sm">{ailySessionHint()}</p>
+          ) : null}
           <ol className="space-y-4">
             <li className="space-y-2">
               <h3 className="text-sm font-medium">

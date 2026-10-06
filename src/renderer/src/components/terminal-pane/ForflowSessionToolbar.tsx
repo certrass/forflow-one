@@ -160,7 +160,7 @@ export function ForflowSessionToolbar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} />
+        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} agent={agent} />
         <Button
           size="xs"
           variant="ghost"

@@ -96,6 +96,9 @@ export async function runCompanionCommand(
         ? conversation.refreshHistory()
         : conversation.send(text))
     } catch (error) {
+      if (closing) {
+        return
+      }
       const message = error instanceof Error ? error.message : '发送失败，请重试。'
       journal.message('system', message)
       journal.status('done')
@@ -141,6 +144,10 @@ export async function runCompanionCommand(
   }
   process.stdin.resume()
   process.stdout.write('\x1b[?2004h> ')
+  if (conversation instanceof AilyConversation) {
+    // Install input before publishing the session; history sync can take a network round trip.
+    void submit('/refresh')
+  }
   if (values.prefill) {
     input.seed(values.prefill)
   }

@@ -1,6 +1,7 @@
 import { MessageSquare, TriangleAlert } from 'lucide-react'
 import { translate } from '@/i18n/i18n'
 import { formatAgentTypeLabel } from '@/lib/agent-status'
+import { Button } from '@/components/ui/button'
 import {
   NATIVE_CHAT_EMPTY_STATE_COPY,
   NATIVE_CHAT_KEEPS_TRYING_COPY
@@ -13,7 +14,8 @@ export function NativeChatEmptyState({
   headline,
   headlineSaysUnread = false,
   agent,
-  retrying = false
+  retrying = false,
+  action
 }: {
   kind: 'loading' | 'empty' | 'error' | 'not-agent'
   message?: string
@@ -26,6 +28,7 @@ export function NativeChatEmptyState({
   /** The read retries on its own (structured chat), so the error says so instead of pointing
    *  back to the terminal. */
   retrying?: boolean
+  action?: { label: string; onClick: () => void }
 }): React.JSX.Element {
   const copy = emptyStateCopy(kind, { message, headline, headlineSaysUnread }, agent, retrying)
   return (
@@ -47,6 +50,11 @@ export function NativeChatEmptyState({
       {copy.subtitle ? (
         <p className="max-w-sm text-balance text-xs text-muted-foreground">{copy.subtitle}</p>
       ) : null}
+      {action ? (
+        <Button size="sm" variant="outline" onClick={action.onClick}>
+          {action.label}
+        </Button>
+      ) : null}
     </div>
   )
 }
@@ -60,14 +68,18 @@ function emptyStateCopy(
   switch (kind) {
     case 'loading':
       return {
-        title: translate(
-          'components.native-chat.state.loading.title',
-          NATIVE_CHAT_EMPTY_STATE_COPY.loading.title
-        ),
-        subtitle: translate(
-          'components.native-chat.state.loading.subtitle',
-          NATIVE_CHAT_EMPTY_STATE_COPY.loading.subtitle
-        )
+        title:
+          words.headline ??
+          translate(
+            'components.native-chat.state.loading.title',
+            NATIVE_CHAT_EMPTY_STATE_COPY.loading.title
+          ),
+        subtitle:
+          words.message ??
+          translate(
+            'components.native-chat.state.loading.subtitle',
+            NATIVE_CHAT_EMPTY_STATE_COPY.loading.subtitle
+          )
       }
     case 'error': {
       const retryingLine = !retrying

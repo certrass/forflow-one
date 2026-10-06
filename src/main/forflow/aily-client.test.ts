@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { runProcess, ProcessResult } from '../../shared/child-process/run-process'
@@ -77,6 +77,30 @@ beforeEach(() => {
 afterEach(() => rmSync(directory, { recursive: true, force: true }))
 
 describe('personal Feishu work partner', () => {
+  it('verifies a saved connection without waiting for message history', async () => {
+    await client.connect(partner.chatId)
+    run.mockClear()
+    await client.verifyConnection()
+    expect(run.mock.calls.map(([spec]) => spec.args)).toEqual([
+      ['--profile', 'cli_profile', 'auth', 'status', '--json']
+    ])
+    userId = 'ou_other'
+    await expect(client.verifyConnection()).rejects.toThrow('账号或工作伙伴已变更')
+  })
+
+  it('rejects a binding changed by another process while checking the account', async () => {
+    const binding = await client.connect(partner.chatId)
+    const auth = await run({ program: 'fixture', args: ['auth'] })
+    run.mockImplementationOnce(async () => {
+      writeFileSync(
+        join(directory, 'forflow-aily-connection.json'),
+        JSON.stringify({ ...binding, partner: { ...partner, chatId: 'oc_changed' } })
+      )
+      return auth
+    })
+    await expect(client.verifyConnection()).rejects.toThrow('账号或工作伙伴已变更')
+  })
+
   it('discovers the personal bot, excluding the notification channel and groups', async () => {
     expect(await client.discover()).toEqual({ partners: [partner], hasMore: false })
     expect(

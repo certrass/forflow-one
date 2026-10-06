@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom/vitest'
 
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type * as React from 'react'
 import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
@@ -146,5 +146,23 @@ describe('NativeChatSessionGate', () => {
 
     expect(screen.getByText('No conversation here')).toBeInTheDocument()
     expect(screen.queryByTestId('native-chat-resolution')).not.toBeInTheDocument()
+  })
+
+  it('offers connection details instead of stranding an unready companion in a loading view', () => {
+    const onSwitchToTerminal = vi.fn()
+    render(
+      <NativeChatSessionGate
+        paneKey="tab:leaf"
+        launchAgent="aily"
+        ptyId="pty"
+        onSwitchToTerminal={onSwitchToTerminal}
+      >
+        {() => <input aria-label="Ready composer" />}
+      </NativeChatSessionGate>
+    )
+    expect(screen.getByText(/one task at a time/)).toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'View connection details' }))
+    expect(onSwitchToTerminal).toHaveBeenCalledOnce()
   })
 })

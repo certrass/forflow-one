@@ -296,5 +296,6 @@
   "src/cli/companion/companion-input.test.ts",
   "src/cli/companion/companion-journal.test.ts",
   "src/main/native-chat/transcript-companion.test.ts",
-  "src/renderer/src/runtime/agent-resume-host-authority-capability.test.ts"
+  "src/renderer/src/runtime/agent-resume-host-authority-capability.test.ts",
+  "src/cli/companion/aily-conversation.test.ts"
 ]

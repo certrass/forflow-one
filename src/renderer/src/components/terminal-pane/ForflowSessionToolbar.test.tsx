@@ -50,6 +50,11 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('Forflow session toolbar', () => {
+  it('explains the shared Feishu conversation when starting parallel work from Aily', () => {
+    render(<ForflowSessionToolbar controller={fixture({ resolveAgentForLeaf: () => 'aily' })} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Parallel work & comparison' }))
+    expect(screen.getByText(/one task at a time/)).toBeTruthy()
+  })
   it('switches only through the existing pane controller and leaves selected views unchanged', async () => {
     const controller = fixture()
     const view = render(<ForflowSessionToolbar controller={controller} />)

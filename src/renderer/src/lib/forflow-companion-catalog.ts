@@ -1,5 +1,12 @@
 import { translate } from '@/i18n/i18n'
 
+export function ailySessionHint(): string {
+  return translate(
+    'forflow.aily.singleConversation',
+    'Doubao continues the same Feishu conversation in one task at a time. For parallel work, run Codex, Claude or WorkBuddy alongside it.'
+  )
+}
+
 export function getCompanionCatalog() {
   return [
     {

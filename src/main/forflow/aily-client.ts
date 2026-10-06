@@ -36,6 +36,7 @@ export class AilyClient {
       (binding.profile !== this.pinned.profile ||
         binding.userId !== this.pinned.userId ||
         binding.partner.chatId !== this.pinned.partner.chatId ||
+        binding.partner.botAppId !== this.pinned.partner.botAppId ||
         binding.partner.botMemberId !== this.pinned.partner.botMemberId)
     ) {
       throw new Error('当前飞书账号或伙伴已变更，请重新打开会话。')
@@ -179,6 +180,36 @@ export class AilyClient {
     rmSync(this.file, { force: true })
   }
 
+  async verifyConnection(): Promise<void> {
+    const binding = this.binding()
+    if (!binding) {
+      throw new Error('先连接飞书中的智能伙伴。')
+    }
+    this.assertPinned(binding)
+    await this.assertAccount(binding, this.generation)
+  }
+
+  private async assertAccount(binding: AilyBinding, generation: number): Promise<void> {
+    const current = await this.identity(binding.profile)
+    const saved = this.binding()
+    if (!saved) {
+      throw new Error('工作伙伴连接已关闭。')
+    }
+    this.assertPinned(saved)
+    if (
+      generation !== this.generation ||
+      current.userId !== binding.userId ||
+      current.appId !== binding.profile ||
+      saved.profile !== binding.profile ||
+      saved.userId !== binding.userId ||
+      saved.partner.chatId !== binding.partner.chatId ||
+      saved.partner.botAppId !== binding.partner.botAppId ||
+      saved.partner.botMemberId !== binding.partner.botMemberId
+    ) {
+      throw new Error('飞书账号或工作伙伴已变更，请重新连接。')
+    }
+  }
+
   private async boundCommand(args: string[]): Promise<{ value: unknown; binding: AilyBinding }> {
     const binding = this.binding()
     if (!binding) {
@@ -186,22 +217,7 @@ export class AilyClient {
     }
     this.assertPinned(binding)
     const generation = this.generation
-    const assertAccount = async (): Promise<void> => {
-      const saved = this.binding()
-      if (!saved) {
-        throw new Error('工作伙伴连接已关闭。')
-      }
-      this.assertPinned(saved)
-      const current = await this.identity(binding.profile)
-      if (
-        generation !== this.generation ||
-        current.userId !== binding.userId ||
-        current.appId !== binding.profile
-      ) {
-        throw new Error('飞书账号或工作伙伴已变更，请重新连接。')
-      }
-    }
-    await assertAccount()
+    await this.assertAccount(binding, generation)
     const value = await this.cli.command(
       [
         '--profile',
@@ -217,7 +233,7 @@ export class AilyClient {
       ],
       'messages'
     )
-    await assertAccount()
+    await this.assertAccount(binding, generation)
     return { value, binding }
   }
 

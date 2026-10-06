@@ -20740,5 +20740,8 @@
   "forflow.parallel.folderHint": "普通文件夹中的任务共用文件。请为每项任务指定不同的产出文件或文件夹，再汇总检查。",
   "forflow.parallel.blankTask": "另开一个任务",
   "forflow.parallel.alternativeHint": "填写共同目标，再选择智能体。创建后进入新对话，发送草稿开始任务。",
-  "forflow.parallel.comparisonHint": "先准备任务说明，创建后在对话中添加两份产出。"
+  "forflow.parallel.comparisonHint": "先准备任务说明，创建后在对话中添加两份产出。",
+  "forflow.aily.singleConversation": "豆包接续飞书中的同一段对话，一次在一个任务中使用。需要并行时，可同时启动 Codex、Claude 或 WorkBuddy。",
+  "forflow.companion.connecting": "连接智能伙伴",
+  "forflow.companion.connectionProgress": "查看连接情况"
 }

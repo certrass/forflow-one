@@ -1,7 +1,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
-export function createAilyCliFixture(profile: string, multiplePartners = false) {
+export function createAilyCliFixture(
+  profile: string,
+  multiplePartners = false,
+  holdHistoryUntil?: string
+) {
   const bin = path.join(profile, 'aily-bin')
   const ledger = path.join(profile, 'aily-calls.jsonl')
   const messages = path.join(profile, 'aily-messages.json')
@@ -39,6 +43,12 @@ if (args.includes('auth')) {
   success({bots:[{app_id:'cli_partner',member_id:'ou_partner',name:value('--chat-id') === 'oc_another' ? '项目小组的工作伙伴' : '示例用户的智能伙伴'}]})
 } else if (args.includes('+chat-messages-list')) {
   if (value('--chat-id') !== 'oc_partner') process.exit(2)
+  const gate = ${JSON.stringify(holdHistoryUntil ?? '')}
+  const deadline = Date.now() + 25000
+  while (gate && !fs.existsSync(gate) && Date.now() < deadline) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100)
+  }
+  if (gate && !fs.existsSync(gate)) process.exit(3)
   const all = JSON.parse(fs.readFileSync(${JSON.stringify(messages)}, 'utf8'))
   const earlier = args.includes('--page-token')
   success({messages: earlier ? [{message_id:'om_earlier',content:'上次评审已完成。',sender:{id:'cli_partner',sender_type:'app'}}] : all.toReversed(),has_more:!earlier,page_token:earlier ? '' : 'earlier'})
