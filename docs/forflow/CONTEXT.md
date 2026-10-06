@@ -1,5 +1,13 @@
 # Forflow One 项目接续
 
+## 2026-10-06 豆包与 WorkBuddy 图标
+
+补齐豆包工作伙伴与 WorkBuddy 官方图标，复用桌面 `AgentIcon` 和手机静态资源映射；选择器、任务标签、侧栏与设置统一使用本地图片。来源及原图哈希见 `resources/forflow/companion-icon-sources.json`，未修改聊天或 CLI 行为。
+
+候选 `1.4.220-forflow.6`，运行时代码 `88e4ee60b0c30aa071d0cba850bd22002f3c5d96`，ASAR `f78af8cca912fc21698a9b4ce635933066aaba702c04b38d08f037e7a4057d96`。完整构建／类型、改动行规范、严格签名与 ZIP 完整性通过；隐藏 Electron 已验证两个图标在明暗主题中正确加载，以及 WorkBuddy 就绪后的任务标签／侧栏显示。临时测试最初使用中间词搜索，改为产品名称前缀后通过；截图等待菜单动画和对话就绪，没有为测试改动产品逻辑。
+
+安装包与截图位于 `~/Library/Caches/Forflow One/builds/1.4.220-forflow.6/`。当前日常应用仍运行 `.5`，退出流程会终止本地任务，已询问更新时间；收到选择后使用 `qa/install/install.py` 安装，再以 `/Applications/Forflow One.app` 重跑 `qa/test-script`。手机资源映射已构建，未做模拟器或真机验收。
+
 ## 2026-10-06 接入方式校正：统一智能体工作流
 
 用户在安装前纠正：「不应该用 cli 调用啊」「保持跟 codex 和 claude 的逻辑不好吗」。产品入口沿用现有智能体选择、任务／工作区和会话窗口；CLI 作为底层传输，连接与登录放在智能体配置中，不再为 aily 增设独立侧栏聊天页。`.4` 的独立页面方案停止安装，此次安装前为 `.3`；此前候选的测试回执仅对应原方案。
