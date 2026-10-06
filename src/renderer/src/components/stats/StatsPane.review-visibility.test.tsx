@@ -158,3 +158,17 @@ it('keeps direct workspace review callers active by default', async () => {
     await screen.findByRole('dialog', { name: 'Start with the source material' })
   ).toBeVisible()
 })
+
+it('opens project intake directly and returns a saved review to the same review surface', async () => {
+  render(<StatsPane reviewOnly />)
+  expect(await screen.findByTestId('workspace-review-intake')).toBeVisible()
+  expect(screen.queryByRole('tab', { name: 'Overview' })).toBeNull()
+  expect(screen.queryByText('Overview content')).toBeNull()
+  fireEvent.click(await screen.findByRole('button', { name: 'Open review' }))
+  expect(
+    await screen.findByRole('dialog', { name: 'Start with the source material' })
+  ).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: 'Hide guidance' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Back to project reviews' }))
+  expect(await screen.findByTestId('workspace-review-intake')).toBeVisible()
+})

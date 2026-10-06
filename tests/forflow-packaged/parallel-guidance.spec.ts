@@ -118,7 +118,8 @@ test('parallel guide prepares both drafts and carries comparison materials into 
     const chat = page.locator('.native-chat-pane-shell:visible').last()
     const composer = chat.locator('[contenteditable="true"]').first()
     await expect(composer).toContainText('请比较版本 A 和版本 B')
-    await toolbar.getByRole('button', { name: '文件', exact: true }).click()
+    await toolbar.getByRole('button', { name: '查看产出', exact: true }).click()
+    await page.getByRole('menuitem', { name: '文件', exact: true }).click()
     for (const name of ['方案A.md', '方案B.md']) {
       await page
         .locator('[data-file-explorer-row]')

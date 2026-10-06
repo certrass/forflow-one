@@ -148,9 +148,17 @@ describe('Forflow session toolbar', () => {
       telemetrySource: 'unknown',
       initialRepoId: 'repo-1'
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Files' }))
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'View outputs' }), {
+      button: 0,
+      ctrlKey: false
+    })
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Files' }))
     expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Review changes' }))
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'View outputs' }), {
+      button: 0,
+      ctrlKey: false
+    })
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Review changes' }))
     expect(mocks.setRightSidebarTab).toHaveBeenCalledExactlyOnceWith('source-control')
     expect(mocks.setRightSidebarOpen).toHaveBeenCalledExactlyOnceWith(true)
   })
@@ -158,8 +166,14 @@ describe('Forflow session toolbar', () => {
   it('keeps files available without offering Git review for a folder project', () => {
     mocks.repos[0].kind = 'folder'
     render(<ForflowSessionToolbar controller={fixture()} />)
-    expect(screen.queryByRole('button', { name: 'Review changes' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Files' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Review results' }))
+    expect(mocks.openModal).toHaveBeenCalledWith('forflow-review')
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'View outputs' }), {
+      button: 0,
+      ctrlKey: false
+    })
+    expect(screen.queryByRole('menuitem', { name: 'Review changes' })).toBeNull()
+    expect(screen.getByRole('menuitem', { name: 'Files' })).toBeTruthy()
   })
 })
 

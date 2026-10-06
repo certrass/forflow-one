@@ -39,7 +39,7 @@ export function updateGpuAccelerationAboutPanel(): void {
       description: isForflowBuild()
         ? translateMain(
             'forflow.productDescription',
-            'A private agent workbench for AI and development teams.'
+            'One workspace for your agents, tasks and results.'
           )
         : undefined
     })

@@ -40,7 +40,7 @@ export function reviewCopy() {
     next: translate('forflow.review.next', 'Next'),
     start: translate('forflow.review.start', 'Start review'),
     open: translate('forflow.review.open', 'Open review'),
-    back: translate('forflow.review.back', 'Back to Analytics'),
+    back: translate('forflow.review.back', 'Back to conversations'),
     unavailable: translate(
       'forflow.review.unavailable',
       'This runtime does not support session review. Update the execution host to use this feature.'

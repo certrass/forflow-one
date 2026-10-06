@@ -1,5 +1,13 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Columns2, FileDiff, FolderOpen, MessageSquare, SquareTerminal } from 'lucide-react'
+import {
+  ChevronDown,
+  ClipboardCheck,
+  Columns2,
+  FileDiff,
+  FolderOpen,
+  MessageSquare,
+  SquareTerminal
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -55,7 +63,7 @@ export function ForflowSessionToolbar({
   const status = !canOpenChat
     ? agent
       ? translate('forflow.workbench.terminalOnly', 'Chat is unavailable for this agent or host')
-      : translate('forflow.workbench.shell', 'Start a supported agent to use chat')
+      : translate('forflow.workbench.shell', 'Start an agent to switch to Chat')
     : !nativeChatEnabled
       ? translate('forflow.workbench.enableHint', 'Choose Chat to enable the conversation view')
       : agent
@@ -132,11 +140,52 @@ export function ForflowSessionToolbar({
       </ButtonGroup>
       <span className="min-w-0 truncate text-xs text-muted-foreground">{status}</span>
       <div className="ml-auto flex flex-wrap items-center gap-1">
+        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} agent={agent} />
+        <Button
+          size="xs"
+          variant="outline"
+          onClick={() => useAppStore.getState().openModal('forflow-review')}
+        >
+          <ClipboardCheck />
+          {translate('forflow.focus.review', 'Review results')}
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="xs" variant="ghost" disabled={!activePane}>
+            <Button size="xs" variant="ghost">
+              <FolderOpen />
+              {translate('forflow.focus.outputs', 'View outputs')}
+              <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => useAppStore.getState().showRightSidebarFiles()}>
+              <FolderOpen />
+              {translate('forflow.workbench.browseFiles', 'Files')}
+            </DropdownMenuItem>
+            {canReview && (
+              <DropdownMenuItem
+                onSelect={() => {
+                  const state = useAppStore.getState()
+                  state.setRightSidebarTab('source-control')
+                  state.setRightSidebarOpen(true)
+                }}
+              >
+                <FileDiff />
+                {translate('forflow.workbench.changes', 'Review changes')}
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon-xs"
+              variant="ghost"
+              disabled={!activePane}
+              aria-label={translate('forflow.workbench.split', 'Split view')}
+              title={translate('forflow.workbench.split', 'Split view')}
+            >
               <Columns2 />
-              {translate('forflow.workbench.split', 'Split view')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -160,33 +209,6 @@ export function ForflowSessionToolbar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} agent={agent} />
-        <Button
-          size="xs"
-          variant="ghost"
-          onClick={() => useAppStore.getState().showRightSidebarFiles()}
-        >
-          <FolderOpen />
-          {translate('forflow.workbench.browseFiles', 'Files')}
-        </Button>
-        {canReview ? (
-          <Button
-            size="xs"
-            variant="ghost"
-            title={translate(
-              'forflow.workbench.changesHint',
-              'Review all workspace changes; this does not commit or publish them'
-            )}
-            onClick={() => {
-              const state = useAppStore.getState()
-              state.setRightSidebarTab('source-control')
-              state.setRightSidebarOpen(true)
-            }}
-          >
-            <FileDiff />
-            {translate('forflow.workbench.changes', 'Review changes')}
-          </Button>
-        ) : null}
         <ForflowSessionGuide canReview={canReview} />
       </div>
     </div>

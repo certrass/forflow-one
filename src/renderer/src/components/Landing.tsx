@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, ExternalLink, FolderPlus, GitBranchPlus, Star, X } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useAppStore } from '../store'
+import { isForflowBuild } from '../../../shared/product-branding'
 import { isGitRepoKind } from '../../../shared/repo-kind'
 import type { Repo } from '../../../shared/repo-types'
 import {
@@ -12,6 +13,7 @@ import {
 import { ShortcutKeyCombo } from './ShortcutKeyCombo'
 import { useShortcutKeyDetails, type ShortcutKeyComboDetails } from '@/hooks/useShortcutLabel'
 import { useMountedRef } from '@/hooks/useMountedRef'
+import { Button } from '@/components/ui/button'
 import { translate } from '@/i18n/i18n'
 import { hasGitHubBackedProject, type PreflightIssue } from './landing-preflight-issues'
 import { useLandingPreflightRuntime } from './landing-preflight-runtime'
@@ -277,21 +279,18 @@ export default function Landing(): React.JSX.Element {
           </p>
 
           <div className="flex items-center justify-center gap-2.5 flex-wrap">
-            <button
-              className="inline-flex items-center gap-1.5 bg-secondary/70 border border-border/80 text-foreground font-medium text-sm px-4 py-2 rounded-md cursor-pointer hover:bg-accent transition-colors"
-              onClick={() => openModal('add-repo')}
-            >
-              <FolderPlus className="size-3.5" />
-              {translate('auto.components.Landing.f9eaa9e12d', 'Add project')}
-            </button>
-
-            <button
-              className="inline-flex items-center gap-1.5 bg-secondary/70 border border-border/80 text-foreground font-medium text-sm px-4 py-2 rounded-md cursor-pointer hover:bg-accent transition-colors"
+            <Button
               onClick={() => openModal('new-workspace-composer', { telemetrySource: 'unknown' })}
             >
-              <GitBranchPlus className="size-3.5" />
-              {createTargetLabel}
-            </button>
+              <GitBranchPlus />
+              {isForflowBuild()
+                ? translate('forflow.focus.newTask', 'New task')
+                : createTargetLabel}
+            </Button>
+            <Button variant="outline" onClick={() => openModal('add-repo')}>
+              <FolderPlus />
+              {translate('auto.components.Landing.f9eaa9e12d', 'Add project')}
+            </Button>
           </div>
 
           <div className="mt-6 w-full max-w-xs space-y-2">

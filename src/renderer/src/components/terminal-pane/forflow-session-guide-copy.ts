@@ -12,11 +12,11 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       title: translate('forflow.sessionGuide.chatTitle', '1. Write a goal in Chat'),
       body: translate(
         'forflow.sessionGuide.chatBody',
-        'Start Codex in this pane, then choose Chat. Describe the result you need, relevant files and how to check success. Review the draft before sending.'
+        'Choose an agent and describe the result you need, with relevant files and success criteria. Send the message to start.'
       ),
       next: translate(
         'forflow.sessionGuide.chatNext',
-        'Chat and Terminal share the same supported session. If Chat is unavailable, read the status beside the controls. Structured conversations do not have a terminal view.'
+        'Use Chat for instructions and replies. Switch to Terminal for the execution details of a supported session.'
       )
     },
     {
@@ -24,11 +24,11 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       title: translate('forflow.sessionGuide.filesTitle', '2. Add reference files'),
       body: translate(
         'forflow.sessionGuide.filesBody',
-        'Open Files and drag a file into the Chat input. Check the reference chip, then add what the agent should do with it. Remove an incorrect reference before sending.'
+        'Open View outputs → Files, then drag a reference file into the message and describe how to use it.'
       ),
       next: translate(
         'forflow.sessionGuide.filesNext',
-        'A reference is a file path, not an uploaded copy. The file must be readable on the execution host; sending lets the configured agent and model process the referenced material.'
+        'References point to files on the task’s computer. For remote tasks, choose files readable there.'
       )
     },
     {
@@ -36,11 +36,11 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       title: translate('forflow.sessionGuide.parallelTitle', '3. Run tasks, then compare outputs'),
       body: translate(
         'forflow.sessionGuide.parallelBody',
-        'Open Parallel work & comparison above. Give each agent the same goal and success criteria. When the outputs are ready, use Prepare comparison draft and add the materials.'
+        'Open Parallel work & comparison to prepare another version with the same goal. Once both are ready, prepare a comparison draft and add their outputs.'
       ),
       next: translate(
         'forflow.sessionGuide.parallelNext',
-        'Use a separate Git workspace for each version. Split view shares files; folder tasks should save outputs to different files or folders.'
+        'Give each version its own Git workspace or output folder. Split view shares the current files.'
       )
     },
     {
@@ -49,15 +49,15 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       body: canReview
         ? translate(
             'forflow.sessionGuide.reviewGit',
-            'Open Review changes to inspect the workspace diff, then check output files and test results. This view includes all workspace changes; opening it does not commit or publish them.'
+            'Use View outputs to inspect files and changes. Open Review results to check selected materials against your requirements.'
           )
         : translate(
             'forflow.sessionGuide.reviewFolder',
-            'Open Files to inspect generated documents or code, then check the agent’s test results. This ordinary folder has no Git diff view; check the actual files before using the result.'
+            'Use View outputs to inspect generated files. Open Review results to check selected materials against your requirements.'
           ),
       next: translate(
         'forflow.sessionGuide.reviewNext',
-        'If something is wrong, state the expected result in the same conversation. For a running Codex bridge session, use Add message to supplement the task or Stop to interrupt it.'
+        'Return to the conversation with any findings and ask the agent to address them.'
       )
     },
     {
@@ -72,7 +72,7 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       ),
       next: translate(
         'forflow.sessionGuide.browserNext',
-        'Send the selected context to the intended agent and check its response. A preview needs a running web service; opening a browser does not start your project’s server.'
+        'Start the preview service, then open its address. Send annotations to the agent working on the page.'
       )
     }
   ]

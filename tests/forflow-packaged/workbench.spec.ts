@@ -44,7 +44,8 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     await expect(composer).toContainText('中文草稿，不要丢失')
     await composer.fill('请检查这份资料')
 
-    await toolbar.getByRole('button', { name: '文件', exact: true }).click()
+    await toolbar.getByRole('button', { name: '查看产出', exact: true }).click()
+    await page.getByRole('menuitem', { name: '文件', exact: true }).click()
     const file = page.locator('[data-file-explorer-row]').filter({ hasText: 'README.md' }).first()
     await expect(file).toBeVisible()
     await file.dragTo(composer)
@@ -86,7 +87,8 @@ test('workbench: same PTY chat switch, draft, file reference, split and task ent
     await page.screenshot({ path: path.join(evidence, 'workbench-chat.png') })
 
     writeFileSync(path.join(profile, '测试项目', 'README.md'), '# 待审阅的更改\n')
-    await toolbar.getByRole('button', { name: '查看更改', exact: true }).click()
+    await toolbar.getByRole('button', { name: '查看产出', exact: true }).click()
+    await page.getByRole('menuitem', { name: '查看更改', exact: true }).click()
     const changedFile = page
       .locator('[data-testid="source-control-entry"]')
       .filter({ hasText: 'README.md' })

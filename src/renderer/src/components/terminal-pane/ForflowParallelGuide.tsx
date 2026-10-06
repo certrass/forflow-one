@@ -56,7 +56,7 @@ export function ForflowParallelGuide({
             <p className="text-sm text-muted-foreground">
               {translate(
                 'forflow.parallel.intro',
-                'Let agents work independently, then compare their outputs against the same requirements.'
+                'Prepare another approach, then compare both outputs against the same requirements.'
               )}
             </p>
           </div>
@@ -71,7 +71,7 @@ export function ForflowParallelGuide({
               <p className="text-sm text-muted-foreground">
                 {translate(
                   'forflow.parallel.startBody',
-                  'Use the same goal, references and success criteria. Choose an agent for each task, then send the draft in its conversation.'
+                  'Keep the goal and success criteria the same. Choose an agent, then send the task in its conversation.'
                 )}
               </p>
               <Button size="sm" variant="outline" onClick={() => prepare('alternative')}>
@@ -86,7 +86,7 @@ export function ForflowParallelGuide({
               <p className="text-sm text-muted-foreground">
                 {translate(
                   'forflow.parallel.collectBody',
-                  'Open each task from the sidebar. Keep its output file and verification results, labeled by version.'
+                  'Open each task and collect its output files and verification results.'
                 )}
               </p>
               <Button
@@ -107,7 +107,7 @@ export function ForflowParallelGuide({
               <p className="text-sm text-muted-foreground">
                 {translate(
                   'forflow.parallel.compareBody',
-                  'Prepare a comparison draft, then attach or paste both outputs in the conversation. Ask for the differences, supporting evidence and a recommendation.'
+                  'Add both outputs to the comparison draft. Ask for differences, evidence and a recommendation.'
                 )}
               </p>
               <Button size="sm" onClick={() => prepare('comparison')}>
