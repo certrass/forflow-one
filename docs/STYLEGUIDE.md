@@ -249,6 +249,8 @@ Use this rubric when reviewing any Orca IDE screen, screenshot, or prototype. A 
 
 #### What to judge
 
+For Forflow One Chinese copy, also follow [interface copy](forflow/interface-copy.md) for action labels, account states, and helper text.
+
 - **Progressive disclosure:** keep high-frequency actions visible and prominent. Move low-frequency actions out of the common pointer path into menus, overflow controls, detail drawers, or advanced sections. Do not make menus so long that the user has to scan unrelated actions; group or split them when they grow.
 - **Action hierarchy:** the primary action must be obvious through placement, size, and `default` button styling. Put high-frequency actions at the top of menus and in the most reachable toolbar positions. Secondary and rare actions should not compete with the primary action.
 - **Click count:** remove unnecessary intermediate steps. Common workflows should complete in 1-2 actions when the app already has enough information to proceed.

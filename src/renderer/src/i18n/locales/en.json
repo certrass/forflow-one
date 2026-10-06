@@ -19712,6 +19712,23 @@
       "partial": "More conversations are available. Open your work partner in Feishu, then refresh.",
       "keyboard": "Enter to send · Shift+Enter for a new line",
       "failed": "Could not sync with Feishu. Try refreshing the conversation."
+    },
+    "workbuddyAccount": {
+      "description": "Use the account signed in to WorkBuddy on this device.",
+      "notInstalled": "WorkBuddy was not found. Install it and sign in, then refresh here.",
+      "signedOut": "Sign in to WorkBuddy, then refresh your account here.",
+      "failed": "Could not read your account. Try again.",
+      "update": "Update Forflow One to view your WorkBuddy account.",
+      "localOnly": "Switch to this device to view your WorkBuddy account.",
+      "switchHint": "To switch accounts, sign in to WorkBuddy with another account, then refresh here.",
+      "current": "Current account",
+      "signedIn": "Signed in",
+      "personal": "Personal account",
+      "enterprise": "Enterprise account",
+      "id": "Account ID: {{id}}",
+      "loading": "Reading account…",
+      "retry": "Retry",
+      "refresh": "Refresh account"
     }
   },
   "forflow.contextBeta.ambiguousSource": "Reload the conversation to restore its message records.",

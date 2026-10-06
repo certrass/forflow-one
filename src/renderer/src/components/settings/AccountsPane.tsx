@@ -63,6 +63,8 @@ import {
 import { renderMiniMaxAccountsSection } from './accounts-pane-minimax-section'
 import { renderAccountsRemovalDialogs } from './accounts-pane-removal-dialogs'
 import { isForflowBuild } from '../../../../shared/product-branding'
+import { WorkBuddyAccountsSection } from './WorkBuddyAccountsSection'
+import { getWorkBuddyAccountSearchEntries } from './workbuddy-account-search'
 import { ForflowModelAccountsSection } from './ForflowModelAccountsSection'
 import { getForflowModelAccountSearchEntries } from './forflow-model-account-search'
 
@@ -393,6 +395,14 @@ export function AccountsPane({
     matchesSettingsSearch(searchQuery, getAccountsCodexSearchEntries())
       ? renderCodexAccountsSection(model)
       : null,
+    isForflowBuild() && matchesSettingsSearch(searchQuery, getWorkBuddyAccountSearchEntries()) ? (
+      <WorkBuddyAccountsSection
+        key={`workbuddy:${activeRuntimeEnvironmentId ?? 'local'}:${accountRuntime.runtime}`}
+        localHost={
+          !isRemoteAccountScope && accountRuntime.runtime === 'host' && !isWebClientLocation()
+        }
+      />
+    ) : null,
     matchesSettingsSearch(searchQuery, getAccountsGeminiSearchEntries())
       ? renderGeminiAccountsSection(model)
       : null,

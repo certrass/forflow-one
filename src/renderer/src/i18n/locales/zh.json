@@ -19712,6 +19712,23 @@
       "partial": "还有更多会话。先在飞书中打开智能伙伴，再刷新。",
       "keyboard": "Enter 发送 · Shift+Enter 换行",
       "failed": "暂时无法同步飞书，请刷新对话重试。"
+    },
+    "workbuddyAccount": {
+      "description": "使用本机 WorkBuddy 中已登录的账号。",
+      "notInstalled": "尚未安装 WorkBuddy。安装并登录后，点击刷新账号。",
+      "signedOut": "尚未登录。登录 WorkBuddy 后，点击刷新账号。",
+      "failed": "账号读取失败，请重试。",
+      "update": "更新 Forflow One 后即可查看 WorkBuddy 账号。",
+      "localOnly": "切换到本机，即可查看 WorkBuddy 账号。",
+      "switchHint": "切换账号：在 WorkBuddy 中登录其他账号，再回到这里刷新。",
+      "current": "当前账号",
+      "signedIn": "已登录",
+      "personal": "个人账户",
+      "enterprise": "企业账户",
+      "id": "账号 ID：{{id}}",
+      "loading": "正在读取账号…",
+      "retry": "重试",
+      "refresh": "刷新账号"
     }
   },
   "forflow.contextBeta.ambiguousSource": "请重新加载对话记录后再复制。",

@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { z } from 'zod'
 import { resolveWorkBuddyCli } from '../../shared/workbuddy-cli-location'
 import { CompanionJournal } from './companion-journal'
-import { WorkBuddyConnection } from './workbuddy-connection'
+import { WorkBuddyConnection } from '../../shared/workbuddy-acp-connection'
 
 const sessionSchema = z.object({ sessionId: z.string().min(1), cwd: z.string() })
 const initializationSchema = z.object({

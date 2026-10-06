@@ -1,3 +1,4 @@
+import { registerForflowWorkBuddyAccountHandlers } from '../forflow/workbuddy-account-ipc'
 import { registerForflowModelAccountHandlers } from '../forflow/model-account-ipc'
 import { registerForflowFeishuHandlers } from '../forflow/feishu-task-ipc'
 import { registerForflowAilyHandlers } from '../forflow/aily-ipc'
@@ -17,6 +18,7 @@ import {
 export function registerMainProcessIpcHandlers(): void {
   registerForflowIdentityHandlers()
   registerForflowModelAccountHandlers()
+  registerForflowWorkBuddyAccountHandlers(() => state.store?.getSettings() ?? null)
   registerForflowFeishuHandlers()
   registerForflowAilyHandlers()
   registerForflowApprovalHandlers()

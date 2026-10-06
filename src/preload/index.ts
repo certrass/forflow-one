@@ -7,6 +7,7 @@ import {
 import { appApi } from './api/app-bridge'
 import { orcaProfilesApi } from './api/orca-profiles-bridge'
 import { forflowIdentityApi } from './api/forflow-identity-bridge'
+import { forflowWorkBuddyAccountApi } from './api/forflow-workbuddy-account-bridge'
 import { forflowModelAccountsApi } from './api/forflow-model-accounts-bridge'
 import { jevAuditApi } from './api/jev-audit-bridge'
 import { forflowFeishuApi } from './api/forflow-feishu-bridge'
@@ -107,6 +108,7 @@ const telemetryGetConsentStateApi: PreloadApi['telemetryGetConsentState'] = () =
 const api = {
   forflowIdentity: forflowIdentityApi,
   forflowModelAccounts: forflowModelAccountsApi,
+  forflowWorkBuddyAccount: forflowWorkBuddyAccountApi,
   forflowJevAudit: jevAuditApi,
   forflowFeishu: forflowFeishuApi,
   forflowAily: forflowAilyApi,

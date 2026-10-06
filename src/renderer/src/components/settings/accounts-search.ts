@@ -3,6 +3,7 @@ import { translate } from '@/i18n/i18n'
 import { translateSearchKeyword } from './settings-search-keywords'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import { isForflowBuild } from '../../../../shared/product-branding'
+import { getWorkBuddyAccountSearchEntries } from './workbuddy-account-search'
 import { getForflowModelAccountSearchEntries } from './forflow-model-account-search'
 
 export const getAccountsLocationSearchEntries = createLocalizedCatalog(() => [
@@ -252,7 +253,9 @@ export const getAccountsCursorSearchEntries = createLocalizedCatalog(() => [
 ])
 
 export const getAccountsPaneSearchEntries = createLocalizedCatalog((): SettingsSearchEntry[] => [
-  ...(isForflowBuild() ? getForflowModelAccountSearchEntries() : []),
+  ...(isForflowBuild()
+    ? [...getForflowModelAccountSearchEntries(), ...getWorkBuddyAccountSearchEntries()]
+    : []),
   ...getAccountsLocationSearchEntries(),
   ...getAccountsClaudeSearchEntries(),
   ...getAccountsCodexSearchEntries(),

@@ -541,6 +541,7 @@
     "auto.components.settings.appearance.search.glm": "glm",
     "auto.components.settings.appearance.search.cursor.kw.cursor": "cursor",
     "auto.components.settings.CursorAccountsSection.source.desktop": "Cursor IDE",
-    "auto.components.settings.CursorAccountsSection.title": "Cursor"
+    "auto.components.settings.CursorAccountsSection.title": "Cursor",
+    "forflow.domestic.workbuddyCli": "WorkBuddy"
   }
 }

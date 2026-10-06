@@ -43,6 +43,7 @@ import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
 import type { ForflowIdentityApi } from '../shared/forflow-identity'
 import type { ForflowAilyApi } from '../shared/forflow-aily'
+import type { ForflowWorkBuddyAccountApi } from '../shared/forflow-workbuddy-account'
 import type { ForflowModelAccountsApi } from '../shared/forflow-model-accounts'
 import type { JevAuditApi } from '../shared/jev-audit-types'
 import type { ForflowApprovalApi } from '../shared/forflow-approval'
@@ -78,6 +79,7 @@ type Merged<T> = { [K in keyof T]: T[K] }
 export type PreloadApi = {
   forflowIdentity?: ForflowIdentityApi
   forflowModelAccounts?: ForflowModelAccountsApi
+  forflowWorkBuddyAccount?: ForflowWorkBuddyAccountApi
   forflowJevAudit?: JevAuditApi
   forflowFeishu?: ForflowFeishuApi
   forflowAily?: ForflowAilyApi

@@ -1,7 +1,7 @@
 import { createInterface } from 'node:readline'
 import { z } from 'zod'
-import { spawnProcess } from '../../shared/child-process/run-process'
-import { forceTerminateProcessTree } from '../../shared/child-process/process-tree-termination'
+import { spawnProcess } from './child-process/run-process'
+import { forceTerminateProcessTree } from './child-process/process-tree-termination'
 
 const frameSchema = z.object({
   id: z.union([z.string(), z.number()]).optional(),
@@ -27,13 +27,14 @@ export class WorkBuddyConnection {
   constructor(
     program: string,
     cwd: string,
-    readonly receive: (method: string, params: unknown, id?: string | number) => void
+    readonly receive: (method: string, params: unknown, id?: string | number) => void,
+    options: { args?: string[]; env?: NodeJS.ProcessEnv } = {}
   ) {
     this.child = spawnProcess({
       program,
-      args: ['--acp', '--permission-mode', 'default'],
+      args: ['--acp', '--permission-mode', 'default', ...(options.args ?? [])],
       cwd,
-      env: { ...process.env, DISABLE_AUTOUPDATER: '1' },
+      env: { ...process.env, DISABLE_AUTOUPDATER: '1', ...options.env },
       detached: process.platform !== 'win32'
     })
     const lines = createInterface({ input: this.child.stdout })
