@@ -54,11 +54,20 @@ test('Aily opens a draft during slow history sync and explains concurrent use', 
     await expect(composer).toContainText('等历史同步完成后再发送这条任务')
     await chat.getByRole('button', { name: '发送', exact: true }).click()
     await expect(chat).toContainText('已整理成会议议程')
+    for (const close of await page.locator('[data-sonner-toast] [data-close-button]').all()) {
+      if (await close.isVisible()) {
+        await close.click()
+      }
+    }
     await page.getByRole('button', { name: '并行与对比', exact: true }).click()
     await expect(page.locator('[data-forflow-parallel-guide]')).toContainText(
       '一次在一个任务中使用'
     )
-    await page.screenshot({ path: path.join(evidence, 'aily-parallel-guidance.png') })
+    await expect(page.locator('[data-forflow-parallel-guide]')).toHaveCSS('opacity', '1')
+    await page.screenshot({
+      path: path.join(evidence, 'aily-parallel-guidance.png'),
+      animations: 'disabled'
+    })
     await page.keyboard.press('Escape')
     await openAily()
     await expect(page.getByText('一次在一个任务中使用', { exact: false })).toBeVisible()
