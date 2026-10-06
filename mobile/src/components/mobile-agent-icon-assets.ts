@@ -10,6 +10,8 @@ import type { TuiAgent } from '../../../src/shared/tui-agent'
 // static literal require() paths, so keep this as an explicit map rather than
 // building the path from the agent id.
 export const MOBILE_AGENT_ICON_ASSETS: Partial<Record<TuiAgent, ImageSourcePropType>> = {
+  aily: require('../../../src/shared/agent-icons/aily.png'),
+  workbuddy: require('../../../src/shared/agent-icons/workbuddy.png'),
   openclaude: require('../../../src/shared/agent-icons/openclaude.png'),
   grok: require('../../../src/shared/agent-icons/grok.png'),
   copilot: require('../../../src/shared/agent-icons/copilot.png'),

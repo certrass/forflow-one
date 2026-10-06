@@ -1,3 +1,5 @@
+import ailyUrl from '../../../shared/agent-icons/aily.png?url'
+import workbuddyUrl from '../../../shared/agent-icons/workbuddy.png?url'
 import qoderUrl from '../../../shared/agent-icons/qoder.png?url'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import grokUrl from '../../../shared/agent-icons/grok.png?url'
@@ -38,6 +40,8 @@ import dshUrl from '../../../shared/agent-icons/dsh.png?url'
 // The PNGs live in src/shared/agent-icons so mobile (Metro) can bundle the same
 // files; see mobile/src/components/mobile-agent-icon-assets.ts.
 export const AGENT_FAVICON_ASSETS: Partial<Record<TuiAgent, string>> = {
+  aily: ailyUrl,
+  workbuddy: workbuddyUrl,
   grok: grokUrl,
   'mimo-code': mimoCodeUrl,
   ante: anteUrl,
