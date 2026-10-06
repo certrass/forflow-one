@@ -19683,6 +19683,30 @@
     "agentStatus": {
       "unconfirmed": "Couldn’t confirm",
       "unconfirmedShort": "unconfirmed"
+    },
+    "aily": {
+      "title": "Doubao Work Partner",
+      "subtitle": "Continue your Feishu conversation here.",
+      "connect": "Connect your work partner",
+      "finding": "Finding your work partner…",
+      "choose": "Choose your work partner",
+      "empty": "Open your personal work partner in Feishu once, then refresh this list.",
+      "setup": "Install and sign in to Feishu CLI",
+      "refresh": "Refresh",
+      "open": "Open in Feishu",
+      "change": "Change work partner",
+      "placeholder": "What would you like your work partner to do?",
+      "send": "Send",
+      "sending": "Sending…",
+      "waiting": "Sent · waiting for a reply",
+      "sync": "Messages are sent with your Feishu account and sync to the same conversation.",
+      "earlier": "Load earlier messages",
+      "loading": "Loading conversation…",
+      "noMessages": "Send a task to start the conversation.",
+      "unavailable": "This connection is available in the Forflow One desktop app.",
+      "partial": "More conversations are available. Open your work partner in Feishu, then refresh.",
+      "keyboard": "Enter to send · Shift+Enter for a new line",
+      "failed": "Could not sync with Feishu. Try refreshing the conversation."
     }
   },
   "forflow.contextBeta.ambiguousSource": "Reload the conversation to restore its message records.",

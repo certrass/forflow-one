@@ -19683,6 +19683,30 @@
     "agentStatus": {
       "unconfirmed": "无法确认",
       "unconfirmedShort": "待确认"
+    },
+    "aily": {
+      "title": "豆包工作伙伴",
+      "subtitle": "在这里继续飞书中的对话。",
+      "connect": "连接我的智能伙伴",
+      "finding": "正在查找智能伙伴…",
+      "choose": "选择智能伙伴",
+      "empty": "先在飞书中打开一次你的专属智能伙伴，再刷新列表。",
+      "setup": "安装并登录飞书 CLI",
+      "refresh": "刷新",
+      "open": "在飞书中打开",
+      "change": "切换伙伴",
+      "placeholder": "想让智能伙伴帮你完成什么？",
+      "send": "发送",
+      "sending": "正在发送…",
+      "waiting": "已发送 · 等待回复",
+      "sync": "以你的飞书账号发送，消息与飞书中的同一对话同步。",
+      "earlier": "加载更早的消息",
+      "loading": "正在加载对话…",
+      "noMessages": "发送一个任务，开始对话。",
+      "unavailable": "请在 Forflow One 桌面版中使用这个连接。",
+      "partial": "还有更多会话。先在飞书中打开智能伙伴，再刷新。",
+      "keyboard": "Enter 发送 · Shift+Enter 换行",
+      "failed": "暂时无法同步飞书，请刷新对话重试。"
     }
   },
   "forflow.contextBeta.ambiguousSource": "请重新加载对话记录后再复制。",

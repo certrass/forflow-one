@@ -1,7 +1,6 @@
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
-import { runProcess } from '../../shared/child-process/run-process'
 import {
   feishuProfileSchema,
   feishuQuerySchema,
@@ -13,9 +12,8 @@ import {
   type FeishuTasklist,
   type FeishuPage
 } from '../../shared/forflow-feishu'
-import { resolveCommandOnLocalPath } from '../ipc/command-path-resolver'
 import { writeCredentialFileAtomic } from '../integration-credential-file'
-import { readFeishuCliError } from './feishu-cli-error'
+import { FeishuCliClient, type FeishuCliDependencies } from './feishu-cli-client'
 import {
   cliEnvelopeSchema,
   pageSchema,
@@ -30,19 +28,17 @@ const bindingSchema = z.object({
   userId: z.string().min(1),
   userName: z.string()
 })
-type Dependencies = { run: typeof runProcess; resolve: typeof resolveCommandOnLocalPath }
 
 export class FeishuTaskClient {
   private generation = 0
   private readonly file: string
+  private readonly cli: FeishuCliClient
   constructor(
     private readonly directory: string,
-    private readonly deps: Dependencies = {
-      run: runProcess,
-      resolve: resolveCommandOnLocalPath
-    }
+    deps?: FeishuCliDependencies
   ) {
     this.file = join(directory, 'forflow-feishu-connection.json')
+    this.cli = new FeishuCliClient(directory, deps)
   }
 
   private binding(): FeishuConnection | null {
@@ -57,7 +53,7 @@ export class FeishuTaskClient {
   }
 
   async status(): Promise<FeishuStatus> {
-    return { installed: Boolean(await this.deps.resolve('lark-cli')), connection: this.binding() }
+    return { installed: await this.cli.installed(), connection: this.binding() }
   }
 
   async connect(appId?: string): Promise<FeishuStatus> {
@@ -77,43 +73,10 @@ export class FeishuTaskClient {
     rmSync(this.file, { force: true })
   }
 
-  private async command(args: string[]): Promise<unknown> {
-    const program = await this.deps.resolve('lark-cli')
-    if (!program) {
-      throw new Error('未找到官方飞书 CLI，请先按连接指引安装。')
-    }
-    let result
-    try {
-      result = await this.deps.run({
-        program,
-        args,
-        cwd: this.directory,
-        timeoutMs: 30_000,
-        maxOutputBytes: 2 * 1024 * 1024
-      })
-    } catch {
-      throw new Error('无法启动飞书 CLI，请检查安装路径和执行权限。')
-    }
-    if (result.timedOut) {
-      throw new Error('飞书读取超时，请检查网络后重试。')
-    }
-    if (result.outputTruncated) {
-      throw new Error('飞书返回内容超过读取上限，请缩小读取范围后重试。')
-    }
-    if (result.code !== 0) {
-      throw new Error(readFeishuCliError(result.stderr))
-    }
-    try {
-      return JSON.parse(result.stdout)
-    } catch {
-      throw new Error('飞书 CLI 返回格式无法识别，请检查版本。')
-    }
-  }
-
   private identity(appId?: string): Promise<FeishuConnection> {
-    return this.command([...(appId ? ['--profile', appId] : []), 'auth', 'status', '--json']).then(
-      readFeishuIdentity
-    )
+    return this.cli
+      .command([...(appId ? ['--profile', appId] : []), 'auth', 'status', '--json'])
+      .then(readFeishuIdentity)
   }
 
   private async read(resource: string, operation: string, params: object): Promise<unknown> {
@@ -133,7 +96,7 @@ export class FeishuTaskClient {
       }
     }
     await assertAccount()
-    const result = await this.command([
+    const result = await this.cli.command([
       '--profile',
       binding.appId,
       'task',

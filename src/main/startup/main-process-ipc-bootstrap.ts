@@ -1,5 +1,6 @@
 import { registerForflowModelAccountHandlers } from '../forflow/model-account-ipc'
 import { registerForflowFeishuHandlers } from '../forflow/feishu-task-ipc'
+import { registerForflowAilyHandlers } from '../forflow/aily-ipc'
 import { ipcMain } from 'electron'
 import { registerForflowIdentityHandlers } from '../forflow/identity-ipc'
 import { registerForflowApprovalHandlers } from '../forflow/approval-broker'
@@ -17,6 +18,7 @@ export function registerMainProcessIpcHandlers(): void {
   registerForflowIdentityHandlers()
   registerForflowModelAccountHandlers()
   registerForflowFeishuHandlers()
+  registerForflowAilyHandlers()
   registerForflowApprovalHandlers()
   registerForflowBundledSkillHandlers()
   ipcMain.handle('app:awaitFirstWindowStartupServices', async () => {

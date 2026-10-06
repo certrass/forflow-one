@@ -290,5 +290,8 @@
   "src/renderer/src/components/stats/WorkspaceReviewStepHelp.test.tsx",
   "src/renderer/src/components/stats/JevDeliveryResults.test.tsx",
   "src/renderer/src/components/stats/CodexReviewWorkspace.jev-navigation.test.tsx",
-  "src/renderer/src/components/stats/JevAuditPanel.test.tsx"
+  "src/renderer/src/components/stats/JevAuditPanel.test.tsx",
+  "src/main/forflow/aily-client.test.ts",
+  "src/main/forflow/aily-ipc.test.ts",
+  "src/renderer/src/components/forflow-aily/use-aily-chat.test.tsx"
 ]

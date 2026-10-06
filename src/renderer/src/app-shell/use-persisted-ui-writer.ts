@@ -218,6 +218,9 @@ export function usePersistedUIWriter(): void {
     if (!persistedUIReady) {
       return
     }
-    void window.api.ui.set({ activeView })
+    // The desktop-only Feishu page is not part of the paired runtime's UI contract.
+    if (activeView !== 'aily') {
+      void window.api.ui.set({ activeView })
+    }
   }, [activeView, persistedUIReady])
 }

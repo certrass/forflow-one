@@ -5,8 +5,11 @@ const errorEnvelope = z.object({
   error: z.object({ type: z.string(), subtype: z.string() })
 })
 
-export function readFeishuCliError(stderr: string): string {
-  const fallback = '飞书 CLI 执行失败，请在系统终端运行相同命令检查；不要分享令牌或应用密钥。'
+export function readFeishuCliError(stderr: string, domain: 'tasks' | 'messages' = 'tasks'): string {
+  const fallback =
+    domain === 'messages'
+      ? '飞书暂时无法完成这次操作，请稍后重试。'
+      : '飞书 CLI 执行失败，请在系统终端运行相同命令检查；不要分享令牌或应用密钥。'
   let value: unknown
   try {
     value = JSON.parse(stderr)
@@ -19,6 +22,18 @@ export function readFeishuCliError(stderr: string): string {
   }
   // Only stable error identifiers select copy; CLI messages and hints may contain credentials.
   const { type, subtype } = parsed.data.error
+  if (domain === 'messages' && type === 'authorization') {
+    return '飞书授权未包含会话访问或发送权限，请在飞书 CLI 中补充消息授权后重试。'
+  }
+  if (domain === 'messages' && type === 'authentication') {
+    return '飞书登录已失效，请在飞书 CLI 中重新登录。'
+  }
+  if (domain === 'messages' && type === 'config' && subtype === 'not_configured') {
+    return '请先在终端运行 lark-cli config init 完成配置，再运行 lark-cli auth login 登录飞书。'
+  }
+  if (domain === 'messages' && type === 'api' && subtype !== 'rate_limit') {
+    return '飞书暂时无法同步这段对话，请稍后刷新。'
+  }
   switch (type) {
     case 'config':
       if (subtype === 'not_configured') {

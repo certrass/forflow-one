@@ -4,7 +4,8 @@ import path from 'node:path'
 /** A local PTY + real hook transport fixture; it never contacts a model provider. */
 export function createChatProviderFixture(
   profile: string,
-  agent: 'claude' | 'codex' = 'claude'
+  agent: 'claude' | 'codex' = 'claude',
+  options: { seedConversation?: boolean } = {}
 ): {
   command: string
   ledger: string
@@ -52,8 +53,10 @@ async function hook(event = working ? 'UserPromptSubmit' : 'Stop') {
   if (!response.ok) throw new Error('fixture hook rejected: ' + response.status)
 }
 if (agent === 'codex') record('session_meta', {id:sessionId,cwd:process.cwd(),history_mode:'paginated'})
-message('user', '工作台测试任务')
-message('assistant', '已连接原会话，可在对话与终端间切换。')
+if (${JSON.stringify(options.seedConversation !== false)}) {
+  message('user', '工作台测试任务')
+  message('assistant', '已连接原会话，可在对话与终端间切换。')
+}
 fs.appendFileSync(ledger, JSON.stringify({type:'start',pid:process.pid})+'\\n')
 process.stdout.write('\\x1b]0;' + agent + '\\x07GUI_FIXTURE_READY\\n')
 hook().catch(e => { console.error(e.message); process.exit(1) })

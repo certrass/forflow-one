@@ -42,6 +42,7 @@ import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
 import type { ForflowIdentityApi } from '../shared/forflow-identity'
+import type { ForflowAilyApi } from '../shared/forflow-aily'
 import type { ForflowModelAccountsApi } from '../shared/forflow-model-accounts'
 import type { JevAuditApi } from '../shared/jev-audit-types'
 import type { ForflowApprovalApi } from '../shared/forflow-approval'
@@ -79,6 +80,7 @@ export type PreloadApi = {
   forflowModelAccounts?: ForflowModelAccountsApi
   forflowJevAudit?: JevAuditApi
   forflowFeishu?: ForflowFeishuApi
+  forflowAily?: ForflowAilyApi
   forflowApproval?: ForflowApprovalApi
   forflowSkills?: ForflowSkillsApi
   app: AppApi

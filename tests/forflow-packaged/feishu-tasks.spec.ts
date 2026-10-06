@@ -11,7 +11,7 @@ test('Feishu: connect, tasklist, paging, editable import and unsent Codex draft'
   const profile = privateProfile('feishu-tasks')
   const cli = createFeishuCliFixture(profile)
   writeFileSync(cli.state, 'not_configured')
-  const codex = createChatProviderFixture(profile, 'codex')
+  const codex = createChatProviderFixture(profile, 'codex', { seedConversation: false })
   const file = path.join(profile, 'orca-data.json')
   const data = JSON.parse(readFileSync(file, 'utf8'))
   Object.assign(data.settings, {
@@ -74,7 +74,7 @@ test('Feishu: connect, tasklist, paging, editable import and unsent Codex draft'
     await expect(create).toBeEnabled()
     await create.click()
     await expect(dialog).not.toBeVisible()
-    const chat = page.locator('.native-chat-pane-shell')
+    const chat = page.locator('.native-chat-pane-shell:visible')
     await expect(chat.locator('[contenteditable="true"]').first()).toContainText(
       '来源：飞书 task-1'
     )
