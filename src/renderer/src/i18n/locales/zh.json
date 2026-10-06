@@ -15704,7 +15704,7 @@
       },
       "taskPageEmptyState": {
         "noProjectSourcesTitle": "未选择项目来源",
-        "noProjectSourcesDescription": "请至少选择一个项目来源，让 Orca 知道要从哪个主机/账户获取任务。",
+        "noProjectSourcesDescription": "选择上方项目，载入外部任务；也可以直接点击“新建任务”开始。",
         "noMatchingGitHubWorkTitle": "没有匹配的 GitHub 工作",
         "changeQueryDescription": "更改查询或清除它。",
         "noGitLabIssuesTitle": "没有 GitLab 议题",
@@ -20752,5 +20752,7 @@
   "forflow.focus.review": "审阅结果",
   "forflow.focus.reviewDescription": "按要求检查交付材料，查看发现的问题并继续完善。",
   "forflow.focus.reviewHint": "选择材料，检查是否符合要求。",
-  "forflow.focus.outputs": "查看产出"
+  "forflow.focus.outputs": "查看产出",
+  "forflow.focus.noHost": "未选择主机",
+  "forflow.focus.selectedProject": "所选项目"
 }

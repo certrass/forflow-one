@@ -16744,7 +16744,7 @@
       },
       "taskPageEmptyState": {
         "noProjectSourcesTitle": "No project sources selected",
-        "noProjectSourcesDescription": "Select at least one project source so Orca knows which host/account to fetch tasks from.",
+        "noProjectSourcesDescription": "Choose a project above to load external tasks, or start with New task.",
         "noMatchingGitHubWorkTitle": "No matching GitHub work",
         "changeQueryDescription": "Change the query or clear it.",
         "noGitLabIssuesTitle": "No GitLab issues",
@@ -20752,5 +20752,7 @@
   "forflow.focus.review": "Review results",
   "forflow.focus.reviewDescription": "Check deliverables against your requirements and follow up on findings.",
   "forflow.focus.reviewHint": "Select materials and check them against your requirements.",
-  "forflow.focus.outputs": "View outputs"
+  "forflow.focus.outputs": "View outputs",
+  "forflow.focus.noHost": "No host",
+  "forflow.focus.selectedProject": "Selected project"
 }

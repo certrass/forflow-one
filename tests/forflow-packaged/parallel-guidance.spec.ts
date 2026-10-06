@@ -51,7 +51,7 @@ test('parallel guide prepares both drafts and carries comparison materials into 
     await entry.click()
     const guide = page.locator('[data-forflow-parallel-guide]')
     await expect(guide).toContainText('同一任务，多做一版')
-    await expect(guide).toContainText('添加两份产出或粘贴内容')
+    await expect(guide).toContainText('把两版产出加入对比草稿')
     await page.screenshot({
       animations: 'disabled',
       path: path.join(evidence, '01-parallel-guide.png')

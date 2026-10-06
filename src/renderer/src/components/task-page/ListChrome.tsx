@@ -1,3 +1,5 @@
+import { ForflowTaskGuide } from './ForflowTaskGuide'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import type { TaskPageComposerActionsModel } from '../use-task-page-composer-actions'
 import { cn } from '@/lib/utils'
 import { TaskPageSourceBar } from './SourceBar'
@@ -15,6 +17,7 @@ export function TaskPageListChrome({
       <section className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           <TaskPageSourceBar model={model} />
+          {isForflowBuild() ? <ForflowTaskGuide /> : null}
 
           {taskSourceAvailabilityNotice ? (
             <div
