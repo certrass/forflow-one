@@ -1,4 +1,6 @@
-import { app, ipcMain, type IpcMainInvokeEvent } from 'electron'
+import { mkdirSync } from 'node:fs'
+import { companionDirectory } from '../../shared/forflow-companion-paths'
+import { ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { z } from 'zod'
 import { ailyChatIdSchema, ailySendSchema } from '../../shared/forflow-aily'
 import { isTrustedUIRenderer } from '../ipc/ui'
@@ -15,7 +17,11 @@ export function registerForflowAilyHandlers(): void {
     ) {
       throw new Error('此调用不属于 Forflow 桌面主界面。')
     }
-    client ??= new AilyClient(app.getPath('userData'))
+    if (!client) {
+      const directory = companionDirectory('aily')
+      mkdirSync(directory, { recursive: true, mode: 0o700 })
+      client = new AilyClient(directory)
+    }
     return client
   }
   ipcMain.handle('forflow:aily:status', (event) => service(event).status())

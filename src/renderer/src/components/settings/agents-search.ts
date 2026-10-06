@@ -94,7 +94,7 @@ const getAllAgentsPaneSearchEntries = createLocalizedCatalog(() => [
     ? [
         {
           id: FORFLOW_DOMESTIC_CONNECTIONS_SECTION,
-          title: translate('forflow.domestic.title', 'Domestic models and agents'),
+          title: translate('forflow.domestic.title', 'Connect your agents'),
           description: translate(
             'forflow.domestic.searchDescription',
             'Connect Doubao, WorkBuddy / CodeBuddy, and QoderWork / Qoder CN.'

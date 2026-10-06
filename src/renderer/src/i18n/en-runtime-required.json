@@ -3134,6 +3134,10 @@
     },
     "domestic": {
       "codebuddyHistory": "CodeBuddy CLI history and resume",
+      "docsFor": "Setup guide for {{name}}",
+      "local": "Local execution environment",
+      "modelConfiguration": "Configure in your agent; model connectivity has not been checked here",
+      "title": "Connect your agents",
       "workbuddy": "WorkBuddy / CodeBuddy",
       "workbuddyDescription": "Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations."
     },

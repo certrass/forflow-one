@@ -250,6 +250,8 @@ export function AgentsPane({
           detectedIds={detectedIds}
           detectionFailed={detectionFailed}
           hostName={activeServerName ?? activeServerEnvironmentId}
+          isRefreshing={isRefreshing}
+          onRefresh={() => void refreshTargetAgents()}
         />
       ) : null}
       <AgentDefaultSetting

@@ -8,6 +8,7 @@ type DomesticConnection = {
   title: string
   description: string
   history: string
+  steps: string[]
   agentId: TuiAgent | null
   command: string
   documentation: string
@@ -23,6 +24,7 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
         'Connect Doubao models through Volcengine Ark. Ark CLI provides model and tool commands; configure the approved endpoint, model and credentials in your chosen agent.'
       ),
       history: translate('forflow.domestic.modelTool', 'Model / tool connection'),
+      steps: [],
       agentId: null,
       command: 'arkcli',
       documentation: 'https://github.com/volcengine/ark-cli'
@@ -32,9 +34,19 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
       title: translate('forflow.aily.title', 'Doubao work partner'),
       description: translate(
         'forflow.domestic.ailyCliDescription',
-        'Use your Feishu login with the official CLI. Choose Doubao work partner in a task to continue your personal conversation.'
+        'Send requests to your Feishu partner and continue the conversation here.'
       ),
       history: translate('forflow.domestic.ailyHistory', 'Continue your Feishu conversation'),
+      steps: [
+        translate(
+          'forflow.domestic.ailyStep1',
+          'Sign in to Feishu using its official connection tool.'
+        ),
+        translate(
+          'forflow.domestic.ailyStep2',
+          'Choose Doubao work partner in a new task to continue your Feishu conversation.'
+        )
+      ],
       agentId: 'aily',
       command: 'forflow aily',
       documentation: 'https://github.com/larksuite/cli'
@@ -44,21 +56,38 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
       title: translate('forflow.domestic.workbuddyCli', 'WorkBuddy'),
       description: translate(
         'forflow.domestic.workbuddyCliDescription',
-        'Use the CLI bundled with WorkBuddy and its existing login. Start a task in the current workspace and continue it in native chat.'
+        'Use your WorkBuddy account to work on projects and view replies here.'
       ),
       history: translate('forflow.domestic.workbuddyHistory', 'Tasks and conversation resume'),
+      steps: [
+        translate('forflow.domestic.workbuddyStep1', 'Install WorkBuddy and sign in.'),
+        translate(
+          'forflow.domestic.workbuddyStep2',
+          'Choose WorkBuddy in a new task and describe what you need.'
+        )
+      ],
       agentId: 'workbuddy',
       command: 'forflow workbuddy',
-      documentation: 'https://www.codebuddy.cn/docs/cli/installation'
+      documentation: 'https://www.workbuddy.cn/'
     },
     {
       id: 'qoderwork',
-      title: translate('forflow.domestic.qoderwork', 'QoderWork / Qoder CN'),
+      title: translate('forflow.domestic.qoderwork', 'Qoder CN'),
       description: translate(
         'forflow.domestic.qoderworkDescription',
-        'Forflow launches Qoder CN CLI using qodercn. QoderWork is a separate desktop app; its conversations are not imported. Configure and sign in to the domestic CLI on the execution host.'
+        'Work on code with Qoder in your project terminal.'
       ),
       history: translate('forflow.domestic.historyUnavailable', 'History not connected yet'),
+      steps: [
+        translate(
+          'forflow.domestic.qoderStep1',
+          'Install Qoder CN CLI using the official guide, then sign in.'
+        ),
+        translate(
+          'forflow.domestic.qoderStep2',
+          'Choose Qoder CN when opening an agent terminal. QoderWork conversations stay in QoderWork.'
+        )
+      ],
       agentId: 'qoder-cn',
       command: 'qodercn',
       documentation: 'https://docs.qoder.cn/cli/quickstart'
@@ -68,12 +97,12 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
 
 export function getDomesticCliDetectionLabel(detected: boolean | null, failed: boolean): string {
   if (failed) {
-    return translate('forflow.domestic.detectionFailed', 'Host detection failed')
+    return translate('forflow.domestic.detectionFailed', 'Check failed')
   }
   if (detected === null) {
-    return translate('forflow.domestic.detecting', 'Detecting CLI…')
+    return translate('forflow.domestic.detecting', 'Checking…')
   }
   return detected
-    ? translate('forflow.domestic.detected', 'CLI detected; sign-in is managed by the CLI')
-    : translate('forflow.domestic.undetected', 'CLI not detected on this host')
+    ? translate('forflow.domestic.detected', 'Launch tool found')
+    : translate('forflow.domestic.undetected', 'Setup needed')
 }

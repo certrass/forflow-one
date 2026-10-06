@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
-export function createAilyCliFixture(profile: string) {
+export function createAilyCliFixture(profile: string, multiplePartners = false) {
   const bin = path.join(profile, 'aily-bin')
   const ledger = path.join(profile, 'aily-calls.jsonl')
   const messages = path.join(profile, 'aily-messages.json')
@@ -34,9 +34,9 @@ const success = (data) => console.log(JSON.stringify({ok:true,identity:'user',da
 if (args.includes('auth')) {
   console.log(JSON.stringify({appId:'cli_fixture',brand:'feishu',identities:{user:{status:'ready',openId:'ou_fixture',scope:'im:message.send_as_user'}}}))
 } else if (args.includes('+chat-list')) {
-  success({chats:[{chat_id:'oc_notices',name:'豆包工作伙伴',chat_mode:'p2p'},{chat_id:'oc_partner',name:'示例用户的智能伙伴',chat_mode:'p2p'}],has_more:false})
+  success({chats:[{chat_id:'oc_notices',name:'豆包工作伙伴',chat_mode:'p2p'},{chat_id:'oc_partner',name:'示例用户的智能伙伴',chat_mode:'p2p'}${multiplePartners ? ", {chat_id:'oc_another',name:'项目小组的工作伙伴',chat_mode:'p2p'}" : ''}],has_more:false})
 } else if (args.includes('+chat-members-list')) {
-  success({bots:[{app_id:'cli_partner',member_id:'ou_partner',name:'示例用户的智能伙伴'}]})
+  success({bots:[{app_id:'cli_partner',member_id:'ou_partner',name:value('--chat-id') === 'oc_another' ? '项目小组的工作伙伴' : '示例用户的智能伙伴'}]})
 } else if (args.includes('+chat-messages-list')) {
   if (value('--chat-id') !== 'oc_partner') process.exit(2)
   const all = JSON.parse(fs.readFileSync(${JSON.stringify(messages)}, 'utf8'))

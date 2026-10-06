@@ -2,7 +2,6 @@ import { ForflowFeishuConnection } from './ForflowFeishuConnection'
 import { isForflowBuild } from '../../../../shared/product-branding'
 import { useAppStore } from '@/store'
 import { normalizeVisibleTaskProviders } from '../../../../shared/task-providers'
-import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import {
   AzureDevOpsIntegrationCard,
@@ -33,6 +32,7 @@ export function IntegrationsPane(): React.JSX.Element {
 
   return (
     <div className="space-y-5">
+      {isForflowBuild() ? <ForflowFeishuConnection onBrowse={browseFeishu} /> : null}
       <section className="space-y-3">
         <div className="space-y-1">
           <h3 className="text-sm font-semibold text-foreground">
@@ -67,14 +67,6 @@ export function IntegrationsPane(): React.JSX.Element {
           </p>
         </div>
         <div className="space-y-3">
-          {isForflowBuild() ? (
-            <>
-              <ForflowFeishuConnection onBrowse={browseFeishu} />
-              <Button variant="outline" size="sm" onClick={browseFeishu}>
-                打开飞书任务入口
-              </Button>
-            </>
-          ) : null}
           <LinearIntegrationCard />
           <JiraIntegrationCard />
         </div>

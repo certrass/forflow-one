@@ -38,10 +38,10 @@ describe('Forflow domestic connections', () => {
   })
 
   it('uses execution-host detection and preserves unknown and failed states', () => {
-    expect(getDomesticCliDetectionLabel(true, false)).toContain('已检测到')
-    expect(getDomesticCliDetectionLabel(false, false)).toContain('尚未检测到')
-    expect(getDomesticCliDetectionLabel(null, false)).toContain('正在检测')
-    expect(getDomesticCliDetectionLabel(true, true)).toBe('主机检测失败')
+    expect(getDomesticCliDetectionLabel(true, false)).toContain('已找到')
+    expect(getDomesticCliDetectionLabel(false, false)).toContain('需要设置')
+    expect(getDomesticCliDetectionLabel(null, false)).toContain('正在检查')
+    expect(getDomesticCliDetectionLabel(true, true)).toBe('检查失败')
     const html = renderToStaticMarkup(
       createElement(ForflowDomesticConnections, {
         detectedIds: new Set(['workbuddy']),
@@ -49,24 +49,24 @@ describe('Forflow domestic connections', () => {
         hostName: '企业内网主机'
       })
     )
-    expect(html).toContain('CLI 检测主机：企业内网主机')
-    expect(html).toContain('已检测到 CLI；登录状态由 CLI 确认')
-    expect(html).toContain('此主机尚未检测到 CLI')
-    expect(html).toContain('历史暂未接入')
-    expect(html).toContain('豆包／火山方舟')
+    expect(html).toContain('连接位置：企业内网主机')
+    expect(html).toContain('已找到连接工具')
+    expect(html).toContain('需要设置')
+    expect(html).not.toContain('历史暂未接入')
+    expect(html).toContain('接入豆包模型')
     expect(html).not.toContain('checkbox')
   })
 
   it('makes user product names searchable and links to the domestic CLI sources', () => {
     const entries = getAgentsPaneSearchEntries()
     const keywords = entries.flatMap((entry) => entry.keywords).join(' ')
-    for (const name of ['豆包', 'WorkBuddy', 'QoderWork', 'qodercn', 'codebuddy']) {
+    for (const name of ['豆包', 'WorkBuddy', 'qodercn', 'codebuddy']) {
       expect(keywords).toContain(name)
     }
     expect(getForflowDomesticConnections().map((connection) => connection.documentation)).toEqual([
       'https://github.com/volcengine/ark-cli',
       'https://github.com/larksuite/cli',
-      'https://www.codebuddy.cn/docs/cli/installation',
+      'https://www.workbuddy.cn/',
       'https://docs.qoder.cn/cli/quickstart'
     ])
   })
