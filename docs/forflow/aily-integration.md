@@ -34,3 +34,5 @@
 候选为 `1.4.220-forflow.4`；详细哈希与最终复验位于 `~/Library/Caches/Forflow One/builds/1.4.220-forflow.4/qa/`。当前安装仍为 `.3`，等待用户保存退出后替换。
 
 最终候选 ASAR SHA-256：`f19b9eceb4341d9dab1c1811e8670b22c5218954476badfbf07b691d1398eb8d`。运行时代码提交 `0cd55e6edf8fa7fb5a61b703dfb3f071d9199747`；最终同包 aily（含小窗口发送和明暗主题）与飞书任务 2 项成品测试通过，另一次真实飞书回读验证通过。源码指纹、归档 CRC 与签名结果在 `qa/proof.json`。截图与模拟内容位于 `qa/final/`。
+
+[私有候选包与运行截图](https://github.com/certrass/forflow-one/releases/tag/untagged-930c354e1398c72d393d)已上传，6 个附件均完整，服务器 ZIP SHA-256 与本机一致。待安装脚本为 `~/Library/Caches/Forflow One/builds/1.4.220-forflow.4/qa/install/install.py`；它在检测到任何 Forflow 主程序仍运行时拒绝替换，并会保留 `.3` 回退。
