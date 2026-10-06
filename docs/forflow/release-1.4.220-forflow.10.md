@@ -16,3 +16,5 @@
 首次并行场景使用了要求窗口焦点的 `toBeFocused`，与隐藏窗口验证约定不符。改为检查 `document.activeElement`，保留真实键盘返回检查，再次通过；没有放开显示窗口。首次打包在下载 Electron 时网络等待，结束该打包子进程，改用已经安装的相同版本 Electron 43.7.5 完成打包与签名。
 
 制品与回执：`~/Library/Caches/Forflow One/builds/1.4.220-forflow.10/`。安装结果与指纹由同目录 `installation.json`、`proof.json` 记录。
+
+`.10` 已安装到 `/Applications/Forflow One.app`。运行代码 `8ed45f4e9d2da857c50d7813e51bbf030522ce03`；ASAR `b9102a7ef426ca7dca93536ba68f555506eec364859bbf68f0797330e2a4ad6c`。安装目录再次完成并行引导的完整场景，23 份配置在安装和复验前后哈希相同；`.9` 已留作回退。
