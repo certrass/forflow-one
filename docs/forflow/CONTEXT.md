@@ -6,7 +6,7 @@
 
 候选 `1.4.220-forflow.6`，运行时代码 `88e4ee60b0c30aa071d0cba850bd22002f3c5d96`，ASAR `f78af8cca912fc21698a9b4ce635933066aaba702c04b38d08f037e7a4057d96`。完整构建／类型、改动行规范、严格签名与 ZIP 完整性通过；隐藏 Electron 已验证两个图标在明暗主题中正确加载，以及 WorkBuddy 就绪后的任务标签／侧栏显示。临时测试最初使用中间词搜索，改为产品名称前缀后通过；截图等待菜单动画和对话就绪，没有为测试改动产品逻辑。
 
-安装包与截图位于 `~/Library/Caches/Forflow One/builds/1.4.220-forflow.6/`。当前日常应用仍运行 `.5`，退出流程会终止本地任务，已询问更新时间；收到选择后使用 `qa/install/install.py` 安装，再以 `/Applications/Forflow One.app` 重跑 `qa/test-script`。手机资源映射已构建，未做模拟器或真机验收。
+用户确认「现在退出并安装」后，`.6` 已于 2026-10-06 23:08 安装到 `/Applications/Forflow One.app`，并从安装目录完成同一图标场景复验；候选和安装包 ASAR 一致，17 份用户配置在安装及复验前后哈希相同，保留 `.5` 回退。安装包、截图和回执位于 `~/Library/Caches/Forflow One/builds/1.4.220-forflow.6/`。手机资源映射已构建，未做模拟器或真机验收。
 
 ## 2026-10-06 接入方式校正：统一智能体工作流
 
