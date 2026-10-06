@@ -3005,6 +3005,34 @@
       "title": "Agent dashboard"
     }
   },
+  "featureTips": {
+    "copy": {
+      "agent-session-search": {
+        "ctaLabel": "Turn on session search",
+        "description": "Find any past conversation by what was said in it, then pick up where the agent left off.",
+        "title": "Search every agent session"
+      },
+      "cmd-j-palette": {
+        "ctaLabel": "Got it",
+        "description": "Search worktrees, switch tabs, tweak settings, or spin up a new worktree, all without leaving the keyboard.",
+        "title": "Jump to a worktree with <shortcut>"
+      },
+      "eyebrow": {
+        "new": "New",
+        "tip": "Tip"
+      },
+      "orca-cli": {
+        "ctaLabel": "Install CLI & Skills",
+        "description": "Enable agents to coordinate child worktrees and communicate between worktrees.",
+        "title": "Let agents drive Orca with the Orca CLI"
+      },
+      "voice-dictation": {
+        "ctaLabel": "Set up voice dictation",
+        "description": "Start voice dictation in any focused pane, then use the shortcut again to stop.",
+        "title": "Dictate into any pane"
+      }
+    }
+  },
   "fileExplorer": {
     "root": {
       "omittedFiles": "Files omitted by sparse checkout are not searched.",
@@ -3013,6 +3041,30 @@
     }
   },
   "forflow": {
+    "aily": {
+      "change": "Change work partner",
+      "choose": "Choose your work partner",
+      "connect": "Connect your work partner",
+      "earlier": "Load earlier messages",
+      "empty": "Open your personal work partner in Feishu once, then refresh this list.",
+      "failed": "Could not sync with Feishu. Try refreshing the conversation.",
+      "finding": "Finding your work partner…",
+      "keyboard": "Enter to send · Shift+Enter for a new line",
+      "loading": "Loading conversation…",
+      "noMessages": "Send a task to start the conversation.",
+      "open": "Open in Feishu",
+      "partial": "More conversations are available. Open your work partner in Feishu, then refresh.",
+      "placeholder": "What would you like your work partner to do?",
+      "refresh": "Refresh",
+      "send": "Send",
+      "sending": "Sending…",
+      "setup": "Install and sign in to Feishu CLI",
+      "subtitle": "Continue your Feishu conversation here.",
+      "sync": "Messages are sent with your Feishu account and sync to the same conversation.",
+      "title": "Doubao Work Partner",
+      "unavailable": "This connection is available in the Forflow One desktop app.",
+      "waiting": "Sent · waiting for a reply"
+    },
     "approval": {
       "allow": "Allow this operation",
       "cancel": "Cancel",
@@ -3079,6 +3131,11 @@
       "commit": "commit diff",
       "staged": "staged diff",
       "unstaged": "diff"
+    },
+    "domestic": {
+      "codebuddyHistory": "CodeBuddy CLI history and resume",
+      "workbuddy": "WorkBuddy / CodeBuddy",
+      "workbuddyDescription": "Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations."
     },
     "emulatorStates": {
       "booted": "Booted",

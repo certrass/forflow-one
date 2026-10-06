@@ -85,6 +85,17 @@ export async function main(
     process.stdout.write(`${version}\n`)
     return
   }
+  if (isForflowCli() && (argv[0] === 'aily' || argv[0] === 'workbuddy')) {
+    try {
+      await (
+        await import('./companion/companion-command.js')
+      ).runCompanionCommand(argv[0], argv.slice(1), cwd)
+    } catch (error) {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
+      process.exitCode = 1
+    }
+    return
+  }
   if (argv[0] === 'agent-teams-tmux') {
     await runAgentTeamsTmuxShim(argv.slice(1))
     return

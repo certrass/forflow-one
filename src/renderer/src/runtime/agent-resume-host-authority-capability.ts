@@ -1,6 +1,7 @@
 import type { ResumableTuiAgent } from '../../../shared/agent-session-resume'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import {
+  AGENT_SESSION_COMPANION_RESUME_RUNTIME_CAPABILITY,
   AGENT_SESSION_KIMI_RESUME_RUNTIME_CAPABILITY,
   AGENT_SESSION_QODER_RESUME_RUNTIME_CAPABILITY,
   AGENT_SESSION_CODEBUDDY_RESUME_RUNTIME_CAPABILITY,
@@ -20,6 +21,8 @@ import {
 // gate — or a deliberate `undefined` — is declared here.
 const RESUME_HOST_AUTHORITY_CAPABILITY_BY_AGENT = {
   // These shipped inside agent-session.host-authority.v1's enum, so the generic probe covers them.
+  aily: AGENT_SESSION_COMPANION_RESUME_RUNTIME_CAPABILITY,
+  workbuddy: AGENT_SESSION_COMPANION_RESUME_RUNTIME_CAPABILITY,
   claude: undefined,
   codebuddy: AGENT_SESSION_CODEBUDDY_RESUME_RUNTIME_CAPABILITY,
   codex: undefined,

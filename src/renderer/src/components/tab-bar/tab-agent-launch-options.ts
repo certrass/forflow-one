@@ -1,4 +1,4 @@
-import { getAgentCatalog } from '@/lib/agent-catalog'
+import { getAgentCatalog, type AgentCatalogEntry } from '@/lib/agent-catalog'
 import { filterEnabledTuiAgents } from '../../../../shared/tui-agent-selection'
 import { normalizeMatchQuery, tokenizeMatchValue } from './query-token-match'
 import type { TuiAgent } from '../../../../shared/tui-agent'
@@ -17,7 +17,7 @@ function compactAgentAlias(value: string): string {
   return normalizeAgentAlias(value).replace(/[\s_-]+/g, '')
 }
 
-function getCatalogEntry(agent: TuiAgent): { id: TuiAgent; label: string; cmd: string } | null {
+function getCatalogEntry(agent: TuiAgent): AgentCatalogEntry | null {
   return getAgentCatalog().find((entry) => entry.id === agent) ?? null
 }
 
@@ -49,6 +49,10 @@ export function buildTabAgentLaunchOptions(
       compactAgentAlias(agent),
       compactAgentAlias(label)
     ])
+    for (const alias of entry?.searchAliases ?? []) {
+      aliases.add(normalizeAgentAlias(alias))
+      aliases.add(compactAgentAlias(alias))
+    }
     if (entry?.cmd) {
       aliases.add(normalizeAgentAlias(entry.cmd))
       aliases.add(compactAgentAlias(entry.cmd))

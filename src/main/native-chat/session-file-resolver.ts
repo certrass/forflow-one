@@ -1,3 +1,4 @@
+import { companionTranscriptPath } from '../../shared/forflow-companion-paths'
 import { homedir } from 'node:os'
 import { basename, extname, join } from 'node:path'
 import type { AgentType } from '../../shared/native-chat-types'
@@ -165,6 +166,16 @@ async function resolveSessionFileById(
     return null
   }
 
+  if (transcriptAgent === 'aily' || transcriptAgent === 'workbuddy') {
+    try {
+      return await toHostReadableTranscriptPath(
+        companionTranscriptPath(transcriptAgent, trimmedId),
+        { signal }
+      )
+    } catch {
+      return null
+    }
+  }
   if (transcriptAgent === 'claude') {
     // An explicit root is the caller naming the exact account tree its session pinned;
     // adding a fallback there could resolve a different account's transcript.

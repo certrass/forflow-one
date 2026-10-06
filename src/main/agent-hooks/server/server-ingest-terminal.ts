@@ -128,6 +128,11 @@ export abstract class AgentHookServerIngestTerminal extends AgentHookServerInges
       // Why in the unchanged gate: the handle is a join key readers match on, so a pane that
       // only just acquired one (or moved to another) must still refresh the row it is stamped on.
       previous.terminalHandle === (terminalHandle ?? previous.terminalHandle) &&
+      (event.payload.providerSession === undefined ||
+        (previous.providerSession?.key === event.payload.providerSession.key &&
+          previous.providerSession?.id === event.payload.providerSession.id &&
+          previous.providerSession?.transcriptPath ===
+            event.payload.providerSession.transcriptPath)) &&
       terminalStatusPayloadMatchesHook(previous.payload, event.payload, preserveActiveTurnStamp)
     ) {
       // A handle-authority transfer is a new pane observation even when its payload is a
@@ -135,10 +140,7 @@ export abstract class AgentHookServerIngestTerminal extends AgentHookServerInges
       this.refreshTerminalStatusEvidence(previous, mutationBefore, mutationBefore !== undefined)
       return
     }
-    // Why: the OSC 9999 wire payload has no providerSession field at all, so an OSC observation is
-    // never evidence that the session ended — yet overwriting the row dropped the cached identity.
-    // That erased it from persisted rows (lost across restart) and from headless `orca serve`, which
-    // serves these rows to mobile directly instead of the renderer store, blanking Chat UI (#10630).
+    // Most OSC producers omit session identity; companion CLIs publish their own transcript.
     // A new turn after `done` still starts clean so a reused pane cannot inherit a finished session.
     // Why: mirror resolveAgentStatusIdentity, which treats a literal 'unknown' exactly like an
     // omitted type — an OSC ping that names no agent makes no claim about the pane's identity, so
@@ -148,11 +150,12 @@ export abstract class AgentHookServerIngestTerminal extends AgentHookServerInges
         ? event.payload.agentType
         : undefined
     const preservedProviderSession =
-      previous?.providerSession &&
+      event.payload.providerSession ??
+      (previous?.providerSession &&
       (claimedAgentType === undefined || claimedAgentType === previous.payload.agentType) &&
       (previous.payload.state !== 'done' || event.payload.state === 'done')
         ? previous.providerSession
-        : undefined
+        : undefined)
     // Why: OSC carries no main agent fact. While it repaints the state the hook row already holds, the
     // main agent behind that state is unchanged too; a different state is a turn edge OSC cannot date.
     const preservedMainAgent =

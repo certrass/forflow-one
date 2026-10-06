@@ -1,3 +1,4 @@
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
 import type { Tab } from '../../../../shared/tab-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { AgentType } from '../../../../shared/agent-status-types'
@@ -40,7 +41,10 @@ export type NativeChatAvailabilityInput = {
  *  launch metadata is next, and title resolution only fills the pre-hook gap for
  *  manually-started Claude/Codex/Grok sessions. */
 export function canToggleNativeChat(input: NativeChatAvailabilityInput): boolean {
-  if (input.experimentalNativeChatEnabled !== true) {
+  if (
+    input.experimentalNativeChatEnabled !== true &&
+    !isCompanionAgent(input.detectedAgent ?? input.launchAgent ?? input.resolvedAgent)
+  ) {
     return false
   }
   if (input.contentType !== 'terminal') {

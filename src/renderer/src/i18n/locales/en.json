@@ -19402,7 +19402,12 @@
       "undetected": "CLI not detected on this host",
       "workbuddy": "WorkBuddy / CodeBuddy",
       "workbuddyDescription": "Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations.",
-      "codebuddyHistory": "CodeBuddy CLI history and resume"
+      "codebuddyHistory": "CodeBuddy CLI history and resume",
+      "ailyCliDescription": "Use your Feishu login with the official CLI. Choose Doubao work partner in a task to continue your personal conversation.",
+      "workbuddyCli": "WorkBuddy",
+      "workbuddyCliDescription": "Use the CLI bundled with WorkBuddy and its existing login. Start a task in the current workspace and continue it in native chat.",
+      "ailyHistory": "Continue your Feishu conversation",
+      "workbuddyHistory": "Tasks and conversation resume"
     },
     "tour": {
       "workflows": {

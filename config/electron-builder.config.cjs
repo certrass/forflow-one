@@ -300,6 +300,7 @@ module.exports = {
     'out/main/claude/**',
     'out/main/claude-accounts/keychain.js',
     'out/main/forflow/bundled-skill-install.js',
+    'out/main/forflow/aily-client.js',
     'out/main/codex/**',
     'out/main/copilot/**',
     'out/main/cursor/**',

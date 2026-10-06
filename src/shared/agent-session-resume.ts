@@ -4,6 +4,8 @@ import type { AgentMainAgentStatus } from './main-agent-status'
 import type { TuiAgent } from './tui-agent'
 
 export const RESUMABLE_TUI_AGENTS = [
+  'aily',
+  'workbuddy',
   'claude',
   'codebuddy',
   'codex',
@@ -279,6 +281,9 @@ export function getAgentResumeArgv(
 ): string[] | null {
   const id = providerSession.id
   switch (agent) {
+    case 'aily':
+    case 'workbuddy':
+      return providerSession.key === 'session_id' ? ['forflow', agent, '--resume', id] : null
     case 'codebuddy':
       return providerSession.key === 'session_id' ? ['codebuddy', '--resume', id] : null
     case 'claude':

@@ -17,7 +17,6 @@ const WorktreeCreationPanel = lazy(
   () => import('../components/worktree-creation/WorktreeCreationPanel')
 )
 const TaskPage = lazy(() => import('../components/task-page/TaskPage'))
-const AilyPage = lazy(() => import('../components/forflow-aily/AilyPage'))
 const AutomationsPage = lazy(() => import('../components/automations/AutomationsPage'))
 const ActivityPrototypePage = lazy(() => import('../components/activity/ActivityPrototypePage'))
 const Settings = lazy(() => import('../components/settings/Settings'))
@@ -73,7 +72,6 @@ function ActivePage({ layout }: { layout: AppChromeLayout }): React.JSX.Element 
       {activeView === 'skills' ? <SkillsPage /> : null}
       {activeView === 'artifacts' ? <ArtifactsPage /> : null}
       {activeView === 'tasks' ? <TaskPage /> : null}
-      {activeView === 'aily' ? <AilyPage /> : null}
       {activeView === 'automations' ? <AutomationsPage /> : null}
       {activeView === 'activity' ? <ActivityPrototypePage /> : null}
       {activeView === 'space' ? <WorkspaceSpacePage /> : null}
@@ -216,7 +214,7 @@ export function AppWorkspaceShell(props: {
                     </RecoverableRenderErrorBoundary>
                   </Suspense>
                 </div>
-                {floatingWorkspace.showToggleButton && layout.activeView !== 'aily' ? (
+                {floatingWorkspace.showToggleButton ? (
                   <FloatingTerminalToggleButton
                     open={floatingWorkspace.open}
                     onToggle={() => floatingWorkspace.setOpenWithFocus((open) => !open)}

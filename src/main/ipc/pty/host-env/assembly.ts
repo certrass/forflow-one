@@ -1,4 +1,6 @@
 import { resolveSetupAgentSequenceLaunchCommand } from '../../../../shared/setup-agent-sequencing'
+import { setCompanionCliShellPath } from '../../../forflow/companion-cli-shell-path'
+import type { BuildPtyHostEnvOptions } from './types'
 import { selectOpenCodeHookAgent } from '../../../../shared/opencode-launch-command'
 import {
   detectExplicitPiAgentKindFromCommand,
@@ -21,7 +23,6 @@ import { mergePersistedWindowsPath } from '../../../pty/windows-environment-path
 import { resolveCodexShellLaunchPreflightCommand } from '../../../pty/codex-shell-launch-preflight'
 import { buildConfiguredProxyEnv } from '../../../../shared/network-proxy'
 import { isTuiAgentEnabled } from '../../../../shared/tui-agent-selection'
-import type { BuildPtyHostEnvOptions } from './types'
 import { stripInheritedOrcaCodexHomeOverride } from './codex-home'
 import {
   clearPiAgentShadowEnv,
@@ -322,11 +323,12 @@ export function buildPtyHostEnv(
     }
     delete baseEnv.ORCA_CLI_COMMAND
   }
-  prependOrcaCliDirToChildPath(baseEnv, {
+  const cliLauncher = prependOrcaCliDirToChildPath(baseEnv, {
     isPackaged: opts.isPackaged,
     userDataPath: opts.userDataPath,
     resourcesPath: opts.resourcesPath
   })
+  setCompanionCliShellPath(baseEnv, cliLauncher, opts.isWsl)
 
   if (
     opts.routeBrowserOpensToClient === true &&

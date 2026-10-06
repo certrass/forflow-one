@@ -24,6 +24,24 @@ function resolveTuiAgentConfig(source: TuiAgentConfigSource): TuiAgentConfig {
 }
 
 const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
+  aily: {
+    detectCmd: 'lark-cli',
+    detectRequiredCommands: ['forflow'],
+    launchCmd: 'forflow aily',
+    expectedProcess: 'forflow-aily',
+    promptInjectionMode: 'argv',
+    argvPromptSeparator: '--',
+    draftPromptFlag: '--prefill'
+  },
+  workbuddy: {
+    detectCmd: 'workbuddy',
+    detectRequiredCommands: ['forflow'],
+    launchCmd: 'forflow workbuddy',
+    expectedProcess: 'forflow-workbuddy',
+    promptInjectionMode: 'argv',
+    argvPromptSeparator: '--',
+    draftPromptFlag: '--prefill'
+  },
   claude: {
     detectCmd: 'claude',
     promptInjectionMode: 'argv',

@@ -1,3 +1,4 @@
+import { getCompanionCatalog } from './forflow-companion-catalog'
 import { getCatalogPlatform } from './agent-catalog-platform'
 import type React from 'react'
 import { ClaudeIcon, DroidIcon, OpenAIIcon } from '@/components/status-bar/icons'
@@ -19,21 +20,11 @@ import { AGENT_FAVICON_ASSETS } from './agent-favicon-assets'
 import { isForflowBuild } from '../../../shared/product-branding'
 import { getTuiAgentAutoPickOrder } from '../../../shared/tui-agent-selection'
 
-export type AgentCatalogEntry = {
-  id: TuiAgent
-  label: string
-  /** Default CLI binary name used for PATH detection. */
-  cmd: string
-  searchAliases?: readonly string[]
-  /** Direct or bundled image URL for agents whose project identity is not represented by a favicon service. */
-  iconUrl?: string
-  /** Domain for Google's favicon service — used for agents without an SVG icon. */
-  faviconDomain?: string
-  /** Homepage/install docs URL, sourced from the README agent badge list. */
-  homepageUrl: string
-}
+import type { AgentCatalogEntry } from './agent-catalog-entry'
+export type { AgentCatalogEntry } from './agent-catalog-entry'
 
 const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] => [
+  ...getCompanionCatalog(),
   {
     id: 'claude',
     label: translate('auto.lib.agent.catalog.0708ed89f1', 'Claude'),
@@ -358,7 +349,7 @@ const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] 
 export function getAgentCatalog(): AgentCatalogEntry[] {
   const catalog = getUnorderedAgentCatalog()
   if (!isForflowBuild()) {
-    return catalog
+    return catalog.filter((agent) => agent.id !== 'aily' && agent.id !== 'workbuddy')
   }
   const order = getTuiAgentAutoPickOrder()
   return catalog.toSorted((left, right) => order.indexOf(left.id) - order.indexOf(right.id))

@@ -1,3 +1,5 @@
+import { normalizeAgentProviderSession } from './agent-session-resume'
+import { isCompanionAgent } from './forflow-companion'
 // ─── Explicit agent status (reported via native agent hooks → IPC) ──────────
 // Why: status comes from hooks (Claude, Codex, etc.) — never inferred from terminal titles;
 // a narrow interrupt fallback synthesizes a final `done` when an agent misses its cancellation hook.
@@ -169,6 +171,7 @@ export type AgentStatusEntry = {
 // Hook integrations provide only normalized state fields; the renderer fills the rest (updatedAt, paneKey, …) on IPC receipt.
 
 export type AgentStatusPayload = {
+  providerSession?: AgentProviderSessionMetadata
   state: AgentStatusState
   /** Ongoing work that does not require foreground agent execution. Only valid while working. */
   workingMode?: AgentWorkingMode
@@ -219,6 +222,7 @@ export function pickParsedAgentStatusPayload(
 ): ParsedAgentStatusPayload {
   return {
     state: row.state,
+    ...(row.providerSession ? { providerSession: row.providerSession } : {}),
     ...(row.workingMode !== undefined ? { workingMode: row.workingMode } : {}),
     prompt: row.prompt,
     ...(row.agentType !== undefined ? { agentType: row.agentType } : {}),
@@ -317,6 +321,9 @@ function normalizeAgentStatusObject(parsed: unknown): ParsedAgentStatusPayload |
   }
   return {
     state: state as AgentStatusState,
+    ...(isCompanionAgent(obj.agentType) && normalizeAgentProviderSession(obj.providerSession)
+      ? { providerSession: normalizeAgentProviderSession(obj.providerSession) ?? undefined }
+      : {}),
     workingMode: state === 'working' && obj.workingMode === 'monitoring' ? 'monitoring' : undefined,
     prompt: normalizePromptField(obj.prompt),
     // Why: normalize like the other single-line fields so embedded newlines (e.g. `agentType: "claude\nrogue"`) can't break single-line UI and equality checks.

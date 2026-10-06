@@ -12,6 +12,8 @@ import type { TuiAgent } from './tui-agent'
  * follows Orca's own rule that OpenClaude reads Claude-owned roots.
  */
 export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
+  aily: null,
+  workbuddy: null,
   claude: 'claude-code',
   'claude-agent-teams': 'claude-code',
   codebuddy: 'codebuddy',

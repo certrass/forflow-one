@@ -27,6 +27,26 @@ afterEach(() => {
 })
 
 describe('AgentHookServer ingestTerminalStatus', () => {
+  it('publishes a companion session change even when its status and prompt match', () => {
+    const server = new AgentHookServer()
+    for (const id of ['first-session', 'replacement-session']) {
+      server.ingestTerminalStatus({
+        paneKey: PANE,
+        payload: {
+          state: 'done',
+          prompt: '',
+          agentType: 'workbuddy',
+          providerSession: { key: 'session_id', id, transcriptPath: `/tmp/${id}.jsonl` }
+        }
+      })
+    }
+    expect(server.getStatusSnapshot()[0]?.providerSession).toEqual({
+      key: 'session_id',
+      id: 'replacement-session',
+      transcriptPath: '/tmp/replacement-session.jsonl'
+    })
+  })
+
   it('keeps hook monitoring mode across an equivalent OSC ping until a hook clears it', () => {
     const server = new AgentHookServer()
 

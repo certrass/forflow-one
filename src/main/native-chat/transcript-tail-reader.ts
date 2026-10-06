@@ -1,3 +1,4 @@
+import { decodeCompanionTranscriptLine } from './transcript-line-decoders-companion'
 import type {
   AgentType,
   NativeChatMessage,
@@ -35,6 +36,9 @@ export type NativeChatLineDecoder = (line: string, fallbackId: string) => Native
 
 export function nativeChatLineDecoderForAgent(agent: AgentType): NativeChatLineDecoder | null {
   const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
+  if (transcriptAgent === 'aily' || transcriptAgent === 'workbuddy') {
+    return decodeCompanionTranscriptLine
+  }
   if (transcriptAgent === 'claude') {
     return decodeClaudeTranscriptLine
   }

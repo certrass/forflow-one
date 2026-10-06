@@ -1,3 +1,4 @@
+import { resolveWorkBuddyCli } from '../../shared/workbuddy-cli-location'
 /**
  * Agent/tool preflight detection. Split out of `ipc/preflight.ts` so the Orca
  * runtime — which calls `detectInstalledAgentsWithShellPathHydration` and
@@ -51,30 +52,8 @@ import {
 } from './agent-command-overrides'
 import { prunePreflightWslCache } from '../preflight-wsl-cache'
 
-export type PreflightStatus = {
-  git: { installed: boolean }
-  gh: { installed: boolean; authenticated: boolean }
-  // Why: optional so existing renderer call sites that only render git/gh
-  // status keep typechecking. Consumers that surface GitLab-specific
-  // affordances (the GitLab tab in the source picker, MR list, etc.)
-  // gate on `glab?.authenticated`.
-  glab?: { installed: boolean; authenticated: boolean }
-  bitbucket?: { configured: boolean; authenticated: boolean; account: string | null }
-  azureDevOps?: {
-    configured: boolean
-    authenticated: boolean
-    account: string | null
-    baseUrl: string | null
-    tokenConfigured: boolean
-  }
-  gitea?: {
-    configured: boolean
-    authenticated: boolean
-    account: string | null
-    baseUrl: string | null
-    tokenConfigured: boolean
-  }
-}
+import type { PreflightStatus } from './preflight-status-types'
+export type { PreflightStatus } from './preflight-status-types'
 
 export { detectRemoteWindowsTerminalCapabilities }
 export type { RemoteWindowsTerminalCapabilities }
@@ -174,6 +153,9 @@ export async function detectInstalledAgents(
       .filter(({ cmd, installedOnPath }) => installedOnPath || installDirCommands.has(cmd))
       .map(({ cmd }) => cmd)
   )
+  if (resolveWorkBuddyCli()) {
+    foundCommands.add('workbuddy')
+  }
   return resolveDetectedTuiAgentIds(commands, foundCommands, process.platform)
 }
 

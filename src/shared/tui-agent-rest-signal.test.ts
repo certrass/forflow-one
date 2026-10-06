@@ -6,6 +6,8 @@ import { getTuiAgentRestSignal, type TuiAgentRestSignal } from './tui-agent-rest
 // Why a full Record: adding a TuiAgent fails to compile here until someone decides what its
 // rest signal is, and a title-table change that moves an agent shows up in review.
 const EXPECTED_REST_SIGNALS: Record<TuiAgent, TuiAgentRestSignal> = {
+  aily: 'none',
+  workbuddy: 'none',
   dsh: 'hook-done',
   codex: 'synthetic-title',
   cursor: 'synthetic-title',

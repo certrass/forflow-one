@@ -12,6 +12,7 @@ import {
   tokenizeCommandLine
 } from './agent-command-line-entrypoint'
 import { isFreshOmpLaunchCommand } from './omp-fresh-launch'
+import { isCompanionAgent } from './forflow-companion'
 
 export type RecognizedAgentProcess = { agent: TuiAgent; processName: string }
 
@@ -46,6 +47,10 @@ for (const [agent, config] of Object.entries(TUI_AGENT_CONFIG) as [
   (typeof TUI_AGENT_CONFIG)[TuiAgent]
 ][]) {
   AGENT_TYPE_IDS.add(agent)
+  if (isCompanionAgent(agent)) {
+    PROCESS_TO_AGENT.set(config.expectedProcess, agent)
+    continue
+  }
   for (const candidate of [
     config.expectedProcess,
     ...getTuiAgentDetectCommands(config),
@@ -190,6 +195,9 @@ export function recognizeAgentProcessFromCommandLine(
   const keep = options?.includeHeadlessOneShot === true
   const tokens = tokenizeCommandLine(commandLine)
   const firstNormalized = normalizeProcessName(tokens[0])
+  if (firstNormalized === 'forflow' && isCompanionAgent(tokens[1])) {
+    return { agent: tokens[1], processName: `forflow-${tokens[1]}` }
+  }
   let direct = recognizedAgentForProcess(firstNormalized)
   // Why: the generic Orca CLI is not an agent; only this subcommand launches its TUI mode.
   if (direct?.agent === 'claude-agent-teams' && tokens[1]?.toLowerCase() !== 'claude-teams') {

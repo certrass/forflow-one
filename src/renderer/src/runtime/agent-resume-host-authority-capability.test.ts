@@ -41,6 +41,8 @@ describe('agentResumeHostAuthorityCapability', () => {
         RESUMABLE_TUI_AGENTS.map((agent) => [agent, agentResumeHostAuthorityCapability(agent)])
       )
     ).toEqual({
+      aily: 'agent-session.companion-resume.v1',
+      workbuddy: 'agent-session.companion-resume.v1',
       claude: undefined,
       codebuddy: AGENT_SESSION_CODEBUDDY_RESUME_RUNTIME_CAPABILITY,
       codex: undefined,

@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef } from 'react'
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
 import { useAppStore } from '../../store'
 import { sendRuntimePtyInput } from '@/runtime/runtime-terminal-inspection'
 import { getSettingsForAgentTabRuntimeOwner } from '@/lib/agent-paste-draft'
@@ -159,8 +160,8 @@ export function useNativeChatInteractiveSend(
   // Stop/cancel: drop any pending answer writes, then send ESC to interrupt.
   const cancel = useCallback(() => {
     cancelInFlight()
-    sendRaw(ESC)
-  }, [cancelInFlight, sendRaw])
+    sendRaw(isCompanionAgent(agent) ? '\x03' : ESC)
+  }, [agent, cancelInFlight, sendRaw])
 
   return { sendAnswer, sendRaw, cancelPending: cancelInFlight, cancel }
 }

@@ -1,3 +1,4 @@
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
 import { useEffect, useRef, type JSX, type ReactNode } from 'react'
 import { NativeChatEmptyState } from './NativeChatEmptyState'
 import {
@@ -49,6 +50,9 @@ export function NativeChatSessionGate({
   }, [resolution])
   if (!resolution) {
     return <NativeChatEmptyState kind="not-agent" />
+  }
+  if (isCompanionAgent(resolution.agent) && !input.agentStatusEntry?.providerSession?.id) {
+    return <NativeChatEmptyState kind="loading" />
   }
   return <>{children(resolution)}</>
 }

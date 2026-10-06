@@ -105,6 +105,37 @@ describe('NativeChatSessionGate', () => {
     )
   })
 
+  it.each(['aily', 'workbuddy'] as const)(
+    'waits for %s to own input before rendering a composer',
+    (agent) => {
+      const paneKey = 'tab-1:leaf-1'
+      const renderGate = (agentStatusEntry?: AgentStatusEntry) => (
+        <NativeChatSessionGate
+          paneKey={paneKey}
+          launchAgent={agent}
+          ptyId="pty-1"
+          agentStatusEntry={agentStatusEntry}
+        >
+          {() => <input aria-label="Ready composer" />}
+        </NativeChatSessionGate>
+      )
+      const view = render(renderGate())
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+      view.rerender(
+        renderGate(
+          entry({
+            paneKey,
+            agentType: agent,
+            providerSession: { key: 'session_id', id: 'ready-session' }
+          })
+        )
+      )
+      expect(screen.getByRole('textbox')).toBeInTheDocument()
+      view.rerender(renderGate())
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    }
+  )
+
   it('does not open native chat from an unsupported title fallback', () => {
     renderResolution({
       paneKey: 'tab-1:leaf-1',

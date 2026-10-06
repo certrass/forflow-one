@@ -1,3 +1,4 @@
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '../../store'
@@ -46,8 +47,7 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
       selectUnifiedTerminalTabFields(store.unifiedTabsByWorktree, worktreeId, tabId)
     )
   )
-  const nativeChatEnabled = useAppStore((store) => store.settings?.experimentalNativeChat === true)
-  const effectiveChatViewMode = nativeChatEnabled && isChatViewMode
+  const nativeChatSetting = useAppStore((store) => store.settings?.experimentalNativeChat === true)
   const runtimePaneTitlesByPaneId = useAppStore(
     useShallow((store) => store.runtimePaneTitlesByTabId[tabId] ?? {})
   )
@@ -62,6 +62,8 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
   const terminalTab = useAppStore((store) =>
     getCachedTerminalTabForWorktree(store.tabsByWorktree, worktreeId, tabId)
   )
+  const nativeChatEnabled = nativeChatSetting || isCompanionAgent(terminalTab?.launchAgent)
+  const effectiveChatViewMode = nativeChatEnabled && isChatViewMode
   const restoredLayout = useMemo(
     () => (terminalTab ? sanitizeTerminalLayoutPaneTitles(savedLayout, terminalTab) : savedLayout),
     [savedLayout, terminalTab]

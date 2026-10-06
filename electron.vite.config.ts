@@ -233,6 +233,7 @@ export const electronViteConfig: UserConfig = {
         external: isExternalMainModule,
         input: {
           index: resolve('src/main/index.ts'),
+          'forflow/aily-client': resolve('src/main/forflow/aily-client.ts'),
           'forflow/bundled-skill-install': resolve('src/main/forflow/bundled-skill-install.ts'),
           // Why: sandboxed webview preloads cannot load Rollup helper chunks.
           'browser-window-close-preload': resolve('src/preload/browser-window-close.ts'),

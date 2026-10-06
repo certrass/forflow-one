@@ -27,6 +27,7 @@
  * hook restores zsh option semantics for the body at call time.
  */
 import { getPosixOmpShellWrapper } from './pty/omp-shell-wrapper'
+import { getCompanionCliPathRestore } from './forflow/companion-cli-shell-path'
 import { WSL_MANAGED_CLI_PATH_RESTORE } from './wsl-managed-cli-path-restore'
 import { getPosixCodexShellLaunchPreflight } from '../shared/codex-shell-function'
 import {
@@ -120,6 +121,7 @@ function featureGuard(name: string, body: (string | null)[]): string | null {
 function getOverlayRestoreBlocks(spec: ZshStartupHookSpec): (string | null)[] {
   return [
     spec.overlayRestoreComment,
+    getCompanionCliPathRestore() || null,
     spec.restores.agentTeamsPath ? AGENT_TEAMS_PATH_RESTORE_BLOCK : null,
     OPENCODE_CONFIG_DIR_RESTORE,
     MIMOCODE_HOME_RESTORE,

@@ -28,15 +28,27 @@ export function getForflowDomesticConnections(): DomesticConnection[] {
       documentation: 'https://github.com/volcengine/ark-cli'
     },
     {
-      id: 'workbuddy',
-      title: translate('forflow.domestic.workbuddy', 'WorkBuddy / CodeBuddy'),
+      id: 'aily',
+      title: translate('forflow.aily.title', 'Doubao work partner'),
       description: translate(
-        'forflow.domestic.workbuddyDescription',
-        'Forflow launches Tencent CodeBuddy CLI. WorkBuddy is a separate desktop app; installing it does not install the standalone CLI or import its account and conversations.'
+        'forflow.domestic.ailyCliDescription',
+        'Use your Feishu login with the official CLI. Choose Doubao work partner in a task to continue your personal conversation.'
       ),
-      history: translate('forflow.domestic.codebuddyHistory', 'CodeBuddy CLI history and resume'),
-      agentId: 'codebuddy',
-      command: 'codebuddy',
+      history: translate('forflow.domestic.ailyHistory', 'Continue your Feishu conversation'),
+      agentId: 'aily',
+      command: 'forflow aily',
+      documentation: 'https://github.com/larksuite/cli'
+    },
+    {
+      id: 'workbuddy',
+      title: translate('forflow.domestic.workbuddyCli', 'WorkBuddy'),
+      description: translate(
+        'forflow.domestic.workbuddyCliDescription',
+        'Use the CLI bundled with WorkBuddy and its existing login. Start a task in the current workspace and continue it in native chat.'
+      ),
+      history: translate('forflow.domestic.workbuddyHistory', 'Tasks and conversation resume'),
+      agentId: 'workbuddy',
+      command: 'forflow workbuddy',
       documentation: 'https://www.codebuddy.cn/docs/cli/installation'
     },
     {

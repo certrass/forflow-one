@@ -24,12 +24,14 @@ describe('Forflow domestic connections', () => {
     const connections = getForflowDomesticConnections()
     expect(connections.map((connection) => connection.command)).toEqual([
       'arkcli',
-      'codebuddy',
+      'forflow aily',
+      'forflow workbuddy',
       'qodercn'
     ])
     expect(connections[0].agentId).toBeNull()
-    expect(connections[1].agentId).toBe('codebuddy')
-    expect(connections[2].agentId).toBe('qoder-cn')
+    expect(connections[1].agentId).toBe('aily')
+    expect(connections[2].agentId).toBe('workbuddy')
+    expect(connections[3].agentId).toBe('qoder-cn')
     expect(AI_VAULT_AGENTS).toContain('codebuddy')
     expect(AI_VAULT_AGENTS).not.toContain('qoder-cn')
     expect(AI_VAULT_AGENTS).not.toContain(null)
@@ -42,7 +44,7 @@ describe('Forflow domestic connections', () => {
     expect(getDomesticCliDetectionLabel(true, true)).toBe('主机检测失败')
     const html = renderToStaticMarkup(
       createElement(ForflowDomesticConnections, {
-        detectedIds: new Set(['codebuddy']),
+        detectedIds: new Set(['workbuddy']),
         detectionFailed: false,
         hostName: '企业内网主机'
       })
@@ -63,6 +65,7 @@ describe('Forflow domestic connections', () => {
     }
     expect(getForflowDomesticConnections().map((connection) => connection.documentation)).toEqual([
       'https://github.com/volcengine/ark-cli',
+      'https://github.com/larksuite/cli',
       'https://www.codebuddy.cn/docs/cli/installation',
       'https://docs.qoder.cn/cli/quickstart'
     ])

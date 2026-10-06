@@ -1,6 +1,13 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
+    "../src/main/forflow/aily-client.ts",
+    "../src/main/forflow/aily-cli-contract.ts",
+    "../src/main/forflow/feishu-cli-client.ts",
+    "../src/main/forflow/feishu-cli-contract.ts",
+    "../src/main/forflow/feishu-cli-error.ts",
+    "../src/main/integration-credential-file.ts",
+    "../src/main/ipc/command-path-resolver.ts",
     "../src/main/forflow/bundled-skill-install.ts",
     "../src/main/observability/redactor.ts",
     "../src/main/observability/tracer.ts",

@@ -293,5 +293,8 @@
   "src/renderer/src/components/stats/JevAuditPanel.test.tsx",
   "src/main/forflow/aily-client.test.ts",
   "src/main/forflow/aily-ipc.test.ts",
-  "src/renderer/src/components/forflow-aily/use-aily-chat.test.tsx"
+  "src/cli/companion/companion-input.test.ts",
+  "src/cli/companion/companion-journal.test.ts",
+  "src/main/native-chat/transcript-companion.test.ts",
+  "src/renderer/src/runtime/agent-resume-host-authority-capability.test.ts"
 ]

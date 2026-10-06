@@ -24,6 +24,23 @@ export class AilyClient {
   private readonly cli: FeishuCliClient
   private generation = 0
   private sending = false
+  private pinned: AilyBinding | null = null
+
+  pinConnection(binding: AilyBinding): void {
+    this.pinned = ailyBindingSchema.parse(binding)
+  }
+
+  private assertPinned(binding: AilyBinding): void {
+    if (
+      this.pinned &&
+      (binding.profile !== this.pinned.profile ||
+        binding.userId !== this.pinned.userId ||
+        binding.partner.chatId !== this.pinned.partner.chatId ||
+        binding.partner.botMemberId !== this.pinned.partner.botMemberId)
+    ) {
+      throw new Error('当前飞书账号或伙伴已变更，请重新打开会话。')
+    }
+  }
 
   constructor(
     private readonly directory: string,
@@ -167,8 +184,14 @@ export class AilyClient {
     if (!binding) {
       throw new Error('先连接飞书中的智能伙伴。')
     }
+    this.assertPinned(binding)
     const generation = this.generation
     const assertAccount = async (): Promise<void> => {
+      const saved = this.binding()
+      if (!saved) {
+        throw new Error('工作伙伴连接已关闭。')
+      }
+      this.assertPinned(saved)
       const current = await this.identity(binding.profile)
       if (
         generation !== this.generation ||

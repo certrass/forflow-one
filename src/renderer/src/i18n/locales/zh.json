@@ -19402,7 +19402,12 @@
       "undetected": "此主机尚未检测到 CLI",
       "workbuddy": "WorkBuddy／CodeBuddy",
       "workbuddyDescription": "Forflow 启动的是腾讯 CodeBuddy CLI。WorkBuddy 是独立桌面应用，安装桌面版不代表已安装独立 CLI，也不会导入其账号与会话。",
-      "codebuddyHistory": "CodeBuddy CLI 历史与恢复"
+      "codebuddyHistory": "CodeBuddy CLI 历史与恢复",
+      "ailyCliDescription": "使用飞书 CLI 的现有个人登录，在任务中选择豆包工作伙伴，继续同一段飞书对话。",
+      "workbuddyCli": "WorkBuddy",
+      "workbuddyCliDescription": "使用 WorkBuddy 内置 CLI 和现有登录，在当前工作区发起任务，并在原生聊天里继续。",
+      "ailyHistory": "接续飞书对话",
+      "workbuddyHistory": "独立任务与会话恢复"
     },
     "tour": {
       "workflows": {
