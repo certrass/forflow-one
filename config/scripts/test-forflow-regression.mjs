@@ -22,6 +22,7 @@ execFileSync(
     '--config',
     'config/vitest.config.ts',
     ...suite,
+    ...process.argv.slice(2),
     '--reporter=default',
     '--reporter=json',
     `--outputFile=${process.env.FORFLOW_REGRESSION_REPORT || '.forflow/evidence/private-v3-unit-tests.json'}`
