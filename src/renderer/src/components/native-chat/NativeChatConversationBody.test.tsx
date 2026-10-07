@@ -115,3 +115,32 @@ it('preserves the structured host read failure and retry notice', () => {
   expect(screen.getByText('Host reconnecting; history will retry')).toBeTruthy()
   expect(screen.queryByText('Unavailable conversation')).toBeNull()
 })
+
+it('keeps the host loading notice and does not reveal stale conversation content', () => {
+  const view = render(
+    <NativeChatConversationBody
+      session={session}
+      viewState={{ kind: 'loading' }}
+      paneKey="tab:leaf"
+      isVisible={false}
+      loadingState={<p>Connecting to the execution host</p>}
+    >
+      Stale conversation
+    </NativeChatConversationBody>
+  )
+  expect(screen.getByText('Connecting to the execution host')).toBeTruthy()
+  expect(screen.queryByText('Stale conversation')).toBeNull()
+  view.rerender(
+    <NativeChatConversationBody
+      session={session}
+      viewState={{ kind: 'loading' }}
+      paneKey="tab:leaf"
+      isVisible={false}
+      loadingState={null}
+    >
+      Stale conversation
+    </NativeChatConversationBody>
+  )
+  expect(screen.queryByText('Connecting to the execution host')).toBeNull()
+  expect(screen.queryByText('Stale conversation')).toBeNull()
+})

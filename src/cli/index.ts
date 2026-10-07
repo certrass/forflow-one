@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { brandCliDocumentation } from './cli-product'
+import { brandCliDocumentation, applyForflowCliEnvironment, isForflowCli } from './cli-product'
 import {
   findCommandSpec,
   isCommandGroup,
@@ -9,7 +9,6 @@ import {
   specPaths,
   validateCommandAndFlags
 } from './args'
-import { applyForflowCliEnvironment, isForflowCli } from './cli-product'
 import { readOrcaCliVersion } from './cli-version'
 import { dispatch } from './dispatch'
 import {

@@ -32,8 +32,15 @@ describe('Forflow CLI identity and compatibility', () => {
 
   it('covers every command with a Chinese summary and runnable Forflow usage', () => {
     forflow()
+    expect(
+      COMMAND_SPECS.filter((spec) => !FORFLOW_COMMAND_SUMMARIES[spec.path.join(' ')]).map((spec) =>
+        spec.path.join(' ')
+      )
+    ).toEqual([])
     for (const spec of COMMAND_SPECS) {
-      expect(FORFLOW_COMMAND_SUMMARIES[spec.path.join(' ')]).toMatch(/[\u4e00-\u9fff]/)
+      expect(FORFLOW_COMMAND_SUMMARIES[spec.path.join(' ')], spec.path.join(' ')).toMatch(
+        /[\u4e00-\u9fff]/
+      )
       const help = formatCommandHelp(spec)
       expect(help).toMatch(/^forflow /)
       expect(help).toContain('用法： forflow ')

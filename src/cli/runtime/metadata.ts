@@ -1,6 +1,4 @@
-import { cliMessage } from '../cli-product'
-import { brandCliDocumentation } from '../cli-product'
-import { cliProductName, isForflowCli } from '../cli-product'
+import { cliMessage, brandCliDocumentation, cliProductName, isForflowCli } from '../cli-product'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'

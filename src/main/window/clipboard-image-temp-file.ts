@@ -6,7 +6,6 @@ import { getAppEnvironment } from '../../shared/app-environment'
 import { requireSshFilesystemProvider } from '../providers/ssh-filesystem-dispatch'
 import { isWindowsAbsolutePathLike } from '../../shared/cross-platform-path'
 import { assertClipboardImageByteLengthWithinLimit } from '../../shared/clipboard-image'
-import { authorizeExternalPath } from '../ipc/filesystem-auth'
 import { isForflowPrivateDeployment } from '../forflow/deployment-policy'
 
 export type SaveClipboardImageAsTempFileArgs = {
@@ -53,8 +52,5 @@ export async function saveClipboardImageBufferAsTempFile(
 
   const tempPath = path.join(getAppEnvironment().getPath('temp'), fileName)
   await fs.writeFile(tempPath, buffer)
-  // Why: the OS temp dir is outside every allowed root, so without this the
-  // composer's own thumbnail/preview read of the file it just wrote is denied.
-  authorizeExternalPath(tempPath)
   return tempPath
 }

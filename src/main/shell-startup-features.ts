@@ -27,6 +27,7 @@ export type ShellStartupFeature = (typeof SHELL_STARTUP_FEATURES)[number]
 /** Spawn-env keys that mean this pane carries an Orca overlay the wrapper must re-apply. */
 const OVERLAY_ENV_KEYS = [
   'FORFLOW_CLI_BIN_DIR',
+  'ORCA_DATA_ACCOUNT_DATA_HOME',
   'ORCA_OPENCODE_CONFIG_DIR',
   'ORCA_MIMOCODE_HOME',
   'ORCA_OMP_STATUS_EXTENSION',

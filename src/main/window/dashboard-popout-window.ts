@@ -1,5 +1,5 @@
 import { translateMain } from '../i18n/main-i18n'
-import { app, BrowserWindow, nativeTheme, type WebContents } from 'electron'
+import { app, BrowserWindow, nativeTheme, type WebContents, type Event } from 'electron'
 import { join } from 'node:path'
 import { is } from '@electron-toolkit/utils'
 import type { Store } from '../persistence'
@@ -265,7 +265,10 @@ export function createOrFocusDashboardPopout(
   window.on('resize', saveBounds)
   window.on('move', saveBounds)
 
-  const freezeBounds = (): void => {
+  const freezeBounds = (event?: Event): void => {
+    if (event?.defaultPrevented) {
+      return
+    }
     windowClosing = true
     if (boundsTimer) {
       clearTimeout(boundsTimer)

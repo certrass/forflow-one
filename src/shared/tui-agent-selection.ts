@@ -21,6 +21,7 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'muse',
   'dsh',
   'qoder',
+  'qoder-cn',
   'zcode',
   'pi',
   'omp',
@@ -46,12 +47,11 @@ export const TUI_AGENT_AUTO_PICK_ORDER = [
   'mistral-vibe',
   'qwen-code',
   'codebuddy',
-  'qoder-cn',
   'rovo',
   'hermes',
   'devin',
   'openclaw',
-  'codebuddy'
+  'jcode'
 ] as const satisfies readonly TuiAgent[]
 
 const FORFLOW_AGENT_PRIORITY: readonly TuiAgent[] = [

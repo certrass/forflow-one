@@ -13,6 +13,7 @@ import {
   CODEX_WEEKLY_WINDOW_MINUTES,
   type CodexRateLimitWindowsSnapshot
 } from './codex-rate-limit-window-classification'
+import { mapCodexCredits } from './codex-credit-balance'
 import type { CodexRateLimitFetchOptions } from './codex-rate-limit-fetch-options'
 import { abortedCodexRateLimitResult } from './codex-rate-limit-fetch-result'
 import { mapCodexRateLimitWindow } from './codex-rate-limit-window-mapper'
@@ -247,6 +248,7 @@ export function readCodexRateLimitsViaRpc(
           const snapshot = wrapper?.rateLimitsByLimitId?.codex ?? wrapper?.rateLimits
           const classified = classifyCodexRateLimitWindows(snapshot)
           const credits = mapRpcRateLimitResetCredits(wrapper?.rateLimitResetCredits)
+          const extraUsage = mapCodexCredits(wrapper?.rateLimits?.credits)
           settle(
             {
               provider: 'codex',
@@ -254,6 +256,7 @@ export function readCodexRateLimitsViaRpc(
               weekly: mapCodexRateLimitWindow(classified.weekly, CODEX_WEEKLY_WINDOW_MINUTES),
               ...mapCodexAccountMetadata(snapshot),
               ...(credits !== undefined ? { rateLimitResetCredits: credits } : {}),
+              ...(extraUsage ? { extraUsage } : {}),
               updatedAt: Date.now(),
               error: null,
               status: 'ok'

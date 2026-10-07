@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNow } from '@/hooks/use-now'
 import type { CodexUsageDailyPoint, CodexUsageRange } from '../../../../shared/codex-usage-types'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -17,9 +18,10 @@ export function CodexUsageDailyChart({
 }): React.JSX.Element {
   const c = usageWorkspaceCopy()
   const [group, setGroup] = useState('types')
+  const now = useNow(60_000)
   const points = useMemo(
-    () => buildCodexUsageChart(daily, range, new Date(), reportedTotals),
-    [daily, range, reportedTotals]
+    () => buildCodexUsageChart(daily, range, new Date(now), reportedTotals),
+    [daily, range, now, reportedTotals]
   )
   const max = Math.max(1, ...points.map((point) => point.total))
   const totals = points.reduce(
