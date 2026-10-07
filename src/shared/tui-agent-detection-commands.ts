@@ -1,3 +1,5 @@
+import { isForflowBuild } from './product-branding'
+import { isCompanionAgent } from './forflow-companion'
 import type { TuiAgent } from './tui-agent'
 import {
   getTuiAgentDetectCommands,
@@ -48,9 +50,11 @@ export function getTuiAgentDetectionProbeCommands(
 ): string[] {
   return [
     ...new Set(
-      commands
-        .filter((command) => !isDetectionUnsupportedInRuntime(command, runtime))
-        .flatMap((command) => [command.cmd, ...(command.requiredCommands ?? [])])
+      commands.flatMap((command) =>
+        isDetectionUnsupportedInRuntime(command, runtime)
+          ? []
+          : [command.cmd, ...(command.requiredCommands ?? [])]
+      )
     )
   ]
 }
@@ -61,6 +65,7 @@ export function resolveDetectedTuiAgentIds(
   runtime: TuiAgentDetectionRuntime
 ): TuiAgent[] {
   const detected = commands
+    .filter((command) => isForflowBuild() || !isCompanionAgent(command.id))
     .filter(
       (command) =>
         !isDetectionUnsupportedInRuntime(command, runtime) &&

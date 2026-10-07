@@ -66,6 +66,23 @@ describe('tui agent permissions', () => {
     )
   })
 
+  it('switches Muse between yolo and manual arguments', () => {
+    expect(
+      applyAgentPermissionMode({
+        mode: 'yolo',
+        agentDefaultArgs: { muse: '' },
+        agentDefaultEnv: {}
+      }).agentDefaultArgs.muse
+    ).toBe('--yolo')
+    expect(
+      applyAgentPermissionMode({
+        mode: 'manual',
+        agentDefaultArgs: { muse: '--yolo' },
+        agentDefaultEnv: {}
+      }).agentDefaultArgs.muse
+    ).toBe('')
+  })
+
   it('resolves custom Codex permission arguments as mixed', () => {
     expect(
       resolveTuiAgentPermissionMode({
@@ -84,5 +101,28 @@ describe('tui agent permissions', () => {
         agentEnv: YOLO_TUI_AGENT_ENV.goose
       })
     ).toBe('yolo')
+  })
+})
+
+describe('explicit CodeBuddy approval mode', () => {
+  it('recognizes domestic manual defaults and permits an explicit mode switch', () => {
+    expect(
+      resolveTuiAgentPermissionMode({
+        agent: 'codebuddy',
+        agentArgs: '--permission-mode default'
+      })
+    ).toBe('manual')
+    expect(
+      resolveTuiAgentPermissionMode({
+        agent: 'codebuddy',
+        agentArgs: '--permission-mode default --model custom'
+      })
+    ).toBe('mixed')
+    expect(
+      applyAgentPermissionMode({
+        mode: 'yolo',
+        agentDefaultArgs: { codebuddy: '--permission-mode default' }
+      }).agentDefaultArgs.codebuddy
+    ).toBe(YOLO_TUI_AGENT_ARGS.codebuddy)
   })
 })

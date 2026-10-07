@@ -8,6 +8,7 @@ import { ContextualTourCallout } from '../contextual-tours/ContextualTourCallout
 
 type WorkspaceReviewStepHelpProps = {
   active?: boolean
+  initiallyOpen?: boolean
   anchorRef: RefObject<HTMLElement | null>
   title: string
   body: string
@@ -21,6 +22,7 @@ type WorkspaceReviewStepHelpProps = {
 
 export function WorkspaceReviewStepHelp({
   active = true,
+  initiallyOpen = true,
   anchorRef,
   title,
   body,
@@ -31,7 +33,7 @@ export function WorkspaceReviewStepHelp({
   children,
   actions
 }: WorkspaceReviewStepHelpProps): React.JSX.Element {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(initiallyOpen)
   const id = useId()
   const globalTourActive = useAppStore((state) => state.activeContextualTourId !== null)
   const visible = active && !globalTourActive

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
+import { ailySessionHint } from '@/lib/forflow-companion-catalog'
 import type { NewWorkspaceComposerCardProps } from './new-workspace-composer-card-props'
 
 type NewWorkspaceComposerAgentSectionProps = Pick<
@@ -17,6 +18,7 @@ type NewWorkspaceComposerAgentSectionProps = Pick<
   | 'advancedOpen'
   | 'onToggleAdvanced'
 > & {
+  advancedLocked?: boolean
   visibleQuickAgents: React.ComponentProps<typeof AgentCombobox>['agents']
   defaultTuiAgent: React.ComponentProps<typeof AgentCombobox>['defaultAgent']
   handleSetDefaultAgent: (
@@ -31,6 +33,7 @@ export function NewWorkspaceComposerAgentSection({
   createDisabled,
   onCreate,
   advancedOpen,
+  advancedLocked = false,
   onToggleAdvanced,
   visibleQuickAgents,
   defaultTuiAgent,
@@ -76,6 +79,9 @@ export function NewWorkspaceComposerAgentSection({
           triggerClassName="h-9 w-full min-w-0 border-input text-sm focus:border-ring focus:ring-[3px] focus:ring-ring/50"
           onTriggerEnter={createDisabled ? undefined : onCreate}
         />
+        {quickAgent === 'aily' ? (
+          <p className="text-sm text-muted-foreground">{ailySessionHint()}</p>
+        ) : null}
       </div>
 
       <div className="!mb-2">
@@ -84,6 +90,8 @@ export function NewWorkspaceComposerAgentSection({
           variant="ghost"
           size="sm"
           onClick={onToggleAdvanced}
+          disabled={advancedLocked}
+          aria-expanded={advancedOpen}
           className="-ml-2 text-xs focus-visible:ring-inset"
         >
           {translate('auto.components.NewWorkspaceComposerCard.f0470c7383', 'Advanced')}

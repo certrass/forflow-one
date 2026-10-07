@@ -171,7 +171,7 @@ test('Analytics to Review: persisted anchored decisions, source changes, history
     }
     await analytics.getByRole('button', { name: '打开审阅', exact: true }).click()
     await expect(review).toContainText('检查执行结果')
-    await review.getByRole('button', { name: '定位关联记录', exact: true }).click()
+    await review.getByRole('button', { name: '查看材料', exact: true }).click()
     await expect(row).toBeVisible()
     await review.getByRole('tab', { name: /发现的问题/ }).click()
     await review.getByRole('button', { name: '驳回', exact: true }).click()
@@ -185,7 +185,7 @@ test('Analytics to Review: persisted anchored decisions, source changes, history
       source,
       `${JSON.stringify({ timestamp: new Date().toISOString(), type: 'response_item', payload: { type: 'function_call_output', call_id: 'call-review-23', output: 'result now visible' } })}\n`
     )
-    await review.getByRole('button', { name: '重新读取当前记录', exact: true }).click()
+    await review.getByRole('button', { name: '更新材料内容', exact: true }).click()
     await expect(review.getByRole('combobox', { name: '版本', exact: true })).toContainText('v2')
     await expect(review.getByRole('button', { name: '确认此版本', exact: true })).toBeDisabled()
     await review.getByRole('tab', { name: '概览与活动', exact: true }).click()
@@ -207,7 +207,7 @@ test('Analytics to Review: persisted anchored decisions, source changes, history
     await review.getByRole('combobox', { name: '版本', exact: true }).click()
     await page.getByRole('option', { name: /^v2/ }).click()
     await expect(row).toContainText('已找到')
-    await row.getByRole('button', { name: '查看返回记录', exact: true }).click()
+    await row.getByRole('button', { name: '查看结果', exact: true }).click()
     await expect(review.locator('pre')).toContainText('result now visible')
     await review.getByRole('tab', { name: /发现的问题/ }).click()
     await review.getByRole('button', { name: '复查后解决', exact: true }).click()

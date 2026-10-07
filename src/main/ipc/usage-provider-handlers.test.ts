@@ -22,13 +22,16 @@ describe('usage provider IPC handlers', () => {
     const claudeUsage = createUsage()
     const codexUsage = createUsage()
     const openCodeUsage = createUsage()
+    const museUsage = createUsage()
     registerUsageProviderHandlers({
       claudeUsage: claudeUsage as never,
       codexUsage: codexUsage as never,
+      // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: the mock implements every method the registrar calls on a usage store.
+      museUsage: museUsage as never,
       openCodeUsage: openCodeUsage as never
     })
 
-    const prefixes = ['claudeUsage', 'codexUsage', 'openCodeUsage']
+    const prefixes = ['claudeUsage', 'codexUsage', 'openCodeUsage', 'museUsage']
     const suffixes = Object.keys(claudeUsage)
     expect(handle.mock.calls.map(([channel]) => channel)).toEqual(
       prefixes.flatMap((prefix) => [
@@ -46,6 +49,7 @@ describe('usage provider IPC handlers', () => {
     call('claudeUsage', 'getScanState')
     call('codexUsage', 'getScanState')
     call('openCodeUsage', 'getScanState')
+    call('museUsage', 'getScanState')
     call('claudeUsage', 'setEnabled', { enabled: true })
     call('claudeUsage', 'refresh')
     call('claudeUsage', 'refresh', { force: true })
@@ -58,6 +62,7 @@ describe('usage provider IPC handlers', () => {
     expect(claudeUsage.getScanState).toHaveBeenCalledWith()
     expect(codexUsage.getScanState).toHaveBeenCalledWith()
     expect(openCodeUsage.getScanState).toHaveBeenCalledWith()
+    expect(museUsage.getScanState).toHaveBeenCalledWith()
     expect(claudeUsage.setEnabled).toHaveBeenCalledWith(true)
     expect(claudeUsage.refresh.mock.calls).toEqual([[false], [true]])
     expect(claudeUsage.getSnapshot).toHaveBeenCalledWith('orca', '30d', 7)

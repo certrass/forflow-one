@@ -21,11 +21,11 @@ describe('feature-wall-setup-checklist-localized-copy', () => {
       return copy.name
     })
     expect(names).toEqual([
-      '多任务并行',
+      '同时处理两项任务',
       '使用 Orca 浏览器',
       '开启通知',
       '选择默认智能体',
-      '启用 Orca CLI',
+      '为智能体提供 Orca 技能',
       '连接集成服务',
       '自动配置工作区',
       '在多个仓库中开始工作'

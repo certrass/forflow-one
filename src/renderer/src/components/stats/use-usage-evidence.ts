@@ -8,11 +8,14 @@ export function useUsageEvidence(selection: UsageEvidenceSelection) {
   const codexSummary = useAppStore((s) => s.codexUsageSummary)
   const openCodeScan = useAppStore((s) => s.openCodeUsageScanState)
   const openCodeSummary = useAppStore((s) => s.openCodeUsageSummary)
+  const museScan = useAppStore((s) => s.museUsageScanState)
+  const museSummary = useAppStore((s) => s.museUsageSummary)
   return buildUsageEvidence(
     {
       claude: { scanState: claudeScan, summary: claudeSummary, daily: [] },
       codex: { scanState: codexScan, summary: codexSummary, daily: [] },
-      opencode: { scanState: openCodeScan, summary: openCodeSummary, daily: [] }
+      opencode: { scanState: openCodeScan, summary: openCodeSummary, daily: [] },
+      muse: { scanState: museScan, summary: museSummary, daily: [] }
     },
     selection
   )

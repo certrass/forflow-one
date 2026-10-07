@@ -24,9 +24,13 @@ export function ForflowSessionGuide({ canReview }: { canReview: boolean }): Reac
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="xs" variant="ghost">
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label={translate('forflow.sessionGuide.label', 'How to use this workspace')}
+          title={translate('forflow.sessionGuide.label', 'How to use this workspace')}
+        >
           <CircleHelp />
-          {translate('forflow.sessionGuide.label', 'How to use this workspace')}
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -42,10 +46,7 @@ export function ForflowSessionGuide({ canReview }: { canReview: boolean }): Reac
               {translate('forflow.sessionGuide.title', 'Complete your first task')}
             </h2>
             <p className="text-xs text-muted-foreground">
-              {translate(
-                'forflow.sessionGuide.intro',
-                'Choose a topic below. You can close this guide and reopen it here at any time.'
-              )}
+              {translate('forflow.sessionGuide.intro', 'Find the next step for your task.')}
             </p>
           </div>
           <Accordion type="single" collapsible defaultValue="chat">

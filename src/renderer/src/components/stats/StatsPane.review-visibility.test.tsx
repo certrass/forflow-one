@@ -72,16 +72,16 @@ const originalApi = window.api
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
-  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
-    function (this: HTMLElement) {
-      return new DOMRect(
-        0,
-        0,
-        this === document.documentElement ? 1280 : 320,
-        this === document.documentElement ? 800 : 80
-      )
-    }
-  )
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: HTMLElement
+  ) {
+    return new DOMRect(
+      0,
+      0,
+      this === document.documentElement ? 1280 : 320,
+      this === document.documentElement ? 800 : 80
+    )
+  })
   vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1280)
   vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(800)
   Object.defineProperty(window, 'api', {
@@ -138,12 +138,14 @@ it('pauses a saved review guide outside Review and preserves dismissal when retu
 
 it('passes Review visibility through the saved-material editor without resetting dismissal', async () => {
   await openReview()
-  fireEvent.click(screen.getByRole('button', { name: 'Edit selected evidence' }))
-  expect(await screen.findByRole('dialog', { name: 'Next, click here' })).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: 'Change materials' }))
+  expect(await screen.findByRole('checkbox', { name: 'README.md' })).toBeChecked()
+  fireEvent.click(screen.getByRole('button', { name: 'Step help' }))
+  expect(await screen.findByRole('dialog', { name: 'Ready to continue' })).toBeVisible()
   switchTab('Analytics')
   expect(document.querySelector('[data-workspace-review-step-help]')).toBeNull()
   switchTab('Review')
-  expect(await screen.findByRole('dialog', { name: 'Next, click here' })).toBeVisible()
+  expect(await screen.findByRole('dialog', { name: 'Ready to continue' })).toBeVisible()
   fireEvent.click(screen.getByRole('button', { name: 'Close this tip' }))
   switchTab('Overview')
   switchTab('Review')
@@ -155,4 +157,18 @@ it('keeps direct workspace review callers active by default', async () => {
   expect(
     await screen.findByRole('dialog', { name: 'Start with the source material' })
   ).toBeVisible()
+})
+
+it('opens project intake directly and returns a saved review to the same review surface', async () => {
+  render(<StatsPane reviewOnly />)
+  expect(await screen.findByTestId('workspace-review-intake')).toBeVisible()
+  expect(screen.queryByRole('tab', { name: 'Overview' })).toBeNull()
+  expect(screen.queryByText('Overview content')).toBeNull()
+  fireEvent.click(await screen.findByRole('button', { name: 'Open review' }))
+  expect(
+    await screen.findByRole('dialog', { name: 'Start with the source material' })
+  ).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: 'Hide guidance' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Back to project reviews' }))
+  expect(await screen.findByTestId('workspace-review-intake')).toBeVisible()
 })

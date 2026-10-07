@@ -29,11 +29,15 @@ function withEvidence(choice: string): JevReceipt {
 }
 
 it.each([
-  ['supported', 'The material supports this requirement', 'Jev does not confirm it for you.'],
+  [
+    'supported',
+    'The material supports this requirement',
+    'confirm this review version when ready.'
+  ],
   [
     'insufficient',
     'More evidence is needed before deciding',
-    'An evidence gap is not a demonstrated failure.'
+    'More execution results or supporting materials are needed'
   ],
   [
     'unmet',
@@ -53,10 +57,10 @@ it.each([
   const summary = screen.getByTestId('jev-result-summary')
   expect(within(summary).getByRole('heading', { name: title })).toBeVisible()
   expect(summary).toHaveTextContent(action)
-  expect(summary).toHaveTextContent('Awaiting human review')
+  expect(summary).toHaveTextContent('Awaiting review')
   expect(screen.getByTestId('jev-check-details')).not.toHaveAttribute('open')
   expect(screen.getByText(/Model confidence: 40.0%/)).not.toBeVisible()
-  fireEvent.click(screen.getByText('What the five checks mean'))
+  fireEvent.click(screen.getByText('Check details'))
   expect(screen.getByText(/Model confidence: 40.0%/)).toBeVisible()
 })
 
@@ -91,7 +95,7 @@ it.each(['missing-answer', 'wrong-primitive', 'unfinished', 'historical'])(
     expect(summary).toHaveTextContent(
       condition === 'historical' ? 'earlier evaluator' : 'No complete judgment'
     )
-    fireEvent.click(screen.getByText('What the five checks mean'))
+    fireEvent.click(screen.getByText('Check details'))
     const button = screen.getByRole('button', { name: jevAuditCopy().accept })
     expect(button).toBeDisabled()
     fireEvent.click(button)
@@ -111,7 +115,7 @@ it('explains what Noul and Score measure and retains their raw numeric outputs',
       onAccept={vi.fn()}
     />
   )
-  fireEvent.click(screen.getByText('What the five checks mean'))
+  fireEvent.click(screen.getByText('Check details'))
   expect(
     screen.getByText(
       /Probability that the material explicitly records an unresolved failure.*90.0%/
@@ -155,13 +159,13 @@ it('records only actionable choice results and navigation never initiates anothe
   const summary = screen.getByTestId('jev-result-summary')
   fireEvent.click(within(summary).getByRole('button', { name: jevAuditCopy().accept }))
   expect(onAccept).toHaveBeenCalledExactlyOnceWith(deliveryReceipt.id, 'criterion_evidence')
-  fireEvent.click(screen.getByText('What the five checks mean'))
+  fireEvent.click(screen.getByText('Check details'))
   expect(
     within(screen.getByTestId('jev-check-details')).queryByRole('button', {
       name: jevAuditCopy().accept
     })
   ).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Choose evidence again' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Choose materials again' }))
   expect(onRecheck).toHaveBeenCalledTimes(1)
   expect(onAccept).toHaveBeenCalledTimes(1)
   const onIssues = vi.fn()
@@ -188,7 +192,7 @@ it('records only actionable choice results and navigation never initiates anothe
     />
   )
   expect(screen.getByRole('button', { name: jevAuditCopy().accepted })).toBeDisabled()
-  fireEvent.click(screen.getByRole('button', { name: 'View recorded issues' }))
+  fireEvent.click(screen.getByRole('button', { name: 'View issues' }))
   expect(onIssues).toHaveBeenCalledTimes(1)
   expect(onAccept).toHaveBeenCalledTimes(1)
 })
@@ -212,7 +216,7 @@ it('allows navigation away from an obsolete judgment while keeping adoption disa
     />
   )
   expect(screen.getByRole('button', { name: jevAuditCopy().accept })).toBeDisabled()
-  fireEvent.click(screen.getByRole('button', { name: 'Choose evidence again' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Choose materials again' }))
   expect(onRecheck).toHaveBeenCalledTimes(1)
   expect(onAccept).not.toHaveBeenCalled()
   view.rerender(
@@ -224,5 +228,5 @@ it('allows navigation away from an obsolete judgment while keeping adoption disa
       onAccept={onAccept}
     />
   )
-  expect(screen.getByRole('button', { name: 'Choose evidence again' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Choose materials again' })).toBeDisabled()
 })

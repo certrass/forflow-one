@@ -21,9 +21,7 @@ describe('GPU acceleration About panel', () => {
       translate,
       description: zh.forflow.productDescription
     })
-    expect(options.credits).toBe(
-      '面向 AI 与研发团队的私有化智能体工作台。\n图形加速: 已关闭（安全图形模式）'
-    )
+    expect(options.credits).toBe('让智能体一起完成任务。\n图形加速: 已关闭（安全图形模式）')
     expect(describeGpuAcceleration({ gpu_compositing: 'new_status' }, false, translate)).toBe(
       '未知 (new_status)'
     )

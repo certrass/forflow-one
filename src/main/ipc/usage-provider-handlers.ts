@@ -4,11 +4,13 @@ import type { ClaudeUsageStore } from '../claude-usage/store'
 import type { CodexUsageStore } from '../codex-usage/store'
 import type { OpenCodeUsageStore } from '../opencode-usage/store'
 import { registerCodexReviewHandlers } from './codex-review-handlers'
+import type { MuseUsageStore } from '../muse-usage/store'
 
 type UsageProviderStores = {
   claudeUsage: ClaudeUsageStore
   codexUsage: CodexUsageStore
   openCodeUsage: OpenCodeUsageStore
+  museUsage: MuseUsageStore
 }
 
 type UsageProviderChannelPrefix = keyof UsageProviderStores
@@ -84,4 +86,5 @@ export function registerUsageProviderHandlers(
     return stores.codexUsage.getAudit(args.scope, args.range)
   })
   registerProviderHandlers('openCodeUsage', stores.openCodeUsage)
+  registerProviderHandlers('museUsage', stores.museUsage)
 }

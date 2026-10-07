@@ -28,7 +28,8 @@ const session: NativeChatLiveSession = {
   ],
   hasMore: false,
   loadingEarlier: false,
-  loadEarlier: () => {}
+  olderHistoryGeneration: 0,
+  loadEarlier: async () => 'exhausted'
 }
 
 it('retains readable history after read failure without allowing it to be copied as settled', () => {
@@ -43,12 +44,10 @@ it('retains readable history after read failure without allowing it to be copied
     </NativeChatConversationBody>
   )
   expect(screen.getByText('Retained conversation')).toBeTruthy()
-  fireEvent.click(screen.getByRole('button', { name: 'Handoff preview · Beta' }))
-  expect(
-    screen
-      .getByRole('button', { name: 'Copy handoff with source receipt' })
-      .hasAttribute('disabled')
-  ).toBe(true)
+  fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
 })
 
 it('blocks a send awaiting transcript confirmation and retains the source runtime identity', () => {
@@ -64,13 +63,11 @@ it('blocks a send awaiting transcript confirmation and retains the source runtim
       Conversation
     </NativeChatConversationBody>
   )
-  fireEvent.click(screen.getByRole('button', { name: 'Handoff preview · Beta' }))
-  expect(screen.getByText(/message is awaiting confirmation/)).toBeTruthy()
-  expect(
-    screen
-      .getByRole('button', { name: 'Copy handoff with source receipt' })
-      .hasAttribute('disabled')
-  ).toBe(true)
+  fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
+  expect(screen.getByText(/Send or retry the pending messages/)).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
   view.rerender(
     <NativeChatConversationBody
       session={session}
@@ -83,4 +80,38 @@ it('blocks a send awaiting transcript confirmation and retains the source runtim
     </NativeChatConversationBody>
   )
   expect(screen.queryByRole('dialog')).toBeNull()
+})
+
+it('keeps a handoff unavailable while the host reports background child work', () => {
+  render(
+    <NativeChatConversationBody
+      session={session}
+      viewState={{ kind: 'ready', isWorking: false }}
+      paneKey="tab:leaf"
+      busy
+      isVisible
+    >
+      Conversation
+    </NativeChatConversationBody>
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Copy conversation' }))
+  expect(screen.getByRole('button', { name: 'Copy to clipboard' }).hasAttribute('disabled')).toBe(
+    true
+  )
+})
+
+it('preserves the structured host read failure and retry notice', () => {
+  render(
+    <NativeChatConversationBody
+      session={session}
+      viewState={{ kind: 'error', message: 'Generic read failure' }}
+      paneKey="tab:leaf"
+      isVisible
+      errorState={<p>Host reconnecting; history will retry</p>}
+    >
+      Unavailable conversation
+    </NativeChatConversationBody>
+  )
+  expect(screen.getByText('Host reconnecting; history will retry')).toBeTruthy()
+  expect(screen.queryByText('Unavailable conversation')).toBeNull()
 })

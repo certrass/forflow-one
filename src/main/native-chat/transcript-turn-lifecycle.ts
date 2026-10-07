@@ -1,3 +1,4 @@
+import { decodeCompanionTurnLifecycle } from './transcript-line-decoders-companion'
 import type { AgentType, NativeChatTurnLifecycle } from '../../shared/native-chat-types'
 import { resolveNativeChatTranscriptAgent } from '../../shared/native-chat-agent-support'
 import { isNoiseMessage } from '../../shared/native-chat-noise'
@@ -24,6 +25,9 @@ export function nativeChatTurnLifecycleDecoderForAgent(
   agent: AgentType
 ): NativeChatTurnLifecycleDecoder | null {
   const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
+  if (transcriptAgent === 'aily' || transcriptAgent === 'workbuddy') {
+    return decodeCompanionTurnLifecycle
+  }
   if (transcriptAgent === 'codex') {
     return decodeCodexTurnLifecycle
   }

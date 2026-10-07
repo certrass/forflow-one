@@ -17,7 +17,10 @@ const cliStatusSchema = z.object({
   identities: z.object({ user: cliUserSchema })
 })
 
-export function readFeishuIdentity(value: unknown): FeishuConnection {
+export function readFeishuAccount(value: unknown): {
+  connection: FeishuConnection
+  scopes: Set<string>
+} {
   const parsed = cliStatusSchema.safeParse(value)
   if (!parsed.success) {
     throw new Error('尚未找到飞书个人授权，请按连接指引配置并登录。')
@@ -27,13 +30,25 @@ export function readFeishuIdentity(value: unknown): FeishuConnection {
   if (!['ready', 'needs_refresh'].includes(user.status)) {
     throw new Error('飞书个人登录已失效，请重新授权后连接。')
   }
+  return {
+    connection: {
+      appId: parsed.data.appId,
+      userId: user.openId,
+      userName: user.userName || '飞书用户'
+    },
+    scopes
+  }
+}
+
+export function readFeishuIdentity(value: unknown): FeishuConnection {
+  const { connection, scopes } = readFeishuAccount(value)
   if (
     !['task:task:read', 'task:task:write'].some((scope) => scopes.has(scope)) ||
     !['task:tasklist:read', 'task:tasklist:write'].some((scope) => scopes.has(scope))
   ) {
     throw new Error('飞书授权缺少任务或任务清单读取权限，请按连接指引补充授权。')
   }
-  return { appId: parsed.data.appId, userId: user.openId, userName: user.userName || '飞书用户' }
+  return connection
 }
 
 const taskSchema = z.object({

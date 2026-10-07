@@ -10,8 +10,7 @@ describe('getRepoBackedTaskEmptyState', () => {
       })
     ).toEqual({
       title: 'No project sources selected',
-      description:
-        'Select at least one project source so Orca knows which host/account to fetch tasks from.'
+      description: 'Choose a project above to load external tasks, or start with New task.'
     })
   })
 

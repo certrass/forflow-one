@@ -36,8 +36,8 @@ it('shows historical legacy and delivery replies without allowing obsolete quest
     />
   )
   expect(screen.getAllByText('历史问题或审计器版本 · 请重新检查后采纳')).toHaveLength(2)
-  expect(screen.getAllByRole('button', { name: '记录为待处理问题' })).toHaveLength(2)
-  for (const button of screen.getAllByRole('button', { name: '记录为待处理问题' })) {
+  expect(screen.getAllByRole('button', { name: '记录问题' })).toHaveLength(2)
+  for (const button of screen.getAllByRole('button', { name: '记录问题' })) {
     expect(button).toBeDisabled()
     fireEvent.click(button)
   }
@@ -56,12 +56,12 @@ it('locates every source and leaves even current delivery results read-only in h
       receipts={[{ ...deliveryReceipt, evidenceKeys: ['evidence', 'linked-source'] }]}
     />
   )
-  const buttons = screen.getAllByRole('button', { name: /^定位关联记录/ })
+  const buttons = screen.getAllByRole('button', { name: /^查看材料/ })
   expect(buttons).toHaveLength(2)
   fireEvent.click(buttons[1])
   expect(onLocate).toHaveBeenCalledWith('linked-source')
-  expect(screen.getByRole('button', { name: '记录为待处理问题' })).toBeDisabled()
-  fireEvent.click(screen.getByText('五项检查分别在看什么'))
+  expect(screen.getByRole('button', { name: '记录问题' })).toBeDisabled()
+  fireEvent.click(screen.getByText('检查详情'))
   expect(screen.getByText(/1.81 \/ 4/)).toBeVisible()
   expect(screen.getByText(/按返回概率重算: 1.70/)).toBeVisible()
 })
@@ -77,7 +77,7 @@ it('keeps current legacy choice adoption compatible', () => {
       receipts={[{ ...receipt, questionVersion: JEV_QUESTION_VERSION }]}
     />
   )
-  fireEvent.click(screen.getByRole('button', { name: '记录为待处理问题' }))
+  fireEvent.click(screen.getByRole('button', { name: '记录问题' }))
   expect(onAccept).toHaveBeenCalledWith(receipt.id, 'evidence')
 })
 
@@ -107,9 +107,9 @@ it('renders the exact delivery criterion and each source role without inventing 
     }
   })
   render(<JevRequestPreview body={body} />)
-  expect(screen.getByText('本次检查要求 · 重启后仍可读取')).toBeVisible()
+  expect(screen.getByText('检查要求 · 重启后仍可读取')).toBeVisible()
   expect(screen.getByText('S1 · 助手主张')).toBeVisible()
   expect(screen.getByText('S2 · 执行返回')).toBeVisible()
   expect(screen.getByText('只完成保存，尚未重启。', { exact: true })).toBeVisible()
-  expect(screen.getByText('作为交接说明')).toBeVisible()
+  expect(screen.getByText('交付说明')).toBeVisible()
 })

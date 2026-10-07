@@ -1,3 +1,4 @@
+import { decodeCompanionTranscriptLine } from './transcript-line-decoders-companion'
 import type {
   AgentType,
   NativeChatMessage,
@@ -55,6 +56,9 @@ export async function readNativeChatTranscript(
   }
   try {
     const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
+    if (transcriptAgent === 'aily' || transcriptAgent === 'workbuddy') {
+      return { messages: await readTranscript(filePath, decodeCompanionTranscriptLine) }
+    }
     if (transcriptAgent === 'claude') {
       return { messages: await readTranscript(filePath, decodeClaudeTranscriptLine) }
     }

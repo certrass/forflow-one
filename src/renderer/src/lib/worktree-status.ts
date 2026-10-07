@@ -19,7 +19,9 @@ export type WorktreeStatus =
   | 'working'
   | 'monitoring'
   | 'permission'
+  | 'failed'
   | 'interrupted'
+  | 'unconfirmed'
   | 'done'
   | 'inactive'
 
@@ -37,6 +39,8 @@ const getStatusLabels = createLocalizedCatalog((): Record<WorktreeStatus, string
   working: translate('worktree.status.working', 'Working'),
   monitoring: translate('worktree.status.monitoring', 'Monitoring background tasks'),
   permission: translate('worktree.status.permission', 'Needs permission'),
+  failed: translate('worktree.status.failed', 'Failed'),
+  unconfirmed: translate('worktree.status.unconfirmed', 'Couldn’t confirm'),
   interrupted: translate('worktree.status.interrupted', 'Interrupted'),
   done: translate('worktree.status.done', 'Done'),
   inactive: translate('worktree.status.inactive', 'Inactive')
@@ -169,7 +173,7 @@ export function getWorktreeStatusLabel(status: WorktreeStatus): string {
  *
  * Map args are narrowed to this worktree. `hasPermission`/`hasLiveWorking`/
  * `hasLiveDone` are fresh hook entries ({blocked,waiting} / {working} / {done});
- * `hasRetainedDone` is a retained-agent snapshot scoped to this worktreeId.
+ * `hasRetainedDone`/`hasRetainedFailed` are retained-agent snapshots scoped to this worktreeId.
  */
 export function resolveWorktreeStatus(args: {
   tabs: readonly Pick<TerminalTab, 'id' | 'title' | 'launchAgent'>[]
@@ -183,9 +187,12 @@ export function resolveWorktreeStatus(args: {
   hasPermission: boolean
   hasLiveWorking: boolean
   hasLiveMonitoring?: boolean
+  hasFailed?: boolean
   hasInterrupted?: boolean
+  hasUnconfirmed?: boolean
   hasLiveDone: boolean
   hasRetainedDone: boolean
+  hasRetainedFailed?: boolean
 }): WorktreeStatus {
   const heuristic = getWorktreeStatus(
     args.tabs,
@@ -206,6 +213,11 @@ export function resolveWorktreeStatus(args: {
   if (heuristic === 'permission') {
     return 'permission'
   }
+  // Why: a failure is news, so it outranks live work (a failed main agent's subagents may still
+  // run); only a pending question comes first.
+  if (args.hasFailed) {
+    return 'failed'
+  }
   // Why: restored cards get the hook snapshot before panes mount; trust the explicit working row so they stay yellow on restart.
   if (args.hasLiveWorking || heuristic === 'working') {
     return 'working'
@@ -213,7 +225,15 @@ export function resolveWorktreeStatus(args: {
   if (args.hasLiveMonitoring || heuristic === 'monitoring') {
     return 'monitoring'
   }
-  // Terminal outcomes follow live states, but an interrupted outcome must not collapse into success.
+  // Why: a departed agent's failure has no expiry, so it must not pin the card over live work.
+  if (args.hasRetainedFailed) {
+    return 'failed'
+  }
+  // Why: an end Orca cannot prove is not a finish, and unlike a user's Stop it is news.
+  if (args.hasUnconfirmed) {
+    return 'unconfirmed'
+  }
+  // A user's Stop follows every state that is news, but must not collapse into success.
   if (args.hasInterrupted) {
     return 'interrupted'
   }

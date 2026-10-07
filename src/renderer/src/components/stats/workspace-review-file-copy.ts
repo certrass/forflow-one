@@ -14,7 +14,7 @@ export function workspaceReviewFileCopy() {
     parent: translate('forflow.workspaceFiles.parent', 'Up one folder'),
     openFolder: translate('forflow.workspaceFiles.openFolder', 'Open folder'),
     currentFolder: translate('forflow.workspaceFiles.currentFolder', 'Current folder'),
-    search: translate('forflow.workspaceFiles.search', 'Filter this folder by name'),
+    search: translate('forflow.workspaceFiles.search', 'Filter files in this folder'),
     loading: translate('forflow.workspaceFiles.loading', 'Listing files…'),
     empty: translate(
       'forflow.workspaceFiles.empty',
@@ -41,8 +41,11 @@ export function workspaceReviewFileCopy() {
       'This project cannot be browsed on this device.'
     ),
     retry: translate('forflow.workspaceFiles.retry', 'Try again'),
-    selected: translate('forflow.workspaceFiles.selected', 'Selected files'),
-    noSelection: translate('forflow.workspaceFiles.noSelection', 'No files selected yet.'),
+    selected: translate('forflow.workspaceFiles.selected', 'Selected materials'),
+    noSelection: translate(
+      'forflow.workspaceFiles.noSelection',
+      'Select at least one file from the project list.'
+    ),
     limit: translate(
       'forflow.workspaceFiles.limit',
       '40 files selected. Remove a file before selecting another.'
@@ -50,7 +53,7 @@ export function workspaceReviewFileCopy() {
     purpose: translate('forflow.workspaceFiles.purpose', 'File purpose'),
     purposeNote: translate(
       'forflow.workspaceFiles.purposeNote',
-      'File purpose is suggested from its extension. You can change it; a test record still needs to be checked against the result.'
+      'Adjust the suggested purpose to match how each file is used.'
     ),
     code: translate('forflow.workspaceFiles.code', 'Code'),
     document: translate('forflow.workspaceFiles.document', 'Requirements and documents'),

@@ -102,7 +102,8 @@ it('opens an existing review at its materials after asynchronous project hydrati
   })
   expect(await screen.findByRole('checkbox', { name: 'README.md' })).toBeChecked()
   expect(screen.queryByRole('combobox', { name: '项目' })).toBeNull()
-  expect(screen.getByText('检查目标：运行说明应包含步骤与预期结果')).toBeVisible()
+  fireEvent.click(screen.getByText('检查要求', { selector: 'summary' }))
+  expect(screen.getByText('运行说明应包含步骤与预期结果')).toBeVisible()
   expect(screen.getByRole('combobox', { name: '文件用途: README.md' })).toHaveTextContent(
     '需求与说明'
   )
@@ -110,8 +111,10 @@ it('opens an existing review at its materials after asynchronous project hydrati
   expect(analytics).not.toHaveBeenCalled()
   expect(open).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button', { name: '上一步' }))
-  expect(screen.getByLabelText('检查目标')).toHaveValue('运行说明应包含步骤与预期结果')
-  fireEvent.click(screen.getByRole('button', { name: '继续：选择材料' }))
+  expect(screen.getByRole('textbox', { name: '检查要求' })).toHaveValue(
+    '运行说明应包含步骤与预期结果'
+  )
+  fireEvent.click(screen.getByRole('button', { name: '下一步：选择材料' }))
   expect(await screen.findByRole('checkbox', { name: 'README.md' })).toBeChecked()
   fireEvent.click(screen.getByRole('button', { name: '更新审阅材料' }))
   await waitFor(() => expect(onOpenReview).toHaveBeenCalledWith(initial))

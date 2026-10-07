@@ -59,7 +59,7 @@ export function ForflowTaskPrompt({
       <p id={`${id}-hint`} className="text-xs text-muted-foreground">
         {translate(
           'forflow.taskPrompt.hint',
-          'Choose an agent after writing the task. Codex is recommended for Chat. Creating the workspace prepares an editable draft; send it when ready to start.'
+          'Choose an agent next. Your task opens as a draft in the conversation; send it to start.'
         )}
       </p>
       <details>

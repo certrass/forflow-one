@@ -22,6 +22,7 @@ import { printHelp } from './help'
 import type { RuntimeClient } from './runtime-client'
 import { COMMAND_SPECS } from './specs'
 import { resolveOrchestrationCliExecutable } from './runtime/orchestration-recovery-command'
+import { refuseConflictingSessionCallerFlags } from './session-caller-flags'
 
 export { COMMAND_SPECS } from './specs'
 export { buildCurrentWorktreeSelector, normalizeWorktreeSelector } from './selectors'
@@ -38,11 +39,12 @@ function shouldIgnoreRemoteSelection(commandPath: string[]): boolean {
     // Why: `host list` answers "what can this machine target, and with what flag". Half of that
     // answer (paired servers) is read from this machine's own pairing store and cannot be routed,
     // so routing the other half produced one listing describing two machines at once.
-    commandPath[0] === 'host' ||
+    commandPath.join(' ') === 'host list' ||
     commandPath[0] === 'serve' ||
     commandPath[0] === 'agent' ||
     commandPath[0] === 'vm' ||
-    commandPath[0] === 'agent-context'
+    commandPath[0] === 'agent-context' ||
+    commandPath[0] === 'profile'
   )
 }
 
@@ -83,6 +85,17 @@ export async function main(
     process.stdout.write(`${version}\n`)
     return
   }
+  if (isForflowCli() && (argv[0] === 'aily' || argv[0] === 'workbuddy')) {
+    try {
+      await (
+        await import('./companion/companion-command.js')
+      ).runCompanionCommand(argv[0], argv.slice(1), cwd)
+    } catch (error) {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
+      process.exitCode = 1
+    }
+    return
+  }
   if (argv[0] === 'agent-teams-tmux') {
     await runAgentTeamsTmuxShim(argv.slice(1))
     return
@@ -118,6 +131,10 @@ export async function main(
     // lookup so users do not get misleading "Orca is not running" failures for
     // simple command typos or unsupported flags.
     validateCommandAndFlags(COMMAND_SPECS, parsed)
+    refuseConflictingSessionCallerFlags(
+      findCommandSpec(COMMAND_SPECS, parsed.commandPath),
+      parsed.flags
+    )
     const RuntimeClientClass = await loadRuntimeClientClass()
     const ignoreRemoteSelection = shouldIgnoreRemoteSelection(parsed.commandPath)
     const pairingCode = ignoreRemoteSelection ? null : parsed.flags.get('pairing-code')

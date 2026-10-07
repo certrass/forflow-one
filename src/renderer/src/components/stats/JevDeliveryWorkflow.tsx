@@ -1,8 +1,8 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { CodexReviewVersion } from '../../../../shared/codex-review-types'
 import type { JevPreview } from '../../../../shared/jev-audit-types'
 import { Button } from '../ui/button'
-import { ContextualTourProgressDots } from '../contextual-tours/ContextualTourProgressDots'
+import { ReviewStepProgress } from './ReviewStepProgress'
 import { WorkspaceReviewStepHelp } from './WorkspaceReviewStepHelp'
 import { JevDeliveryInput } from './JevDeliveryInput'
 import { JevRequestPreview } from './JevRequestPreview'
@@ -47,6 +47,7 @@ export function JevDeliveryWorkflow({
   const [step, setStep] = useState<Step | undefined>()
   const [keys, setKeys] = useState<string[]>([])
   const [handoff, setHandoff] = useState<string[]>([])
+  const workflowRef = useRef<HTMLElement>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
   const actionRef = useRef<HTMLButtonElement>(null)
   const current = readOnly
@@ -56,6 +57,11 @@ export function JevDeliveryWorkflow({
     : step === 3 && !preview
       ? 2
       : (step ?? (hasResults ? 4 : 1))
+  useEffect(() => {
+    if (active) {
+      workflowRef.current?.scrollIntoView({ block: 'start' })
+    }
+  }, [active, current])
   const title = [g.goal, g.materials, g.preview, g.results][current - 1]
   const hint = [g.goalHint, g.materialsHint, g.previewHint, g.resultHint][current - 1]
   const help = [
@@ -71,10 +77,15 @@ export function JevDeliveryWorkflow({
     }
   }
   return (
-    <section className="space-y-4" data-testid="jev-delivery-workflow">
+    <section
+      ref={workflowRef}
+      className="scroll-mt-4 space-y-4"
+      data-testid="jev-delivery-workflow"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <ContextualTourProgressDots current={current} total={4} />
+        <ReviewStepProgress current={current} steps={[g.goal, g.materials, g.preview, g.results]} />
         <WorkspaceReviewStepHelp
+          initiallyOpen={false}
           active={active}
           anchorRef={current < 3 && (current === 1 || keys.length > 0) ? actionRef : anchorRef}
           title={title}
@@ -94,7 +105,7 @@ export function JevDeliveryWorkflow({
           <p className="whitespace-pre-wrap break-words text-sm">{version.focus}</p>
           <p className="text-xs text-muted-foreground">{g.example}</p>
           {onEditGoal && !readOnly && (
-            <Button variant="outline" size="sm" disabled={busy} onClick={onEditGoal}>
+            <Button variant="outline" size="default" disabled={busy} onClick={onEditGoal}>
               {g.editGoal}
             </Button>
           )}
@@ -102,11 +113,6 @@ export function JevDeliveryWorkflow({
       )}
       {current === 2 && (
         <>
-          <ul className="space-y-1 text-sm text-muted-foreground">
-            <li>{g.requirementMaterial}</li>
-            <li>{g.resultMaterial}</li>
-            <li>{g.handoffMaterial}</li>
-          </ul>
           <JevDeliveryInput
             version={version}
             evidenceKeys={keys}
@@ -121,12 +127,12 @@ export function JevDeliveryWorkflow({
           />
           <div className="flex flex-wrap gap-2">
             {onEditSources && (
-              <Button variant="outline" size="sm" disabled={busy} onClick={onEditSources}>
+              <Button variant="outline" size="default" disabled={busy} onClick={onEditSources}>
                 {g.editSources}
               </Button>
             )}
             {onReread && (
-              <Button variant="ghost" size="sm" disabled={busy} onClick={onReread}>
+              <Button variant="ghost" size="default" disabled={busy} onClick={onReread}>
                 {g.reread}
               </Button>
             )}
@@ -147,12 +153,12 @@ export function JevDeliveryWorkflow({
       {current === 4 && renderResults(() => go(2))}
       {readOnly && !hasResults && <p className="text-sm text-muted-foreground">{c.noCalls}</p>}
       {!readOnly && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+        <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background py-4">
           <div className="flex flex-wrap gap-2">
             {(current === 2 || current === 3) && (
               <Button
                 variant="ghost"
-                size="sm"
+                size="default"
                 disabled={busy}
                 onClick={() => go(current === 2 ? 1 : 2)}
               >
@@ -160,17 +166,17 @@ export function JevDeliveryWorkflow({
               </Button>
             )}
             {current !== 4 && hasResults && (
-              <Button variant="ghost" size="sm" disabled={busy} onClick={() => go(4)}>
+              <Button variant="ghost" size="default" disabled={busy} onClick={() => go(4)}>
                 {g.history}
               </Button>
             )}
             {current === 4 && onEditSources && (
-              <Button variant="outline" size="sm" disabled={busy} onClick={onEditSources}>
+              <Button variant="outline" size="default" disabled={busy} onClick={onEditSources}>
                 {g.editSources}
               </Button>
             )}
             {current === 4 && onReread && (
-              <Button variant="outline" size="sm" disabled={busy} onClick={onReread}>
+              <Button variant="outline" size="default" disabled={busy} onClick={onReread}>
                 {g.reread}
               </Button>
             )}
@@ -178,7 +184,7 @@ export function JevDeliveryWorkflow({
           {current === 1 && (
             <Button
               ref={actionRef}
-              size="sm"
+              size="default"
               disabled={busy || !version.focus.trim()}
               onClick={() => go(2)}
             >
@@ -188,7 +194,7 @@ export function JevDeliveryWorkflow({
           {current === 2 && (
             <Button
               ref={actionRef}
-              size="sm"
+              size="default"
               disabled={busy || keys.length === 0}
               onClick={async () => {
                 if (await onPrepare(keys, handoff)) {
@@ -202,7 +208,7 @@ export function JevDeliveryWorkflow({
           {current === 3 && (
             <Button
               ref={actionRef}
-              size="sm"
+              size="default"
               disabled={busy}
               onClick={async () => {
                 if (await onSend()) {
@@ -214,7 +220,7 @@ export function JevDeliveryWorkflow({
             </Button>
           )}
           {current === 4 && (
-            <Button size="sm" disabled={busy} onClick={() => go(1)}>
+            <Button size="default" disabled={busy} onClick={() => go(1)}>
               {g.again}
             </Button>
           )}

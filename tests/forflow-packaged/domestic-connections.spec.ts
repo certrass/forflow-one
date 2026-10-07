@@ -16,7 +16,7 @@ test('domestic connection discovery and real CLI status remain separate from his
     const menu = page.getByRole('menu')
     await expect(menu.getByRole('menuitem', { name: /豆包／火山方舟/ })).toBeVisible()
     await expect(menu.getByRole('menuitem', { name: /WorkBuddy／CodeBuddy/ })).toContainText(
-      '历史暂未接入'
+      'CodeBuddy CLI 历史与恢复'
     )
     await expect(menu.getByRole('menuitem', { name: /QoderWork／Qoder CN/ })).toBeVisible()
     await expect(menu.getByRole('menuitemcheckbox', { name: /Kimi/ })).toBeVisible()

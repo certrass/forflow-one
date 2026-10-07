@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { ContextualTourProgressDots } from '../contextual-tours/ContextualTourProgressDots'
+import { ReviewStepProgress } from './ReviewStepProgress'
 import { Button } from '../ui/button'
 import { WorkspaceReviewTargetPicker } from './WorkspaceReviewTargetPicker'
 import { WorkspaceReviewFilePicker } from './WorkspaceReviewFilePicker'
@@ -13,17 +13,20 @@ import { reviewCopy } from './review-copy'
 import { WorkspaceReviewGoal } from './WorkspaceReviewGoal'
 import { ReviewEvidenceNeeds } from './ReviewEvidenceNeeds'
 import { reviewIntakeCopy } from './review-intake-copy'
+import { cn } from '@/lib/utils'
 
 export function WorkspaceReviewGuide({
   active,
   editing,
   form,
-  onCancel
+  onCancel,
+  embedded = false
 }: {
   active: boolean
   editing: boolean
   form: ReturnType<typeof useWorkspaceReviewIntake>
   onCancel?: () => void
+  embedded?: boolean
 }): React.JSX.Element {
   const c = workspaceReviewCopy()
   const g = workspaceReviewGuideCopy()
@@ -93,36 +96,50 @@ export function WorkspaceReviewGuide({
   }
   return (
     <form
-      className="rounded-lg border border-border bg-card"
+      className={cn('min-w-0', !embedded && 'rounded-lg border border-border bg-card')}
       data-testid="workspace-review-guide"
       onSubmit={(event) => {
         event.preventDefault()
         continueReview()
       }}
     >
-      <div className="space-y-5 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <ContextualTourProgressDots current={current} total={3} />
-          {current > 1 && (
-            <p className="text-xs text-muted-foreground">
-              {g.selectedProject} · {target?.name}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
+      <div className={cn('space-y-4', embedded ? 'pb-5' : 'p-5')}>
+        <ReviewStepProgress current={current} steps={[g.projectTitle, g.goalTitle, g.filesTitle]} />
+        <div className="space-y-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h4 className="text-base font-semibold">{title}</h4>
-            <WorkspaceReviewStepHelp
-              active={active}
-              key={current}
-              anchorRef={ready ? actionRef : anchorRef}
-              progress={{ current, total: 3 }}
-              placement={ready ? 'top' : current === 1 ? 'right' : 'top'}
-              title={ready ? g.nextAction : title}
-              body={current === 1 && target && !target.available ? g.projectUnavailable : help}
-              label={g.help}
-              closeLabel={g.closeHelp}
-            />
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+              <h4 className="text-sm font-semibold">{title}</h4>
+              {current > 1 && (
+                <span className="break-words text-xs text-muted-foreground">
+                  {g.selectedProject} · {target?.name}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {embedded && current === 1 && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={loading || busy}
+                  onClick={form.refresh}
+                >
+                  {g.refresh}
+                </Button>
+              )}
+              <WorkspaceReviewStepHelp
+                initiallyOpen={false}
+                active={active}
+                key={current}
+                anchorRef={ready ? actionRef : anchorRef}
+                progress={{ current, total: 3 }}
+                placement={ready ? 'top' : current === 1 ? 'right' : 'top'}
+                title={ready ? g.nextAction : title}
+                body={current === 1 && target && !target.available ? g.projectUnavailable : help}
+                label={g.help}
+                closeLabel={g.closeHelp}
+              />
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">{hint}</p>
         </div>
@@ -138,7 +155,10 @@ export function WorkspaceReviewGuide({
                 />
               </div>
               {target && (
-                <p className="break-all text-xs text-muted-foreground">{target.rootPath}</p>
+                <details className="space-y-2 text-sm text-muted-foreground">
+                  <summary className="cursor-pointer">{r.source}</summary>
+                  <p className="break-all font-mono text-xs">{target.rootPath}</p>
+                </details>
               )}
               {target && !target.available && (
                 <p role="status" className="text-sm text-muted-foreground">
@@ -157,14 +177,10 @@ export function WorkspaceReviewGuide({
           )}
           {current === 3 && (
             <>
-              <p className="break-words text-sm text-muted-foreground">
-                {c.focus}：{focus}
-              </p>
-              <ReviewEvidenceNeeds
-                files={selection.files}
-                hasConversations={selection.sessionIds.length > 0}
-                beforeRead
-              />
+              <details className="space-y-2 text-sm">
+                <summary className="cursor-pointer font-medium">{c.focus}</summary>
+                <p className="whitespace-pre-wrap break-words text-muted-foreground">{focus}</p>
+              </details>
               <WorkspaceReviewFilePicker
                 key={form.workspaceId}
                 target={active ? target : undefined}
@@ -172,6 +188,10 @@ export function WorkspaceReviewGuide({
                 guideAnchorRef={anchorRef}
                 disabled={busy}
                 onChange={(files) => form.setSelection((value) => ({ ...value, files }))}
+              />
+              <ReviewEvidenceNeeds
+                files={selection.files}
+                hasConversations={selection.sessionIds.length > 0}
               />
               <details className="space-y-4">
                 <summary className="cursor-pointer text-sm text-muted-foreground">
@@ -192,9 +212,14 @@ export function WorkspaceReviewGuide({
             {form.error}
           </p>
         )}
-        {current === 3 && <p className="text-xs text-muted-foreground">{c.prepareNote}</p>}
+        {current === 3 && <p className="text-sm text-muted-foreground">{c.prepareNote}</p>}
       </div>
-      <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card p-4">
+      <div
+        className={cn(
+          'sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card',
+          embedded ? 'py-4' : 'p-4'
+        )}
+      >
         <div className="flex gap-2">
           {current > 1 && (
             <Button
@@ -219,22 +244,29 @@ export function WorkspaceReviewGuide({
             </Button>
           )}
         </div>
-        <Button ref={actionRef} disabled={!ready || busy || loading}>
-          {busy
-            ? c.preparing
-            : current === 1
-              ? g.nextGoal
-              : current === 2
-                ? form.clarifyingGoal
-                  ? q.useAnswer
-                  : form.goalPrepared
-                    ? g.nextFiles
-                    : q.ask
-                : editing
-                  ? c.update
-                  : c.prepare}
-          {current < 3 && <ArrowRight />}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          {current === 3 && (
+            <span className="text-sm text-muted-foreground" aria-live="polite">
+              {c.selected} {selection.files.length}/40
+            </span>
+          )}
+          <Button ref={actionRef} disabled={!ready || busy || loading}>
+            {busy
+              ? c.preparing
+              : current === 1
+                ? g.nextGoal
+                : current === 2
+                  ? form.clarifyingGoal
+                    ? q.useAnswer
+                    : form.goalPrepared
+                      ? g.nextFiles
+                      : q.ask
+                  : editing
+                    ? c.update
+                    : c.prepare}
+            {current < 3 && <ArrowRight />}
+          </Button>
+        </div>
       </div>
     </form>
   )

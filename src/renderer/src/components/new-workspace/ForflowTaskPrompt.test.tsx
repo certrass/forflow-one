@@ -41,3 +41,12 @@ it('does not overwrite imported task material or change an in-flight draft', () 
   fireEvent.click(screen.getByRole('button', { name: 'Understand this project' }))
   expect(onChange).not.toHaveBeenCalled()
 })
+
+it('does not offer a handoff template without a source task', () => {
+  const onChange = vi.fn()
+  render(<ForflowTaskPrompt value="" onChange={onChange} creating={false} />)
+  expect(screen.queryByRole('button', { name: 'Make another version' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Compare outputs' })).toBeNull()
+  expect(screen.getByRole('textbox')).toHaveProperty('value', '')
+  expect(onChange).not.toHaveBeenCalled()
+})

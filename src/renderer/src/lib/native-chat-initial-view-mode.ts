@@ -1,3 +1,4 @@
+import { isCompanionAgent } from '../../../shared/forflow-companion'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
 import { agentTabsDefaultToNativeChat } from '../../../shared/structured-native-chat-launch-route'
 import type { Tab } from '../../../shared/tab-types'
@@ -28,7 +29,7 @@ export function decideInitialAgentTabViewMode(args: {
   launchDraftText?: string
   nativeChatTranscriptIsLocalReadable?: boolean
 }): Tab['viewMode'] {
-  if (!agentTabsDefaultToNativeChat(args)) {
+  if (!isCompanionAgent(args.agent) && !agentTabsDefaultToNativeChat(args)) {
     return undefined
   }
   if (!isNativeChatSupportedAgent(args.agent)) {

@@ -1,3 +1,5 @@
+import { getCompanionCatalog } from './forflow-companion-catalog'
+import { getCatalogPlatform } from './agent-catalog-platform'
 import type React from 'react'
 import { ClaudeIcon, DroidIcon, OpenAIIcon } from '@/components/status-bar/icons'
 import openClaudeLogoUrl from '../../../../resources/openclaude-logo.png?url'
@@ -18,35 +20,11 @@ import { AGENT_FAVICON_ASSETS } from './agent-favicon-assets'
 import { isForflowBuild } from '../../../shared/product-branding'
 import { getTuiAgentAutoPickOrder } from '../../../shared/tui-agent-selection'
 
-export type AgentCatalogEntry = {
-  id: TuiAgent
-  label: string
-  /** Default CLI binary name used for PATH detection. */
-  cmd: string
-  searchAliases?: readonly string[]
-  /** Direct or bundled image URL for agents whose project identity is not represented by a favicon service. */
-  iconUrl?: string
-  /** Domain for Google's favicon service — used for agents without an SVG icon. */
-  faviconDomain?: string
-  /** Homepage/install docs URL, sourced from the README agent badge list. */
-  homepageUrl: string
-}
-
-function getCatalogPlatform(): NodeJS.Platform {
-  const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent
-  if (userAgent.includes('Windows')) {
-    return 'win32'
-  }
-  if (userAgent.includes('Mac')) {
-    return 'darwin'
-  }
-  if (userAgent) {
-    return 'linux'
-  }
-  return typeof process === 'undefined' ? 'linux' : process.platform
-}
+import type { AgentCatalogEntry } from './agent-catalog-entry'
+export type { AgentCatalogEntry } from './agent-catalog-entry'
 
 const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] => [
+  ...getCompanionCatalog(),
   {
     id: 'claude',
     label: translate('auto.lib.agent.catalog.0708ed89f1', 'Claude'),
@@ -121,6 +99,34 @@ const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] 
     // Why: bare `trae.cn` 404s on Google's favicon service.
     faviconDomain: 'www.trae.cn',
     homepageUrl: 'https://docs.trae.cn/cli_get-started-with-trae-cli'
+  },
+  {
+    id: 'muse',
+    label: translate('auto.lib.agent.catalog.muse_label', 'Muse'),
+    cmd: 'muse',
+    faviconDomain: 'dev.meta.ai',
+    homepageUrl: 'https://dev.meta.ai/docs/muse-code'
+  },
+  {
+    id: 'dsh',
+    label: translate('auto.lib.agent.catalog.dsh_label', 'DeepSeek Harness'),
+    cmd: 'dsh-tui',
+    searchAliases: ['deepseek', 'dsh', 'dst', 'deepseek harness'],
+    homepageUrl: 'https://deepseek-harness.github.io/deepseek-harness/'
+  },
+  {
+    id: 'qoder',
+    label: translate('auto.lib.agent.catalog.qoder_label', 'Qoder CLI'),
+    cmd: 'qodercli',
+    faviconDomain: 'qoder.com',
+    homepageUrl: 'https://docs.qoder.com/cli/overview'
+  },
+  {
+    id: 'zcode',
+    label: translate('auto.lib.agent.catalog.zcode_label', 'ZCode'),
+    cmd: 'zcode',
+    faviconDomain: 'zcode.z.ai',
+    homepageUrl: 'https://zcode.z.ai/en/docs'
   },
   {
     id: 'pi',
@@ -231,6 +237,13 @@ const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] 
     homepageUrl: 'https://www.codebuff.com/docs/help/quick-start'
   },
   {
+    id: 'freebuff',
+    label: translate('auto.lib.agent.catalog.freebuff_label', 'Freebuff'),
+    cmd: 'freebuff',
+    faviconDomain: 'freebuff.com',
+    homepageUrl: 'https://freebuff.com/cli'
+  },
+  {
     id: 'command-code',
     label: translate('auto.lib.agent.catalog.6f8056a565', 'Command Code'),
     // Why: `npm i -g command-code` installs both `command-code` and the
@@ -290,7 +303,7 @@ const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] 
   },
   {
     id: 'codebuddy',
-    label: 'CodeBuddy',
+    label: translate('auto.lib.agent.catalog.codebuddy_label', 'CodeBuddy'),
     cmd: 'codebuddy',
     searchAliases: ['腾讯', 'WorkBuddy', 'codebuddy-code', 'cbc'],
     homepageUrl: 'https://www.codebuddy.cn/docs/cli/installation'
@@ -336,7 +349,7 @@ const getUnorderedAgentCatalog = createLocalizedCatalog((): AgentCatalogEntry[] 
 export function getAgentCatalog(): AgentCatalogEntry[] {
   const catalog = getUnorderedAgentCatalog()
   if (!isForflowBuild()) {
-    return catalog
+    return catalog.filter((agent) => agent.id !== 'aily' && agent.id !== 'workbuddy')
   }
   const order = getTuiAgentAutoPickOrder()
   return catalog.toSorted((left, right) => order.indexOf(left.id) - order.indexOf(right.id))
@@ -363,35 +376,22 @@ export function AgentIcon({
   if (!agent) {
     return <AgentLetterIcon letter="?" size={size} />
   }
-  if (agent === 'claude' || agent === 'claude-agent-teams') {
-    return <ClaudeIcon size={size} />
+  const glyphs: Partial<Record<TuiAgent, React.ComponentType<{ size: number }>>> = {
+    claude: ClaudeIcon,
+    'claude-agent-teams': ClaudeIcon,
+    codex: OpenAIIcon,
+    droid: DroidIcon,
+    pi: PiIcon,
+    omp: OmpIcon,
+    aider: AiderIcon,
+    kilo: KiloIcon,
+    copilot: CopilotIcon,
+    opencode: OpenCodeIcon,
+    opencode2: OpenCodeIcon
   }
-  if (agent === 'codex') {
-    return <OpenAIIcon size={size} />
-  }
-  if (agent === 'droid') {
-    return <DroidIcon size={size} />
-  }
-  if (agent === 'pi') {
-    return <PiIcon size={size} />
-  }
-  if (agent === 'omp') {
-    return <OmpIcon size={size} />
-  }
-  if (agent === 'aider') {
-    return <AiderIcon size={size} />
-  }
-  if (agent === 'kilo') {
-    return <KiloIcon size={size} />
-  }
-  if (agent === 'copilot') {
-    return <CopilotIcon size={size} />
-  }
-  if (agent === 'opencode') {
-    return <OpenCodeIcon size={size} />
-  }
-  if (agent === 'opencode2') {
-    return <OpenCodeIcon size={size} />
+  const Glyph = glyphs[agent]
+  if (Glyph) {
+    return <Glyph size={size} />
   }
   const catalogEntry = getAgentCatalog().find((a) => a.id === agent)
   // Why: prefer the favicon bundled at build time so the icon renders without a

@@ -1,10 +1,9 @@
 import { isForflowBuild } from '../../../../shared/product-branding'
-import type { ComponentProps } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject, type ComponentProps } from 'react'
 import { ArrowRight, Loader2, Share2 } from 'lucide-react'
 import type { ArtifactWriteRequest } from '../../../../shared/artifacts'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { translate } from '@/i18n/i18n'
 import { cn } from '@/lib/utils'
@@ -23,14 +22,26 @@ function UpstreamArtifactPublishButton({
   sourceKey,
   createRequest,
   className,
-  disabled
+  disabled,
+  anchorRef,
+  open: controlledOpen,
+  onOpenChange
 }: {
   sourceKey: string
   createRequest: () => Promise<ArtifactWriteRequest>
   className?: string
   disabled?: boolean
-}): React.JSX.Element {
-  const [open, setOpen] = useState(false)
+} & (
+  | { anchorRef?: never; open?: never; onOpenChange?: never }
+  | {
+      anchorRef?: RefObject<HTMLButtonElement | null>
+      open: boolean
+      onOpenChange: (open: boolean) => void
+    }
+)): React.JSX.Element {
+  const [ownOpen, setOwnOpen] = useState(false)
+  const open = controlledOpen ?? ownOpen
+  const setOpen = onOpenChange ?? setOwnOpen
   const [publishing, setPublishing] = useState(false)
   const [lookupRevision, setLookupRevision] = useState(0)
   const [linkLookup, setLinkLookup] = useState<PublishedLinkLookup | null>(null)
@@ -113,25 +124,32 @@ function UpstreamArtifactPublishButton({
   )
   return (
     <Popover open={open} onOpenChange={(nextOpen) => !busy && setOpen(nextOpen)}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className={cn('shrink-0', className)}
-              disabled={blocked}
-              aria-label={label}
-            >
-              {publishing ? <Loader2 className="animate-spin" /> : <Share2 />}
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" sideOffset={4}>
-          {label}
-        </TooltipContent>
-      </Tooltip>
+      {anchorRef ? (
+        <PopoverAnchor
+          // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: DOM refs are transiently null before mount, though Radix's virtualRef type omits that lifecycle state.
+          virtualRef={anchorRef as RefObject<HTMLButtonElement>}
+        />
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className={cn('shrink-0', className)}
+                disabled={blocked}
+                aria-label={label}
+              >
+                {publishing ? <Loader2 className="animate-spin" /> : <Share2 />}
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" sideOffset={4}>
+            {label}
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       <PopoverContent
         ref={popoverContentRef}
@@ -142,6 +160,13 @@ function UpstreamArtifactPublishButton({
         onOpenAutoFocus={(event) => {
           event.preventDefault()
           popoverContentRef.current?.focus({ preventScroll: true })
+        }}
+        onCloseAutoFocus={(event) => {
+          if (!anchorRef) {
+            return
+          }
+          event.preventDefault()
+          anchorRef.current?.focus({ preventScroll: true })
         }}
       >
         <div className="space-y-1 border-b border-border/60 px-4 py-3.5">

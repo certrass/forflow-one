@@ -4,8 +4,8 @@
  * Pids are reused within minutes on a busy host, and reuse happens precisely in the recovery
  * case, so a bare pid match is never proof. Every element of the identity tuple is unavailable
  * somewhere — start time costs a CIM query on Windows and is missing in some containers, /proc
- * does not exist on macOS — so an exact but unanswerable identity stays fenced in `recovering`;
- * an ownerless, unattributable reservation enters `manual-recovery`.
+ * does not exist on macOS — so an unanswerable identity reports `indeterminate` and is never read
+ * as alive or dead.
  */
 
 import { readFile } from 'node:fs/promises'
@@ -68,12 +68,13 @@ async function readDarwinProcessStartTimeMs(pid: number): Promise<number | null>
     const result = await runProcess({
       program: 'ps',
       args: ['-o', 'lstart=', '-p', String(pid)],
+      env: { ...process.env, LC_ALL: 'C', TZ: 'UTC' },
       timeoutMs: PROCESS_START_TIME_TIMEOUT_MS
     })
     if (result.timedOut || result.code !== 0) {
       return null
     }
-    const parsed = Date.parse(result.stdout.trim())
+    const parsed = Date.parse(`${result.stdout.trim()} UTC`)
     return Number.isFinite(parsed) ? parsed : null
   } catch {
     return null
@@ -91,6 +92,7 @@ async function readDarwinProcessStartTimesMs(
     const result = await runProcess({
       program: 'ps',
       args: ['-o', 'pid=,lstart=', '-p', pids.join(',')],
+      env: { ...process.env, LC_ALL: 'C', TZ: 'UTC' },
       timeoutMs: PROCESS_START_TIME_TIMEOUT_MS
     })
     if (result.timedOut || result.code !== 0) {
@@ -102,7 +104,7 @@ async function readDarwinProcessStartTimesMs(
         continue
       }
       const pid = Number(match[1])
-      const parsed = Date.parse(match[2])
+      const parsed = Date.parse(`${match[2]} UTC`)
       if (Number.isSafeInteger(pid) && Number.isFinite(parsed)) {
         observed.set(pid, parsed)
       }

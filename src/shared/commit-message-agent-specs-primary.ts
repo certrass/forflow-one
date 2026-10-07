@@ -94,8 +94,7 @@ export function buildPrimaryCommitMessageAgentSpecs({
         '--skip-git-repo-check',
         '-s',
         'read-only',
-        '--model',
-        model,
+        ...(model === 'default' ? [] : ['--model', model]),
         ...(thinkingLevel ? ['-c', `model_reasoning_effort=${thinkingLevel}`] : [])
       ],
       // `-c` is intentionally absent: Codex accepts repeated overrides.
@@ -207,7 +206,11 @@ export function buildPrimaryCommitMessageAgentSpecs({
       modelDiscovery: { binary: 'opencode2', args: ['models'], parse: parseLineModels },
       models: [
         { id: 'opencode/deepseek-v4-flash-free', label: 'OpenCode DeepSeek V4 Flash Free' },
-        { id: 'opencode/gpt-5.4-mini', label: 'OpenCode GPT 5.4 Mini', ...withOpenAiThinking('gpt-5.4-mini') }
+        {
+          id: 'opencode/gpt-5.4-mini',
+          label: 'OpenCode GPT 5.4 Mini',
+          ...withOpenAiThinking('gpt-5.4-mini')
+        }
       ],
       defaultModelId: 'opencode/deepseek-v4-flash-free'
     },

@@ -21,7 +21,7 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     if (!ptyId || !leafId) {
       throw new Error('Missing pane identity')
     }
-    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command), {
+    await page.evaluate(({ ptyId, command }) => window.api.pty.write(ptyId, command, 'driving'), {
       ptyId,
       command: fixture.command
     })
@@ -39,10 +39,16 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     await composer.pressSequentially('并保留原始结论')
     await expect(composer).toContainText('并保留原始结论')
     expect(ledger()).not.toContain('"type":"input"')
-    await toolbar.getByRole('button', { name: '文件', exact: true }).click()
+    await toolbar.getByRole('button', { name: '查看产出', exact: true }).click()
+    await page.getByRole('menuitem', { name: '文件', exact: true }).click()
     const file = page.locator('[data-file-explorer-row]').filter({ hasText: 'README.md' }).first()
     await file.dragTo(composer)
     await expect(composer.locator('[data-native-chat-file-reference]')).toHaveCount(1)
+    const notice = page.locator('[data-sonner-toast]').filter({
+      hasText: 'Codex 现在使用独立服务运行'
+    })
+    await notice.getByRole('button', { name: 'Close toast', exact: true }).click()
+    await expect(notice).toHaveCount(0)
     await chat.getByRole('button', { name: '发送', exact: true }).click()
     await expect.poll(ledger).toContain('并保留原始结论')
     const followUp = chat.getByRole('button', { name: '补充消息', exact: true })
@@ -62,6 +68,7 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
     await chat.getByRole('button', { name: '停止智能体', exact: true }).click()
     await expect.poll(ledger).toContain('"type":"stop"')
     await expect(page.getByText('本轮已停止，可以继续输入。', { exact: true })).toBeVisible()
+    await chat.getByRole('button', { name: '切换本轮详情', exact: true }).last().click()
     await expect(chat.getByText('本轮已中断', { exact: true })).toBeVisible()
     await expect(chat.getByText('Conversation interrupted', { exact: true })).toHaveCount(0)
     await expect(followUp).toHaveCount(0)
@@ -114,6 +121,12 @@ test('Codex GUI: multiline input, follow-up, stop, same session and split owners
       )
     )
   } catch (error) {
+    const session = await page.evaluate(
+      (file) =>
+        window.api.nativeChat.readSession('codex', 'forflow-gui-fixture-session', 100, file),
+      fixture.transcript
+    )
+    writeFileSync(path.join(evidence, 'codex-error-session.json'), JSON.stringify(session, null, 2))
     writeFileSync(
       path.join(evidence, 'codex-error-text.txt'),
       await page.locator('body').innerText()

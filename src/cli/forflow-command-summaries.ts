@@ -1,4 +1,7 @@
 export const FORFLOW_COMMAND_SUMMARIES: Readonly<Record<string, string>> = {
+  'host name': '读取或设置执行主机向客户端报告的名称',
+  'profile state exports': '列出保留的配置备份与导出文件',
+  'profile state rollback': '从保留的配置备份恢复状态，或保留当前 JSON 配置',
   search: '搜索执行主机上的智能体会话记录',
   'browser identity get': '读取应用级浏览器标识',
   'browser identity set': '设置应用级浏览器标识',

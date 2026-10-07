@@ -2,6 +2,7 @@ import type { CommitMessagePlan } from '../../shared/commit-message-plan'
 import { UnsafeWindowsBatchArgumentsError } from '../win32-utils'
 import { terminateWindowsProcessTree } from '../windows-process-tree-kill'
 import {
+  finalizeAgentTimeout,
   finalizeFromAgentOutput,
   userFacingUnsafeWindowsBatchArgs
 } from './source-control-agent-failure'
@@ -66,6 +67,7 @@ export function runLocalSourceControlPlan(input: {
         args: plan.args,
         cwd,
         env: input.env,
+        commandEnv: plan.env,
         wslDistro: input.wslDistro,
         stdinMode: 'pipe',
         useCwdForNative: true
@@ -125,10 +127,14 @@ export function runLocalSourceControlPlan(input: {
     setLocalGenerationCancelToken(laneKey, cancel)
     timer = setTimeout(() => {
       startTermination()
-      finalize({
-        success: false,
-        error: `Generation timed out after ${SOURCE_CONTROL_GENERATION_TIMEOUT_MS / 1000}s.`
-      })
+      finalize(
+        finalizeAgentTimeout({
+          label: plan.label,
+          stdout,
+          stderr,
+          includeStdoutDetail: operation !== 'branch-name'
+        })
+      )
     }, SOURCE_CONTROL_GENERATION_TIMEOUT_MS)
 
     const onStdoutData = (chunk: Buffer): void => {

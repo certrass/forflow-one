@@ -42,15 +42,13 @@ test('smoke: production app starts in Chinese with independent identity and priv
     await expect(page.getByRole('button', { name: /^继续/ })).toBeVisible()
     await expect(page.locator('body')).not.toContainText('No workspaces found')
     await expect(page.locator('vite-error-overlay')).toHaveCount(0)
-    await expect(page.getByRole('checkbox', { name: /跳过权限检查/ })).not.toBeChecked()
+    await expect(page.getByRole('switch', { name: /^Yolo 模式/ })).not.toBeChecked()
     const more = page.getByRole('button', { name: /显示另外.*智能体/ })
     if (await more.isVisible()) {
       await more.click()
     }
-    await expect(
-      page.getByRole('button', { name: 'CodeBuddy codebuddy', exact: true })
-    ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Qoder CN qodercn', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'CodeBuddy', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Qoder CN', exact: true })).toBeVisible()
     await expect(page.locator('img[src*="google.com/s2/favicons"]')).toHaveCount(0)
     expect(
       await page
@@ -157,7 +155,7 @@ test('regression: local project, worktree, Chinese terminal, file editing, diff 
       const events: string[] = []
       const dispose = window.api.pty.onData((event) => events.push(event.data))
       const pty = await window.api.pty.spawn({ cols: 80, rows: 24, cwd, shellOverride: '/bin/zsh' })
-      window.api.pty.write(pty.id, "printf '\\u4e2d\\u6587-PTY-%s\\n' 'PASS'\r")
+      window.api.pty.write(pty.id, "printf '\\u4e2d\\u6587-PTY-%s\\n' 'PASS'\r", 'driving')
       const deadline = Date.now() + 20_000
       while (Date.now() < deadline && !events.join('').includes('中文-PTY-PASS')) {
         await new Promise((resolve) => setTimeout(resolve, 100))

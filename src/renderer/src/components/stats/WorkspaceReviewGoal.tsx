@@ -71,15 +71,17 @@ export function WorkspaceReviewGoal({
           </Button>
         ))}
       </div>
-      <Textarea
-        id="workspace-review-focus"
-        aria-label={c.focus}
-        value={form.focus}
-        placeholder={c.focusPlaceholder}
-        maxLength={2000}
-        disabled={form.busy}
-        onChange={(event) => form.setFocus(event.target.value)}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="workspace-review-focus">{c.focus}</Label>
+        <Textarea
+          id="workspace-review-focus"
+          value={form.focus}
+          placeholder={c.focusPlaceholder}
+          maxLength={2000}
+          disabled={form.busy}
+          onChange={(event) => form.setFocus(event.target.value)}
+        />
+      </div>
       {!form.goalPrepared && form.focus.trim() && (
         <Button
           type="button"

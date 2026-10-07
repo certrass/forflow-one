@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom/vitest'
 
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type * as React from 'react'
 import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
@@ -35,8 +35,10 @@ function renderResolution(
   )
 }
 
+const notComposing = (): boolean => false
+
 function DraftProbe({ paneKey, sessionId }: { paneKey: string; sessionId: string | null }) {
-  const { draft, setDraft } = useNativeChatDraft(paneKey)
+  const { draft, setDraft } = useNativeChatDraft(paneKey, notComposing)
   return (
     <label>
       Session {sessionId ?? 'none'}
@@ -53,40 +55,6 @@ describe('NativeChatSessionGate', () => {
   afterEach(() => {
     cleanup()
     clearNativeChatDraftCacheForTests()
-  })
-
-  it.each(['codex', 'claude'] as const)(
-    'opens the resolved native chat session from a %s title fallback',
-    (resolvedAgent) => {
-      renderResolution({
-        paneKey: 'tab-1:leaf-1',
-        launchAgent: null,
-        resolvedAgent,
-        ptyId: 'pty-1'
-      })
-
-      expect(screen.getByTestId('native-chat-resolution')).toHaveTextContent(
-        `${resolvedAgent}:no-session:tab-1:leaf-1`
-      )
-    }
-  )
-
-  it('keeps live hook identity ahead of a stale title fallback', () => {
-    renderResolution({
-      paneKey: 'tab-1:leaf-1',
-      launchAgent: null,
-      agentStatusEntry: entry({
-        paneKey: 'tab-1:leaf-1',
-        agentType: 'claude',
-        providerSession: { key: 'session_id', id: 'claude-session' }
-      }),
-      resolvedAgent: 'codex',
-      ptyId: 'pty-1'
-    })
-
-    expect(screen.getByTestId('native-chat-resolution')).toHaveTextContent(
-      'claude:claude-session:tab-1:leaf-1'
-    )
   })
 
   it('preserves the open composer, session, and draft through disconnect and reconnect', () => {
@@ -137,6 +105,37 @@ describe('NativeChatSessionGate', () => {
     )
   })
 
+  it.each(['aily', 'workbuddy'] as const)(
+    'waits for %s to own input before rendering a composer',
+    (agent) => {
+      const paneKey = 'tab-1:leaf-1'
+      const renderGate = (agentStatusEntry?: AgentStatusEntry) => (
+        <NativeChatSessionGate
+          paneKey={paneKey}
+          launchAgent={agent}
+          ptyId="pty-1"
+          agentStatusEntry={agentStatusEntry}
+        >
+          {() => <input aria-label="Ready composer" />}
+        </NativeChatSessionGate>
+      )
+      const view = render(renderGate())
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+      view.rerender(
+        renderGate(
+          entry({
+            paneKey,
+            agentType: agent,
+            providerSession: { key: 'session_id', id: 'ready-session' }
+          })
+        )
+      )
+      expect(screen.getByRole('textbox')).toBeInTheDocument()
+      view.rerender(renderGate())
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    }
+  )
+
   it('does not open native chat from an unsupported title fallback', () => {
     renderResolution({
       paneKey: 'tab-1:leaf-1',
@@ -147,5 +146,23 @@ describe('NativeChatSessionGate', () => {
 
     expect(screen.getByText('No conversation here')).toBeInTheDocument()
     expect(screen.queryByTestId('native-chat-resolution')).not.toBeInTheDocument()
+  })
+
+  it('offers connection details instead of stranding an unready companion in a loading view', () => {
+    const onSwitchToTerminal = vi.fn()
+    render(
+      <NativeChatSessionGate
+        paneKey="tab:leaf"
+        launchAgent="aily"
+        ptyId="pty"
+        onSwitchToTerminal={onSwitchToTerminal}
+      >
+        {() => <input aria-label="Ready composer" />}
+      </NativeChatSessionGate>
+    )
+    expect(screen.getByText(/one task at a time/)).toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'View connection details' }))
+    expect(onSwitchToTerminal).toHaveBeenCalledOnce()
   })
 })

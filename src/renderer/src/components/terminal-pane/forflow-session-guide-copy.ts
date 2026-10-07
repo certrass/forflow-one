@@ -12,11 +12,11 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       title: translate('forflow.sessionGuide.chatTitle', '1. Write a goal in Chat'),
       body: translate(
         'forflow.sessionGuide.chatBody',
-        'Start Codex in this pane, then choose Chat. Describe the result you need, relevant files and how to check success. Review the draft before sending.'
+        'Choose an agent and describe the result you need, with relevant files and success criteria. Send the message to start.'
       ),
       next: translate(
         'forflow.sessionGuide.chatNext',
-        'Chat and Terminal share the same supported session. If Chat is unavailable, read the status beside the controls. Structured conversations do not have a terminal view.'
+        'Use Chat for instructions and replies. Switch to Terminal for the execution details of a supported session.'
       )
     },
     {
@@ -24,26 +24,23 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       title: translate('forflow.sessionGuide.filesTitle', '2. Add reference files'),
       body: translate(
         'forflow.sessionGuide.filesBody',
-        'Open Files and drag a file into the Chat input. Check the reference chip, then add what the agent should do with it. Remove an incorrect reference before sending.'
+        'Open View outputs → Files, then drag a reference file into the message and describe how to use it.'
       ),
       next: translate(
         'forflow.sessionGuide.filesNext',
-        'A reference is a file path, not an uploaded copy. The file must be readable on the execution host; sending lets the configured agent and model process the referenced material.'
+        'References point to files on the task’s computer. For remote tasks, choose files readable there.'
       )
     },
     {
       id: 'parallel',
-      title: translate(
-        'forflow.sessionGuide.parallelTitle',
-        '3. Split a view or start parallel work'
-      ),
+      title: translate('forflow.sessionGuide.parallelTitle', '3. Continue or delegate work'),
       body: translate(
         'forflow.sessionGuide.parallelBody',
-        'Split view opens another terminal in this workspace, sharing its files. For an independent Git task, use Parallel task to create a new worktree and branch.'
+        'Open Agent collaboration to continue the current session with another agent or fork it into a new workspace. For sequential or parallel tasks, use the examples on the Orchestration page.'
       ),
       next: translate(
         'forflow.sessionGuide.parallelNext',
-        'Ordinary folder workspaces do not isolate branches. Check the project and execution location before starting another task.'
+        'Use the current task’s goal, progress and relevant files when handing off. Split view shares files; use separate workspaces for independent changes.'
       )
     },
     {
@@ -52,15 +49,15 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       body: canReview
         ? translate(
             'forflow.sessionGuide.reviewGit',
-            'Open Review changes to inspect the workspace diff, then check output files and test results. This view includes all workspace changes; opening it does not commit or publish them.'
+            'Use View outputs to inspect files and changes. Open Review results to check selected materials against your requirements.'
           )
         : translate(
             'forflow.sessionGuide.reviewFolder',
-            'Open Files to inspect generated documents or code, then check the agent’s test results. This ordinary folder has no Git diff view; check the actual files before using the result.'
+            'Use View outputs to inspect generated files. Open Review results to check selected materials against your requirements.'
           ),
       next: translate(
         'forflow.sessionGuide.reviewNext',
-        'If something is wrong, state the expected result in the same conversation. For a running Codex bridge session, use Add message to supplement the task or Stop to interrupt it.'
+        'Return to the conversation with any findings and ask the agent to address them.'
       )
     },
     {
@@ -75,7 +72,7 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
       ),
       next: translate(
         'forflow.sessionGuide.browserNext',
-        'Send the selected context to the intended agent and check its response. A preview needs a running web service; opening a browser does not start your project’s server.'
+        'Start the preview service, then open its address. Send annotations to the agent working on the page.'
       )
     }
   ]

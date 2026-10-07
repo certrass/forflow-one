@@ -27,6 +27,7 @@ import type { FloatingWorkspacePanelState } from './use-floating-workspace-panel
 import type { OnboardingGate } from './use-onboarding-and-feature-tips'
 
 const QuickOpen = lazy(() => import('../components/QuickOpen'))
+const ForflowReviewDialog = lazy(() => import('../components/stats/ForflowReviewDialog'))
 const WorktreeJumpPalette = lazy(() => import('../components/WorktreeJumpPalette'))
 const WorkspaceCleanupDialog = lazy(
   () => import('../components/workspace-cleanup/WorkspaceCleanupDialog')
@@ -199,6 +200,11 @@ export function AppRootSurfaces(props: {
         </ModalBoundary>
       ) : null}
       <Suspense fallback={null}>
+        {activeModal === 'forflow-review' ? (
+          <ModalBoundary boundaryId="modal.forflow-review" resetKey>
+            <ForflowReviewDialog />
+          </ModalBoundary>
+        ) : null}
         {shouldMountAddRepoDialog ? (
           <ModalBoundary boundaryId="modal.add-repo" resetKey={activeModal === 'add-repo'}>
             <AddRepoDialog />

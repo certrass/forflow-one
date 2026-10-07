@@ -17,7 +17,7 @@ const steps = [
   ['run', 'verify:forflow:localization'],
   ['run', 'tc'],
   ['run', 'test:forflow:identity'],
-  ['run', 'test:forflow:regression'],
+  ['run', 'test:forflow:regression', '--maxWorkers=2'],
   ['run', 'build:forflow'],
   ['exec', 'node', 'config/scripts/build-computer-macos.mjs', '--single-arch'],
   ['exec', 'node', 'config/scripts/build-keyboard-layout-macos.mjs', '--single-arch'],

@@ -8,7 +8,7 @@
 
 本手册按当前 Forflow 界面、源码和本版安装包验证编写，参考 [Orca 官方文档](https://www.onorca.dev/docs) 的工作流结构。上游网页可能随版本变化；遇到差异，以本版说明和管理员配置为准。部署人员请看 [管理员手册](admin-manual.md)，开发人员请看 [工程文档索引](README.md)。
 
-可选试用 [接续预检 · Beta](context-handoff-beta.md)：在设置中开启后，检查当前 Codex 对话的交接材料，再决定是否复制。功能默认关闭，不自动提取长期记忆或向其他 Agent 发送。
+1.4.220-forflow.1 提供 [复制对话内容](context-handoff-beta.md)：在设置中开启后，查看 Codex 对话摘录，复制并粘贴到新对话继续处理。
 
 ## 1. 先知道三个区别
 

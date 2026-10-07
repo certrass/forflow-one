@@ -5,6 +5,7 @@ import { translate } from '@/i18n/i18n'
 import { Input } from '../ui/input'
 import { SettingsSegmentedControl, SettingsSubsectionHeader } from './SettingsFormControls'
 import { terminalDefaultShellCopy } from './terminal-default-shell-copy'
+import { TerminalShellArguments } from './TerminalShellArguments'
 
 export function TerminalDefaultShellSection({
   settings,
@@ -67,7 +68,7 @@ export function TerminalDefaultShellSection({
             clearValidation()
             setEditingCustom(value === 'custom')
             if (value === 'system') {
-              updateSettings({ terminalDefaultShell: '' })
+              updateSettings({ terminalDefaultShell: '', terminalDefaultShellArgs: undefined })
             }
           }}
           options={[
@@ -104,6 +105,10 @@ export function TerminalDefaultShellSection({
                 {error}
               </p>
             ) : null}
+            <TerminalShellArguments
+              value={settings.terminalDefaultShellArgs}
+              onChange={(terminalDefaultShellArgs) => updateSettings({ terminalDefaultShellArgs })}
+            />
           </div>
         ) : null}
       </div>

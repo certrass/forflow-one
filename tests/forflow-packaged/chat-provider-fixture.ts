@@ -4,7 +4,8 @@ import path from 'node:path'
 /** A local PTY + real hook transport fixture; it never contacts a model provider. */
 export function createChatProviderFixture(
   profile: string,
-  agent: 'claude' | 'codex' = 'claude'
+  agent: 'claude' | 'codex' = 'claude',
+  options: { seedConversation?: boolean; independentSessions?: boolean } = {}
 ): {
   command: string
   ledger: string
@@ -19,10 +20,17 @@ export function createChatProviderFixture(
     `
 const fs = require('node:fs')
 const readline = require('node:readline')
-const transcript = ${JSON.stringify(transcript)}
+const initialTranscript = ${JSON.stringify(transcript)}
+const independentSessions = ${JSON.stringify(options.independentSessions === true)}
+const tabId = process.env.ORCA_TAB_ID || String(process.pid)
+const transcript = independentSessions
+  ? initialTranscript + '.' + tabId.replace(/[^a-zA-Z0-9_-]/g, '_') + '.jsonl'
+  : initialTranscript
+const emptyTranscript = !fs.existsSync(transcript) || fs.statSync(transcript).size === 0
+fs.appendFileSync(transcript, '')
 const ledger = ${JSON.stringify(ledger)}
 const agent = ${JSON.stringify(agent)}
-const sessionId = 'forflow-gui-fixture-session'
+const sessionId = 'forflow-gui-fixture-session' + (independentSessions ? '-' + tabId : '')
 let working = false
 let recordTime = Date.now()
 function record(type, payload) {
@@ -52,9 +60,11 @@ async function hook(event = working ? 'UserPromptSubmit' : 'Stop') {
   if (!response.ok) throw new Error('fixture hook rejected: ' + response.status)
 }
 if (agent === 'codex') record('session_meta', {id:sessionId,cwd:process.cwd(),history_mode:'paginated'})
-message('user', '工作台测试任务')
-message('assistant', '已连接原会话，可在对话与终端间切换。')
-fs.appendFileSync(ledger, JSON.stringify({type:'start',pid:process.pid})+'\\n')
+if (${JSON.stringify(options.seedConversation !== false)} && (!independentSessions || emptyTranscript)) {
+  message('user', '工作台测试任务')
+  message('assistant', '已连接原会话，可在对话与终端间切换。')
+}
+fs.appendFileSync(ledger, JSON.stringify({type:'start',pid:process.pid,tabId,transcript})+'\\n')
 process.stdout.write('\\x1b]0;' + agent + '\\x07GUI_FIXTURE_READY\\n')
 hook().catch(e => { console.error(e.message); process.exit(1) })
 const timer = setInterval(() => hook().catch(e => console.error(e.message)), 2000)
@@ -93,7 +103,7 @@ if (agent === 'codex') {
       if (char === '\\x03') process.exit(0)
       if (char === '\\x1b' && !pasted) {
         working = false
-        record('event_msg', {type:'turn_aborted',turn_id:'turn-fixture'})
+        record('event_msg', {type:'turn_aborted',reason:'interrupted',turn_id:'turn-fixture'})
         message('assistant', '本轮已停止，可以继续输入。')
         fs.appendFileSync(ledger, JSON.stringify({type:'stop',pid:process.pid})+'\\n')
         hook().catch(e => console.error(e.message))

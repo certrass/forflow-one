@@ -2,7 +2,7 @@ import { translate } from '@/i18n/i18n'
 import type { AgentDotState } from '@/components/AgentStateDot'
 import type { DashboardAgentRow as DashboardAgentRowData } from '@/components/dashboard/useDashboardData'
 import { formatAgentTypeLabel } from '@/lib/agent-status'
-import { agentRowDotState } from '@/lib/agent-row-dot-state'
+import { agentRowDisplayDotState } from '@/lib/agent-row-dot-state'
 
 export type SummaryAgentGroup = {
   state: AgentDotState
@@ -12,8 +12,12 @@ export type SummaryAgentGroup = {
 const SUMMARY_STATE_ORDER: AgentDotState[] = [
   'waiting',
   'blocked',
+  // Why: a failed main agent outranks live work; a pending question still comes first.
+  'failed',
   'working',
   'monitoring',
+  'unconfirmed',
+  // Why: a user's Stop is not news, but it is not a finish either.
   'interrupted',
   'done',
   // Why: below every reporting state, above true idle — the pane is still held.
@@ -22,10 +26,7 @@ const SUMMARY_STATE_ORDER: AgentDotState[] = [
 ]
 
 export function getAgentDotState(agent: DashboardAgentRowData): AgentDotState {
-  if (agent.entry.interrupted === true) {
-    return 'interrupted'
-  }
-  return agentRowDotState(agent.state, agent.entry.workingMode)
+  return agentRowDisplayDotState(agent)
 }
 
 export function formatSummaryStateLabel(state: AgentDotState): string {
@@ -48,6 +49,8 @@ export function formatSummaryStateLabel(state: AgentDotState): string {
       return translate('forflow.finalCopy.4fb6234885', 'idle')
     case 'unverifiable':
       return translate('forflow.desktopCopy.b949b6c663', 'not reporting')
+    case 'unconfirmed':
+      return translate('forflow.agentStatus.unconfirmedShort', 'unconfirmed')
     case 'permission':
       return translate('forflow.desktopCopy.ca25baf7eb', 'needs attention')
   }

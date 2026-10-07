@@ -5,7 +5,7 @@ import type { NativeChatViewState } from './native-chat-view-state'
 import {
   isNativeChatTranscriptUnsettled,
   type NativeChatLiveSession
-} from './use-native-chat-live-session'
+} from './native-chat-live-session-contract'
 
 type Props = {
   session: NativeChatLiveSession
@@ -15,7 +15,9 @@ type Props = {
   isVisible: boolean
   initializing?: boolean
   deliveryPending?: boolean
+  busy?: boolean
   runtimeEnvironmentId?: string | null
+  errorState?: ReactNode
   children: ReactNode
 }
 
@@ -23,6 +25,17 @@ export function NativeChatConversationBody(props: Props): React.JSX.Element {
   const { session, viewState } = props
   return (
     <>
+      <div className="flex min-h-0 flex-1 flex-col">
+        {viewState.kind === 'loading' ? (
+          <NativeChatEmptyState kind="loading" />
+        ) : viewState.kind === 'error' ? (
+          (props.errorState ?? <NativeChatEmptyState kind="error" message={viewState.message} />)
+        ) : viewState.kind === 'empty' ? (
+          <NativeChatEmptyState kind="empty" agent={session.agent} />
+        ) : (
+          props.children
+        )}
+      </div>
       {props.isVisible ? (
         <ForflowContextPreview
           agent={session.agent}
@@ -41,20 +54,9 @@ export function NativeChatConversationBody(props: Props): React.JSX.Element {
           }
           sourceUnavailable={session.readPhase === 'error' || session.status === 'error'}
           deliveryPending={props.deliveryPending}
-          busy={session.status === 'working'}
+          busy={props.busy ?? session.status === 'working'}
         />
       ) : null}
-      <div className="flex min-h-0 flex-1 flex-col">
-        {viewState.kind === 'loading' ? (
-          <NativeChatEmptyState kind="loading" />
-        ) : viewState.kind === 'error' ? (
-          <NativeChatEmptyState kind="error" message={viewState.message} />
-        ) : viewState.kind === 'empty' ? (
-          <NativeChatEmptyState kind="empty" agent={session.agent} />
-        ) : (
-          props.children
-        )}
-      </div>
     </>
   )
 }

@@ -5,13 +5,14 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { createBootstrapFatalExitBanner } from './config/build-plugins/bootstrap-fatal-exit-banner'
 import { createPdfjsViewerAssetsPlugin } from './config/build-plugins/pdfjs-viewer-assets'
-import { createPlainNodeEntryGuardPlugin } from './config/build-plugins/plain-node-entry-guard'
+import {
+  CLI_MAIN_ENTRY_NAMES,
+  createPlainNodeEntryGuardPlugin
+} from './config/build-plugins/plain-node-entry-guard'
 import packageJson from './package.json' with { type: 'json' }
 import { forflowBrandingPlugin, forflowBuildEnabled } from './config/build-plugins/forflow-branding'
 import { forflowLocalizationPlugin } from './config/build-plugins/forflow-localization'
-import { jevEvaluatorFingerprint } from './config/build-plugins/jev-evaluator-fingerprint'
-
-const jevEvaluatorHash = JSON.stringify(jevEvaluatorFingerprint())
+import { forflowBuildDefines } from './config/build-plugins/forflow-build-defines'
 
 const BUNDLED_MAIN_DEPENDENCIES = new Set([
   '@streamparser/json',
@@ -200,6 +201,13 @@ function createMainBootstrapPlugin() {
   }
 }
 
+/**
+ * Diagnostic escape hatch: an unminified main bundle so a V8 CPU profile of the
+ * main process attributes self time to real function names. Release builds never
+ * set this, and `pnpm build` does not read it.
+ */
+const MAIN_MINIFY: 'oxc' | false = process.env.ORCA_UNMINIFIED_MAIN === '1' ? false : 'oxc'
+
 export const electronViteConfig: UserConfig = {
   main: {
     plugins: [forflowBrandingPlugin()],
@@ -207,7 +215,7 @@ export const electronViteConfig: UserConfig = {
       // Why: 'esbuild' makes rolldown disable its own minifier and re-print every
       // chunk through esbuild, which is undeclared here and only resolves via
       // pnpm hoisting. 'oxc' is rolldown's in-process minifier.
-      minify: 'oxc',
+      minify: MAIN_MINIFY,
       // Why: 'hidden' emits .js.map with no sourceMappingURL, so the shipped
       // bundle never references maps that packaging strips out. Release CI
       // uploads them so minified crash traces stay decodable.
@@ -225,6 +233,7 @@ export const electronViteConfig: UserConfig = {
         external: isExternalMainModule,
         input: {
           index: resolve('src/main/index.ts'),
+          'forflow/aily-client': resolve('src/main/forflow/aily-client.ts'),
           'forflow/bundled-skill-install': resolve('src/main/forflow/bundled-skill-install.ts'),
           // Why: sandboxed webview preloads cannot load Rollup helper chunks.
           'browser-window-close-preload': resolve('src/preload/browser-window-close.ts'),
@@ -232,6 +241,9 @@ export const electronViteConfig: UserConfig = {
           'daemon-entry': resolve('src/main/daemon/daemon-entry.ts'),
           'plugin-host-entry': resolve('src/main/plugins/plugin-host-entry.ts'),
           'computer-sidecar': resolve('src/main/computer/sidecar-entry.ts'),
+          'cursor-desktop-profile-worker-entry': resolve(
+            'src/main/rate-limits/cursor-desktop-profile-worker-entry.ts'
+          ),
           'stt-worker': resolve('src/main/speech/stt-worker.ts'),
           'warp-theme-parser-worker': resolve('src/main/warp-themes/warp-theme-parser-worker.ts'),
           'session-scanner-opencode-sqlite-worker-entry': resolve(
@@ -255,6 +267,12 @@ export const electronViteConfig: UserConfig = {
           // corpora and read SQLite synchronously; a worker thread keeps that
           // off the main-process event loop.
           'usage-scan-worker-entry': resolve('src/main/usage/usage-scan-worker-entry.ts'),
+          'profile-state-backup-worker-entry': resolve(
+            'src/main/persistence/profile-state/profile-state-backup-worker-entry.ts'
+          ),
+          'profile-state-writer-worker-entry': resolve(
+            'src/main/persistence/profile-state/profile-state-writer-worker-entry.ts'
+          ),
           // Why: forked with ELECTRON_RUN_AS_NODE so @parcel/watcher faults
           // can't take down the main process (issue #7547).
           'parcel-watcher-process-entry': resolve('src/main/ipc/parcel-watcher-process-entry.ts'),
@@ -263,16 +281,9 @@ export const electronViteConfig: UserConfig = {
           'main-thread-hang-watchdog-entry': resolve(
             'src/main/hang-watchdog/main-thread-hang-watchdog-entry.ts'
           ),
-          // Why: electron-vite cleans out/main in dev. The dev CLI imports
-          // this path for `orca agent hooks ...`, so it must survive rebuilds.
-          'agent-hooks/managed-agent-hook-controls': resolve(
-            'src/main/agent-hooks/managed-agent-hook-controls.ts'
-          ),
-          'codex/managed-home-shell-preflight': resolve(
-            'src/main/codex/managed-home-shell-preflight.ts'
-          ),
-          // Why: account import mutates the user's macOS Keychain from the CLI.
-          'claude-accounts/keychain': resolve('src/main/claude-accounts/keychain.ts')
+          ...Object.fromEntries(
+            CLI_MAIN_ENTRY_NAMES.map((module) => [module, resolve(`src/main/${module}.ts`)])
+          )
         },
         // Why: Rolldown's SSR default is ESM, but Electron and sidecar launchers
         // consume these stable CommonJS paths.
@@ -287,8 +298,7 @@ export const electronViteConfig: UserConfig = {
     // Why: compile-time substitution for the telemetry gate. See the block
     // above for the full rationale.
     define: {
-      __FORFLOW_JEV_EVALUATOR_HASH__: jevEvaluatorHash,
-      FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
+      ...forflowBuildDefines,
       ORCA_BUILD_IDENTITY: ORCA_BUILD_IDENTITY_LITERAL,
       ORCA_POSTHOG_WRITE_KEY: ORCA_POSTHOG_WRITE_KEY_LITERAL,
       ORCA_DIAGNOSTICS_TOKEN_URL: ORCA_DIAGNOSTICS_TOKEN_URL_LITERAL
@@ -313,10 +323,7 @@ export const electronViteConfig: UserConfig = {
     }
   },
   renderer: {
-    define: {
-      FORFLOW_BRAND_ENABLED: JSON.stringify(forflowBuildEnabled),
-      __FORFLOW_JEV_EVALUATOR_HASH__: jevEvaluatorHash
-    },
+    define: forflowBuildDefines,
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),

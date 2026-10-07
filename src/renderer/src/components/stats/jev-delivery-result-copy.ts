@@ -2,14 +2,14 @@ import { translate } from '@/i18n/i18n'
 
 export function jevDeliveryResultCopy() {
   return {
-    heading: translate('forflow.jevResultGuide.heading', 'Start with this judgment'),
-    next: translate('forflow.jevResultGuide.next', 'What to do next'),
-    details: translate('forflow.jevResultGuide.details', 'What the five checks mean'),
-    issues: translate('forflow.jevResultGuide.issues', 'View recorded issues'),
-    recheck: translate('forflow.jevResultGuide.recheck', 'Choose evidence again'),
+    heading: translate('forflow.jevResultGuide.heading', 'Main finding'),
+    next: translate('forflow.jevResultGuide.next', 'Suggested next action'),
+    details: translate('forflow.jevResultGuide.details', 'Check details'),
+    issues: translate('forflow.jevResultGuide.issues', 'View issues'),
+    recheck: translate('forflow.jevResultGuide.recheck', 'Choose materials again'),
     missingAnswer: translate(
       'forflow.jevResultGuide.missingAnswer',
-      'No answer was returned for this check. Do not treat a missing answer as a pass.'
+      'No answer was returned for this check.'
     ),
     confidenceHint: translate(
       'forflow.jevResultGuide.confidenceHint',
@@ -83,7 +83,7 @@ export function jevDeliveryResultCopy() {
         ),
         action: translate(
           'forflow.jevResultGuide.supportedAction',
-          'After checking the sources, decide whether to confirm this review version. Jev does not confirm it for you.'
+          'After checking the sources, confirm this review version when ready.'
         )
       },
       insufficient: {
@@ -93,7 +93,7 @@ export function jevDeliveryResultCopy() {
         ),
         meaning: translate(
           'forflow.jevResultGuide.insufficientMeaning',
-          'The selected material does not establish whether this requirement was met. An evidence gap is not a demonstrated failure.'
+          'More execution results or supporting materials are needed to assess this requirement.'
         ),
         action: translate(
           'forflow.jevResultGuide.insufficientAction',
@@ -160,7 +160,7 @@ export function jevDeliveryResultCopy() {
         ),
         meaning: translate(
           'forflow.jevResultGuide.incompleteMeaning',
-          'The request is unfinished or one of its five answers is missing or unusable. This does not show whether the requirement was met.'
+          'The request is unfinished, or one of the five answers is missing or unusable. Check the request status before retrying.'
         ),
         action: translate(
           'forflow.jevResultGuide.incompleteAction',

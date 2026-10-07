@@ -120,14 +120,19 @@ function getRepoBackedTaskSourceSummary(args: {
   )
   const accountLabels = uniqueLabels(contexts.map((context) => context.accountLabel))
   const repoCount = args.selectedRepoCount ?? contexts.length
-  const hostLabel = hostLabels.length === 0 ? 'No host' : formatShortList(hostLabels)
+  const hostLabel =
+    hostLabels.length === 0
+      ? translate('forflow.focus.noHost', 'No host')
+      : formatShortList(hostLabels)
   const accountLabel = accountLabels.length > 0 ? `Account: ${formatLongList(accountLabels)}` : null
   const targetLabel =
     accountLabels.length > 1
       ? formatShortList(accountLabels)
       : repoCount > 1
         ? `${repoCount} projects`
-        : (identityLabels[0] ?? contexts[0]?.accountLabel ?? 'Selected project')
+        : (identityLabels[0] ??
+          contexts[0]?.accountLabel ??
+          translate('forflow.focus.selectedProject', 'Selected project'))
   const titleParts = [
     args.providerLabel,
     hostLabels.length > 0 ? `Host: ${formatLongList(hostLabels)}` : null,
@@ -203,17 +208,10 @@ function getProviderIdentityLabel(
 }
 
 function uniqueLabels(labels: readonly (string | null | undefined)[]): string[] {
-  const seen = new Set<string>()
-  const result: string[] = []
-  for (const label of labels) {
-    const trimmed = label?.trim()
-    if (!trimmed || seen.has(trimmed)) {
-      continue
-    }
-    seen.add(trimmed)
-    result.push(trimmed)
-  }
-  return result
+  const trimmed = labels
+    .map((label) => label?.trim())
+    .filter((label): label is string => Boolean(label))
+  return [...new Set(trimmed)]
 }
 
 function getUnavailableHosts(

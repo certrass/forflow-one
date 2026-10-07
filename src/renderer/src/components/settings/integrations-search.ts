@@ -7,8 +7,9 @@ export const getIntegrationsPaneSearchEntries = createLocalizedCatalog(() => [
   ...(isForflowBuild()
     ? [
         {
+          id: 'forflow-feishu',
           title: '飞书任务与任务清单',
-          description: '连接本机飞书个人授权，读取任务并带入工作区。',
+          description: '查看飞书任务和清单，选择一项交给智能体处理。',
           keywords: ['飞书', 'feishu', 'lark', '任务清单', '授权']
         }
       ]

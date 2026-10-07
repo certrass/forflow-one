@@ -22,12 +22,12 @@ export function LandingBrandHeader(): React.JSX.Element {
         <p className="text-sm text-muted-foreground text-center">
           {translate(
             'forflow.productDescription',
-            'A private agent workbench for AI and development teams.'
+            'One workspace for your agents, tasks and results.'
           )}
           <br />
           {translate(
             'forflow.productWorkflow',
-            'Organize parallel tasks, inspect changes, and review the results in one workspace.'
+            'Give a task, explore approaches in parallel, and review the results.'
           )}
         </p>
       )}

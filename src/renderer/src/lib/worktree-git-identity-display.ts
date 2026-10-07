@@ -12,7 +12,7 @@ export type WorktreeGitIdentityDisplay =
       tooltip: string
     }
 
-export function shortGitHead(head: string | null | undefined): string {
+function shortGitHead(head: string | null | undefined): string {
   return (head ?? '').trim().slice(0, 7)
 }
 

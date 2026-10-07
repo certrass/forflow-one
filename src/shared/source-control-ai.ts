@@ -199,6 +199,9 @@ export function resolveSourceControlAiForOperation(
     }
   }
   const hostKey = input.discoveryHostKey ?? LOCAL_COMMIT_MESSAGE_HOST_KEY
+  // Unconfigured branch naming follows the execution host's Codex model and effort.
+  const defaultModelId =
+    resolvedAgent === 'codex' && input.operation === 'branchName' ? 'default' : spec.defaultModelId
   const persistedModelId = selectPersistedModelId({
     source,
     legacy,
@@ -206,13 +209,18 @@ export function resolveSourceControlAiForOperation(
     operation: input.operation,
     hostKey,
     agentId: resolvedAgent,
-    defaultModelId: spec.defaultModelId
+    defaultModelId
   })
   const discoveredModels = getDiscoveredModels(source, legacy, hostKey, resolvedAgent)
   const model =
     spec.models.find((candidate) => candidate.id === persistedModelId) ??
     discoveredModels.find((candidate) => candidate.id === persistedModelId) ??
-    getCommitMessageModel(resolvedAgent, spec.defaultModelId)
+    getCommitMessageModel(
+      resolvedAgent,
+      resolvedAgent === 'codex' && input.operation === 'branchName'
+        ? persistedModelId
+        : defaultModelId
+    )
   if (!model) {
     return { ok: false, error: `No model is available for ${spec.label}.` }
   }

@@ -1,3 +1,4 @@
+import type { SecretAtRestProtection } from '../../../../shared/secret-at-rest-protection'
 import { useEffect, useRef, useState } from 'react'
 import type {
   ClaudeRateLimitAccountsState,
@@ -18,6 +19,7 @@ import {
   getAccountsClaudeSearchEntries,
   getAccountsCodexSearchEntries,
   getAccountsGeminiSearchEntries,
+  getAccountsCursorSearchEntries,
   getAccountsGrokSearchEntries,
   getAccountsLocationSearchEntries,
   getAccountsMiniMaxSearchEntries,
@@ -26,6 +28,7 @@ import {
 } from './accounts-search'
 import { getRemoteAccountsPaneScope } from './provider-account-scope'
 import { ProviderHostScopeControl } from './ProviderHostScopeControl'
+import { SettingsSectionStack } from './SettingsSectionStack'
 import { matchesSettingsSearch } from './settings-search'
 import { getCodexAccountAuthWarning } from './codex-account-auth-warning'
 import { getCodexConfigSyncWarning } from './codex-config-sync-warning'
@@ -34,8 +37,8 @@ import {
   providerAccountIsActiveInView,
   providerAccountMatchesView
 } from './provider-account-visibility'
-import { Separator } from '../ui/separator'
 import { GrokAccountsSection } from './GrokAccountsSection'
+import { CursorAccountsSection } from './CursorAccountsSection'
 import type {
   AccountsPaneProps,
   AccountsPaneSectionModel,
@@ -60,6 +63,8 @@ import {
 import { renderMiniMaxAccountsSection } from './accounts-pane-minimax-section'
 import { renderAccountsRemovalDialogs } from './accounts-pane-removal-dialogs'
 import { isForflowBuild } from '../../../../shared/product-branding'
+import { WorkBuddyAccountsSection } from './WorkBuddyAccountsSection'
+import { getWorkBuddyAccountSearchEntries } from './workbuddy-account-search'
 import { ForflowModelAccountsSection } from './ForflowModelAccountsSection'
 import { getForflowModelAccountSearchEntries } from './forflow-model-account-search'
 
@@ -81,11 +86,17 @@ export function AccountsPane({
   const recordFeatureInteraction = useAppStore((s) => s.recordFeatureInteraction)
   const fetchSettings = useAppStore((s) => s.fetchSettings)
   const runtimeEnvironments = useAppStore((s) => s.runtimeEnvironments)
-  const recordedOpenCodeSettingEditsRef = useRef<Set<'cookie' | 'workspaceId'>>(new Set())
+  const recordedOpenCodeSettingEditsRef = useRef<Set<'cookie' | 'workspaceId' | 'apiKey'>>(
+    new Set()
+  )
   const [miniMaxCookieDraft, setMiniMaxCookieDraft] = useState('')
   const [miniMaxApiKeyDraft, setMiniMaxApiKeyDraft] = useState('')
   const [miniMaxApiKeyConfigured, setMiniMaxApiKeyConfigured] = useState(false)
+  const [miniMaxApiKeyProtection, setMiniMaxApiKeyProtection] =
+    useState<SecretAtRestProtection | null>(null)
   const [miniMaxConfigured, setMiniMaxConfigured] = useState(false)
+  const [miniMaxCookieProtection, setMiniMaxCookieProtection] =
+    useState<SecretAtRestProtection | null>(null)
   const [miniMaxCredentialBusy, setMiniMaxCredentialBusy] = useState(false)
   const localAccountRuntime = getSelectedAccountRuntime(
     settings,
@@ -217,7 +228,7 @@ export function AccountsPane({
   const accountRuntimeUnavailable =
     accountRuntime.runtime === 'wsl' && !wslAvailable && !wslCapabilitiesLoading
 
-  const recordOpenCodeSettingEdit = (field: 'cookie' | 'workspaceId'): void => {
+  const recordOpenCodeSettingEdit = (field: 'cookie' | 'workspaceId' | 'apiKey'): void => {
     if (recordedOpenCodeSettingEditsRef.current.has(field)) {
       return
     }
@@ -229,6 +240,8 @@ export function AccountsPane({
       const status = await window.api.minimaxCredentials.getStatus()
       setMiniMaxConfigured(status.cookieConfigured)
       setMiniMaxApiKeyConfigured(status.apiKeyConfigured)
+      setMiniMaxCookieProtection(status.cookieProtection)
+      setMiniMaxApiKeyProtection(status.apiKeyProtection)
     } catch (error) {
       console.error('Failed to load MiniMax credential status:', error)
     }
@@ -240,7 +253,9 @@ export function AccountsPane({
       miniMaxApiKeyDraft,
       setMiniMaxApiKeyDraft,
       setMiniMaxApiKeyConfigured,
+      setMiniMaxApiKeyProtection,
       setMiniMaxConfigured,
+      setMiniMaxCookieProtection,
       setMiniMaxCredentialBusy,
       recordFeatureInteraction
     })
@@ -348,11 +363,13 @@ export function AccountsPane({
     miniMaxApiKeyDraft,
     setMiniMaxApiKeyDraft,
     miniMaxApiKeyConfigured,
+    miniMaxApiKeyProtection,
     saveMiniMaxApiKey,
     clearMiniMaxApiKey,
     miniMaxCookieDraft,
     setMiniMaxCookieDraft,
     miniMaxConfigured,
+    miniMaxCookieProtection,
     miniMaxCredentialBusy,
     saveMiniMaxCookie,
     clearMiniMaxCookie
@@ -378,6 +395,14 @@ export function AccountsPane({
     matchesSettingsSearch(searchQuery, getAccountsCodexSearchEntries())
       ? renderCodexAccountsSection(model)
       : null,
+    isForflowBuild() && matchesSettingsSearch(searchQuery, getWorkBuddyAccountSearchEntries()) ? (
+      <WorkBuddyAccountsSection
+        key={`workbuddy:${activeRuntimeEnvironmentId ?? 'local'}:${accountRuntime.runtime}`}
+        localHost={
+          !isRemoteAccountScope && accountRuntime.runtime === 'host' && !isWebClientLocation()
+        }
+      />
+    ) : null,
     matchesSettingsSearch(searchQuery, getAccountsGeminiSearchEntries())
       ? renderGeminiAccountsSection(model)
       : null,
@@ -389,18 +414,16 @@ export function AccountsPane({
       : null,
     matchesSettingsSearch(searchQuery, getAccountsGrokSearchEntries()) ? (
       <GrokAccountsSection key="grok" />
+    ) : null,
+    matchesSettingsSearch(searchQuery, getAccountsCursorSearchEntries()) ? (
+      <CursorAccountsSection key="cursor" />
     ) : null
-  ].filter(Boolean)
+  ]
 
   return (
     <div className="space-y-8">
       {renderAccountsRemovalDialogs(model, removeCodexTarget, removeClaudeTarget)}
-      {visibleSections.map((section, index) => (
-        <div key={index} className="space-y-8">
-          {index > 0 ? <Separator /> : null}
-          {section}
-        </div>
-      ))}
+      <SettingsSectionStack sections={visibleSections} spacing="group" />
     </div>
   )
 }

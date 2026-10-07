@@ -3,15 +3,17 @@ import type {
   ClaudeAccountsApi,
   CodexAccountsApi,
   CodexConfigSyncApi,
+  CursorAccountsApi,
   GrokAccountsApi,
   MinimaxCredentialsApi
 } from './api/agent-account-api'
 import type { HooksApi } from './api/agent-hook-api'
 import type { SkillsApi } from './api/agent-skill-api'
-import type { AgentAwakeApi, AgentStatusApi, AgentTrustApi } from './api/agent-status-api'
+import type { AgentAwakeApi, AgentStatusApi } from './api/agent-status-api'
 import type {
   ClaudeUsageApi,
   CodexUsageApi,
+  MuseUsageApi,
   OpenCodeUsageApi,
   RateLimitsApi
 } from './api/agent-usage-api'
@@ -40,6 +42,8 @@ import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi, StarNagApi } from './api/onboarding-api'
 import type { OrcaProfileApi } from './api/orca-profile-api'
 import type { ForflowIdentityApi } from '../shared/forflow-identity'
+import type { ForflowAilyApi } from '../shared/forflow-aily'
+import type { ForflowWorkBuddyAccountApi } from '../shared/forflow-workbuddy-account'
 import type { ForflowModelAccountsApi } from '../shared/forflow-model-accounts'
 import type { JevAuditApi } from '../shared/jev-audit-types'
 import type { ForflowApprovalApi } from '../shared/forflow-approval'
@@ -75,8 +79,10 @@ type Merged<T> = { [K in keyof T]: T[K] }
 export type PreloadApi = {
   forflowIdentity?: ForflowIdentityApi
   forflowModelAccounts?: ForflowModelAccountsApi
+  forflowWorkBuddyAccount?: ForflowWorkBuddyAccountApi
   forflowJevAudit?: JevAuditApi
   forflowFeishu?: ForflowFeishuApi
+  forflowAily?: ForflowAilyApi
   forflowApproval?: ForflowApprovalApi
   forflowSkills?: ForflowSkillsApi
   app: AppApi
@@ -116,7 +122,6 @@ export type PreloadApi = {
   claudeAccounts: ClaudeAccountsApi
   cli: CliApi
   codexConfigSync: CodexConfigSyncApi
-  agentTrust: AgentTrustApi
   preflight: PreflightApi
   notifications: NotificationsApi
   onboarding: OnboardingApi
@@ -143,6 +148,7 @@ export type PreloadApi = {
   claudeUsage: ClaudeUsageApi
   codexUsage: CodexUsageApi
   openCodeUsage: OpenCodeUsageApi
+  museUsage: MuseUsageApi
   aiVault: AiVaultApi
   nativeChat: NativeChatApi
   fs: FilesystemApi['fs']
@@ -153,6 +159,7 @@ export type PreloadApi = {
   rateLimits: RateLimitsApi
   minimaxCredentials: MinimaxCredentialsApi
   grokAccounts: GrokAccountsApi
+  cursorAccounts: CursorAccountsApi
   ssh: SshApi
   automations: AutomationsApi
   wsl: RuntimeApi['wsl']
@@ -164,7 +171,12 @@ export type PreloadApi = {
   speech: SpeechApi
 }
 
-export type { ClaudeUsageApi, CodexUsageApi, OpenCodeUsageApi } from './api/agent-usage-api'
+export type {
+  ClaudeUsageApi,
+  CodexUsageApi,
+  MuseUsageApi,
+  OpenCodeUsageApi
+} from './api/agent-usage-api'
 export type { AiVaultApi } from './api/ai-vault-api'
 export type { AutomationsApi, ExternalAutomationManagerResult } from './api/automation-api'
 export type { AppApi } from './api/app-api'
@@ -198,6 +210,8 @@ export type {
 } from './api/preflight-api'
 export type {
   PtyManagementApi,
+  PtyManagementDaemonCwdClass,
+  PtyManagementFolderAccessMismatch,
   PtyManagementMacTccAttributionHealth,
   PtyManagementSession
 } from './api/pty-management-api'

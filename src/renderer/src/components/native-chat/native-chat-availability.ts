@@ -1,3 +1,4 @@
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
 import type { Tab } from '../../../../shared/tab-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { AgentType } from '../../../../shared/agent-status-types'
@@ -40,7 +41,10 @@ export type NativeChatAvailabilityInput = {
  *  launch metadata is next, and title resolution only fills the pre-hook gap for
  *  manually-started Claude/Codex/Grok sessions. */
 export function canToggleNativeChat(input: NativeChatAvailabilityInput): boolean {
-  if (input.experimentalNativeChatEnabled !== true) {
+  if (
+    input.experimentalNativeChatEnabled !== true &&
+    !isCompanionAgent(input.detectedAgent ?? input.launchAgent ?? input.resolvedAgent)
+  ) {
     return false
   }
   if (input.contentType !== 'terminal') {
@@ -57,17 +61,4 @@ export function canToggleNativeChat(input: NativeChatAvailabilityInput): boolean
     return false
   }
   return isNativeChatSupportedAgent(agent)
-}
-
-/** Whether a user-facing terminal⇄chat switcher may be offered. A structured
- *  session IS the conversation — it owns the surface with no live TUI beneath
- *  it — so only terminal-backed (bridge) chat, which renders a terminal we can
- *  return to, gets the switch. */
-export function canSwitchNativeChatView(
-  input: NativeChatAvailabilityInput & { structuredSessionId?: string | null }
-): boolean {
-  if (input.structuredSessionId) {
-    return false
-  }
-  return canToggleNativeChat(input)
 }

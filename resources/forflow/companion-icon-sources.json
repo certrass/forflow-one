@@ -1,0 +1,20 @@
+{
+  "retrievedAt": "2026-10-06",
+  "usage": "Third-party product identification in agent pickers, tabs and settings. Original images, unchanged.",
+  "assets": [
+    {
+      "file": "src/shared/agent-icons/aily.png",
+      "product": "豆包工作伙伴",
+      "sourcePage": "https://www.feishu.cn/service/ai",
+      "sourceUrl": "https://p1-hera.feishucdn.com/tos-cn-i-jbbdkfciu3/e300f933d5954b5799edcbfe5676c44e.png~tplv-jbbdkfciu3-png:0:0.png",
+      "sha256": "8c915d10fd38765f5bf2915240c69810efc15eb5ee5fa1042825fb2514c522bb"
+    },
+    {
+      "file": "src/shared/agent-icons/workbuddy.png",
+      "product": "WorkBuddy",
+      "sourcePage": "https://www.codebuddy.cn/work/",
+      "sourceBundle": "WorkBuddy.app 5.5.6 / Contents/Resources/app.asar.unpacked/resources/icon.png",
+      "sha256": "3c2bc7d338c9eacc027af2b27693056b7cbea3a6c0a09225cf87020afe57fd7b"
+    }
+  ]
+}

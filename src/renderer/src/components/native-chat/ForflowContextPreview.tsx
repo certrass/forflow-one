@@ -1,20 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardCopy, ScanText } from 'lucide-react'
+import { ClipboardCopy } from 'lucide-react'
 import { toast } from 'sonner'
 import type { AgentType, NativeChatMessage } from '../../../../shared/native-chat-types'
 import {
   buildForflowContextPreview,
   encodeForflowContextReceipt,
+  formatForflowContextText,
   type ForflowContextScope
 } from '../../../../shared/forflow-context-packet'
 import { useAppStore } from '@/store'
 import { translate } from '@/i18n/i18n'
+import { ForflowContextSourceDetails } from './ForflowContextSourceDetails'
 import { forflowContextBlockingCopy } from './forflow-context-blocking-copy'
 import { Button } from '../ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
@@ -78,35 +82,43 @@ function ContextPreview(props: Props): React.JSX.Element {
   }
   const stale = snapshot?.revision !== revision
   const preview = snapshot?.preview
-  const copy = async (): Promise<void> => {
+  const copy = async (format: 'text' | 'receipt'): Promise<void> => {
     if (!preview?.canCopy || stale || props.busy || copying) {
       return
     }
     const expected = generation.current
     setCopying(true)
     try {
-      const receipt = await encodeForflowContextReceipt(preview)
+      const text =
+        format === 'receipt'
+          ? await encodeForflowContextReceipt(preview)
+          : formatForflowContextText(preview, {
+              title: translate('forflow.contextBeta.excerpt', 'Conversation excerpt'),
+              user: translate('forflow.contextBeta.exportUser', 'User'),
+              assistant: 'Codex'
+            })
       if (expected !== generation.current || current.current !== snapshot.revision) {
         return
       }
-      await navigator.clipboard.writeText(receipt)
+      await navigator.clipboard.writeText(text)
       toast.success(
-        translate(
-          'forflow.contextBeta.copied',
-          'Handoff copied. Review it before sending to another agent.'
-        )
+        format === 'receipt'
+          ? translate('forflow.contextBeta.receiptCopied', 'Source receipt copied')
+          : translate(
+              'forflow.contextBeta.copied',
+              'Copied. Paste into a new conversation to continue.'
+            )
       )
     } catch {
-      toast.error(
-        translate('forflow.contextBeta.copyFailed', 'Could not copy the handoff. Please try again.')
-      )
+      toast.error(translate('forflow.contextBeta.copyFailed', 'Could not copy. Please try again.'))
     } finally {
       setCopying(false)
     }
   }
+  const copyDisabled = !preview?.canCopy || stale || props.busy || copying
   return (
     <div
-      className="flex shrink-0 justify-end border-b border-border px-2 py-1"
+      className="flex shrink-0 justify-end border-t border-border px-2 py-1"
       data-forflow-context-beta=""
       data-pane-prevent-terminal-focus=""
     >
@@ -124,110 +136,98 @@ function ContextPreview(props: Props): React.JSX.Element {
       >
         <DialogTrigger asChild>
           <Button variant="ghost" size="xs">
-            <ScanText />
-            {translate('forflow.contextBeta.open', 'Handoff preview · Beta')}
+            <ClipboardCopy />
+            {translate('forflow.contextBeta.open', 'Copy conversation')}
           </Button>
         </DialogTrigger>
         <DialogContent
+          className="flex max-h-[calc(100dvh-2rem)] flex-col sm:max-w-xl"
           data-forflow-context-preview=""
           data-native-chat-typing-redirect-ignore="true"
           onKeyDown={(event) => event.stopPropagation()}
           onPointerDown={(event) => event.stopPropagation()}
         >
           <DialogHeader>
-            <DialogTitle>
-              {translate('forflow.contextBeta.title', 'Context handoff preview · Beta')}
-            </DialogTitle>
+            <DialogTitle>{translate('forflow.contextBeta.title', 'Copy conversation')}</DialogTitle>
             <DialogDescription>
               {translate(
                 'forflow.contextBeta.intro',
-                'Extracts whole user messages and up to three recent assistant replies from this conversation. This is an excerpt, not a semantic summary or approved memory.'
+                'Take this conversation into a new chat and continue your task.'
               )}
             </DialogDescription>
           </DialogHeader>
           {preview ? (
-            <div className="max-h-[55vh] space-y-3 overflow-y-auto text-sm scrollbar-sleek">
-              <p>
-                {translate('forflow.contextBeta.scope', 'Current session')}:{' '}
-                <span className="break-all font-mono text-xs">{props.scope.sessionId || '—'}</span>
-              </p>
-              <p>
-                {translate(
-                  'forflow.contextBeta.size',
-                  'Selected text and metadata (UTF-8 bytes, not tokens)'
-                )}
-                : {preview.bytes.toLocaleString()} / {preview.budgetBytes.toLocaleString()}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {translate(
-                  'forflow.contextBeta.omitted',
-                  'Omitted user / assistant / tool or system messages'
-                )}
-                : {preview.packet.omitted.userMessages} / {preview.packet.omitted.assistantMessages}{' '}
-                / {preview.packet.omitted.nonConversationMessages}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {translate(
-                  'forflow.contextBeta.unsupported',
-                  'Unincluded attachment or tool blocks / unpersisted messages'
-                )}
-                : {preview.packet.omitted.nonTextBlocks} /{' '}
-                {preview.packet.omitted.nonTranscriptMessages}
-              </p>
-              {stale || props.busy ? (
-                <p role="status">
-                  {translate(
-                    'forflow.contextBeta.changed',
-                    'Conversation changed or is still running. Wait for it to settle, then refresh the preview.'
-                  )}
-                </p>
-              ) : null}
-              {preview.blockingReasons.map((reason) => (
-                <p key={reason} role="status">
-                  {forflowContextBlockingCopy(reason)}
-                </p>
-              ))}
-              <div className="max-h-64 space-y-3 overflow-y-auto rounded-md border border-border p-3 scrollbar-sleek">
-                {preview.packet.items.map((item) => (
-                  <div key={item.messageId} className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      {item.role === 'user'
-                        ? translate('forflow.contextBeta.user', 'User original text')
-                        : translate(
-                            'forflow.contextBeta.assistant',
-                            'Agent statement · unverified'
-                          )}{' '}
-                      · <span className="break-all">{item.messageId}</span>
-                    </p>
-                    <p className="whitespace-pre-wrap break-words text-sm">{item.text}</p>
+            <>
+              <div className="min-h-0 space-y-4 overflow-y-auto scrollbar-sleek">
+                <div className="overflow-hidden rounded-lg border border-border">
+                  <div className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-sm text-muted-foreground">
+                    <span>{translate('forflow.contextBeta.previewLabel', 'Content to copy')}</span>
+                    <span>
+                      {translate('forflow.contextBeta.count', '{{count}} messages', {
+                        count: preview.packet.items.length
+                      })}
+                    </span>
                   </div>
-                ))}
+                  <div className="divide-y divide-border px-4">
+                    {preview.packet.items.map((item) => (
+                      <div key={item.messageId} className="space-y-2 py-4">
+                        <p className="text-sm font-medium">
+                          {item.role === 'user'
+                            ? translate('forflow.contextBeta.user', 'You')
+                            : 'Codex'}
+                        </p>
+                        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+                          {item.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <ForflowContextSourceDetails
+                  preview={preview}
+                  disabled={copyDisabled}
+                  onCopyReceipt={() => void copy('receipt')}
+                />
               </div>
-              <p className="text-xs text-muted-foreground">
-                {translate(
-                  'forflow.contextBeta.boundary',
-                  'Only the loaded transcript is included. Tool results, attachments, hidden prompts and other agents are not carried over. Check sensitive content before copying. No automatic sending, persistence or authorization transfer.'
-                )}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={props.busy || copying}
-                  onClick={capture}
+              {props.busy ? (
+                <p role="status" className="text-sm text-muted-foreground">
+                  {translate('forflow.contextBeta.busy', 'Codex is still working. Please wait.')}
+                </p>
+              ) : stale ? (
+                <div
+                  role="status"
+                  className="flex flex-wrap items-center justify-between gap-2 text-sm"
                 >
-                  {translate('forflow.contextBeta.refresh', 'Refresh preview')}
-                </Button>
-                <Button
-                  size="sm"
-                  disabled={!preview.canCopy || stale || props.busy || copying}
-                  onClick={() => void copy()}
-                >
+                  <p>
+                    {translate(
+                      'forflow.contextBeta.changed',
+                      'Update the excerpt to include the latest content.'
+                    )}
+                  </p>
+                  <Button variant="outline" size="sm" disabled={copying} onClick={capture}>
+                    {translate('forflow.contextBeta.refresh', 'Update excerpt')}
+                  </Button>
+                </div>
+              ) : null}
+              {preview.blockingReasons.length > 0 ? (
+                <div role="status" className="space-y-1 text-sm text-muted-foreground">
+                  {preview.blockingReasons.map((reason) => (
+                    <p key={reason}>{forflowContextBlockingCopy(reason)}</p>
+                  ))}
+                </div>
+              ) : null}
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="ghost">
+                    {translate('forflow.contextBeta.back', 'Back to conversation')}
+                  </Button>
+                </DialogClose>
+                <Button disabled={copyDisabled} onClick={() => void copy('text')}>
                   <ClipboardCopy />
-                  {translate('forflow.contextBeta.copy', 'Copy handoff with source receipt')}
+                  {translate('forflow.contextBeta.copy', 'Copy to clipboard')}
                 </Button>
-              </div>
-            </div>
+              </DialogFooter>
+            </>
           ) : null}
         </DialogContent>
       </Dialog>

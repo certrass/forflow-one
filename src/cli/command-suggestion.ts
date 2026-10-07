@@ -2,8 +2,6 @@ import { cliCommandName, isForflowCli } from './cli-product'
 import { specPaths, type CommandSpec } from './command-spec'
 import { levenshtein } from '../shared/edit-distance'
 
-export { levenshtein } from '../shared/edit-distance'
-
 // Why: rank the live registry so typo recovery cannot drift from accepted paths.
 
 const SUGGESTION_THRESHOLD = 3

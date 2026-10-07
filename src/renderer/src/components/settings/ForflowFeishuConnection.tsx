@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ListChecks } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useAppStore } from '@/store'
 import {
   getSettingsFocusedExecutionHostId,
@@ -9,16 +9,8 @@ import {
 } from '../../../../shared/execution-host'
 import { feishuProfileSchema, type FeishuStatus } from '../../../../shared/forflow-feishu'
 import { IntegrationCardShell, IntegrationCardDetails } from './integration-card-shell'
+import { ForflowFeishuSetup } from './ForflowFeishuSetup'
 import { readIpcErrorMessage } from '@/lib/ipc-error'
-
-const FEISHU_SETUP_COMMANDS = [
-  { title: '1. 安装官方 CLI（已有可跳过）', command: 'npm install -g @larksuite/cli' },
-  { title: '2. 配置飞书应用（在提示中选择复用已有应用或新建）', command: 'lark-cli config init' },
-  {
-    title: '3. 授予任务读取权限',
-    command: 'lark-cli auth login --scope "task:task:read task:tasklist:read offline_access"'
-  }
-]
 
 export function ForflowFeishuConnection({
   onChange,
@@ -32,15 +24,11 @@ export function ForflowFeishuConnection({
   const [status, setStatus] = useState<FeishuStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [checking, setChecking] = useState(available)
+  const [setupOpen, setSetupOpen] = useState(false)
   const [profile, setProfile] = useState('')
+  const generation = useRef(0)
   const appId = profile.trim() || status?.connection?.appId || ''
-  const validProfile = feishuProfileSchema.safeParse(appId)
-  const setupCommands = FEISHU_SETUP_COMMANDS.map((step) => ({
-    ...step,
-    command: validProfile.success
-      ? step.command.replace('lark-cli auth', `lark-cli --profile ${validProfile.data} auth`)
-      : step.command
-  }))
   const update = useCallback(
     (value: FeishuStatus | null) => {
       setStatus(value)
@@ -49,159 +37,178 @@ export function ForflowFeishuConnection({
     [onChange]
   )
   useEffect(() => {
-    let current = true
+    const request = ++generation.current
     update(null)
+    setError(null)
+    setBusy(false)
+    setChecking(available)
+    setSetupOpen(false)
     if (available) {
       void window.api.forflowFeishu
         ?.status()
         .then((value) => {
-          if (current) {
+          if (request === generation.current) {
             update(value)
           }
         })
         .catch(() => {
-          if (current) {
-            setError('无法读取飞书连接状态，请重试。')
+          if (request === generation.current) {
+            setError('暂时无法检查连接，请重试。')
+          }
+        })
+        .finally(() => {
+          if (request === generation.current) {
+            setChecking(false)
           }
         })
     }
     return () => {
-      current = false
+      generation.current = request + 1
     }
   }, [available, update])
 
   const act = async (disconnect: boolean): Promise<void> => {
     const api = window.api.forflowFeishu
-    if (!available || !api || busy) {
+    if (!available || !api || busy || checking) {
       return
     }
+    const request = generation.current
     setBusy(true)
     setError(null)
     try {
       if (disconnect) {
         await api.disconnect()
-        update({ installed: true, connection: null })
+        if (request === generation.current) {
+          update({ installed: status?.installed ?? true, connection: null })
+        }
       } else {
-        if (appId && !validProfile.success) {
-          setError('应用 ID 格式不正确，应以 cli_ 开头；留空可使用 CLI 默认应用。')
+        if (appId && !feishuProfileSchema.safeParse(appId).success) {
+          setError('应用 ID 应以 cli_ 开头，只包含字母和数字。')
           return
         }
-        update(await api.connect(appId || undefined))
+        const result = await api.connect(appId || undefined)
+        if (request === generation.current) {
+          update(result)
+          setSetupOpen(false)
+        }
       }
     } catch (cause) {
-      setError(readIpcErrorMessage(cause) ?? '飞书连接失败，请重试。')
+      if (request === generation.current) {
+        setError(readIpcErrorMessage(cause) ?? '连接未完成，请重试。')
+      }
     } finally {
-      setBusy(false)
+      if (request === generation.current) {
+        setBusy(false)
+      }
     }
   }
 
+  const connected = Boolean(status?.connection)
   return (
     <IntegrationCardShell
       icon={<ListChecks className="size-5" />}
       name="飞书任务"
-      description="通过本机官方飞书 CLI 的个人授权，读取任务和任务清单。"
+      description="查看飞书任务和清单，选择一项交给智能体处理。"
       settingsSectionId="forflow-feishu"
-      statusTone={status?.connection ? 'connected' : 'neutral'}
-      statusLabel={status?.connection ? `已绑定 · ${status.connection.userName}` : '未连接'}
+      statusTone={connected ? 'connected' : 'neutral'}
+      statusLabel={
+        !available ? '请切回本机' : checking ? '正在检查…' : connected ? '已连接' : '未连接'
+      }
       actions={
-        <>
-          {status?.connection && onBrowse ? (
+        available && (!connected || onBrowse) ? (
+          connected && onBrowse ? (
             <Button size="sm" onClick={onBrowse}>
-              浏览任务
+              查看任务
             </Button>
-          ) : null}
-          <Button
-            size="sm"
-            variant={status?.connection ? 'outline' : 'default'}
-            disabled={!available || busy}
-            onClick={() => void act(false)}
-          >
-            {busy ? '处理中…' : status?.connection ? '重新检测授权' : '连接本机飞书'}
-          </Button>
-          {status?.connection ? (
+          ) : (
             <Button
               size="sm"
-              variant="ghost"
-              disabled={!available || busy}
-              onClick={() => void act(true)}
+              disabled={busy || checking}
+              onClick={() => {
+                if (!setupOpen && status && !status.installed) {
+                  setSetupOpen(true)
+                } else {
+                  void act(false)
+                }
+              }}
             >
-              断开连接
+              {busy ? '正在连接…' : '连接飞书'}
             </Button>
-          ) : null}
-        </>
+          )
+        ) : undefined
       }
     >
       <IntegrationCardDetails>
         {!available ? (
-          <p role="status" className="text-sm text-muted-foreground">
-            飞书连接由本机桌面管理，请切回本机运行环境后连接和读取。SSH、远程服务器及网页版暂不读取本机授权。
-          </p>
-        ) : null}
-        {error ? (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
-        {status?.connection ? (
-          <p className="text-xs text-muted-foreground">
-            应用：{status.connection.appId}。断开仅移除 Forflow
-            绑定；不会退出其他工具的飞书登录。实际任务权限将在读取时验证。
-          </p>
-        ) : null}
-        {!status?.connection && status ? (
-          <p className="text-xs text-muted-foreground">
-            {status.installed
-              ? '官方 CLI 已检测到；仍需完成应用配置和个人授权。'
-              : '尚未检测到官方 CLI，请先完成第 1 步安装。'}
-          </p>
-        ) : null}
-        <details open={Boolean(error) || !status?.connection}>
-          <summary className="cursor-pointer text-sm font-medium">首次连接与授权指引</summary>
-          <div className="mt-3 space-y-3">
-            <p className="text-xs text-muted-foreground">
-              在系统终端依次执行，按提示到飞书完成应用配置和个人授权，再点击上方“连接本机飞书”。企业管理员可能需要批准应用权限。密钥由官方
-              CLI 管理，无需粘贴到 Forflow。
-            </p>
-            {setupCommands.map((step) => (
-              <div key={step.command} className="space-y-1">
-                <p className="text-sm">{step.title}</p>
-                <div className="flex items-start gap-2">
-                  <code className="min-w-0 flex-1 break-all rounded-md bg-muted p-2 text-xs">
-                    {step.command}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      void navigator.clipboard
-                        .writeText(step.command)
-                        .catch(() => setError('复制失败，请手动选择命令复制。'))
-                    }}
-                  >
-                    复制
-                  </Button>
+          <p className="text-sm text-muted-foreground">切回本机后，即可连接飞书并查看任务。</p>
+        ) : (
+          <>
+            {error ? (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            ) : null}
+            {connected ? (
+              <>
+                <p className="text-sm">{status?.connection?.userName}</p>
+                <details>
+                  <summary className="cursor-pointer text-sm text-muted-foreground">
+                    管理连接
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <p className="break-all text-xs text-muted-foreground">
+                      应用 ID：{status?.connection?.appId}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => void act(false)}
+                      >
+                        {busy ? '正在更新…' : '刷新连接'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => void act(true)}
+                      >
+                        断开连接
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      断开后，飞书中的登录和任务仍会保留。
+                    </p>
+                  </div>
+                </details>
+              </>
+            ) : (
+              <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm text-muted-foreground">
+                    已有飞书授权？点击“连接飞书”即可继续。
+                  </p>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      {setupOpen ? '收起步骤' : '首次连接'}
+                    </Button>
+                  </CollapsibleTrigger>
                 </div>
-              </div>
-            ))}
-            <label className="block space-y-1 text-sm">
-              应用 ID（可选，多账号时指定）
-              <Input
-                value={profile}
-                onChange={(event) => setProfile(event.target.value)}
-                placeholder="cli_…，留空使用 CLI 默认应用"
-                autoComplete="off"
-                disabled={busy}
-              />
-            </label>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() => void window.api.shell.openUrl('https://github.com/larksuite/cli')}
-            >
-              官方安装与授权文档
-            </Button>
-          </div>
-        </details>
+                <CollapsibleContent>
+                  <div className="pt-4">
+                    <ForflowFeishuSetup
+                      profile={profile}
+                      onProfileChange={setProfile}
+                      installed={status?.installed ?? false}
+                      busy={busy}
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+          </>
+        )}
       </IntegrationCardDetails>
     </IntegrationCardShell>
   )

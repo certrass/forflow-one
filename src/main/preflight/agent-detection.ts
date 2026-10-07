@@ -1,3 +1,4 @@
+import { resolveWorkBuddyCli } from '../../shared/workbuddy-cli-location'
 /**
  * Agent/tool preflight detection. Split out of `ipc/preflight.ts` so the Orca
  * runtime — which calls `detectInstalledAgentsWithShellPathHydration` and
@@ -49,31 +50,10 @@ import {
   agentDetectionCommandsWithOverrides,
   type AgentCommandOverrides
 } from './agent-command-overrides'
+import { prunePreflightWslCache } from '../preflight-wsl-cache'
 
-export type PreflightStatus = {
-  git: { installed: boolean }
-  gh: { installed: boolean; authenticated: boolean }
-  // Why: optional so existing renderer call sites that only render git/gh
-  // status keep typechecking. Consumers that surface GitLab-specific
-  // affordances (the GitLab tab in the source picker, MR list, etc.)
-  // gate on `glab?.authenticated`.
-  glab?: { installed: boolean; authenticated: boolean }
-  bitbucket?: { configured: boolean; authenticated: boolean; account: string | null }
-  azureDevOps?: {
-    configured: boolean
-    authenticated: boolean
-    account: string | null
-    baseUrl: string | null
-    tokenConfigured: boolean
-  }
-  gitea?: {
-    configured: boolean
-    authenticated: boolean
-    account: string | null
-    baseUrl: string | null
-    tokenConfigured: boolean
-  }
-}
+import type { PreflightStatus } from './preflight-status-types'
+export type { PreflightStatus } from './preflight-status-types'
 
 export { detectRemoteWindowsTerminalCapabilities }
 export type { RemoteWindowsTerminalCapabilities }
@@ -92,6 +72,7 @@ let cached: PreflightStatus | null = null
 // would report "git not installed" until relaunch; expiring lets it self-heal
 // while still collapsing the burst of calls that made this expensive.
 const WSL_PREFLIGHT_CACHE_TTL_MS = 30_000
+const MAX_WSL_PREFLIGHT_DISTRO_ENTRIES = 128
 const cachedByWslDistro = new Map<string, { result: PreflightStatus; expiresAt: number }>()
 // Collapses concurrent callers (several panes mounting at once) onto one probe
 // set instead of one full set each before the first result lands.
@@ -133,15 +114,8 @@ async function detectCommandRuntime(
   context?: PreflightRuntimeContext
 ): Promise<{ installed: boolean; wslTarget?: WslPreflightTarget }> {
   const wslTarget = getPreflightWslTarget(context)
-  if (wslTarget) {
-    return (await isCommandAvailable(command, wslTarget))
-      ? { installed: true, wslTarget }
-      : { installed: false }
-  }
-  if (await isCommandAvailable(command)) {
-    return { installed: true }
-  }
-  return { installed: false }
+  const installed = await isCommandAvailable(command, wslTarget ?? undefined)
+  return installed && wslTarget ? { installed, wslTarget } : { installed }
 }
 
 export async function detectInstalledAgents(
@@ -179,6 +153,9 @@ export async function detectInstalledAgents(
       .filter(({ cmd, installedOnPath }) => installedOnPath || installDirCommands.has(cmd))
       .map(({ cmd }) => cmd)
   )
+  if (resolveWorkBuddyCli()) {
+    foundCommands.add('workbuddy')
+  }
   return resolveDetectedTuiAgentIds(commands, foundCommands, process.platform)
 }
 
@@ -300,6 +277,12 @@ export async function runPreflightCheck(
 ): Promise<PreflightStatus> {
   const wslTarget = getPreflightWslTarget(context)
   const cacheKey = preflightCacheKey(wslTarget)
+  prunePreflightWslCache(
+    cachedByWslDistro,
+    latestPreflightRun,
+    Date.now(),
+    MAX_WSL_PREFLIGHT_DISTRO_ENTRIES
+  )
 
   if (!force) {
     if (wslTarget) {
@@ -334,6 +317,12 @@ export async function runPreflightCheck(
           result,
           expiresAt: Date.now() + WSL_PREFLIGHT_CACHE_TTL_MS
         })
+        prunePreflightWslCache(
+          cachedByWslDistro,
+          latestPreflightRun,
+          Date.now(),
+          MAX_WSL_PREFLIGHT_DISTRO_ENTRIES
+        )
       } else {
         cached = result
       }
