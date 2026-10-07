@@ -110,7 +110,7 @@ function MobileOnboardingFlow({
         await saveDefaultSessionView(view)
         advanceOrContinue()
       } catch {
-        setError('Your choice could not be saved. Try again.')
+        setError('未能保存选择，请重试。')
         setBusyChoice(null)
         choiceInFlightRef.current = false
       }
@@ -131,7 +131,7 @@ function MobileOnboardingFlow({
         await setRemotePushEnabled(enabled)
         advanceOrContinue()
       } catch {
-        setError('Notification settings could not be updated. Try again.')
+        setError('未能更新通知设置，请重试。')
         setBusyChoice(null)
         choiceInFlightRef.current = false
       }
@@ -150,8 +150,8 @@ function MobileOnboardingFlow({
           <View
             accessible
             accessibilityRole="progressbar"
-            accessibilityLabel="Onboarding progress"
-            accessibilityValue={{ text: `Step ${activeIndex + 1} of ${steps.length}` }}
+            accessibilityLabel="首次使用引导进度"
+            accessibilityValue={{ text: `第 ${activeIndex + 1} 步，共 ${steps.length} 步` }}
             style={styles.progress}
           >
             {steps.map((step, index) => (

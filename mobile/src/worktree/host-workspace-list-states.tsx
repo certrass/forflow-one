@@ -22,9 +22,9 @@ export function HostWorkspaceListStates(
   if (state === 'catalog-error') {
     return (
       <View style={styles.centered}>
-        <Text style={styles.emptyText}>Could not load workspaces from this host</Text>
+        <Text style={styles.emptyText}>暂时无法读取电脑上的工作区</Text>
         <Text style={styles.catalogErrorDetail}>
-          {`worktree.ps failed (${props.catalogError}) — retrying automatically`}
+          {`正在自动重试，请保持电脑在线。详情：${props.catalogError}`}
         </Text>
       </View>
     )
@@ -34,11 +34,16 @@ export function HostWorkspaceListStates(
       <View style={styles.centered}>
         <Text style={styles.emptyText}>
           {props.search
-            ? 'No matching worktrees'
+            ? '没有找到匹配的工作区'
             : props.activeFilterCount > 0
-              ? 'No worktrees match filters'
-              : 'No worktrees'}
+              ? '没有符合筛选条件的工作区'
+              : '还没有工作区'}
         </Text>
+        {!props.search && props.activeFilterCount === 0 ? (
+          <Text style={styles.catalogErrorDetail}>
+            点击「＋」新建工作区，或先在电脑端打开一个项目或文件夹。
+          </Text>
+        ) : null}
       </View>
     )
   }

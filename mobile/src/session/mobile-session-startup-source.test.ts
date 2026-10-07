@@ -241,19 +241,19 @@ describe('mobile session startup', () => {
 
   it('keeps dynamic agent rows above fixed New Tab actions', () => {
     const newTabActions = sliceBetween(
-      'title="New Tab"',
+      'title="开始新任务"',
       'onClose={() => setShowCreateTabDrawer',
       sheetsSource
     )
 
     expect(newTabActions.indexOf('...createTabAgentActions')).toBeLessThan(
-      newTabActions.indexOf("label: 'Terminal'")
+      newTabActions.indexOf("label: '命令终端'")
     )
-    expect(newTabActions.indexOf("label: 'Terminal'")).toBeLessThan(
-      newTabActions.indexOf("label: 'Browser'")
+    expect(newTabActions.indexOf("label: '命令终端'")).toBeLessThan(
+      newTabActions.indexOf("label: '浏览器'")
     )
-    expect(newTabActions.indexOf("label: 'Browser'")).toBeLessThan(
-      newTabActions.indexOf("label: 'Markdown Note'")
+    expect(newTabActions.indexOf("label: '浏览器'")).toBeLessThan(
+      newTabActions.indexOf("label: 'Markdown 笔记'")
     )
   })
 

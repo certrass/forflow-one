@@ -197,7 +197,8 @@ export function MobileSessionHeader({ controller }: { controller: MobileSessionC
               setCreateError('')
               setShowCreateTabDrawer(true)
             }}
-            accessibilityLabel="New tab"
+            accessibilityRole="button"
+            accessibilityLabel="新建智能体对话或工具"
           >
             <Plus size={16} color={colors.textSecondary} strokeWidth={2.2} />
           </Pressable>

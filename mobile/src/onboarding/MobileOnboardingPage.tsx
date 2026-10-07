@@ -48,16 +48,29 @@ export function MobileOnboardingPage({
           <NotificationOnboardingPreview active={active} />
         )}
         <Text style={styles.title}>
-          {isSessionView ? '你想怎样查看会话？' : 'Don’t miss when an agent needs you'}
+          {isSessionView ? '用对话开始第一项任务' : 'Don’t miss when an agent needs you'}
         </Text>
         <Text style={styles.body}>
           {isSessionView
-            ? '选择聊天界面或终端作为默认会话视图。长按会话标签可以切换，也可以稍后在设置中修改。'
+            ? '接下来选择工作区和智能体，输入你想完成的事，回复会出现在同一对话中。已有会话也可以直接继续。'
             : 'Get a notification on this phone when an agent finishes or is waiting — even if you aren’t using the app.'}
         </Text>
+        {isSessionView ? (
+          <View style={styles.modeGuide}>
+            <Text style={styles.modeTitle}>智能体聊天 · 推荐</Text>
+            <Text style={styles.modeBody}>用自然语言提问、交代任务，适合在手机上阅读和回复。</Text>
+            <Text style={styles.modeTitle}>命令终端</Text>
+            <Text style={styles.modeBody}>
+              查看完整终端输出、执行命令。不支持聊天界面的智能体仍使用终端。
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.footer}>
+        {isSessionView ? (
+          <Text style={styles.disclosure}>长按会话标签可切换视图，也可稍后在设置中更改。</Text>
+        ) : null}
         {!isSessionView ? (
           <Text style={styles.disclosure}>
             Delivered through Orca’s push service after your desktop has been idle for 3 minutes.
@@ -95,7 +108,7 @@ function SessionViewChoices({
   return (
     <>
       <ChoiceButton
-        label="使用聊天界面"
+        label="使用聊天界面（推荐）"
         accessibilityLabel="使用聊天界面打开会话"
         primary
         busy={busyChoice === 'chat'}
@@ -103,7 +116,7 @@ function SessionViewChoices({
         onPress={() => onChoice('chat')}
       />
       <ChoiceButton
-        label="使用终端"
+        label="使用命令终端"
         accessibilityLabel="使用终端打开会话"
         busy={busyChoice === 'terminal'}
         disabled={disabled}

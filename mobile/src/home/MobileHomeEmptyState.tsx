@@ -12,8 +12,8 @@ const ONBOARDING_STEPS = [
     desc: '使用上方按钮扫描电脑上的二维码，也可以粘贴配对码。'
   },
   {
-    title: '连接你的电脑',
-    desc: '配对后即可查看任务和会话，连接使用端到端加密。'
+    title: '选择工作区，开始对话',
+    desc: '配对后打开工作区，选择智能体并发送任务，也可以继续已有会话。'
   }
 ]
 
@@ -37,9 +37,10 @@ export function MobileHomeEmptyState(props: {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.emptyHero}>
-        <Text style={styles.emptyTitle}>连接你的 Forflow One</Text>
+        <Text style={styles.emptyTitle}>在手机上继续工作</Text>
         <Text style={styles.emptyBody}>
-          通过局域网或已有 VPN 连接电脑，查看任务、继续对话并操作终端，通过配对码授权。
+          连接电脑上的 Forflow
+          One，继续智能体对话、查看任务进展。请让手机和电脑处于同一局域网，或通过已有 VPN 互通。
         </Text>
         <Pressable
           accessibilityRole="button"

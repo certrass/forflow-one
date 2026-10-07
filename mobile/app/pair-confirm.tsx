@@ -133,7 +133,7 @@ export default function PairConfirmScreen() {
       setStatus('error')
       setErrorMessage(
         timedOut
-          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接，请检查网络和下方日志`
+          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接。请保持电脑端开启，确认两端在同一局域网或 VPN 内，然后重新生成配对码。`
           : `配对失败：${err instanceof Error ? err.message : String(err)}`
       )
     }
@@ -143,7 +143,12 @@ export default function PairConfirmScreen() {
 
   return (
     <View ref={setPairConfirmRootRef} style={[styles.container, containerPadding]}>
-      <Pressable style={styles.backButton} onPress={cancel}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="返回首页"
+        style={styles.backButton}
+        onPress={cancel}
+      >
         <ChevronLeft size={22} color={colors.textSecondary} />
       </Pressable>
 
@@ -185,7 +190,7 @@ export default function PairConfirmScreen() {
             )}
             <View style={styles.actionStack}>
               <Pressable style={styles.primaryButton} onPress={cancel}>
-                <Text style={styles.primaryButtonText}>Back to home</Text>
+                <Text style={styles.primaryButtonText}>返回首页</Text>
               </Pressable>
             </View>
           </>
@@ -202,8 +207,8 @@ const styles = StyleSheet.create({
     padding: spacing.lg
   },
   backButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',

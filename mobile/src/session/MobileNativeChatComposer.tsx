@@ -89,7 +89,7 @@ export function MobileNativeChatComposer({
   onMicPressIn,
   onMicPressOut,
   disabled = false,
-  placeholder = 'Message, @files, /commands',
+  placeholder = '输入任务或问题，@ 引用文件，/ 查看命令',
   filePaths = NO_FILE_PATHS,
   onNeedFiles
 }: Props): React.JSX.Element {

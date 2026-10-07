@@ -32,6 +32,7 @@ import { MobileNativeChatTurnStatus } from './MobileNativeChatTurnStatus'
 import { MobileAgentWorkingIndicator } from './MobileAgentWorkingIndicator'
 import type { PendingNativeChatImage } from './mobile-native-chat-image-attachment'
 import { MobileNativeChatComposer } from './MobileNativeChatComposer'
+import { MobileChatStarterPrompts } from './MobileChatStarterPrompts'
 import { MobileNativeChatPromptCard } from './MobileNativeChatPromptCard'
 import type { MobileChatPermission } from './mobile-native-chat-permission'
 import type { MobileChatQuestion } from './mobile-native-chat-question'
@@ -328,7 +329,7 @@ export function MobileNativeChatView({
                     {loadingEarlier ? (
                       <ActivityIndicator size="small" color={colors.textMuted} />
                     ) : (
-                      <Text style={styles.loadEarlierText}>Load earlier messages</Text>
+                      <Text style={styles.loadEarlierText}>加载更早的消息</Text>
                     )}
                   </Pressable>
                 ) : null
@@ -351,6 +352,14 @@ export function MobileNativeChatView({
                   <View style={styles.center}>
                     <Text style={styles.emptyTitle}>{emptyState.title}</Text>
                     <Text style={styles.emptySubtitle}>{emptyState.subtitle}</Text>
+                    {status !== 'error' &&
+                    inputLockReason == null &&
+                    lockReason === null &&
+                    !agentWorking &&
+                    !composerText &&
+                    !attachments?.length ? (
+                      <MobileChatStarterPrompts onPick={onComposerTextChange} />
+                    ) : null}
                   </View>
                 ) : null
               }
@@ -359,7 +368,7 @@ export function MobileNativeChatView({
           {/* Jump-to-latest control. */}
           {showJumpToTail ? (
             <Pressable
-              accessibilityLabel="Scroll to latest"
+              accessibilityLabel="滚动到最新消息"
               style={[styles.fab, styles.fabBottom]}
               onPress={jumpToTail}
             >
@@ -393,7 +402,7 @@ export function MobileNativeChatView({
             ) : (
               <ChevronsUpDown size={14} color={colors.textMuted} strokeWidth={2} />
             )}
-            <Text style={styles.chromeToggleLabel}>{toolsExpanded ? 'Collapse' : 'Tools'}</Text>
+            <Text style={styles.chromeToggleLabel}>{toolsExpanded ? '收起工具' : '展开工具'}</Text>
           </Pressable>
         </View>
         {canStop ? (
@@ -401,10 +410,10 @@ export function MobileNativeChatView({
             style={({ pressed }) => [styles.stopButton, pressed && styles.pressed]}
             onPress={onStop}
             hitSlop={8}
-            accessibilityLabel="Stop the agent"
+            accessibilityLabel="停止智能体"
           >
             <Square size={13} color={colors.statusRed} strokeWidth={2.4} fill={colors.statusRed} />
-            <Text style={styles.stopLabel}>Stop</Text>
+            <Text style={styles.stopLabel}>停止</Text>
           </Pressable>
         ) : null}
       </View>
@@ -441,10 +450,10 @@ export function MobileNativeChatView({
         disabled={lockReason !== null}
         placeholder={
           lockReason === 'disconnected'
-            ? 'Reconnecting…'
+            ? '正在重新连接…'
             : lockReason === 'waiting'
-              ? 'Waiting for terminal…'
-              : 'Message, @files, /commands'
+              ? '正在准备输入…'
+              : '输入任务或问题，@ 引用文件，/ 查看命令'
         }
         filePaths={filePaths}
         onNeedFiles={onNeedFiles}

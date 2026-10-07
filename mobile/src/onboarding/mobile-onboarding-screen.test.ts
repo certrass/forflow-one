@@ -121,7 +121,7 @@ describe('MobileOnboardingScreen', () => {
     mocks.setRemotePushEnabled.mockRejectedValueOnce(new Error('disk full'))
     await renderScreen()
     await act(async () => pages()[0].props.onNotificationChoice('enable'))
-    expect(pages()[0].props.error).toBe('Notification settings could not be updated. Try again.')
+    expect(pages()[0].props.error).toBe('未能更新通知设置，请重试。')
     expect(mocks.replace).not.toHaveBeenCalled()
     await act(async () => pages()[0].props.onNotificationChoice('enable'))
     expect(mocks.setRemotePushEnabled).toHaveBeenCalledTimes(2)
@@ -145,7 +145,7 @@ describe('MobileOnboardingScreen', () => {
     await renderScreen()
 
     await act(async () => pages()[0].props.onSessionChoice('chat'))
-    expect(pages()[0].props.error).toBe('Your choice could not be saved. Try again.')
+    expect(pages()[0].props.error).toBe('未能保存选择，请重试。')
 
     await act(async () => pages()[0].props.onSessionChoice('chat'))
     expect(mocks.saveDefaultSessionView).toHaveBeenCalledTimes(2)

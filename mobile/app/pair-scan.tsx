@@ -177,7 +177,7 @@ export default function PairScanScreen() {
       setStatus('error')
       setErrorMessage(
         timedOut
-          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接，请检查网络和下方日志`
+          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接。请保持电脑端开启，确认两端在同一局域网或 VPN 内，然后重新生成配对码。`
           : `配对失败：${err instanceof Error ? err.message : String(err)}`
       )
       processingRef.current = false
@@ -214,26 +214,34 @@ export default function PairScanScreen() {
     )
   }
 
-  if (!permission.granted) {
+  if (!permission.granted && status === 'scanning') {
     const canAskAgain = permission.canAskAgain !== false
     return (
       <View ref={setPairScanRootRef} style={[styles.container, containerPadding]}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="返回"
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={22} color={colors.textSecondary} />
         </Pressable>
         <View style={styles.centered}>
           <Text style={styles.title}>{canAskAgain ? '配对桌面端' : '相机访问已关闭'}</Text>
           <Text style={styles.subtitle}>
             {canAskAgain
-              ? '扫描 Forflow One 桌面端的配对码，或直接粘贴配对码。'
+              ? '允许相机访问后，扫描电脑端「设置 → 手机」里的配对码。也可以不使用相机，直接粘贴配对码。'
               : '请在系统设置中允许相机访问，也可以直接粘贴配对码。'}
           </Text>
           <Pressable
+            accessibilityRole="button"
             style={styles.primaryButton}
             onPress={canAskAgain ? requestPermission : () => void Linking.openSettings()}
           >
             {canAskAgain && <QrCode size={16} color={colors.bgBase} />}
-            <Text style={styles.primaryButtonText}>{canAskAgain ? '继续' : '打开设置'}</Text>
+            <Text style={styles.primaryButtonText}>
+              {canAskAgain ? '允许相机并扫码' : '打开设置'}
+            </Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.pasteButton, pressed && styles.pasteButtonPressed]}
@@ -257,7 +265,12 @@ export default function PairScanScreen() {
 
   return (
     <View ref={setPairScanRootRef} style={[styles.container, containerPadding]}>
-      <Pressable style={styles.backButton} onPress={() => router.back()}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="返回"
+        style={styles.backButton}
+        onPress={() => router.back()}
+      >
         <ChevronLeft size={22} color={colors.textSecondary} />
       </Pressable>
 

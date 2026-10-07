@@ -114,11 +114,14 @@ export function MobileSessionSheets({ controller }: { controller: MobileSessionC
       />
       <ActionSheetModal
         visible={showCreateTabDrawer}
-        title="New Tab"
+        title="开始新任务"
+        message="选择智能体，用自然语言交代任务；执行命令或打开网页请使用下方工具。"
         actions={[
-          ...createTabAgentActions,
+          ...createTabAgentActions.map((action) => ({ ...action, section: '智能体对话' })),
           {
-            label: 'Terminal',
+            label: '命令终端',
+            section: '工具',
+            hint: '执行终端命令',
             icon: SquareTerminal,
             onPress: () => {
               setShowCreateTabDrawer(false)
@@ -132,19 +135,21 @@ export function MobileSessionSheets({ controller }: { controller: MobileSessionC
             ? []
             : [
                 {
-                  label: 'Browser',
+                  label: '浏览器',
+                  section: '工具',
                   icon: Globe,
                   closeBeforePress: true,
                   onPress: () => {
                     if (browserScreencastSupported !== true) {
-                      showToast('Desktop update required for mobile browser streaming', 1600)
+                      showToast('请更新电脑端后使用手机浏览器', 1600)
                       return
                     }
                     setShowCreateBrowserModal(true)
                   }
                 },
                 {
-                  label: 'Markdown Note',
+                  label: 'Markdown 笔记',
+                  section: '工具',
                   icon: FileText,
                   onPress: () => {
                     setShowCreateTabDrawer(false)

@@ -40,7 +40,7 @@ export function useMobileSessionPanelRouteActions(scope: MobileSessionPresentati
     createTabAgentLoadState === 'loading'
       ? [
           {
-            label: 'Detecting Agents',
+            label: '正在查找可用智能体…',
             icon: Bot,
             disabled: true,
             loading: true,
@@ -59,7 +59,8 @@ export function useMobileSessionPanelRouteActions(scope: MobileSessionPresentati
         : createTabAgentLoadState === 'loaded'
           ? [
               {
-                label: 'No Enabled Agents',
+                label: '尚无可用智能体',
+                hint: '请先在执行此工作区的电脑上安装并启用智能体',
                 icon: Bot,
                 disabled: true,
                 onPress: () => {}
@@ -68,8 +69,8 @@ export function useMobileSessionPanelRouteActions(scope: MobileSessionPresentati
           : createTabAgentLoadState === 'error'
             ? [
                 {
-                  label: 'Agent Presets Unavailable',
-                  hint: 'Check the host connection',
+                  label: '暂时无法读取智能体',
+                  hint: '请检查与电脑的连接后重试',
                   icon: Bot,
                   disabled: true,
                   onPress: () => {}
