@@ -17,11 +17,7 @@ import { getGiteaAuthStatus } from '../gitea/client'
 import { _resetKnownHostsCache } from '../gitlab/gl-utils'
 import { mergePersistedWindowsPathAsync } from '../pty/windows-environment-path'
 import { getActiveMultiplexer } from '../ssh/ssh-target-registry'
-import {
-  detectWslCommandsOnPath,
-  type WslPreflightTarget
-} from '../ipc/preflight-wsl-agent-detection'
-import { detectCommandsInInstallDirs } from '../ipc/local-agent-install-dir-detection'
+import type { WslPreflightTarget } from '../ipc/preflight-wsl-agent-detection'
 import {
   getPreflightWslTarget,
   type PreflightRuntimeContext
@@ -32,8 +28,8 @@ import { hydrateShellPathForAgentDetection } from '../ipc/agent-detection-shell-
 import {
   execCommandInWslOrThrow,
   execLocalPreflightCommandOrThrow,
+  findRunnableLocalCommand,
   isCommandAvailable,
-  isCommandOnPath,
   shellQuote
 } from '../ipc/preflight-command-exec'
 import {
@@ -51,6 +47,8 @@ import {
   type AgentCommandOverrides
 } from './agent-command-overrides'
 import { prunePreflightWslCache } from '../preflight-wsl-cache'
+import { detectAgentCommandsOnHost } from './agent-command-detection'
+export { detectAgentCommandsOnHost } from './agent-command-detection'
 
 import type { PreflightStatus } from './preflight-status-types'
 export type { PreflightStatus } from './preflight-status-types'
@@ -109,13 +107,24 @@ function uniqueAgentIds(ids: Iterable<string>): string[] {
   return [...new Set(ids)]
 }
 
+/** A CLI verdict and, on the local path, the exact copy that produced it. */
+type CommandRuntime = { installed: boolean; wslTarget?: WslPreflightTarget; binary?: string }
+
 async function detectCommandRuntime(
   command: string,
   context?: PreflightRuntimeContext
-): Promise<{ installed: boolean; wslTarget?: WslPreflightTarget }> {
+): Promise<CommandRuntime> {
   const wslTarget = getPreflightWslTarget(context)
-  const installed = await isCommandAvailable(command, wslTarget ?? undefined)
-  return installed && wslTarget ? { installed, wslTarget } : { installed }
+  if (wslTarget) {
+    return (await isCommandAvailable(command, wslTarget))
+      ? { installed: true, wslTarget }
+      : { installed: false }
+  }
+  // Pin auth to the copy that passed --version, so PATH cannot select the dead shim again.
+  const probe = await findRunnableLocalCommand(command)
+  return probe.status === 'available'
+    ? { installed: true, binary: probe.binary }
+    : { installed: false }
 }
 
 export async function detectInstalledAgents(
@@ -123,40 +132,19 @@ export async function detectInstalledAgents(
   overrides: AgentCommandOverrides = {}
 ): Promise<string[]> {
   const wslTarget = getPreflightWslTarget(context)
+  const platform = wslTarget ? 'wsl' : process.platform
   const { commands, overrideCommands } = agentDetectionCommandsWithOverrides(
     overrides,
     wslTarget ? 'linux' : process.platform
   )
-  if (wslTarget) {
-    const foundCommands = await detectWslCommandsOnPath(
-      wslTarget,
-      getTuiAgentDetectionProbeCommands(commands, 'wsl')
-    )
-    return resolveDetectedTuiAgentIds(commands, foundCommands, 'wsl')
+  const found = await detectAgentCommandsOnHost(
+    getTuiAgentDetectionProbeCommands(commands, platform),
+    { context, excludeInstallDirCommands: overrideCommands }
+  )
+  if (!wslTarget && !Object.hasOwn(overrides, 'workbuddy') && resolveWorkBuddyCli()) {
+    found.add('workbuddy')
   }
-
-  const probeCommands = getTuiAgentDetectionProbeCommands(commands, process.platform)
-  const pathChecks = await Promise.all(
-    probeCommands.map(async (cmd) => ({
-      cmd,
-      installedOnPath: await isCommandOnPath(cmd)
-    }))
-  )
-  const missedCommands = pathChecks.filter((check) => !check.installedOnPath).map(({ cmd }) => cmd)
-  // Why: PATH may still be unhydrated on a cold GUI launch; bulk resolution
-  // computes user install dirs once instead of blocking once per missed CLI.
-  const installDirCommands = detectCommandsInInstallDirs(
-    missedCommands.filter((command) => !overrideCommands.has(command))
-  )
-  const foundCommands = new Set(
-    pathChecks
-      .filter(({ cmd, installedOnPath }) => installedOnPath || installDirCommands.has(cmd))
-      .map(({ cmd }) => cmd)
-  )
-  if (resolveWorkBuddyCli()) {
-    foundCommands.add('workbuddy')
-  }
-  return resolveDetectedTuiAgentIds(commands, foundCommands, process.platform)
+  return resolveDetectedTuiAgentIds(commands, found, platform)
 }
 
 export async function detectInstalledAgentsWithShellPathHydration(
@@ -236,11 +224,15 @@ export async function detectRemoteAgents(args: { connectionId: string }): Promis
   return uniqueAgentIds(result.agents)
 }
 
-async function isGhAuthenticated(wslTarget?: WslPreflightTarget): Promise<boolean> {
+// Why the probe object rather than the bare command name: on the local path
+// `binary` is the copy that just passed `--version`, which on a shim-shadowed
+// host is not what PATH would resolve (#22975). WSL has no `binary` — the guest
+// resolves the name inside the distro, where Orca's PATH ordering cannot apply.
+async function isGhAuthenticated(probe: CommandRuntime): Promise<boolean> {
   try {
-    await (wslTarget
-      ? execCommandInWslOrThrow(wslTarget, `${shellQuote('gh')} auth status`)
-      : execLocalPreflightCommandOrThrow('gh', ['auth', 'status']))
+    await (probe.wslTarget
+      ? execCommandInWslOrThrow(probe.wslTarget, `${shellQuote('gh')} auth status`)
+      : execLocalPreflightCommandOrThrow(probe.binary ?? 'gh', ['auth', 'status']))
     // Why: for plain-text `gh auth status`, exit 0 means gh did not detect any
     // authentication issues for the checked hosts/accounts.
     return true
@@ -257,11 +249,11 @@ async function isGhAuthenticated(wslTarget?: WslPreflightTarget): Promise<boolea
 
 // Why: parallel to isGhAuthenticated for the glab CLI. glab writes auth
 // status to stderr in some versions and stdout in others; check both.
-async function isGlabAuthenticated(wslTarget?: WslPreflightTarget): Promise<boolean> {
+async function isGlabAuthenticated(probe: CommandRuntime): Promise<boolean> {
   try {
-    await (wslTarget
-      ? execCommandInWslOrThrow(wslTarget, `${shellQuote('glab')} auth status`)
-      : execLocalPreflightCommandOrThrow('glab', ['auth', 'status']))
+    await (probe.wslTarget
+      ? execCommandInWslOrThrow(probe.wslTarget, `${shellQuote('glab')} auth status`)
+      : execLocalPreflightCommandOrThrow(probe.binary ?? 'glab', ['auth', 'status']))
     return true
   } catch (error) {
     const stdout = (error as { stdout?: string }).stdout ?? ''
@@ -363,8 +355,8 @@ async function executePreflightCheck(
   ])
 
   const [ghAuthenticated, glabAuthenticated, bitbucket, azureDevOps, gitea] = await Promise.all([
-    ghProbe.installed ? isGhAuthenticated(ghProbe.wslTarget) : Promise.resolve(false),
-    glabProbe.installed ? isGlabAuthenticated(glabProbe.wslTarget) : Promise.resolve(false),
+    ghProbe.installed ? isGhAuthenticated(ghProbe) : Promise.resolve(false),
+    glabProbe.installed ? isGlabAuthenticated(glabProbe) : Promise.resolve(false),
     getBitbucketAuthStatus(),
     getAzureDevOpsAuthStatus(),
     getGiteaAuthStatus()

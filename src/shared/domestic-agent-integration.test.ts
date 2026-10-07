@@ -20,7 +20,7 @@ describe('domestic CLI launch contract', () => {
     })
     expect(tokenizeStartupCommand(qoder?.launchCommand ?? '', shell)).toMatchObject({
       ok: true,
-      tokens: ['qodercn', '--prompt-interactive', prompt]
+      tokens: ['qoderclicn', '--prompt-interactive', prompt]
     })
     expect(buddy?.followupPrompt).toBeNull()
     expect(qoder?.followupPrompt).toBeNull()
@@ -35,7 +35,7 @@ describe('domestic CLI launch contract', () => {
     expect(recognizeAgentProcessFromCommandLine('cbc')).toMatchObject({ agent: 'codebuddy' })
     expect(recognizeAgentProcessFromCommandLine('workbuddy')).toBeNull()
     expect(recognizeAgentProcessFromCommandLine('arkcli chat')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('qoder')).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine('qoder')).toMatchObject({ agent: 'qoder' })
   })
 
   it.each([

@@ -1,5 +1,4 @@
-import { cliMessage } from '../cli-product'
-import { brandCliDocumentation } from '../cli-product'
+import { cliMessage, brandCliDocumentation } from '../cli-product'
 import { RuntimeClientError } from './types'
 
 export const MAC_CRASH_REPORT_GLOB = '~/Library/Logs/DiagnosticReports/Orca-*.ips'

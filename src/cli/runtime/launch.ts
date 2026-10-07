@@ -1,5 +1,4 @@
-import { cliMessage } from '../cli-product'
-import { brandCliDocumentation } from '../cli-product'
+import { cliMessage, brandCliDocumentation } from '../cli-product'
 import { spawn as spawnProcess, type SpawnOptions } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'

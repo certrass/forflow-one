@@ -1046,6 +1046,10 @@
                 }
               },
               "discard": {
+                "confirmation": {
+                  "1426c2efff": "This will revert all changes to this file. This cannot be undone.",
+                  "40e9357b2a": "This will restore the file from HEAD and discard the deletion. This cannot be undone."
+                },
                 "dialog": {
                   "48c5ef95d9": "area",
                   "6de99d162b": "entry"
@@ -1552,20 +1556,51 @@
           "typographyAdvanced": "Typography"
         },
         "TerminalPane": {
+          "01c600daff": "Shell arguments",
           "05efc0bada": "true",
+          "0cbe5ad727": "fish",
+          "17ad899ba4": "bash",
+          "1c29734248": "Shell used for new terminal panes",
           "219aaa59f4": "WSL Distribution",
           "2503f1e86b": "Used for new WSL terminal panes and local agent detection when the active workspace is not already inside WSL.",
           "29154326bb": "on",
           "348246b06f": "false",
+          "44f8a56f66": "args",
+          "48b91a3ed2": "Custom args",
+          "4faf688f78": "login",
+          "578ec79449": "Enter one argument per line. Leave it empty to pass no arguments.",
           "5936387ddd": "auto",
+          "59573d0b33": "Enter a shell name on PATH or an executable path. Orca starts it as a login shell.",
+          "5a5eac2f44": "Shell not found: {{value0}}",
+          "5e06e87730": "Custom shell executable",
           "5fe79a5e56": "Choose which WSL distribution new WSL terminals and local agent scans use.",
+          "5ffc4777b6": "Shell argument mode",
+          "69724e8f0c": "Choose what Orca opens for new local terminal panes.",
+          "73c211e979": "wrapper",
+          "7bd83fc1d0": "-l (default)",
+          "81694f1584": "terminal",
+          "884a006065": "Starts the shell as a login shell with -l.",
+          "8dbe0bc942": "Shell arguments, one per line",
+          "9589abc009": "Default shell",
+          "a909136b3f": "shell",
           "ab20575a8a": "off",
           "ab3a1f9068": "wsl.exe",
           "adbafefe56": "custom",
+          "af893aa433": "arguments",
           "ask_before_closing_running_terminals_description": "Show a confirmation before closing a terminal that has a running command or agent.",
           "ask_before_closing_running_terminals_title": "Ask Before Closing Running Terminals",
+          "c2bf02ce2f": "fish, nu, or /bin/zsh",
+          "c2ddb189e7": "rcfile",
+          "c9bc93d343": "zsh",
           "cc8c5ca224": "Windows default",
-          "d78fc4fdef": "Loading distributions"
+          "d469840b75": "nushell",
+          "d78fc4fdef": "Loading distributions",
+          "dd3f4c35da": "System shell ({{value0}})",
+          "ddc72a4860": "default",
+          "e3ae5aed18": ". Switch to System shell or choose an executable on this host.",
+          "f51cc79784": "Custom shell",
+          "f58cb71f53": "--rcfile\n/path/to/rcfile",
+          "fd05fb109c": "Terminal shell"
         },
         "TerminalSettingsPreview": {
           "d06664e889": "dark"
@@ -1590,6 +1625,9 @@
           "7c3bb36706": "remove",
           "e2b0ee267f": "stale"
         },
+        "ZcodePlanAccountsSection": {
+          "keyRequired": "GLM Coding Plan API key is required."
+        },
         "accounts": {
           "search": {
             "d1d2ae383c": "Paste your opencode.ai session cookie for rate limit fetching."
@@ -1600,6 +1638,7 @@
           "a42f6fbdd8": "Keeps this computer and display awake while agents are working. Orca also asks this device to stay awake when the lid is closed, subject to its power policy.",
           "e5995ce268": "Keep computer awake while agents are working",
           "modeDescriptionDefault": "Choose On, Agent, or Off. Agent mode stays awake while agents are working. Orca also asks this device to stay awake when the lid is closed, subject to its power policy.",
+          "modeDescriptionMac": "Choose On, Agent, or Off. Agent mode prevents idle sleep while agents work, so long runs finish with the lid open. Closing the lid still puts this Mac to sleep.",
           "modeDescriptionWindows": "Choose On, Agent, or Off. Agent mode stays awake while agents are working; lid-close behavior follows this device's power settings.",
           "modeTitle": "Keep computer awake"
         },
@@ -1903,6 +1942,9 @@
         },
         "CacheTimer": {
           "07729cc155": "expired"
+        },
+        "DeleteWorktreeDirtyChangeHint": {
+          "8e2994ce28": "Deleting this workspace permanently removes these changes from disk."
         },
         "FolderWorkspaceComposerDialog": {
           "chooseSourceProject": "Choose task source",
@@ -2665,6 +2707,21 @@
       }
     },
     "hooks": {
+      "ipc": {
+        "events": {
+          "os": {
+            "markdown": {
+              "file": {
+                "open": {
+                  "bridge": {
+                    "1e9a1a63c4": "Failed to open the Markdown file."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "useComposerState": {
         "dropPartiallyAttached_one": "{{failureCount}} of {{count}} item could not be attached.",
         "dropPartiallyAttached_other": "{{failureCount}} of {{count}} items could not be attached."
@@ -2813,7 +2870,7 @@
         "notDelivered": "This message was not delivered.",
         "notDeliveredSendAgain": "This message was not delivered. Send it again to continue.",
         "notSignedIn": "{{agent}} is not signed in for the selected account.",
-        "previousExitUnverifiable": "Orca couldn't confirm {{agent}}'s previous process ended. Messages wait to be sent until Orca confirms it has ended.",
+        "previousExitUnverifiable": "{{agent}} from before may still be running. Your messages will send once it stops.",
         "providerExitedRejection": "{{agent}} stopped before this message was sent.",
         "providerExitedRow": "{{agent}} stopped while this response was in progress. You can continue in this conversation.",
         "providerRateLimited": "{{agent}} is rate-limited and retrying.",
@@ -2833,6 +2890,10 @@
         "theAgent": "The agent",
         "writeFailed": "Orca couldn't hand this message to the agent, so it was not sent."
       },
+      "notices": {
+        "historyItemTooLarge": "This part of the chat was too large to show.",
+        "historyRepaired": "Part of this chat's history couldn't be loaded."
+      },
       "question": {
         "other": "Other…"
       },
@@ -2842,8 +2903,6 @@
           "title": "Start a chat with {{value0}}"
         },
         "error": {
-          "keepsTrying": "Orca keeps trying to load it.",
-          "retryingSubtitle": "The transcript could not be read. Orca keeps trying to load it.",
           "subtitle": "The transcript could not be read. Toggle back to the terminal to keep working.",
           "title": "Could not load conversation"
         },
@@ -2888,7 +2947,8 @@
         "answerFirst": "Answer the question or approval first.",
         "backgroundTasksRunning": "Background tasks are still running.",
         "capacity": "Orca has received too many requests in the last day.",
-        "chatNotFound": "The Orca running this chat has no record of it.",
+        "chatNotFound": "Orca can't find this chat.",
+        "chatSavedByNewerOrca": "This chat was saved by a newer Orca.",
         "clearUnfinished": "The last /clear didn't finish.",
         "commandRunning": "A /compact or /clear is still running.",
         "conversationCleared": "This conversation has been cleared.",
@@ -2897,7 +2957,9 @@
         "historyUnreadable": "Orca couldn't read this chat's saved history.",
         "historyUnusable": "Unable to load this chat.",
         "hostReconciling": "Orca is still checking on this chat after restarting.",
-        "messagesUnsettled": "A message you sent earlier hasn't been confirmed yet.",
+        "messageNotSaved": "Couldn't save your message.",
+        "messagesUnsettled": "A message you sent earlier isn't confirmed yet.",
+        "notAvailable": "This isn't available in this chat.",
         "notDoneAnswer": "Your answer was not sent.",
         "notDoneCommand": "The command didn't run.",
         "notDoneGoal": "The goal wasn't changed.",
@@ -2910,15 +2972,16 @@
         "openCurrentConversation": "Open the current conversation to continue.",
         "optionRejected": "The agent didn't accept this setting.",
         "outcomeUnknown": "Orca couldn't confirm what happened. Check the chat.",
-        "ownerUnproven": "Orca hasn't confirmed that this chat's previous agent stopped.",
+        "ownerUnproven": "The previous agent in this chat may still be running.",
         "promptPending": "The agent is waiting for an answer to a question or approval.",
         "questionChanged": "This question was already answered or has changed.",
         "quitTerminalAgent": "Quit that agent to continue the chat here.",
-        "recordFailed": "Orca couldn't record it in this chat's history.",
+        "recordFailed": "Orca couldn't save this to the chat's history.",
         "recordUnreadable": "Orca couldn't read this chat's saved state.",
         "reopenChat": "Reopen the chat to check again.",
         "restartFailed": "The agent couldn't restart.",
         "savedByNewerOrca": "Chats were saved by a newer Orca.",
+        "sendOutcomeLost": "Orca couldn't confirm your message reached the agent. Check the chat, then send it again if needed.",
         "settleEarlierMessage": "Wait for your earlier message to go through, or retry it.",
         "startNewChat": "Start a new chat to continue.",
         "terminalAgentHoldsChat": "This chat is still open in a terminal agent.",
@@ -2926,8 +2989,9 @@
         "tryAgainComposerSend": "Send it again.",
         "turnActive": "The agent is still responding.",
         "unreachable": "Orca couldn't reach the agent.",
-        "unsupported": "The Orca running this chat doesn't support this. Update Orca, then try again.",
+        "unsupported": "This needs a newer Orca on the computer running this chat. Update Orca there, then try again.",
         "updateOrcaToKeepUsing": "Update Orca to keep using them.",
+        "updateOrcaToOpenChat": "Update Orca to open it.",
         "waitForBackgroundTasks": "Wait for the background tasks to finish.",
         "waitForCommand": "Wait for the /compact or /clear to finish.",
         "waitForStart": "Wait for the agent to finish starting.",
@@ -3241,6 +3305,9 @@
           "checks": {
             "toggle": "Show Checks"
           },
+          "childWorkspaces": {
+            "toggle": "Toggle Child Workspaces"
+          },
           "explorer": {
             "toggle": "Show Explorer"
           },
@@ -3548,6 +3615,10 @@
       "parallelHint": "Create a separate workspace for another task",
       "structured": "Structured conversation"
     }
+  },
+  "menu": {
+    "minimize": "Minimize",
+    "zoom": "Zoom"
   },
   "runtimeRpc": {
     "startupFailure": {

@@ -1,5 +1,4 @@
-import { cliMessage } from './cli-product'
-import { brandCliDocumentation } from './cli-product'
+import { cliMessage, brandCliDocumentation } from './cli-product'
 import {
   LOCAL_EXECUTION_HOST_ID,
   normalizeExecutionHostId,

@@ -18,6 +18,7 @@ type Props = {
   busy?: boolean
   runtimeEnvironmentId?: string | null
   errorState?: ReactNode
+  loadingState?: ReactNode
   children: ReactNode
 }
 
@@ -27,7 +28,11 @@ export function NativeChatConversationBody(props: Props): React.JSX.Element {
     <>
       <div className="flex min-h-0 flex-1 flex-col">
         {viewState.kind === 'loading' ? (
-          <NativeChatEmptyState kind="loading" />
+          props.loadingState === undefined ? (
+            <NativeChatEmptyState kind="loading" />
+          ) : (
+            props.loadingState
+          )
         ) : viewState.kind === 'error' ? (
           (props.errorState ?? <NativeChatEmptyState kind="error" message={viewState.message} />)
         ) : viewState.kind === 'empty' ? (

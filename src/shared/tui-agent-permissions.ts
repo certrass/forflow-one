@@ -10,6 +10,7 @@ export const YOLO_TUI_AGENT_ARGS: Partial<Record<TuiAgent, string>> = {
   openclaude: '--dangerously-skip-permissions',
   codex: '--dangerously-bypass-approvals-and-sandbox',
   qoder: '--dangerously-skip-permissions',
+  'qoder-cn': '--dangerously-skip-permissions',
   gemini: '--yolo',
   antigravity: '--dangerously-skip-permissions',
   aider: '--yes-always',
@@ -62,6 +63,7 @@ function sameEnv(
 }
 
 const MANUAL_TUI_AGENT_ARGS: Partial<Record<TuiAgent, string>> = {
+  'qoder-cn': '--permission-mode default',
   codebuddy: '--permission-mode default'
 }
 

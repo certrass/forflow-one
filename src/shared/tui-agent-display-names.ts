@@ -27,6 +27,7 @@ export const TUI_AGENT_DISPLAY_NAMES: Record<TuiAgent, string> = {
   omp: 'OMP',
   'prime-agent': 'Prime Agent',
   qoder: 'Qoder CLI',
+  'qoder-cn': 'Qoder CLI China',
   gemini: 'Gemini',
   antigravity: 'Antigravity',
   aider: 'Aider',
@@ -46,12 +47,12 @@ export const TUI_AGENT_DISPLAY_NAMES: Record<TuiAgent, string> = {
   kimi: 'Kimi',
   'mistral-vibe': 'Mistral Vibe',
   'qwen-code': 'Qwen Code',
-  'qoder-cn': 'Qoder CN',
   rovo: 'Rovo Dev',
   hermes: 'Hermes',
   openclaw: 'OpenClaw',
   copilot: 'GitHub Copilot',
-  grok: 'Grok'
+  grok: 'Grok',
+  jcode: 'Jcode'
 }
 
 /** Canonical agent id list derived from the exhaustive display-name record,

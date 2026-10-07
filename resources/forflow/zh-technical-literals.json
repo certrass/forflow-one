@@ -542,6 +542,22 @@
     "auto.components.settings.appearance.search.cursor.kw.cursor": "cursor",
     "auto.components.settings.CursorAccountsSection.source.desktop": "Cursor IDE",
     "auto.components.settings.CursorAccountsSection.title": "Cursor",
-    "forflow.domestic.workbuddyCli": "WorkBuddy"
+    "forflow.domestic.workbuddyCli": "WorkBuddy",
+    "accounts.antigravity.title": "Antigravity",
+    "auto.components.settings.TerminalPane.f58cb71f53": "--rcfile\n/path/to/rcfile",
+    "auto.components.settings.TerminalPane.c2ddb189e7": "rcfile",
+    "auto.components.settings.TerminalPane.d469840b75": "nushell",
+    "auto.components.settings.TerminalPane.17ad899ba4": "bash",
+    "auto.components.settings.TerminalPane.c9bc93d343": "zsh",
+    "auto.components.settings.TerminalPane.0cbe5ad727": "fish",
+    "auto.components.settings.accounts.search.zcodePlan.kw.glm": "glm",
+    "auto.components.settings.accounts.search.zcodePlan.kw.zai": "zai",
+    "auto.components.settings.notifications.search.ssh": "ssh",
+    "auto.components.settings.terminal.search.d31ed1ac1c": "rcfile",
+    "auto.components.settings.terminal.search.7c3ede6f12": "nushell",
+    "auto.components.settings.terminal.search.bf09070e31": "bash",
+    "auto.components.settings.terminal.search.d26257a80d": "zsh",
+    "auto.components.settings.terminal.search.454df22a5e": "fish",
+    "auto.lib.agent.catalog.jcode_label": "Jcode"
   }
 }

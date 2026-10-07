@@ -4,6 +4,7 @@ import {
   FORFLOW_MANAGED_UPDATE_MESSAGE
 } from '../forflow/deployment-policy'
 import { is } from '@electron-toolkit/utils'
+import { isMacInstallRequested } from '../updater-mac-install'
 import type { UpdateCheckOptions } from '../../shared/update-status-types'
 import type { ReleaseChannel } from '../../shared/release-channel'
 import { UpdaterScheduling } from './updater-scheduling'
@@ -13,6 +14,13 @@ export abstract class UpdaterMenuChecks extends UpdaterScheduling {
   protected checkForUpdatesFromMenu(options?: UpdateCheckOptions): void {
     if (isForflowPrivateDeployment()) {
       this.sendErrorStatus(FORFLOW_MANAGED_UPDATE_MESSAGE, true)
+      return
+    }
+    if (
+      this.pendingQuitAndInstallTimer ||
+      this.quitAndInstallInProgress ||
+      isMacInstallRequested()
+    ) {
       return
     }
     if (!app.isPackaged || is.dev) {
@@ -68,6 +76,13 @@ export abstract class UpdaterMenuChecks extends UpdaterScheduling {
     const attemptId = this.beginUpdateCheckAttempt()
     const autoUpdater = this.getAutoUpdater()
     const launch = (): Promise<unknown> | undefined => {
+      if (
+        this.pendingQuitAndInstallTimer ||
+        this.quitAndInstallInProgress ||
+        isMacInstallRequested()
+      ) {
+        return undefined
+      }
       if (!this.isActiveUpdateCheckAttempt(attemptId)) {
         return undefined
       }

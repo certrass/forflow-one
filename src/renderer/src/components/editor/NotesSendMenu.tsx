@@ -14,6 +14,13 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { ReviewNotesSendMenuContent } from './ReviewNotesSendMenuContent'
+import type { DiffCommentDeliverySnapshot } from '@/store/slices/diffComments'
+import {
+  diffCommentSendKey,
+  holdNotesForSend,
+  isNoteInFlight,
+  useNotesInFlightVersion
+} from '@/lib/notes-send-in-flight'
 import { translate } from '@/i18n/i18n'
 
 function enabledSendTooltip(): string {
@@ -24,6 +31,11 @@ export type NotesSendMenuScope<TNote> = {
   id: string
   label: string
   notes: readonly TNote[]
+  /** The prompt for the notes this send carries: notes another send holds are left out. */
+  formatPrompt: (notes: readonly TNote[]) => string
+}
+
+type SendableNotesScope<TNote> = Omit<NotesSendMenuScope<TNote>, 'formatPrompt'> & {
   prompt: string
 }
 
@@ -59,7 +71,7 @@ export function buildNotesSendTargetModeId(modeIdParts: readonly string[]): stri
   return `note-send:${modeIdParts.map((part) => `${part.length}:${part}`).join('|')}`
 }
 
-export function NotesSendMenu<TNote>({
+export function NotesSendMenu<TNote extends DiffCommentDeliverySnapshot>({
   worktreeId,
   groupId,
   modeIdParts,
@@ -84,12 +96,27 @@ export function NotesSendMenu<TNote>({
   const activeTargetModeId = useAppStore((s) => s.agentSendPopoverTargetMode?.id ?? null)
   const [sendMenuOpen, setSendMenuOpen] = useState(false)
   const targetModeId = useMemo(() => buildNotesSendTargetModeId(modeIdParts), [modeIdParts])
-  const enabledScopes = useMemo(() => scopes.filter((scope) => scope.notes.length > 0), [scopes])
+  const inFlightVersion = useNotesInFlightVersion()
+  const sendableScopes = useMemo<SendableNotesScope<TNote>[]>(() => {
+    void inFlightVersion
+    return scopes.map(({ formatPrompt, ...scope }) => {
+      const notes = scope.notes.filter((note) => !isNoteInFlight(diffCommentSendKey(note)))
+      return { ...scope, notes, prompt: notes.length > 0 ? formatPrompt(notes) : '' }
+    })
+  }, [inFlightVersion, scopes])
+  const enabledScopes = useMemo(
+    () => sendableScopes.filter((scope) => scope.notes.length > 0),
+    [sendableScopes]
+  )
   const defaultScope = useMemo(() => {
     const requested = enabledScopes.find((scope) => scope.id === defaultScopeId)
     return requested ?? enabledScopes[0] ?? null
   }, [defaultScopeId, enabledScopes])
   const hasDeliverableNotes = enabledScopes.length > 0
+  // Notes only on their way to an agent are not sent yet.
+  const disabledTitle = scopes.some((scope) => scope.notes.length > 0)
+    ? translate('components.native-chat.question.sending', 'Sending…')
+    : disabledTooltip
 
   const markDelivered = useCallback(
     (notes: readonly TNote[]) => {
@@ -97,9 +124,14 @@ export function NotesSendMenu<TNote>({
     },
     [onDelivered]
   )
+  const holdInFlight = useCallback(
+    (notes: readonly TNote[]) => (delivered: Promise<unknown>) =>
+      holdNotesForSend(notes.map(diffCommentSendKey), delivered, () => markDelivered(notes)),
+    [markDelivered]
+  )
 
   const openTargetMode = useCallback(
-    (scope: NotesSendMenuScope<TNote>) => {
+    (scope: SendableNotesScope<TNote>) => {
       if (scope.notes.length === 0) {
         return
       }
@@ -110,10 +142,12 @@ export function NotesSendMenu<TNote>({
         prompt: scope.prompt,
         label: targetModeLabel ?? scope.label,
         launchSource: 'notes_send',
-        onPromptDelivered: () => markDelivered(scope.notes)
+        onPromptDelivered: () => markDelivered(scope.notes),
+        onPromptHandedOff: holdInFlight(scope.notes)
       })
     },
     [
+      holdInFlight,
       markDelivered,
       openAgentSendPopoverTargetMode,
       source,
@@ -183,7 +217,7 @@ export function NotesSendMenu<TNote>({
                 triggerClassName
               )}
               disabled={!hasDeliverableNotes}
-              title={hasDeliverableNotes ? enabledSendTooltip() : disabledTooltip}
+              title={hasDeliverableNotes ? enabledSendTooltip() : disabledTitle}
               aria-label={
                 triggerLabel
                   ? translate(
@@ -214,7 +248,7 @@ export function NotesSendMenu<TNote>({
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent side="bottom" sideOffset={6}>
-          {hasDeliverableNotes ? enabledSendTooltip() : disabledTooltip}
+          {hasDeliverableNotes ? enabledSendTooltip() : disabledTitle}
         </TooltipContent>
       </Tooltip>
       <DropdownMenuContent
@@ -228,7 +262,7 @@ export function NotesSendMenu<TNote>({
             <DropdownMenuLabel>
               {translate('auto.components.editor.NotesSendMenu.44dc5e60a6', 'Send notes')}
             </DropdownMenuLabel>
-            {scopes.map((scope) => (
+            {sendableScopes.map((scope) => (
               <DropdownMenuSub key={scope.id}>
                 <DropdownMenuSubTrigger
                   disabled={scope.notes.length === 0}
@@ -246,6 +280,7 @@ export function NotesSendMenu<TNote>({
                     promptDelivery="submit-after-ready"
                     launchSource="notes_send"
                     onPromptDelivered={() => markDelivered(scope.notes)}
+                    onPromptHandedOff={holdInFlight(scope.notes)}
                   />
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
@@ -263,6 +298,7 @@ export function NotesSendMenu<TNote>({
                 markDelivered(defaultScope.notes)
               }
             }}
+            onPromptHandedOff={holdInFlight(defaultScope?.notes ?? [])}
           />
         )}
       </DropdownMenuContent>

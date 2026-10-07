@@ -1,6 +1,13 @@
 import type { TuiAgent } from './tui-agent'
 
-export type NativeChatTranscriptAgent = 'claude' | 'codex' | 'grok' | 'omp' | 'aily' | 'workbuddy'
+export type NativeChatTranscriptAgent =
+  | 'claude'
+  | 'codex'
+  | 'grok'
+  | 'omp'
+  | 'opencode'
+  | 'aily'
+  | 'workbuddy'
 
 /** Agents whose transcripts the native chat view can parse and render, in the
  *  order the settings pane advertises them. */
@@ -11,7 +18,9 @@ export const NATIVE_CHAT_SUPPORTED_AGENT_LIST: readonly TuiAgent[] = [
   'openclaude',
   'codex',
   'grok',
-  'omp'
+  'omp',
+  'opencode',
+  'opencode2'
 ]
 
 export const NATIVE_CHAT_SUPPORTED_AGENTS: ReadonlySet<string> = new Set(
@@ -29,19 +38,18 @@ export function nativeChatRequiresLocalTranscript(agent: string | null | undefin
   return (
     transcriptAgent === 'grok' ||
     transcriptAgent === 'omp' ||
+    transcriptAgent === 'opencode' ||
     transcriptAgent === 'aily' ||
     transcriptAgent === 'workbuddy'
   )
 }
 
-/** True when the agent renders a digit-commit question selector that ignores
- *  typed label text (pasting "Blue" + Enter commits the highlighted FIRST
- *  option — STA-1860): Claude's AskUserQuestion and Codex 0.145's
- *  request_user_input card both behave this way, so answers must be delivered
- *  as per-option keystrokes. Other agents commit a pasted answer. */
+/** Selector TUIs require key steps rather than pasted option labels. */
 export function shouldStepNativeChatAskAnswer(agent: string | null | undefined): boolean {
   const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
-  return transcriptAgent === 'claude' || transcriptAgent === 'codex'
+  return (
+    transcriptAgent === 'claude' || transcriptAgent === 'codex' || transcriptAgent === 'opencode'
+  )
 }
 
 export function resolveNativeChatTranscriptAgent(
@@ -51,6 +59,9 @@ export function resolveNativeChatTranscriptAgent(
   // Orca preserves its distinct agent identity for launch and UI behavior.
   if (agent === 'claude' || agent === 'openclaude') {
     return 'claude'
+  }
+  if (agent === 'opencode' || agent === 'opencode2') {
+    return 'opencode'
   }
   if (
     agent === 'codex' ||
@@ -62,4 +73,8 @@ export function resolveNativeChatTranscriptAgent(
     return agent
   }
   return null
+}
+
+export function nativeChatApprovalAcceptKey(agent: string | null | undefined): string {
+  return resolveNativeChatTranscriptAgent(agent) === 'opencode' ? '\r' : '1'
 }

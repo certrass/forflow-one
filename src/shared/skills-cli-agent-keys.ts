@@ -28,6 +28,7 @@ export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
   omp: null,
   'prime-agent': null,
   qoder: 'qoder',
+  'qoder-cn': 'qoder-cn',
   gemini: 'gemini-cli',
   antigravity: 'antigravity',
   aider: null,
@@ -47,7 +48,6 @@ export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
   kimi: 'kimi-code-cli',
   'mistral-vibe': 'mistral-vibe',
   'qwen-code': 'qwen-code',
-  'qoder-cn': null,
   rovo: 'rovodev',
   hermes: 'hermes-agent',
   openclaw: 'openclaw',
@@ -60,7 +60,8 @@ export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
   muse: null,
   zcode: 'zcode',
   // Why: DSH ships skills as Cordis plugins, not a `skills --agent` target.
-  dsh: null
+  dsh: null,
+  jcode: null
 } satisfies Record<TuiAgent, string | null>
 
 /**
