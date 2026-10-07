@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { CodexReview } from '../../../../shared/codex-review-types'
+import type { WorkspaceReviewTarget } from '../../../../shared/workspace-review-types'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { StatsOverviewTab } from './StatsOverviewTab'
 import { CodexAnalyticsPanel } from './CodexAnalyticsPanel'
@@ -9,7 +10,13 @@ import { workspaceReviewCopy } from './workspace-review-copy'
 import { WorkspaceReviewIntake } from './WorkspaceReviewIntake'
 export { getStatsPaneSearchEntries } from './stats-search'
 
-export function StatsPane({ reviewOnly = false }: { reviewOnly?: boolean }): React.JSX.Element {
+export function StatsPane({
+  reviewOnly = false,
+  initialReviewTarget
+}: {
+  reviewOnly?: boolean
+  initialReviewTarget?: Pick<WorkspaceReviewTarget, 'hostId' | 'selector'>
+}): React.JSX.Element {
   const c = usageWorkspaceCopy()
   const w = workspaceReviewCopy()
   const [tab, setTab] = useState(reviewOnly ? 'review' : 'overview')
@@ -49,6 +56,7 @@ export function StatsPane({ reviewOnly = false }: { reviewOnly?: boolean }): Rea
           active={tab === 'review'}
           onOpenReview={openReview}
           embedded={reviewOnly}
+          initialTarget={initialReviewTarget}
         />
       ) : (
         <CodexAnalyticsPanel

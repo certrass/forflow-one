@@ -28,13 +28,15 @@ function selectionIdentity(target: WorkspaceReviewTarget | undefined): string {
 export function useWorkspaceReviewIntake(
   active: boolean,
   initial: CodexReview | undefined,
-  onOpenReview: (review: CodexReview) => void
+  onOpenReview: (review: CodexReview) => void,
+  initialTarget?: Pick<WorkspaceReviewTarget, 'hostId' | 'selector'>
 ) {
   const c = workspaceReviewCopy()
   const r = reviewCopy()
   const snapshot = initial?.versions.at(-1)?.workspace
   const [step, setStep] = useState<1 | 2 | 3>(initial ? 3 : 1)
   const selectedTarget = useRef(snapshot?.target)
+  const pendingInitialTarget = useRef(initial ? undefined : initialTarget)
   const [targets, setTargets] = useState<WorkspaceReviewTarget[]>([])
   const [saved, setSaved] = useState<CodexReview[]>([])
   const [workspaceId, setWorkspaceId] = useState(snapshot?.target.id ?? '')
@@ -79,6 +81,17 @@ export function useWorkspaceReviewIntake(
         if (!cancelled) {
           setTargets(available)
           setSaved(reviews)
+          const preferred = pendingInitialTarget.current
+          pendingInitialTarget.current = undefined
+          if (preferred && !selectedTarget.current) {
+            const matches = available.filter(
+              (entry) => entry.hostId === preferred.hostId && entry.selector === preferred.selector
+            )
+            if (matches.length === 1) {
+              selectedTarget.current = matches[0]
+              setWorkspaceId(matches[0].id)
+            }
+          }
           const previous = selectedTarget.current
           const current = available.find((entry) => entry.id === previous?.id)
           if (previous && selectionIdentity(previous) !== selectionIdentity(current)) {

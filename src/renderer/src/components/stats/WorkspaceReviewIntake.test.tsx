@@ -64,7 +64,13 @@ beforeEach(async () => {
       codexUsage: {
         listWorkspaceReviewTargets: async () => [
           { ...target, rootPath },
-          { ...target, id: 'second', name: 'Second project', rootPath: '/fixture/second' },
+          {
+            ...target,
+            id: 'second',
+            selector: 'folder:two',
+            name: 'Second project',
+            rootPath: '/fixture/second'
+          },
           {
             ...target,
             id: 'remote',
@@ -374,4 +380,52 @@ it('can keep an unknown acceptance condition explicit and rejects an oversized c
       })
     )
   )
+})
+
+it('preselects the source workspace once and preserves a later user selection', async () => {
+  render(
+    <WorkspaceReviewIntake
+      active
+      initialTarget={{ hostId: 'local', selector: 'folder:one' }}
+      onOpenReview={vi.fn()}
+    />
+  )
+  const picker = screen.getByRole('combobox', { name: '项目' })
+  await waitFor(() => expect(picker).toHaveTextContent('Local fixture'))
+  expect(open).not.toHaveBeenCalled()
+  await selectTarget('Second project')
+  fireEvent.click(screen.getByRole('button', { name: '刷新项目列表' }))
+  await waitFor(() => expect(picker).not.toBeDisabled())
+  expect(picker).toHaveTextContent('Second project')
+})
+
+it('keeps a remote source selected without substituting the local workspace', async () => {
+  render(
+    <WorkspaceReviewIntake
+      active
+      initialTarget={{ hostId: 'ssh:fixture', selector: 'folder:one' }}
+      onOpenReview={vi.fn()}
+    />
+  )
+  await waitFor(() =>
+    expect(screen.getByRole('combobox', { name: '项目' })).toHaveTextContent('Remote fixture')
+  )
+  expect(screen.getByText('SSH evidence reader is not connected.')).toBeVisible()
+  expect(open).not.toHaveBeenCalled()
+  expect(listFiles).not.toHaveBeenCalled()
+})
+
+it('leaves selection to the user when the source is no longer registered', async () => {
+  render(
+    <WorkspaceReviewIntake
+      active
+      initialTarget={{ hostId: 'local', selector: 'folder:missing' }}
+      onOpenReview={vi.fn()}
+    />
+  )
+  const picker = screen.getByRole('combobox', { name: '项目' })
+  await waitFor(() => expect(picker).not.toBeDisabled())
+  expect(picker).not.toHaveTextContent('Local fixture')
+  expect(open).not.toHaveBeenCalled()
+  expect(listFiles).not.toHaveBeenCalled()
 })

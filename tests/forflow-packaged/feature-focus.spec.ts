@@ -140,7 +140,12 @@ test('task actions lead to drafts and material review, then return to the origin
       animations: 'disabled'
     })
     await toolbar.getByRole('button', { name: '审阅结果', exact: true }).click()
+    await expect(review.getByRole('combobox', { name: '项目', exact: true })).toHaveText('测试项目')
     await expect(review.getByRole('button', { name: '打开审阅', exact: true })).toBeVisible()
+    await page.screenshot({
+      path: path.join(evidence, 'feature-review-current-workspace.png'),
+      animations: 'disabled'
+    })
     await review.getByRole('button', { name: '关闭', exact: true }).click()
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1000, 720))
     await page.evaluate(() => window.api.settings.set({ theme: 'dark' }))

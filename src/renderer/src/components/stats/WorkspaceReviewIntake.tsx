@@ -1,4 +1,5 @@
 import type { CodexReview } from '../../../../shared/codex-review-types'
+import type { WorkspaceReviewTarget } from '../../../../shared/workspace-review-types'
 import { Button } from '../ui/button'
 import { SettingsSubsectionHeader } from '../settings/SettingsFormControls'
 import { WorkspaceReviewGuide } from './WorkspaceReviewGuide'
@@ -10,12 +11,14 @@ import { reviewCopy } from './review-copy'
 export function WorkspaceReviewIntake({
   active,
   initial,
+  initialTarget,
   onOpenReview,
   onCancel,
   embedded = false
 }: {
   active: boolean
   initial?: CodexReview
+  initialTarget?: Pick<WorkspaceReviewTarget, 'hostId' | 'selector'>
   onOpenReview: (review: CodexReview) => void
   onCancel?: () => void
   embedded?: boolean
@@ -23,7 +26,7 @@ export function WorkspaceReviewIntake({
   const c = workspaceReviewCopy()
   const g = workspaceReviewGuideCopy()
   const r = reviewCopy()
-  const form = useWorkspaceReviewIntake(active, initial, onOpenReview)
+  const form = useWorkspaceReviewIntake(active, initial, onOpenReview, initialTarget)
   const { busy, loading } = form
   return (
     <section className="space-y-6" data-testid="workspace-review-intake">

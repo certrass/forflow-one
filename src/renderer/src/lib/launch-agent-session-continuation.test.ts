@@ -175,7 +175,10 @@ describe('launchAgentSessionContinuation', () => {
     expect(writeClipboardText).toHaveBeenCalledWith('continue the unfinished task')
   })
 
-  it('still reports a confirmed delivery as a success', async () => {
+  it.each([
+    ['claude', 'Context is ready in the new Claude draft. Send it to continue.'],
+    ['codex', 'Session context sent to Codex in a new session.']
+  ] as const)('reports the actual delivery mode for %s', async (agent, message) => {
     launchAgentInNewTab.mockImplementation((args: { onPromptDelivered?: () => void }): unknown => {
       args.onPromptDelivered?.()
       return {
@@ -186,13 +189,13 @@ describe('launchAgentSessionContinuation', () => {
     const { launchAgentSessionContinuation } = await import('./launch-agent-session-continuation')
 
     await launchAgentSessionContinuation({
-      agent: 'codex',
+      agent,
       prompt: 'continue',
       worktreeId: 'wt-1',
       launchSource: 'sidebar'
     })
 
-    expect(toast.success).toHaveBeenCalledWith('Session context sent to Codex in a new session.')
+    expect(toast.success).toHaveBeenCalledWith(message)
     expect(toast.warning).not.toHaveBeenCalled()
   })
 })

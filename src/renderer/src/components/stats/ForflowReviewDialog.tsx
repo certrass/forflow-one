@@ -2,9 +2,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useAppStore } from '@/store'
 import { translate } from '@/i18n/i18n'
 import { StatsPane } from './StatsPane'
+import { workspaceReviewTargetSchema } from '../../../../shared/workspace-review-types'
+
+const initialTargetSchema = workspaceReviewTargetSchema.pick({ hostId: true, selector: true })
 
 export default function ForflowReviewDialog(): React.JSX.Element {
   const closeModal = useAppStore((state) => state.closeModal)
+  const target = useAppStore((state) => state.modalData.initialReviewTarget)
+  const initialTarget = initialTargetSchema.safeParse(target)
   return (
     <Dialog
       open
@@ -28,7 +33,10 @@ export default function ForflowReviewDialog(): React.JSX.Element {
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 overflow-y-auto scrollbar-sleek">
-          <StatsPane reviewOnly />
+          <StatsPane
+            reviewOnly
+            initialReviewTarget={initialTarget.success ? initialTarget.data : undefined}
+          />
         </div>
       </DialogContent>
     </Dialog>

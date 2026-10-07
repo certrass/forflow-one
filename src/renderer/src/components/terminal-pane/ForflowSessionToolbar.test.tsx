@@ -7,6 +7,7 @@ import { ForflowSessionToolbar } from './ForflowSessionToolbar'
 const mocks = vi.hoisted(() => ({
   updateSettingsOrThrow: vi.fn(),
   openModal: vi.fn(),
+  resolveHost: vi.fn((): string | null => 'local'),
   setSettingsSearchQuery: vi.fn(),
   openSettingsTarget: vi.fn(),
   openSettingsPage: vi.fn(),
@@ -23,6 +24,9 @@ vi.mock('@/store', () => ({
   })
 }))
 vi.mock('sonner', () => ({ toast: { error: mocks.error } }))
+vi.mock('@/lib/resolved-worktree-execution-host', () => ({
+  getResolvedExecutionHostIdForWorktree: mocks.resolveHost
+}))
 vi.mock('@/i18n/i18n', () => ({ translate: (_key: string, fallback: string) => fallback }))
 
 function fixture(overrides: Partial<TerminalPaneController> = {}): TerminalPaneController {
@@ -55,6 +59,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mocks.updateSettingsOrThrow.mockResolvedValue(undefined)
   mocks.repos[0].kind = 'git'
+  mocks.resolveHost.mockReturnValue('local')
 })
 afterEach(cleanup)
 
@@ -163,7 +168,9 @@ describe('Forflow session toolbar', () => {
     mocks.repos[0].kind = 'folder'
     render(<ForflowSessionToolbar controller={fixture()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Review results' }))
-    expect(mocks.openModal).toHaveBeenCalledWith('forflow-review')
+    expect(mocks.openModal).toHaveBeenCalledWith('forflow-review', {
+      initialReviewTarget: { hostId: 'local', selector: 'id:workspace-1' }
+    })
     fireEvent.pointerDown(screen.getByRole('button', { name: 'View outputs' }), {
       button: 0,
       ctrlKey: false
@@ -230,3 +237,19 @@ it('opens the existing orchestration page without preparing an unrelated task', 
   expect(mocks.setSettingsSearchQuery).toHaveBeenCalledWith('')
   expect(mocks.openModal).not.toHaveBeenCalled()
 })
+
+it.each([
+  ['folder:notes', 'local', 'folder:notes'],
+  ['workspace-1', 'ssh:remote', 'id:workspace-1'],
+  ['workspace-1', null, undefined]
+])(
+  'opens material review with the existing host and workspace identity',
+  (worktreeId, host, selector) => {
+    mocks.resolveHost.mockReturnValue(host ?? null)
+    render(<ForflowSessionToolbar controller={fixture({ worktreeId: worktreeId ?? '' })} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Review results' }))
+    expect(mocks.openModal).toHaveBeenCalledWith('forflow-review', {
+      initialReviewTarget: host ? { hostId: host, selector } : undefined
+    })
+  }
+)

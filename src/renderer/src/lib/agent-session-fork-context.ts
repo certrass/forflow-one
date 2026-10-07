@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 const MAX_FORK_CONTEXT_CHARS = 36_000
 const MAX_FORK_CAPTURE_SANITIZE_CHARS = MAX_FORK_CONTEXT_CHARS * 4
 const ESCAPE_CODE = 27
@@ -150,14 +151,19 @@ export function buildAgentSessionForkPrompt({
   const fence = getMarkdownFenceForTranscript(transcript)
 
   const header = [
-    'This is a fork of an existing Orca agent session.',
+    translate('agentFork.prompt.intro', 'This is a fork of an existing Orca agent session.'),
     '',
-    'Use the captured transcript as background context for this new, independent session. Keep file edits and decisions independent from the original terminal unless I explicitly ask you to coordinate with it.',
+    translate(
+      'agentFork.prompt.independent',
+      'Use the captured transcript as background context for this new, independent session. Keep file edits and decisions independent from the original terminal unless I explicitly ask you to coordinate with it.'
+    ),
     '',
-    sourceLabel ? `Source: ${sourceLabel}` : null,
-    agentLabel ? `Original agent: ${agentLabel}` : null,
+    sourceLabel ? `${translate('agentFork.prompt.source', 'Source:')} ${sourceLabel}` : null,
+    agentLabel
+      ? `${translate('agentContinuation.prompt.agent', 'Original agent:')} ${agentLabel}`
+      : null,
     '',
-    'Captured terminal transcript:',
+    translate('agentFork.prompt.capture', 'Captured terminal transcript:'),
     `${fence}text`
   ].filter((line): line is string => line !== null)
 
@@ -166,6 +172,9 @@ export function buildAgentSessionForkPrompt({
     transcript,
     fence,
     '',
-    'Acknowledge that you have the forked context, then wait for my next instruction.'
+    translate(
+      'agentFork.prompt.next',
+      'Acknowledge that you have the forked context, then wait for my next instruction.'
+    )
   ].join('\n')
 }

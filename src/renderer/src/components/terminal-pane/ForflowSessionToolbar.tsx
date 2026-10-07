@@ -21,6 +21,7 @@ import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
 import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
+import { getResolvedExecutionHostIdForWorktree } from '@/lib/resolved-worktree-execution-host'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 import { ForflowSessionGuide } from './ForflowSessionGuide'
 import { ForflowAgentActions } from './ForflowAgentActions'
@@ -141,7 +142,22 @@ export function ForflowSessionToolbar({
         <Button
           size="sm"
           variant="outline"
-          onClick={() => useAppStore.getState().openModal('forflow-review')}
+          onClick={() => {
+            const state = useAppStore.getState()
+            const scope = parseWorkspaceKey(controller.worktreeId)
+            const hostId = getResolvedExecutionHostIdForWorktree(state, controller.worktreeId)
+            state.openModal('forflow-review', {
+              initialReviewTarget: hostId
+                ? {
+                    hostId,
+                    selector:
+                      scope?.type === 'folder'
+                        ? `folder:${scope.folderWorkspaceId}`
+                        : `id:${controller.worktreeId}`
+                  }
+                : undefined
+            })
+          }}
         >
           <ClipboardCheck />
           {translate('forflow.focus.review', 'Review results')}

@@ -5,6 +5,8 @@ import {
   cleanAgentSessionForkTranscript
 } from './agent-session-fork-context'
 
+vi.mock('@/i18n/i18n', () => ({ translate: (_key: string, fallback: string) => fallback }))
+
 describe('agent session fork context', () => {
   it('cleans terminal control sequences before building fork context', () => {
     const cleaned = cleanAgentSessionForkTranscript(

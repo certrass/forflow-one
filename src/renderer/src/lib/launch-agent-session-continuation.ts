@@ -83,12 +83,13 @@ export async function launchAgentSessionContinuation({
   // written prompt is not a delivered one. Claiming success there is how the whole handoff
   // could vanish silently (#22479).
   let deliveryUnconfirmed = false
+  const promptDelivery = agent === 'claude' ? 'draft' : 'submit-after-ready'
   const result = launchAgentInNewTab({
     agent,
     worktreeId,
     ...(groupId ? { groupId } : {}),
     prompt,
-    promptDelivery: agent === 'claude' ? 'draft' : 'submit-after-ready',
+    promptDelivery,
     launchSource,
     ...(initialCwd ? { initialCwd } : {}),
     onPromptDeliveryUnconfirmed: () => {
@@ -100,11 +101,17 @@ export async function launchAgentSessionContinuation({
         return
       }
       toast.success(
-        translate(
-          'components.agentSessionContinuation.sent',
-          'Session context sent to {{agent}} in a new session.',
-          { agent: label }
-        )
+        promptDelivery === 'draft'
+          ? translate(
+              'components.agentSessionContinuation.draftReady',
+              'Context is ready in the new {{agent}} draft. Send it to continue.',
+              { agent: label }
+            )
+          : translate(
+              'components.agentSessionContinuation.sent',
+              'Session context sent to {{agent}} in a new session.',
+              { agent: label }
+            )
       )
     }
   })

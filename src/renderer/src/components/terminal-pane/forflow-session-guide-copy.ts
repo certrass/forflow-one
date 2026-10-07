@@ -33,14 +33,14 @@ export function getForflowSessionGuideSteps(canReview: boolean): {
     },
     {
       id: 'parallel',
-      title: translate('forflow.sessionGuide.parallelTitle', '3. Run tasks, then compare outputs'),
+      title: translate('forflow.sessionGuide.parallelTitle', '3. Continue or delegate work'),
       body: translate(
         'forflow.sessionGuide.parallelBody',
-        'Open Parallel work & comparison to prepare another version with the same goal. Once both are ready, prepare a comparison draft and add their outputs.'
+        'Open Agent collaboration to continue the current session with another agent or fork it into a new workspace. For sequential or parallel tasks, use the examples on the Orchestration page.'
       ),
       next: translate(
         'forflow.sessionGuide.parallelNext',
-        'Give each version its own Git workspace or output folder. Split view shares the current files.'
+        'Use the current task’s goal, progress and relevant files when handing off. Split view shares files; use separate workspaces for independent changes.'
       )
     },
     {
