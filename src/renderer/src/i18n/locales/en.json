@@ -20174,7 +20174,7 @@
   "forflow.workspaceFiles.limit": "40 files selected. Remove a file before selecting another.",
   "forflow.workspaceFiles.loading": "Listing files…",
   "forflow.workspaceFiles.noMatches": "No names match in this folder. Clear the filter or open another folder.",
-  "forflow.workspaceFiles.noSelection": "Select at least one file from the list above.",
+  "forflow.workspaceFiles.noSelection": "Select at least one file from the project list.",
   "forflow.workspaceFiles.openFolder": "Open folder",
   "forflow.workspaceFiles.parent": "Up one folder",
   "forflow.workspaceFiles.purpose": "File purpose",
@@ -20754,5 +20754,7 @@
   "forflow.focus.reviewHint": "Select materials and check them against your requirements.",
   "forflow.focus.outputs": "View outputs",
   "forflow.focus.noHost": "No host",
-  "forflow.focus.selectedProject": "Selected project"
+  "forflow.focus.selectedProject": "Selected project",
+  "forflow.focus.newTaskHint": "Choose an agent and describe what you need.",
+  "forflow.focus.externalTasks": "External tasks"
 }

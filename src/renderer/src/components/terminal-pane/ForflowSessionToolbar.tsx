@@ -18,7 +18,6 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { translate } from '@/i18n/i18n'
-import { formatAgentTypeLabel } from '@/lib/agent-status'
 import { useAppStore } from '@/store'
 import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
@@ -66,9 +65,7 @@ export function ForflowSessionToolbar({
       : translate('forflow.workbench.shell', 'Start an agent to switch to Chat')
     : !nativeChatEnabled
       ? translate('forflow.workbench.enableHint', 'Choose Chat to enable the conversation view')
-      : agent
-        ? formatAgentTypeLabel(agent)
-        : ''
+      : ''
 
   const openChat = async (): Promise<void> => {
     if (chatSelected || !canOpenChat || enabling || !activePane) {
@@ -108,13 +105,13 @@ export function ForflowSessionToolbar({
 
   return (
     <div
-      className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-2 py-1"
+      className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-background px-3 py-2"
       data-forflow-session-toolbar=""
       data-pane-prevent-terminal-focus=""
     >
       <ButtonGroup aria-label={translate('forflow.workbench.view', 'Session view')}>
         <Button
-          size="xs"
+          size="sm"
           variant={chatSelected ? 'secondary' : 'ghost'}
           aria-pressed={chatSelected}
           disabled={!activePane || !canOpenChat || enabling}
@@ -124,7 +121,7 @@ export function ForflowSessionToolbar({
           {translate('forflow.workbench.chat', 'Chat')}
         </Button>
         <Button
-          size="xs"
+          size="sm"
           variant={!chatSelected ? 'secondary' : 'ghost'}
           aria-pressed={!chatSelected}
           disabled={!activePane || enabling}
@@ -138,11 +135,11 @@ export function ForflowSessionToolbar({
           {translate('forflow.workbench.terminal', 'Terminal')}
         </Button>
       </ButtonGroup>
-      <span className="min-w-0 truncate text-xs text-muted-foreground">{status}</span>
+      {status && <span className="min-w-0 text-xs text-muted-foreground">{status}</span>}
       <div className="ml-auto flex flex-wrap items-center gap-1">
         <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} agent={agent} />
         <Button
-          size="xs"
+          size="sm"
           variant="outline"
           onClick={() => useAppStore.getState().openModal('forflow-review')}
         >
@@ -151,7 +148,7 @@ export function ForflowSessionToolbar({
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="xs" variant="ghost">
+            <Button size="sm" variant="ghost">
               <FolderOpen />
               {translate('forflow.focus.outputs', 'View outputs')}
               <ChevronDown />
@@ -179,7 +176,7 @@ export function ForflowSessionToolbar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              size="icon-xs"
+              size="icon-sm"
               variant="ghost"
               disabled={!activePane}
               aria-label={translate('forflow.workbench.split', 'Split view')}

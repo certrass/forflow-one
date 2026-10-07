@@ -11,12 +11,14 @@ export function WorkspaceReviewIntake({
   active,
   initial,
   onOpenReview,
-  onCancel
+  onCancel,
+  embedded = false
 }: {
   active: boolean
   initial?: CodexReview
   onOpenReview: (review: CodexReview) => void
   onCancel?: () => void
+  embedded?: boolean
 }): React.JSX.Element {
   const c = workspaceReviewCopy()
   const g = workspaceReviewGuideCopy()
@@ -25,26 +27,29 @@ export function WorkspaceReviewIntake({
   const { busy, loading } = form
   return (
     <section className="space-y-6" data-testid="workspace-review-intake">
-      <SettingsSubsectionHeader
-        title={g.title}
-        description={g.description}
-        action={
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={loading || busy}
-            onClick={form.refresh}
-          >
-            {g.refresh}
-          </Button>
-        }
-      />
+      {!embedded && (
+        <SettingsSubsectionHeader
+          title={g.title}
+          description={g.description}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={loading || busy}
+              onClick={form.refresh}
+            >
+              {g.refresh}
+            </Button>
+          }
+        />
+      )}
       <WorkspaceReviewGuide
         active={active}
         editing={Boolean(initial)}
         form={form}
         onCancel={onCancel}
+        embedded={embedded}
       />
       {!initial && form.saved.length > 0 && (
         <section className="space-y-3 border-t border-border pt-5">

@@ -15,7 +15,7 @@ export default function ForflowReviewDialog(): React.JSX.Element {
       }}
     >
       <DialogContent
-        className="max-h-[90vh] sm:max-w-4xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
+        className="w-[calc(100%-2rem)] max-h-[90vh] sm:max-w-4xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
         onInteractOutside={(event) => event.preventDefault()}
       >
         <DialogHeader>

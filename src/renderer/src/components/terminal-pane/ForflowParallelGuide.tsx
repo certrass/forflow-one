@@ -36,7 +36,7 @@ export function ForflowParallelGuide({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="xs" variant="outline">
+        <Button size="sm" variant="outline">
           <GitCompareArrows />
           {translate('forflow.parallel.entry', 'Parallel work & comparison')}
         </Button>

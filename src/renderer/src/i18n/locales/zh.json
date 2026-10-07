@@ -20174,7 +20174,7 @@
   "forflow.workspaceFiles.limit": "已选 40 个文件。请先移除一个，再选择其他文件。",
   "forflow.workspaceFiles.loading": "正在列出文件…",
   "forflow.workspaceFiles.noMatches": "当前文件夹中没有匹配的名称。请清除筛选或打开其他文件夹。",
-  "forflow.workspaceFiles.noSelection": "从上方列表勾选至少一份文件。",
+  "forflow.workspaceFiles.noSelection": "从项目文件中勾选至少一份材料。",
   "forflow.workspaceFiles.openFolder": "打开文件夹",
   "forflow.workspaceFiles.parent": "上一级",
   "forflow.workspaceFiles.purpose": "文件用途",
@@ -20754,5 +20754,7 @@
   "forflow.focus.reviewHint": "选择材料，检查是否符合要求。",
   "forflow.focus.outputs": "查看产出",
   "forflow.focus.noHost": "未选择主机",
-  "forflow.focus.selectedProject": "所选项目"
+  "forflow.focus.selectedProject": "所选项目",
+  "forflow.focus.newTaskHint": "选择智能体，交代这次要完成的事。",
+  "forflow.focus.externalTasks": "外部任务"
 }

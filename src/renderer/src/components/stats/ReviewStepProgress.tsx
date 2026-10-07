@@ -11,14 +11,14 @@ export function ReviewStepProgress({
   return (
     <ol
       aria-label={translate('forflow.review.progress', 'Review progress')}
-      className="flex min-w-0 flex-1 gap-3"
+      className="flex min-w-0 flex-1 gap-3 border-b border-border pb-4"
     >
       {steps.map((label, index) => (
         <li
           key={label}
           aria-current={index + 1 === current ? 'step' : undefined}
           data-current={index + 1 === current}
-          className="flex min-w-0 flex-1 items-start gap-2 border-b border-border pb-3 text-sm text-muted-foreground data-[current=true]:border-primary data-[current=true]:font-medium data-[current=true]:text-foreground"
+          className="flex min-w-0 flex-1 items-center gap-2 text-xs text-muted-foreground data-[current=true]:font-medium data-[current=true]:text-foreground"
         >
           <span
             aria-hidden="true"

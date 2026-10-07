@@ -44,7 +44,7 @@ export function workspaceReviewFileCopy() {
     selected: translate('forflow.workspaceFiles.selected', 'Selected materials'),
     noSelection: translate(
       'forflow.workspaceFiles.noSelection',
-      'Select at least one file from the list above.'
+      'Select at least one file from the project list.'
     ),
     limit: translate(
       'forflow.workspaceFiles.limit',

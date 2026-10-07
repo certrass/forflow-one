@@ -25,7 +25,7 @@ export function ForflowSessionGuide({ canReview }: { canReview: boolean }): Reac
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          size="icon-xs"
+          size="icon-sm"
           variant="ghost"
           aria-label={translate('forflow.sessionGuide.label', 'How to use this workspace')}
           title={translate('forflow.sessionGuide.label', 'How to use this workspace')}

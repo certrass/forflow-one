@@ -16,8 +16,8 @@ export function TaskPageListChrome({
     <div className={cn('flex-none flex flex-col gap-2', taskPageListChromeHidden && 'hidden')}>
       <section className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
+          {isForflowBuild() ? <ForflowTaskGuide onClose={model.closeTaskPage} /> : null}
           <TaskPageSourceBar model={model} />
-          {isForflowBuild() ? <ForflowTaskGuide /> : null}
 
           {taskSourceAvailabilityNotice ? (
             <div

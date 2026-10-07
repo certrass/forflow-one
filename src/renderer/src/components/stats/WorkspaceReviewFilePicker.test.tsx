@@ -93,7 +93,7 @@ it('preserves explicit choices across directories and allows changing their purp
   fireEvent.click(screen.getByRole('checkbox', { name: 'README.md' }))
   expect(screen.queryByRole('button', { name: 'Remove README.md' })).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Remove src/main.ts' }))
-  expect(screen.getByText('Select at least one file from the list above.')).toBeVisible()
+  expect(screen.getByText('Select at least one file from the project list.')).toBeVisible()
   expect(list.mock.calls.map(([query]) => query)).toEqual([
     { workspaceId: target.id, directory: '' },
     { workspaceId: target.id, directory: 'src' },

@@ -24,11 +24,11 @@ export function StatsPane({ reviewOnly = false }: { reviewOnly?: boolean }): Rea
   const reviewContent = (
     <>
       {!review && (
-        <div className="mb-5">
+        <div className="mb-4">
           <Tabs value={objectType} onValueChange={setObjectType}>
             <TabsList aria-label={w.objectType}>
-              <TabsTrigger value="conversation">{w.conversations}</TabsTrigger>
               <TabsTrigger value="workspace">{w.workspaces}</TabsTrigger>
+              <TabsTrigger value="conversation">{w.conversations}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -45,7 +45,11 @@ export function StatsPane({ reviewOnly = false }: { reviewOnly?: boolean }): Rea
           }}
         />
       ) : objectType === 'workspace' ? (
-        <WorkspaceReviewIntake active={tab === 'review'} onOpenReview={openReview} />
+        <WorkspaceReviewIntake
+          active={tab === 'review'}
+          onOpenReview={openReview}
+          embedded={reviewOnly}
+        />
       ) : (
         <CodexAnalyticsPanel
           active={tab === 'review'}

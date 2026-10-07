@@ -2,6 +2,9 @@ import { DEFAULT_APP_FONT_FAMILY } from '../../../shared/constants'
 
 const APP_FONT_FALLBACKS = [
   DEFAULT_APP_FONT_FAMILY,
+  'PingFang SC',
+  'Microsoft YaHei',
+  'Noto Sans CJK SC',
   '-apple-system',
   'BlinkMacSystemFont',
   'Segoe UI',
