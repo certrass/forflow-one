@@ -1,9 +1,8 @@
-import { ClipboardCheck, GitCompareArrows, Plus, X } from 'lucide-react'
+import { ClipboardCheck, Network, Plus, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
-import { forflowParallelPrompts } from '../new-workspace/forflow-parallel-prompts'
 
 export function ForflowTaskGuide({ onClose }: { onClose: () => void }): React.JSX.Element {
   useTranslation()
@@ -45,20 +44,20 @@ export function ForflowTaskGuide({ onClose }: { onClose: () => void }): React.JS
           <Button
             size="sm"
             variant="outline"
-            onClick={() =>
-              openModal('new-workspace-composer', {
-                forflowTaskIntent: 'alternative',
-                prefilledPrompt: forflowParallelPrompts().alternative.prompt
-              })
-            }
+            onClick={() => {
+              const state = useAppStore.getState()
+              state.setSettingsSearchQuery('')
+              state.openSettingsTarget({ pane: 'orchestration', repoId: null })
+              state.openSettingsPage()
+            }}
           >
-            <GitCompareArrows />
-            {translate('forflow.focus.parallel', 'Explore approaches in parallel')}
+            <Network />
+            {translate('forflow.collaboration.entry', 'Agent collaboration')}
           </Button>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {translate(
-              'forflow.focus.parallelDescription',
-              'Give agents the same goal, then compare their outputs.'
+              'forflow.collaboration.description',
+              'Continue with another agent, hand off work, or coordinate parallel tasks.'
             )}
           </p>
         </div>

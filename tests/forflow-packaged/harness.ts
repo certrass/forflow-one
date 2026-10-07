@@ -9,16 +9,19 @@ import {
 } from '../e2e/helpers/electron-home-isolation'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 const appPath = process.env.FORFLOW_PACKAGED_APP
+const developmentMain = process.env.FORFLOW_QA_MAIN
 const evidencePath = process.env.FORFLOW_QA_OUTPUT
-if (!appPath || !evidencePath) {
-  throw new Error('Set FORFLOW_PACKAGED_APP and FORFLOW_QA_OUTPUT.')
+if ((!appPath && !developmentMain) || !evidencePath) {
+  throw new Error('Set FORFLOW_PACKAGED_APP or FORFLOW_QA_MAIN, and FORFLOW_QA_OUTPUT.')
 }
 export const evidence = evidencePath
 mkdirSync(evidence, { recursive: true })
-const executablePath = path.join(appPath, 'Contents/MacOS/Forflow One')
-export const packageFingerprint = createHash('sha256')
-  .update(readFileSync(path.join(appPath, 'Contents/Resources/app.asar')))
-  .digest('hex')
+const executablePath = appPath ? path.join(appPath, 'Contents/MacOS/Forflow One') : undefined
+export const packageFingerprint = appPath
+  ? createHash('sha256')
+      .update(readFileSync(path.join(appPath, 'Contents/Resources/app.asar')))
+      .digest('hex')
+  : 'development-build'
 
 export async function launch(profile: string, extraEnv: Record<string, string> = {}) {
   const isolation = createElectronHomeIsolation({
@@ -40,7 +43,13 @@ export async function launch(profile: string, extraEnv: Record<string, string> =
   const app = await electron.launch({
     executablePath,
     cwd: tmpdir(),
-    args: ['--password-store=basic', '--use-mock-keychain', '-ApplePersistenceIgnoreState', 'YES'],
+    args: [
+      ...(!appPath && developmentMain ? [developmentMain] : []),
+      '--password-store=basic',
+      '--use-mock-keychain',
+      '-ApplePersistenceIgnoreState',
+      'YES'
+    ],
     env: Object.fromEntries(
       Object.entries(isolation.env).filter(
         (entry): entry is [string, string] => typeof entry[1] === 'string'

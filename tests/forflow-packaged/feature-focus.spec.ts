@@ -67,11 +67,9 @@ test('task actions lead to drafts and material review, then return to the origin
       path: path.join(evidence, 'feature-task-actions.png'),
       animations: 'disabled'
     })
-    await hub.getByRole('button', { name: '并行做方案', exact: true }).click()
-    await expect(page.getByRole('textbox', { name: '这次要完成什么？', exact: true })).toHaveValue(
-      /验收标准/
-    )
-    await page.keyboard.press('Escape')
+    await hub.getByRole('button', { name: '智能体协作', exact: true }).click()
+    await expect(page.getByText('移交活动任务', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: '返回应用', exact: true }).click()
     await hub.getByRole('button', { name: '审阅结果', exact: true }).click()
     const review = page.getByRole('dialog', { name: '审阅结果', exact: true })
     await expect(review).toBeVisible()

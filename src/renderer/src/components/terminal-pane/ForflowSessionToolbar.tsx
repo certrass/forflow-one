@@ -23,7 +23,7 @@ import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 import { ForflowSessionGuide } from './ForflowSessionGuide'
-import { ForflowParallelGuide } from './ForflowParallelGuide'
+import { ForflowAgentActions } from './ForflowAgentActions'
 
 export function ForflowSessionToolbar({
   controller
@@ -137,7 +137,7 @@ export function ForflowSessionToolbar({
       </ButtonGroup>
       {status && <span className="min-w-0 text-xs text-muted-foreground">{status}</span>}
       <div className="ml-auto flex flex-wrap items-center gap-1">
-        <ForflowParallelGuide worktreeId={controller.worktreeId} isGit={canReview} agent={agent} />
+        <ForflowAgentActions controller={controller} isGit={canReview} />
         <Button
           size="sm"
           variant="outline"

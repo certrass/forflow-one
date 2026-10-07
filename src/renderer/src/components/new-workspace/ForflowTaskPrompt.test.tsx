@@ -42,18 +42,11 @@ it('does not overwrite imported task material or change an in-flight draft', () 
   expect(onChange).not.toHaveBeenCalled()
 })
 
-it.each(['Make another version', 'Compare outputs'])(
-  'offers %s directly and preserves an existing draft',
-  (label) => {
-    const onChange = vi.fn()
-    const view = render(<ForflowTaskPrompt value="" onChange={onChange} creating={false} />)
-    fireEvent.click(screen.getByRole('button', { name: label }))
-    expect(onChange).toHaveBeenCalledOnce()
-    view.rerender(<ForflowTaskPrompt value="my task" onChange={onChange} creating={false} />)
-    expect(screen.queryByRole('button', { name: label })).toBeNull()
-    expect(onChange).toHaveBeenCalledOnce()
-    view.rerender(<ForflowTaskPrompt value="" onChange={onChange} creating />)
-    fireEvent.click(screen.getByRole('button', { name: label }))
-    expect(onChange).toHaveBeenCalledOnce()
-  }
-)
+it('does not offer a handoff template without a source task', () => {
+  const onChange = vi.fn()
+  render(<ForflowTaskPrompt value="" onChange={onChange} creating={false} />)
+  expect(screen.queryByRole('button', { name: 'Make another version' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Compare outputs' })).toBeNull()
+  expect(screen.getByRole('textbox')).toHaveProperty('value', '')
+  expect(onChange).not.toHaveBeenCalled()
+})

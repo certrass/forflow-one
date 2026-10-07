@@ -19742,6 +19742,18 @@
       "loading": "Reading account…",
       "retry": "Retry",
       "refresh": "Refresh account"
+    },
+    "collaboration": {
+      "entry": "Agent collaboration",
+      "orchestration": "Orchestration & examples",
+      "description": "Continue with another agent, hand off work, or coordinate parallel tasks."
+    },
+    "orchestrationPrompts": {
+      "handoff": "Use /orchestration to hand off the current task to a suitable idle agent. Include the goal, current progress, relevant files, constraints, and what to finish next.",
+      "worktree": "Use /orchestration to hand off the current task to an agent in another worktree. Confirm the destination, then send the goal, progress, relevant files, and expected result.",
+      "sequence": "Use /orchestration to break the current task into dependent phases. Give each child agent the requirements and the previous phase’s results, and start the next phase after the current one finishes.",
+      "parallel": "Use /orchestration to split the current task into independent parts and run them in parallel. Give each agent the relevant context, a clear scope, and completion criteria. Collect the results and check them against the original requirements.",
+      "worktrees": "Use /orchestration to split the current change into smaller reviewable PRs, each in its own child worktree. Define the scope, shared requirements, and dependencies before starting the agents."
     }
   },
   "forflow.contextBeta.ambiguousSource": "Reload the conversation to restore its message records.",
