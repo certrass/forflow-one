@@ -1556,20 +1556,51 @@
           "typographyAdvanced": "Typography"
         },
         "TerminalPane": {
+          "01c600daff": "Shell arguments",
           "05efc0bada": "true",
+          "0cbe5ad727": "fish",
+          "17ad899ba4": "bash",
+          "1c29734248": "Shell used for new terminal panes",
           "219aaa59f4": "WSL Distribution",
           "2503f1e86b": "Used for new WSL terminal panes and local agent detection when the active workspace is not already inside WSL.",
           "29154326bb": "on",
           "348246b06f": "false",
+          "44f8a56f66": "args",
+          "48b91a3ed2": "Custom args",
+          "4faf688f78": "login",
+          "578ec79449": "Enter one argument per line. Leave it empty to pass no arguments.",
           "5936387ddd": "auto",
+          "59573d0b33": "Enter a shell name on PATH or an executable path. Orca starts it as a login shell.",
+          "5a5eac2f44": "Shell not found: {{value0}}",
+          "5e06e87730": "Custom shell executable",
           "5fe79a5e56": "Choose which WSL distribution new WSL terminals and local agent scans use.",
+          "5ffc4777b6": "Shell argument mode",
+          "69724e8f0c": "Choose what Orca opens for new local terminal panes.",
+          "73c211e979": "wrapper",
+          "7bd83fc1d0": "-l (default)",
+          "81694f1584": "terminal",
+          "884a006065": "Starts the shell as a login shell with -l.",
+          "8dbe0bc942": "Shell arguments, one per line",
+          "9589abc009": "Default shell",
+          "a909136b3f": "shell",
           "ab20575a8a": "off",
           "ab3a1f9068": "wsl.exe",
           "adbafefe56": "custom",
+          "af893aa433": "arguments",
           "ask_before_closing_running_terminals_description": "Show a confirmation before closing a terminal that has a running command or agent.",
           "ask_before_closing_running_terminals_title": "Ask Before Closing Running Terminals",
+          "c2bf02ce2f": "fish, nu, or /bin/zsh",
+          "c2ddb189e7": "rcfile",
+          "c9bc93d343": "zsh",
           "cc8c5ca224": "Windows default",
-          "d78fc4fdef": "Loading distributions"
+          "d469840b75": "nushell",
+          "d78fc4fdef": "Loading distributions",
+          "dd3f4c35da": "System shell ({{value0}})",
+          "ddc72a4860": "default",
+          "e3ae5aed18": ". Switch to System shell or choose an executable on this host.",
+          "f51cc79784": "Custom shell",
+          "f58cb71f53": "--rcfile\n/path/to/rcfile",
+          "fd05fb109c": "Terminal shell"
         },
         "TerminalSettingsPreview": {
           "d06664e889": "dark"
@@ -3274,6 +3305,9 @@
           "checks": {
             "toggle": "Show Checks"
           },
+          "childWorkspaces": {
+            "toggle": "Toggle Child Workspaces"
+          },
           "explorer": {
             "toggle": "Show Explorer"
           },
@@ -3581,6 +3615,10 @@
       "parallelHint": "Create a separate workspace for another task",
       "structured": "Structured conversation"
     }
+  },
+  "menu": {
+    "minimize": "Minimize",
+    "zoom": "Zoom"
   },
   "runtimeRpc": {
     "startupFailure": {

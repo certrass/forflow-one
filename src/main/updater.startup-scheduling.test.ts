@@ -39,6 +39,7 @@ describe('updater', () => {
     try {
       const mainWindow = { webContents: { send: vi.fn() } }
       const updater = await loadUpdaterModule()
+      // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: Private setup only stores the window and sends status through this stub.
       updater.setupAutoUpdater(mainWindow as never)
       updater.checkForUpdatesFromMenu()
       updater.downloadUpdate()
