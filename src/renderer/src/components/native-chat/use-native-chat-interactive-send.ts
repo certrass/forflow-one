@@ -174,7 +174,7 @@ export function useNativeChatInteractiveSend(
       )
       return
     }
-    sendRaw(ESC)
+    sendRaw(isCompanionAgent(agent) ? '\x03' : ESC)
   }, [agent, cancelInFlight, sendRaw, targetPtyId, terminalTabId])
 
   return { sendAnswer, sendRaw, cancelPending: cancelInFlight, cancelAsk, cancel }

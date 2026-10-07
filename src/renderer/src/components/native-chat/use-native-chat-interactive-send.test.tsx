@@ -184,6 +184,26 @@ describe('useNativeChatInteractiveSend', () => {
     )
   })
 
+  it.each(['aily', 'workbuddy'] as const)(
+    'interrupts %s through its existing Ctrl+C contract for both Stop and question cancellation',
+    (agent) => {
+      const { result } = renderHook(() =>
+        useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', agent)
+      )
+      for (const action of ['cancel', 'cancelAsk'] as const) {
+        mocks.sendRuntimePtyInput.mockClear()
+        act(() => result.current[action]())
+        expect(mocks.sendRuntimePtyInput).toHaveBeenCalledExactlyOnceWith(
+          { terminalTabId: 'tab-1' },
+          'pty-1',
+          '\x03',
+          'driving'
+        )
+      }
+      expect(mocks.sendNativeChatAskAnswer).not.toHaveBeenCalled()
+    }
+  )
+
   it.each(['opencode', 'opencode2'] as const)(
     'paces two Escape writes for %s Stop and cancels them on rebind',
     (agent) => {
