@@ -17,9 +17,7 @@ test('collaboration reuses session continuation and fork with source context', a
   Object.assign(seed.settings, {
     defaultTuiAgent: 'claude',
     agentCmdOverrides: { claude: fixture.command.trim() },
-    experimentalNativeChat: true,
-    experimentalStructuredNativeChat: false,
-    openAgentTabsInChatByDefault: true
+    experimentalNativeChat: false
   })
   writeFileSync(profileFile, JSON.stringify(seed))
   const { app, page, errors } = await launch(profile)
@@ -27,6 +25,8 @@ test('collaboration reuses session continuation and fork with source context', a
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1250, 900))
     await addPrivateProject(page, profile)
     const toolbar = page.locator('[data-forflow-session-toolbar]:visible').first()
+    await expect(toolbar.getByRole('button', { name: '对话', exact: true })).toBeEnabled()
+    await toolbar.getByRole('button', { name: '对话', exact: true }).click()
     const entry = toolbar.getByRole('button', { name: '智能体协作', exact: true })
     const composer = page
       .locator('.native-chat-pane-shell:visible [contenteditable="true"]')
@@ -54,14 +54,14 @@ test('collaboration reuses session continuation and fork with source context', a
     expect(typeof sourceTranscript).toBe('string')
     await composer.fill('保留当前草稿')
     await entry.click()
-    await expect(page.getByRole('menuitem', { name: '在新会话中继续…' })).toBeVisible()
+    await expect(page.getByRole('menuitem', { name: '移交给另一个智能体' })).toBeVisible()
     await expect(page.getByRole('menuitem', { name: '派生智能体会话...' })).toBeVisible()
     await page.screenshot({
       animations: 'disabled',
       path: path.join(evidence, 'collaboration-actions.png')
     })
-    await page.getByRole('menuitem', { name: '在新会话中继续…' }).click()
-    const continuation = page.getByRole('dialog', { name: '在新会话中继续', exact: true })
+    await page.getByRole('menuitem', { name: '移交给另一个智能体' }).click()
+    const continuation = page.getByRole('dialog', { name: '移交给另一个智能体', exact: true })
     await expect(continuation).toBeVisible()
     await expect(continuation).toContainText('测试项目')
     await expect(

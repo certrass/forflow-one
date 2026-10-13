@@ -46,7 +46,6 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
       selectUnifiedTerminalTabFields(store.unifiedTabsByWorktree, worktreeId, tabId)
     )
   )
-  const nativeChatEnabled = useAppStore((store) => store.settings?.experimentalNativeChat === true)
   const effectiveChatViewMode = isChatViewMode
   const runtimePaneTitlesByPaneId = useAppStore(
     useShallow((store) => store.runtimePaneTitlesByTabId[tabId] ?? {})
@@ -259,7 +258,6 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
     unifiedTabId,
     isChatViewMode,
     effectiveChatViewMode,
-    nativeChatEnabled,
     unifiedTabLabel,
     isTabPinned,
     runtimePaneTitlesByPaneId,

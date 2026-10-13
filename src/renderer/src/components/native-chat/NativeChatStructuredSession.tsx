@@ -1,3 +1,4 @@
+import { ForflowWorkspaceToolbar } from '../terminal-pane/ForflowWorkspaceActions'
 import { NativeChatConversationBody } from './NativeChatConversationBody'
 import { cn } from '@/lib/utils'
 import { NATIVE_CHAT_APPEARANCE_ROOT_CLASS } from './native-chat-appearance-style'
@@ -262,6 +263,7 @@ export function NativeChatStructuredSession(
       style={appearanceStyle}
       data-native-chat-scheme={appearanceStyle.colorScheme}
     >
+      <ForflowWorkspaceToolbar worktreeId={fileLinkContext?.worktreeId} />
       <NativeChatConversationBody
         session={session}
         viewState={viewState.kind === 'error' && !readFailure ? { kind: 'loading' } : viewState}
