@@ -3432,9 +3432,7 @@
             "1d04b1630b": "向下拆分",
             "6b3efb106e": "向上拆分",
             "fdd29eb669": "固定标签",
-            "8e9d603a09": "取消固定标签",
-            "openContainingFolder": "打开所在文件夹",
-            "revealInFinder": "在访达中显示"
+            "8e9d603a09": "取消固定标签"
           },
           "QuickLaunchButton": {
             "348a04c1ad": "智能体设置...",
@@ -7227,11 +7225,6 @@
             "resumeCopy": "Orca 退出或安装更新后，下次打开时会自动恢复此前正在运行的聊天。",
             "resumeToggleLabel": "切换重启后自动恢复",
             "copy": "为新建且受支持的本机会话启用实验性聊天界面。已有终端会话继续使用终端聊天；我们仍在改进记录完整性、流式显示和功能一致性。",
-            "defaultViewNative": "聊天界面",
-            "structuredCopy": "将新建 Codex 和 Claude 智能体作为结构化聊天打开。关闭后使用终端支持的聊天界面。已有会话保持原样。",
-            "structuredScope": "支持本机和已配对且支持此功能的服务器。较旧的服务器、WSL 和 SSH 主机继续使用终端对话；Windows 无法读取进程启动时间时也会使用终端对话。",
-            "structuredTitle": "使用新版结构化原生对话",
-            "structuredToggleLabel": "切换新版结构化原生对话",
             "description": "新建受支持的智能体时，使用聊天界面。"
           },
           "agentDashboard": {
@@ -13837,8 +13830,7 @@
             "resumeInNewNativeChat": "在新的本机聊天中恢复",
             "resumeInNewCli": "在新的 CLI 中恢复",
             "resumeInNewCliTooltipFork": "将此对话派生到新的 CLI 会话中。",
-            "resumeInNewCliTooltipChat": "本机聊天保持不变。",
-            "resumeInNewChat": "在新对话中恢复"
+            "resumeInNewCliTooltipChat": "本机聊天保持不变。"
           },
           "AiVaultSessionDeleteDialog": {
             "title": "要删除此会话吗？",
@@ -15326,9 +15318,7 @@
           "f0fd4174b5": "打开文件选项卡以使用富文本 Markdown 编辑",
           "a10d9b8337": "打开文件",
           "2076ecfc9c": "上一个更改",
-          "631dab0df3": "下一个更改",
-          "openContainingFolder": "打开所在文件夹",
-          "revealInFinder": "在访达中显示"
+          "631dab0df3": "下一个更改"
         },
         "EditorPanelMarkdownActionsMenu": {
           "3e0ce48c24": "导出为 PDF",
@@ -17610,10 +17600,7 @@
         "expandNode": "展开 {{value0}}",
         "selectMachine": "选择 {{value0}} 上的全部聊天",
         "sshHost": "SSH",
-        "done": "完成",
-        "continueUnconfirmed": "尚未确认向 {{value0}} 个聊天发送继续请求。请先打开检查，再发送其他消息。",
-        "continueUnconfirmed_one": "尚未确认向 {{value0}} 个聊天发送继续请求。请先打开检查，再发送其他消息。",
-        "continueUnconfirmed_other": "尚未确认向 {{value0}} 个聊天发送继续请求。请先打开检查，再发送其他消息。"
+        "done": "完成"
       },
       "linear-issue-attribute-filter-coverage-notice": {
         "statusPartialTeamCoverage": "正在按 {{value1}} 个团队中的 {{value0}} 个团队状态筛选，其余团队的议题未包含在内。",
@@ -17657,9 +17644,7 @@
             "unknown": "尚未确认聊天是否连接。",
             "retry": "重试"
           },
-          "NativeChatStructuredSession": {
-            "1f772bb5d0": "尚未确认消息是否送达。"
-          }
+          "NativeChatStructuredSession": {}
         }
       },
       "browserPane": {
@@ -18170,9 +18155,7 @@
         "runLivePlanOne": "更新计划",
         "runLivePlanMany": "更新计划 {{value0}} 次",
         "runLiveToolOne": "使用 1 个工具",
-        "runLiveToolMany": "使用 {{value0}} 工具",
-        "deletedFile": "已删除文件",
-        "renamedFile": "已重命名文件"
+        "runLiveToolMany": "使用 {{value0}} 工具"
       },
       "status": {
         "responding": "智能体正在回复",
@@ -18253,8 +18236,7 @@
         "needsAccess": "需要访问的路径",
         "plan": {
           "file": "计划文件"
-        },
-        "blockedPath": "受阻路径"
+        }
       },
       "launchPromptNotDelivered": "未送达 — 请检查终端",
       "taskList": {
@@ -19887,7 +19869,7 @@
       "statusReadFailed": "无法读取命令注册状态，请刷新重试。"
     },
     "skills": {
-      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他代理按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
+      "offline": "将安装包内置技能写入本机 ~/.agents/skills，供其他智能体按其配置读取；已有改动会保留。远程环境由管理员离线分发。",
       "complete": "内置技能已安装到本机共享目录。",
       "conflict": "部分技能未安装，已保留本机现有内容。请检查技能页与安装记录。",
       "settingUp": "正在配置能力…",

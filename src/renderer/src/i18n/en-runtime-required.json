@@ -3256,6 +3256,11 @@
         "new": "New",
         "tip": "Tip"
       },
+      "native-chat-upgrade": {
+        "ctaLabel": "Got it",
+        "description": "New chats with supported agents now open in the upgraded chat view. To move between chat and CLI, open Agent Session History in the right sidebar:",
+        "title": "Native chat got an upgrade"
+      },
       "orca-cli": {
         "ctaLabel": "Install CLI & Skills",
         "description": "Enable agents to coordinate child worktrees and communicate between worktrees.",
@@ -3441,6 +3446,9 @@
           "hardReload": "Hard Reload Browser Page",
           "reload": "Reload Browser Page"
         },
+        "chat": {
+          "find": "Find in chat"
+        },
         "dashboard": {
           "toggle": "Toggle Agent Dashboard"
         },
@@ -3581,6 +3589,7 @@
       "groups": {
         "agents": "Agents",
         "browser": "Browser",
+        "chat": "Chat",
         "editors": "Editors",
         "fileexplorer": "File Explorer",
         "global": "Global",
