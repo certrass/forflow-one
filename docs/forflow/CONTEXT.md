@@ -2,11 +2,11 @@
 
 ## 2026-10-13 · Orca v1.4.224 候选与 Git AI 提示修复
 
-完整三方合入 v1.4.224，工作树 `orca-1-4-224-cn-update/Forflow One`，私有分支 `codex/upstream-v1.4.224` 已推送并建立[草稿 PR #6](https://github.com/certrass/forflow-one/pull/6)（承接 #5）。运行代码 `ab873f04372fab2d896228086ecca88f263d19ca`，最终候选 `1.4.224-forflow.1` 的 12 个隐藏 Electron 场景通过，ASAR `bf9e651e849d5ba7531b21901cd3f4c9755fb164a547182db5deecef1665e5af`。最终 CLI／Web 类型复验通过，Node 类型复验仍在运行；候选与 ZIP 已完成签名／完整性核对，未替换 `1.4.222-forflow.1` 安装版。
+完整三方合入 v1.4.224，工作树 `orca-1-4-224-cn-update/Forflow One`，私有分支 `codex/upstream-v1.4.224` 已推送并建立[草稿 PR #6](https://github.com/certrass/forflow-one/pull/6)（承接 #5）。运行代码 `ee75fc273809d776fb9fdfc6ebd4013f52abf8d9`，最终候选 `1.4.224-forflow.1` 的 12 个隐藏 Electron 场景通过，ASAR `23cd0d0d87f7d68e9b260f4a98652e3c9ebac4208ee5386763eb41dfd74a71f2`。Node／CLI 类型复验通过，最后辅助文字调整的 Web 类型与各语言目录复验通过；候选与 ZIP 已完成签名／完整性核对，未替换 `1.4.222-forflow.1` 安装版。
 
 复用新版聊天、移交、分叉与编排；结构化聊天补回现有审阅与产出入口。用户报告的 Source Control AI 英文错误，核对本机有效设置后确认：聊天默认 Aily，而 Git 未单独选择智能体。新版补了中文原因与原有设置页的提前说明，分别选择 Codex 后生成通过、聊天仍为豆包；没有改用户真实偏好。主体 3,853 项登记回归及最新 Git AI 的 82 项相关测试通过，真实 WorkBuddy 无工具收发另行通过。
 
-下一步读取 `.forflow/evidence/upstream-1.4.224/source-ai-types-final.exit`，完成最后 Node 类型复验并提交最终回执；当前测试仅改了 Git 导航夹具名称，运行代码无需重建。真实远程、Aily 任务、Claude 在线与自动汇入审阅仍有明确验收边界。见[能力核对](upstream-capability-audit-20261013.md)和[候选记录](release-1.4.224-forflow.1.md)。
+最终文案与各语言占位符规则统一，候选已重新构建并复验 12 个成品场景。后续发现新稳定版时从这条升级分支核对，或按用户明确指令安装当前候选。真实远程、Aily 任务、Claude 在线与自动汇入审阅仍有明确验收边界。见[能力核对](upstream-capability-audit-20261013.md)和[候选记录](release-1.4.224-forflow.1.md)。
 
 ## 2026-10-08 · 安装与 Orca v1.4.222 整体导入
 

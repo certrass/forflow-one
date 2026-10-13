@@ -1,8 +1,8 @@
 # Orca v1.4.224 整合与验证
 
-2026-10-13：完整三方合入稳定版 v1.4.224，macOS arm64 候选已打包，12 个隐藏 Electron 成品场景通过。最终 CLI／Web 类型复验通过，Node 类型复验仍在运行。升级已推送到私有[草稿 PR #6](https://github.com/certrass/forflow-one/pull/6)，承接 #5，未合并、未安装。
+2026-10-13：完整三方合入稳定版 v1.4.224，macOS arm64 候选已打包，12 个隐藏 Electron 成品场景通过。Node／CLI 类型复验通过，最后辅助文字调整的 Web 类型与各语言目录复验通过。升级已推送到私有[草稿 PR #6](https://github.com/certrass/forflow-one/pull/6)，承接 #5，未合并、未安装。
 
-上游 `2bb20586ebc39d605e16d95f57420e20a16e7485`，国内起点 `01aa1dc90bfbb03fc32c6017f2d2ea39836ed115`，合并 `3dff9295e240c274858464768a80ae0063b88887`，最终运行代码 `ab873f04372fab2d896228086ecca88f263d19ca`。候选 ASAR 为 `bf9e651e849d5ba7531b21901cd3f4c9755fb164a547182db5deecef1665e5af`，日常安装仍为 `1.4.222-forflow.1`。
+上游 `2bb20586ebc39d605e16d95f57420e20a16e7485`，国内起点 `01aa1dc90bfbb03fc32c6017f2d2ea39836ed115`，合并 `3dff9295e240c274858464768a80ae0063b88887`，最终运行代码 `ee75fc273809d776fb9fdfc6ebd4013f52abf8d9`。候选 ASAR 为 `23cd0d0d87f7d68e9b260f4a98652e3c9ebac4208ee5386763eb41dfd74a71f2`，日常安装仍为 `1.4.222-forflow.1`。
 
 复用原生聊天、移交、分叉、编排与审阅。修复新结构化聊天绕过国内工具栏、视图切换改动新会话默认值、伙伴停止／取消指令、中文与 Forflow CLI 模块迁移，以及默认聊天伙伴被 Git AI 沿用时的英文错误和缺少设置说明。没有另建交接、比较或审阅流程。
 
