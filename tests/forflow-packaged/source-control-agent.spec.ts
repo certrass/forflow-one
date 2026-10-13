@@ -41,7 +41,7 @@ process.stdin.on('end', () => console.log('feat: clarify source control AI selec
         '默认智能体暂不支持 Git 自动生成。请到「设置 → Git → 源代码管理 AI」选择 Codex 或其他可用智能体。'
     })
     await page.getByRole('button', { name: '设置', exact: true }).click()
-    await page.getByRole('button', { name: 'Git', exact: true }).click()
+    await page.getByRole('button', { name: 'Git 和源代码控制', exact: true }).click()
     const section = page.locator('#source-control-ai-settings')
     const warning = section.getByText(/默认的豆包工作伙伴暂不支持自动生成文字/).first()
     await warning.scrollIntoViewIfNeeded()

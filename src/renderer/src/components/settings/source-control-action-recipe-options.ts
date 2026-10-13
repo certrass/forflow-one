@@ -115,24 +115,13 @@ export function getAgentCatalogForAction(
   )
 }
 
-function formatSupportedAgentLabels(): string {
-  return [
-    ...listCommitMessageAgentCapabilities().map((capability) => capability.label),
-    translate(
-      'auto.components.settings.source.control.action.recipe.options.customCommand',
-      'Custom command'
-    )
-  ].join(', ')
-}
-
 export function getSourceControlActionAgentSupportText(actionId: AiActionId): string | null {
   if (!AI_TEXT_ACTION_ID_SET.has(actionId)) {
     return null
   }
   return translate(
     'auto.components.settings.source.control.action.recipe.options.supportedAgents',
-    'Supported agents for this recipe: {{value0}}.',
-    { value0: formatSupportedAgentLabels() }
+    'Choose Codex, Claude or another supported agent, or use a custom command.'
   )
 }
 

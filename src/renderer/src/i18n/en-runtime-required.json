@@ -1863,6 +1863,17 @@
           "refreshLinks": "Refresh",
           "showButton": "Show Skills button"
         },
+        "source": {
+          "control": {
+            "action": {
+              "recipe": {
+                "options": {
+                  "customCommand": "Custom command"
+                }
+              }
+            }
+          }
+        },
         "ssh": {
           "search": {
             "62826efbe9": "Add a new remote SSH target.",

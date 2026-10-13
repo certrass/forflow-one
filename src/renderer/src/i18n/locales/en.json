@@ -11152,7 +11152,7 @@
                   "fixChecks": "Start an agent from failed hosted-review checks.",
                   "resolveConflicts": "Start an agent for local or hosted-review merge conflicts.",
                   "customCommand": "Custom command",
-                  "supportedAgents": "Supported agents for this recipe: {{value0}}.",
+                  "supportedAgents": "Choose Codex, Claude or another supported agent, or use a custom command.",
                   "unsupportedSavedAgent": "{{value0}} cannot run this text-generation recipe. Pick one of the supported agents below.",
                   "resolveComments": "Start an agent from selected unresolved PR or MR comments.",
                   "fixPushFailure": "Start an agent when a pre-push hook or git push fails."

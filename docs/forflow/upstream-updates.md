@@ -1,6 +1,8 @@
 # 将 Orca 更新纳入 Forflow One
 
-更新日期：2026-09-20。本文以 `.14` 提交为核对检查点整理研发操作流程，未拉取或合并新的 Orca 版本；当前 Forflow 发行见 [文档索引](README.md)。工程合入与客户应用更新是两个独立阶段。
+当前状态（2026-10-13）：v1.4.224 已三方合入私有升级分支，候选与 12 个成品场景通过，最终 Node 类型复验进行中；日常安装为 v1.4.222。见[本轮候选](release-1.4.224-forflow.1.md)与[草稿 PR #6](https://github.com/certrass/forflow-one/pull/6)。
+
+以下是 2026-09-20 的流程检查点，表中的版本是历史起点。更新日期：2026-09-20。本文以 `.14` 提交为核对检查点整理研发操作流程，未拉取或合并新的 Orca 版本；当前 Forflow 发行见 [文档索引](README.md)。工程合入与客户应用更新是两个独立阶段。
 
 ## 已核对的起点
 
@@ -13,7 +15,7 @@
 | Orca 基线             | `v1.4.205` / `11aba8bdc5e492d3ba01fc7fe333495ace74128f`           |
 | Forflow 检查点        | `e3dfa009ef0aba9cf152d2d516172365051a650f` / `1.4.205-forflow.14` |
 
-基线是当前 Forflow 提交的祖先，保留了可用于三方合并的历史。上述检查点相对基线有 30 个提交、645 个文件差异，包含功能、资源、测试和文档，并非 645 个冲突。每次更新重新读取 `resources/forflow/product.json` 和 `resources/forflow/release-profile.json`，不将本表当作永久基线。
+此历史基线是当时 Forflow 提交的祖先，保留了可用于三方合并的历史。上述检查点相对基线有 30 个提交、645 个文件差异，包含功能、资源、测试和文档，并非 645 个冲突。每次更新重新读取 `resources/forflow/product.json` 和 `resources/forflow/release-profile.json`，不将本表当作永久基线。
 
 ## 选择更新范围
 
@@ -60,6 +62,8 @@ cd "$SYNC_WORKTREE"
 git merge --no-ff --no-commit "$ORCA_TARGET_SHA"
 git status --short
 ```
+
+发行标签可能分叉：本轮 v222 与 v224 的共同祖先为 `761d63a4e52ff7915d4432c004df13182db63010`。旧 tag 不是新 tag 的祖先时，先核实两者的官方发行身份、共同祖先和双侧差异；完成审查后可正常三方合并，不伪造线性关系，也不覆盖已有国内历史。
 
 命令按步骤执行，不整段盲跑。`fetch` 只获取对象和引用；`merge --no-ff --no-commit` 在形成合并提交前停下，供解决冲突和检查。冲突时逐文件判断，禁止整批选择 ours/theirs。即便没有文本冲突，也要检查新入口是否绕过 Forflow 策略。放弃试合并时，在这个新工作树中执行 `git merge --abort`；不要对主开发目录执行清理或重置。[Git fetch](https://git-scm.com/docs/git-fetch)、[Git merge](https://git-scm.com/docs/git-merge)、[Git worktree](https://git-scm.com/docs/git-worktree)
 
