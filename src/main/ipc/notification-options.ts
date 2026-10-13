@@ -1,5 +1,13 @@
-import { translateMain } from '../i18n/main-i18n'
 import type { NotificationDispatchRequest } from '../../shared/notification-settings-types'
+
+type NotificationStatusTranslator = (
+  key: string,
+  fallback: string,
+  values?: Record<string, string>
+) => string
+
+const englishNotificationStatus: NotificationStatusTranslator = (_key, fallback, values) =>
+  fallback.replace(/\{\{(\w+)\}\}/g, (token, name: string) => values?.[name] ?? token)
 
 const NOTIFICATION_AGENT_LABEL_MAX_LENGTH = 40
 const NOTIFICATION_TITLE_CONTEXT_MAX_LENGTH = 80
@@ -21,7 +29,10 @@ const AGENT_TYPE_LABELS: Readonly<Record<string, string>> = {
   hermes: 'Hermes'
 }
 
-export function buildNotificationOptions(args: NotificationDispatchRequest): {
+export function buildNotificationOptions(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator = englishNotificationStatus
+): {
   title: string
   body: string
   silent?: boolean
@@ -29,80 +40,87 @@ export function buildNotificationOptions(args: NotificationDispatchRequest): {
 } {
   if (args.source === 'terminal-bell') {
     return {
-      title: translateMain('forflow.nativeCopy.a956f9380a', 'Bell in {{workspace}}', {
-        workspace: args.worktreeLabel ?? translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
+      title: translate('forflow.nativeCopy.a956f9380a', 'Bell in {{workspace}}', {
+        workspace: args.worktreeLabel ?? translate('forflow.nativeCopy.21a3230e03', 'workspace')
       }),
       body: args.repoLabel
-        ? translateMain('forflow.nativeCopy.2112fe2906', '{{repo}} \u00b7 Attention requested', {
+        ? translate('forflow.nativeCopy.2112fe2906', '{{repo}} \u00b7 Attention requested', {
             repo: args.repoLabel
           })
-        : translateMain('forflow.nativeCopy.93e52d6412', 'Attention requested')
+        : translate('forflow.nativeCopy.93e52d6412', 'Attention requested')
     }
   }
 
   if (args.source === 'test') {
     return {
-      title: translateMain('forflow.nativeCopy.c72b3d5fad', 'Orca notifications are on'),
-      body: translateMain('forflow.nativeCopy.3e9e493e47', 'This is a test notification from Orca.')
+      title: translate('forflow.nativeCopy.c72b3d5fad', 'Orca notifications are on'),
+      body: translate('forflow.nativeCopy.3e9e493e47', 'This is a test notification from Orca.')
     }
   }
 
-  const richOptions = buildAgentTaskCompleteNotificationOptions(args)
+  const richOptions = buildAgentTaskCompleteNotificationOptions(args, translate)
   if (richOptions) {
     return richOptions
   }
 
-  return buildAgentTaskCompleteFallbackNotificationOptions(args)
+  return buildAgentTaskCompleteFallbackNotificationOptions(args, translate)
 }
 
 function buildAgentTaskCompleteNotificationOptions(
-  args: NotificationDispatchRequest
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
 ): { title: string; body: string } | null {
   if (!hasAgentNotificationSnapshot(args)) {
     return null
   }
 
-  const agentLabel = formatNotificationAgentLabel(args.agentType)
-  const worktreeContext = formatNotificationWorktreeContext(args)
-  const statusText = formatAgentNotificationStatusText(args)
+  const agentLabel = formatNotificationAgentLabel(args.agentType, translate)
+  const worktreeContext = formatNotificationWorktreeContext(args, translate)
+  const statusText = formatAgentNotificationStatusText(args, translate)
 
   return {
     title: `${worktreeContext} - ${agentLabel} ${statusText}`,
-    body: buildAgentTaskCompleteRichBody(args) ?? `${agentLabel} ${statusText}.`
+    body: buildAgentTaskCompleteRichBody(args, translate) ?? `${agentLabel} ${statusText}.`
   }
 }
 
 // Why (#4375): a still-working agent must never be announced as finished. Only an
 // explicit terminal state, or no state at all (the hook snapshot expired and the
 // notification itself is the completion signal), may say "finished".
-function formatAgentNotificationStatusText(args: NotificationDispatchRequest): string {
+function formatAgentNotificationStatusText(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
+): string {
   if (args.agentState === 'blocked' || args.agentState === 'waiting') {
-    return translateMain('notifications.agentStatus.needsInput', 'needs input')
+    return translate('notifications.agentStatus.needsInput', 'needs input')
   }
   if (args.agentState === 'working') {
-    return translateMain('notifications.agentStatus.working', 'working')
+    return translate('notifications.agentStatus.working', 'working')
   }
   if (args.agentState !== 'done') {
-    return translateMain('notifications.agentStatus.finished', 'finished')
+    return translate('notifications.agentStatus.finished', 'finished')
   }
   switch (args.agentTurnOutcome) {
     // A turn cut short by anything but the user is a fault, as a failure is.
     case 'failure':
     case 'interruption':
-      return translateMain('notifications.agentStatus.failed', 'failed')
+      return translate('notifications.agentStatus.failed', 'failed')
     // Why: a Stop the user asked for, a turn a newer request replaced, or an end Orca cannot
     // prove, still never reads finished.
     case 'cancellation':
     case 'superseded':
     case 'unconfirmed':
-      return translateMain('notifications.agentStatus.stopped', 'stopped')
+      return translate('notifications.agentStatus.stopped', 'stopped')
     case 'success':
     case undefined:
-      return translateMain('notifications.agentStatus.finished', 'finished')
+      return translate('notifications.agentStatus.finished', 'finished')
   }
 }
 
-function formatNotificationWorktreeContext(args: NotificationDispatchRequest): string {
+function formatNotificationWorktreeContext(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
+): string {
   const worktreeLabel = normalizeNotificationText(
     args.worktreeLabel,
     NOTIFICATION_TITLE_CONTEXT_MAX_LENGTH
@@ -114,7 +132,7 @@ function formatNotificationWorktreeContext(args: NotificationDispatchRequest): s
       NOTIFICATION_TITLE_CONTEXT_MAX_LENGTH
     )
   }
-  return worktreeLabel || repoLabel || translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
+  return worktreeLabel || repoLabel || translate('forflow.nativeCopy.21a3230e03', 'workspace')
 }
 
 function hasAgentNotificationSnapshot(args: NotificationDispatchRequest): boolean {
@@ -129,7 +147,10 @@ function hasAgentNotificationSnapshot(args: NotificationDispatchRequest): boolea
   )
 }
 
-function buildAgentTaskCompleteRichBody(args: NotificationDispatchRequest): string | null {
+function buildAgentTaskCompleteRichBody(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
+): string | null {
   const assistantMessage = normalizeNotificationText(
     args.agentLastAssistantMessage,
     NOTIFICATION_BODY_PREVIEW_MAX_LENGTH
@@ -144,16 +165,16 @@ function buildAgentTaskCompleteRichBody(args: NotificationDispatchRequest): stri
     NOTIFICATION_BODY_PREVIEW_MAX_LENGTH
   )
   if (toolName && toolInput) {
-    return translateMain('forflow.nativeCopy.19f05a3a09', 'Using {{tool}}: {{input}}', {
+    return translate('forflow.nativeCopy.19f05a3a09', 'Using {{tool}}: {{input}}', {
       tool: toolName,
       input: toolInput
     })
   }
   if (toolName) {
-    return translateMain('forflow.nativeCopy.ba2ee2bae5', 'Using {{tool}}', { tool: toolName })
+    return translate('forflow.nativeCopy.ba2ee2bae5', 'Using {{tool}}', { tool: toolName })
   }
   if (toolInput) {
-    return translateMain('forflow.nativeCopy.87abf34531', 'Tool input: {{input}}', {
+    return translate('forflow.nativeCopy.87abf34531', 'Tool input: {{input}}', {
       input: toolInput
     })
   }
@@ -161,29 +182,38 @@ function buildAgentTaskCompleteRichBody(args: NotificationDispatchRequest): stri
   return null
 }
 
-function buildAgentTaskCompleteFallbackNotificationOptions(args: NotificationDispatchRequest): {
+function buildAgentTaskCompleteFallbackNotificationOptions(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
+): {
   title: string
   body: string
 } {
   return {
-    title: translateMain('forflow.nativeCopy.8107a9ed2f', 'Task complete in {{workspace}}', {
-      workspace: args.worktreeLabel ?? translateMain('forflow.nativeCopy.21a3230e03', 'workspace')
+    title: translate('forflow.nativeCopy.8107a9ed2f', 'Task complete in {{workspace}}', {
+      workspace: args.worktreeLabel ?? translate('forflow.nativeCopy.21a3230e03', 'workspace')
     }),
-    body: buildAgentTaskCompleteFallbackBody(args)
+    body: buildAgentTaskCompleteFallbackBody(args, translate)
   }
 }
 
-function buildAgentTaskCompleteFallbackBody(args: NotificationDispatchRequest): string {
+function buildAgentTaskCompleteFallbackBody(
+  args: NotificationDispatchRequest,
+  translate: NotificationStatusTranslator
+): string {
   return args.repoLabel
     ? `${args.repoLabel}${args.terminalTitle ? ` · ${args.terminalTitle}` : ''}`
     : (args.terminalTitle ??
-        translateMain('forflow.nativeCopy.1f2e038865', 'A coding agent finished working.'))
+        translate('forflow.nativeCopy.1f2e038865', 'A coding agent finished working.'))
 }
 
-function formatNotificationAgentLabel(agentType: string | null | undefined): string {
+function formatNotificationAgentLabel(
+  agentType: string | null | undefined,
+  translate: NotificationStatusTranslator
+): string {
   const normalized = normalizeNotificationText(agentType, NOTIFICATION_AGENT_LABEL_MAX_LENGTH)
   if (!normalized || normalized === 'unknown') {
-    return translateMain('forflow.nativeCopy.11b39c9377', 'Agent')
+    return translate('forflow.nativeCopy.11b39c9377', 'Agent')
   }
   return AGENT_TYPE_LABELS[normalized] ?? normalized
 }

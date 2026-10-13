@@ -1,8 +1,10 @@
+import type * as ProductBranding from '../../../../shared/product-branding'
 // @vitest-environment happy-dom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 import { ForflowSessionToolbar } from './ForflowSessionToolbar'
+import { ForflowWorkspaceToolbar } from './ForflowWorkspaceActions'
 
 const mocks = vi.hoisted(() => ({
   updateSettingsOrThrow: vi.fn(),
@@ -22,6 +24,10 @@ vi.mock('@/store', () => ({
   useAppStore: Object.assign((selector: (state: typeof mocks) => unknown) => selector(mocks), {
     getState: () => mocks
   })
+}))
+vi.mock('../../../../shared/product-branding', async (importOriginal) => ({
+  ...(await importOriginal<typeof ProductBranding>()),
+  isForflowBuild: () => true
 }))
 vi.mock('sonner', () => ({ toast: { error: mocks.error } }))
 vi.mock('@/lib/resolved-worktree-execution-host', () => ({
@@ -43,7 +49,6 @@ function fixture(overrides: Partial<TerminalPaneController> = {}): TerminalPaneC
     },
     activePaneIsChatLeaf: false,
     effectiveChatViewMode: false,
-    nativeChatEnabled: true,
     structuredSessionId: null,
     isActive: true,
     resolveAgentForLeaf: vi.fn(() => 'codex'),
@@ -83,58 +88,29 @@ describe('Forflow session toolbar', () => {
     expect(mocks.updateSettingsOrThrow).not.toHaveBeenCalled()
   })
 
-  it('enables an existing profile without enabling structured sessions or changing its default view', async () => {
-    const controller = fixture({ nativeChatEnabled: false, activePaneCanToggleChat: false })
+  it('opens an existing terminal conversation without changing defaults for new agents', () => {
+    const controller = fixture({ activePaneCanToggleChat: false })
     render(<ForflowSessionToolbar controller={controller} />)
     fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
-    await waitFor(() => expect(controller.handleToggleNativeChat).toHaveBeenCalledOnce())
-    expect(mocks.updateSettingsOrThrow).toHaveBeenCalledExactlyOnceWith({
-      experimentalNativeChat: true
-    })
+    expect(controller.handleToggleNativeChat).toHaveBeenCalledOnce()
+    expect(mocks.updateSettingsOrThrow).not.toHaveBeenCalled()
   })
 
-  it.each(['changed-pane', 'closed', 'agent-exited', 'hidden'] as const)(
-    'does not misroute a delayed enable after %s',
-    async (change) => {
-      let settle: () => void = () => {}
-      mocks.updateSettingsOrThrow.mockImplementation(
-        () =>
-          new Promise<void>((resolve) => {
-            settle = resolve
-          })
-      )
-      const controller = fixture({ nativeChatEnabled: false, activePaneCanToggleChat: false })
-      const view = render(<ForflowSessionToolbar controller={controller} />)
-      fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
-      if (change === 'closed') {
-        view.unmount()
-      } else {
-        view.rerender(
-          <ForflowSessionToolbar
-            controller={{
-              ...controller,
-              tabId: change === 'changed-pane' ? 'terminal-2' : controller.tabId,
-              isActive: change !== 'hidden',
-              isChatEligibleForLeaf: () => change !== 'agent-exited'
-            }}
-          />
-        )
-      }
-      await act(async () => {
-        settle()
+  it.each(['hidden', 'missing-pane', 'agent-exited'] as const)(
+    'keeps an unavailable target unchanged: %s',
+    (reason) => {
+      const controller = fixture({
+        isActive: reason !== 'hidden',
+        activePane: reason === 'missing-pane' ? null : fixture().activePane,
+        activePaneCanToggleChat: reason !== 'agent-exited',
+        isChatEligibleForLeaf: () => reason !== 'agent-exited'
       })
+      render(<ForflowSessionToolbar controller={controller} />)
+      fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
       expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
+      expect(mocks.updateSettingsOrThrow).not.toHaveBeenCalled()
     }
   )
-
-  it('retains the terminal if saving the feature setting fails', async () => {
-    mocks.updateSettingsOrThrow.mockRejectedValue(new Error('offline'))
-    const controller = fixture({ nativeChatEnabled: false })
-    render(<ForflowSessionToolbar controller={controller} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chat' }))
-    await waitFor(() => expect(mocks.error).toHaveBeenCalledOnce())
-    expect(controller.handleToggleNativeChat).not.toHaveBeenCalled()
-  })
 
   it('explains an unsupported terminal agent and keeps its terminal view available', () => {
     const controller = fixture({
@@ -180,7 +156,7 @@ describe('Forflow session toolbar', () => {
   })
 })
 
-it.each(['Continue in New Session…', 'Fork Agent Session…'])(
+it.each(['Hand Off to Another Agent', 'Fork Agent Session…'])(
   'routes %s through the existing action for the active pane',
   (action) => {
     const controller = fixture()
@@ -192,7 +168,7 @@ it.each(['Continue in New Session…', 'Fork Agent Session…'])(
     fireEvent.click(screen.getByRole('menuitem', { name: action }))
     expect(controller.contextMenu.runForPane).toHaveBeenCalledWith(1, expect.any(Function))
     expect(
-      action === 'Continue in New Session…'
+      action === 'Hand Off to Another Agent'
         ? controller.contextMenu.onContinueAgentSessionInNewSession
         : controller.contextMenu.onForkAgentSession
     ).toHaveBeenCalledOnce()
@@ -207,7 +183,7 @@ it('keeps folder continuation available without offering a Git worktree fork', (
     button: 0,
     ctrlKey: false
   })
-  expect(screen.getByRole('menuitem', { name: 'Continue in New Session…' })).toBeTruthy()
+  expect(screen.getByRole('menuitem', { name: 'Hand Off to Another Agent' })).toBeTruthy()
   expect(screen.queryByRole('menuitem', { name: 'Fork Agent Session…' })).toBeNull()
 })
 
@@ -221,7 +197,7 @@ it.each(['missing-pane', 'hidden'])('does not offer source actions for a %s sess
     button: 0,
     ctrlKey: false
   })
-  expect(screen.queryByRole('menuitem', { name: 'Continue in New Session…' })).toBeNull()
+  expect(screen.queryByRole('menuitem', { name: 'Hand Off to Another Agent' })).toBeNull()
   expect(screen.queryByRole('menuitem', { name: 'Fork Agent Session…' })).toBeNull()
 })
 
@@ -253,3 +229,23 @@ it.each([
     })
   }
 )
+
+it('keeps review and files available for structured chat with its workspace owner', () => {
+  render(<ForflowWorkspaceToolbar worktreeId="workspace-1" />)
+  fireEvent.click(screen.getByRole('button', { name: 'Review results' }))
+  expect(mocks.openModal).toHaveBeenCalledExactlyOnceWith('forflow-review', {
+    initialReviewTarget: { hostId: 'local', selector: 'id:workspace-1' }
+  })
+  fireEvent.pointerDown(screen.getByRole('button', { name: 'View outputs' }), {
+    button: 0,
+    ctrlKey: false
+  })
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Files' }))
+  expect(mocks.showRightSidebarFiles).toHaveBeenCalledOnce()
+})
+
+it('does not offer structured workspace actions until the workspace is known', () => {
+  render(<ForflowWorkspaceToolbar />)
+  expect(screen.queryByRole('button', { name: 'Review results' })).toBeNull()
+  expect(mocks.openModal).not.toHaveBeenCalled()
+})

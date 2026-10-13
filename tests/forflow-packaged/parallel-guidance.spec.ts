@@ -17,16 +17,24 @@ test('collaboration reuses session continuation and fork with source context', a
   Object.assign(seed.settings, {
     defaultTuiAgent: 'claude',
     agentCmdOverrides: { claude: fixture.command.trim() },
-    experimentalNativeChat: true,
-    experimentalStructuredNativeChat: false,
-    openAgentTabsInChatByDefault: true
+    experimentalNativeChat: false
   })
   writeFileSync(profileFile, JSON.stringify(seed))
   const { app, page, errors } = await launch(profile)
   try {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1250, 900))
     await addPrivateProject(page, profile)
+    await page.getByRole('button', { name: '新标签页', exact: true }).first().click()
+    await page.getByRole('combobox').filter({ visible: true }).fill('Claude')
+    await page
+      .locator('#tab-create-entry-results')
+      .getByRole('option')
+      .filter({ hasText: 'Claude' })
+      .first()
+      .click()
     const toolbar = page.locator('[data-forflow-session-toolbar]:visible').first()
+    await expect(toolbar.getByRole('button', { name: '对话', exact: true })).toBeEnabled()
+    await toolbar.getByRole('button', { name: '对话', exact: true }).click()
     const entry = toolbar.getByRole('button', { name: '智能体协作', exact: true })
     const composer = page
       .locator('.native-chat-pane-shell:visible [contenteditable="true"]')
@@ -54,14 +62,14 @@ test('collaboration reuses session continuation and fork with source context', a
     expect(typeof sourceTranscript).toBe('string')
     await composer.fill('保留当前草稿')
     await entry.click()
-    await expect(page.getByRole('menuitem', { name: '在新会话中继续…' })).toBeVisible()
+    await expect(page.getByRole('menuitem', { name: '移交给另一个智能体' })).toBeVisible()
     await expect(page.getByRole('menuitem', { name: '派生智能体会话...' })).toBeVisible()
     await page.screenshot({
       animations: 'disabled',
       path: path.join(evidence, 'collaboration-actions.png')
     })
-    await page.getByRole('menuitem', { name: '在新会话中继续…' }).click()
-    const continuation = page.getByRole('dialog', { name: '在新会话中继续', exact: true })
+    await page.getByRole('menuitem', { name: '移交给另一个智能体' }).click()
+    const continuation = page.getByRole('dialog', { name: '移交给另一个智能体', exact: true })
     await expect(continuation).toBeVisible()
     await expect(continuation).toContainText('测试项目')
     await expect(
@@ -73,6 +81,7 @@ test('collaboration reuses session continuation and fork with source context', a
     })
     await continuation.getByRole('button', { name: '启动新会话', exact: true }).click()
     await expect(continuation).toHaveCount(0)
+    await toolbar.getByRole('button', { name: '对话', exact: true }).click()
     await expect(composer).toContainText(sourceTranscript)
     await expect(composer).toContainText('继续 Forflow One 中的上一项任务')
     await expect(page.getByText('上下文已放入新的 Claude 草稿，发送后即可继续。')).toBeVisible()

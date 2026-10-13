@@ -186,8 +186,10 @@ describe('CommitMessageAiPane', () => {
       })
     )
 
-    expect(markup).toContain('Supported agents for this recipe:')
-    expect(markup).toContain('Claude, Codex')
+    expect(markup).toContain(
+      'Choose Codex, Claude or another supported agent, or use a custom command.'
+    )
+    expect(markup).toContain('Codex, Claude')
     expect(markup).toContain('Custom command')
   })
 
@@ -218,7 +220,9 @@ describe('CommitMessageAiPane', () => {
     expect(markup).toContain(
       'Aider cannot run this text-generation recipe. Pick one of the supported agents below.'
     )
-    expect(markup).toContain('Supported agents for this recipe:')
+    expect(markup).toContain(
+      'Choose Codex, Claude or another supported agent, or use a custom command.'
+    )
   })
 
   it('keeps action agent selectors constrained for long labels', () => {

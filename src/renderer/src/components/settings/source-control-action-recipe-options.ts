@@ -1,60 +1,65 @@
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import {
+  AI_TEXT_ACTION_IDS,
   SOURCE_CONTROL_TEXT_ACTION_IDS,
-  type SourceControlActionId
+  type AiActionId
 } from '../../../../shared/source-control-ai-actions'
 import {
   CUSTOM_AGENT_ID,
   type CustomAgentId,
   getCommitMessageAgentCapability,
   isCustomAgentId,
+  type DefaultTuiAgentPreference,
   listCommitMessageAgentCapabilities
 } from '../../../../shared/commit-message-agent-spec'
 import { getAgentCatalog, type AgentCatalogEntry } from '@/lib/agent-catalog'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import { translate } from '@/i18n/i18n'
 
+export const AI_TEXT_ACTION_ID_SET = new Set<string>(AI_TEXT_ACTION_IDS)
 export const SOURCE_CONTROL_TEXT_ACTION_ID_SET = new Set<string>(SOURCE_CONTROL_TEXT_ACTION_IDS)
 const TEXT_GENERATION_AGENT_ID_SET = new Set(
   listCommitMessageAgentCapabilities().map((capability) => capability.id)
 )
 
-export const getActionDescriptions = createLocalizedCatalog(
-  (): Record<SourceControlActionId, string> => ({
-    commitMessage: translate(
-      'auto.components.settings.source.control.action.recipe.options.commitMessage',
-      'Generate the commit message from staged changes.'
-    ),
-    pullRequest: translate(
-      'auto.components.settings.source.control.action.recipe.options.pullRequest',
-      'Generate the hosted review title and description.'
-    ),
-    branchName: translate(
-      'auto.components.settings.source.control.action.recipe.options.branchName',
-      'Rename Orca-created branches from the initial agent task.'
-    ),
-    fixCommitFailure: translate(
-      'auto.components.settings.source.control.action.recipe.options.fixCommitFailure',
-      'Start an agent when a commit hook or git commit fails.'
-    ),
-    fixPushFailure: translate(
-      'auto.components.settings.source.control.action.recipe.options.fixPushFailure',
-      'Start an agent when a pre-push hook or git push fails.'
-    ),
-    fixChecks: translate(
-      'auto.components.settings.source.control.action.recipe.options.fixChecks',
-      'Start an agent from failed hosted-review checks.'
-    ),
-    resolveConflicts: translate(
-      'auto.components.settings.source.control.action.recipe.options.resolveConflicts',
-      'Start an agent for local or hosted-review merge conflicts.'
-    ),
-    resolveComments: translate(
-      'auto.components.settings.source.control.action.recipe.options.resolveComments',
-      'Start an agent from selected unresolved PR or MR comments.'
-    )
-  })
-)
+export const getActionDescriptions = createLocalizedCatalog((): Record<AiActionId, string> => ({
+  conversationName: translate(
+    'settings.chat.names.recipeDescription',
+    'Generate a short name from the first message in a new chat.'
+  ),
+  commitMessage: translate(
+    'auto.components.settings.source.control.action.recipe.options.commitMessage',
+    'Generate the commit message from staged changes.'
+  ),
+  pullRequest: translate(
+    'auto.components.settings.source.control.action.recipe.options.pullRequest',
+    'Generate the hosted review title and description.'
+  ),
+  branchName: translate(
+    'auto.components.settings.source.control.action.recipe.options.branchName',
+    'Rename Orca-created branches from the initial agent task.'
+  ),
+  fixCommitFailure: translate(
+    'auto.components.settings.source.control.action.recipe.options.fixCommitFailure',
+    'Start an agent when a commit hook or git commit fails.'
+  ),
+  fixPushFailure: translate(
+    'auto.components.settings.source.control.action.recipe.options.fixPushFailure',
+    'Start an agent when a pre-push hook or git push fails.'
+  ),
+  fixChecks: translate(
+    'auto.components.settings.source.control.action.recipe.options.fixChecks',
+    'Start an agent from failed hosted-review checks.'
+  ),
+  resolveConflicts: translate(
+    'auto.components.settings.source.control.action.recipe.options.resolveConflicts',
+    'Start an agent for local or hosted-review merge conflicts.'
+  ),
+  resolveComments: translate(
+    'auto.components.settings.source.control.action.recipe.options.resolveComments',
+    'Start an agent from selected unresolved PR or MR comments.'
+  )
+}))
 
 const FALLBACK_AGENT_ARGS_PLACEHOLDER = '--model sonnet'
 
@@ -99,10 +104,10 @@ export function getSourceControlAgentArgsPlaceholder(
 // response, so restrict the picker while still surfacing an already-selected
 // agent even if it is no longer a supported text generator.
 export function getAgentCatalogForAction(
-  actionId: SourceControlActionId,
+  actionId: AiActionId,
   selectedAgent: TuiAgent | CustomAgentId | null | undefined
 ): AgentCatalogEntry[] {
-  if (!SOURCE_CONTROL_TEXT_ACTION_ID_SET.has(actionId)) {
+  if (!AI_TEXT_ACTION_ID_SET.has(actionId)) {
     return getAgentCatalog()
   }
   return getAgentCatalog().filter(
@@ -110,35 +115,37 @@ export function getAgentCatalogForAction(
   )
 }
 
-function formatSupportedAgentLabels(): string {
-  return [
-    ...listCommitMessageAgentCapabilities().map((capability) => capability.label),
-    translate(
-      'auto.components.settings.source.control.action.recipe.options.customCommand',
-      'Custom command'
-    )
-  ].join(', ')
-}
-
-export function getSourceControlActionAgentSupportText(
-  actionId: SourceControlActionId
-): string | null {
-  if (!SOURCE_CONTROL_TEXT_ACTION_ID_SET.has(actionId)) {
+export function getSourceControlActionAgentSupportText(actionId: AiActionId): string | null {
+  if (!AI_TEXT_ACTION_ID_SET.has(actionId)) {
     return null
   }
   return translate(
     'auto.components.settings.source.control.action.recipe.options.supportedAgents',
-    'Supported agents for this recipe: {{value0}}.',
-    { value0: formatSupportedAgentLabels() }
+    'Choose Codex, Claude or another supported agent, or use a custom command.'
   )
 }
 
 export function getSourceControlActionAgentWarningText(
-  actionId: SourceControlActionId,
-  selectedAgent: TuiAgent | CustomAgentId | null | undefined
+  actionId: AiActionId,
+  selectedAgent: TuiAgent | CustomAgentId | null | undefined,
+  defaultTuiAgent?: DefaultTuiAgentPreference
 ): string | null {
-  if (!SOURCE_CONTROL_TEXT_ACTION_ID_SET.has(actionId)) {
+  if (!AI_TEXT_ACTION_ID_SET.has(actionId)) {
     return null
+  }
+
+  if (
+    !selectedAgent &&
+    defaultTuiAgent &&
+    defaultTuiAgent !== 'blank' &&
+    !TEXT_GENERATION_AGENT_ID_SET.has(defaultTuiAgent)
+  ) {
+    const agentLabel = getAgentCatalog().find((agent) => agent.id === defaultTuiAgent)?.label
+    return translate(
+      'forflow.sourceControl.validation.inheritedAgent',
+      'The default agent, {{agent}}, cannot generate this text. Choose an agent for this action; your chat default stays the same.',
+      { agent: agentLabel ?? defaultTuiAgent }
+    )
   }
 
   if (selectedAgent && !isCustomAgentId(selectedAgent)) {

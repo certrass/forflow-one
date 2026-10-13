@@ -8,7 +8,7 @@ import { createStructuredCodexFixture } from './structured-codex-fixture'
 import { structuredAgentSessionCreateParams } from '../../src/shared/structured-agent-session-create'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from '../e2e/helpers/electron-process-shutdown'
 
-test('structured chat: opt-in, host journal, child agent and stop in the packaged app', async () => {
+test('structured chat: Chat UI, host journal, child agent, find and stop in the packaged app', async () => {
   const profile = privateProfile('structured-chat')
   const fixture = createStructuredCodexFixture(profile)
   const { app, page, errors } = await launch(profile, {
@@ -28,12 +28,6 @@ test('structured chat: opt-in, host journal, child agent and stop in the package
     if (!(await chatToggle.isChecked())) {
       await chatToggle.click()
     }
-    await page.getByRole('combobox', { name: '默认 Chat UI 视图', exact: true }).click()
-    await page.getByRole('option', { name: '聊天界面', exact: true }).click()
-    const toggle = page.getByRole('switch', { name: '切换新版结构化原生对话', exact: true })
-    await expect(toggle).not.toBeChecked()
-    await toggle.click()
-    await expect(toggle).toBeChecked()
     await page.keyboard.press('Escape')
     const sessionId = `codex_${randomUUID().replaceAll('-', '_')}`
     const params = structuredAgentSessionCreateParams({
@@ -72,6 +66,42 @@ test('structured chat: opt-in, host journal, child agent and stop in the package
     await expect.poll(ledger).toContain('turn/interrupt')
     await expect(chat).toHaveAttribute('data-native-chat-working', 'false')
     await page.screenshot({ path: path.join(evidence, 'structured-chat-stopped.png') })
+    await composer.click()
+    await composer.press('ControlOrMeta+f')
+    const findBar = chat.locator('[data-native-chat-find-bar="true"]')
+    await expect(findBar).toBeVisible()
+    await findBar.getByRole('textbox').fill('来源')
+    await expect(findBar).toContainText(/\d+\/[1-9]\d*/)
+    await page.screenshot({ path: path.join(evidence, 'structured-chat-find.png') })
+    await findBar.getByRole('textbox').press('Escape')
+    await expect(findBar).toHaveCount(0)
+    await chat
+      .getByText('已读取审阅材料，正在检查来源。', { exact: true })
+      .first()
+      .evaluate((element) => {
+        element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+        const range = document.createRange()
+        range.selectNodeContents(element)
+        const selection = window.getSelection()
+        if (!selection) {
+          throw new Error('Selection unavailable')
+        }
+        selection.removeAllRanges()
+        selection.addRange(range)
+        document.dispatchEvent(new Event('selectionchange'))
+        const rect = range.getBoundingClientRect()
+        element.dispatchEvent(
+          new MouseEvent('mouseup', {
+            bubbles: true,
+            button: 0,
+            clientX: rect.right,
+            clientY: rect.top
+          })
+        )
+      })
+    await page.getByRole('button', { name: '添加到聊天', exact: true }).dispatchEvent('click')
+    await expect(composer).toContainText('> 已读取审阅材料，正在检查来源。')
+    await page.screenshot({ path: path.join(evidence, 'structured-chat-quote.png') })
     expect(errors).toEqual([])
     expect(
       await app.evaluate(({ BrowserWindow }) =>

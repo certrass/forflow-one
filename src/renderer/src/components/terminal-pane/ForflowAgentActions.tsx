@@ -16,10 +16,13 @@ export function ForflowAgentActions({
   controller,
   isGit
 }: {
-  controller: TerminalPaneController
+  controller?: TerminalPaneController
   isGit: boolean
 }): React.JSX.Element {
-  const { activePane, activePaneCanContinueInNewSession, contextMenu, isActive } = controller
+  const activePane = controller?.activePane
+  const activePaneCanContinueInNewSession = controller?.activePaneCanContinueInNewSession
+  const contextMenu = controller?.contextMenu
+  const isActive = controller?.isActive
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,14 +32,14 @@ export function ForflowAgentActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {activePane && isActive && activePaneCanContinueInNewSession && (
+        {activePane && isActive && contextMenu && activePaneCanContinueInNewSession && (
           <AgentSessionContinuationMenuItem
             onSelect={() =>
               contextMenu.runForPane(activePane.id, contextMenu.onContinueAgentSessionInNewSession)
             }
           />
         )}
-        {activePane && isActive && isGit && (
+        {activePane && isActive && contextMenu && isGit && (
           <DropdownMenuItem
             onSelect={() =>
               contextMenu.runForPane(activePane.id, () => void contextMenu.onForkAgentSession())

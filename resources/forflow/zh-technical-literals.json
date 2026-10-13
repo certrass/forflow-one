@@ -558,6 +558,16 @@
     "auto.components.settings.terminal.search.bf09070e31": "bash",
     "auto.components.settings.terminal.search.d26257a80d": "zsh",
     "auto.components.settings.terminal.search.454df22a5e": "fish",
-    "auto.lib.agent.catalog.jcode_label": "Jcode"
+    "auto.lib.agent.catalog.jcode_label": "Jcode",
+    "settings.appearance.chat.pixels": "px",
+    "auto.components.NativeChatResumeOnRestartModal.sshHost": "SSH",
+    "auto.components.settings.managedServers.search.keywordSsh": "ssh",
+    "workspace.links.kind.github_pr": "GitHub PR",
+    "workspace.links.kind.gitlab_mr": "GitLab MR",
+    "workspace.links.kind.bitbucket_pr": "Bitbucket PR",
+    "workspace.links.kind.azure_devops_pr": "Azure DevOps PR",
+    "workspace.links.kind.gitea_pr": "Gitea PR",
+    "workspace.links.mrReference": "MR !{{number}}",
+    "workspace.links.prReference": "PR #{{number}}"
   }
 }

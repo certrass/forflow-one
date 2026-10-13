@@ -13,6 +13,9 @@ export type NativeChatComposerInput = Pick<
   insertText?: (text: string) => void
   insertSkill?: (from: number, to: number, token: string) => void
   insertFileReferences?: (paths: string[]) => void
+  /** Whether a collapsed caret sits on the first (`start`) or last (`end`) visual line,
+   *  counting wrapped lines, so an arrow key there has nowhere left to move it. */
+  isCaretOnVisualEdge?: (edge: 'start' | 'end') => boolean
 }
 
 export function insertNativeChatPastedText(

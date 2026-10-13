@@ -15,9 +15,7 @@ test('task actions lead to drafts and material review, then return to the origin
   Object.assign(seed.settings, {
     defaultTuiAgent: 'codex',
     agentCmdOverrides: { codex: fixture.command.trim() },
-    experimentalNativeChat: true,
-    experimentalStructuredNativeChat: false,
-    openAgentTabsInChatByDefault: true
+    experimentalNativeChat: false
   })
   writeFileSync(seedPath, JSON.stringify(seed))
   const { app, page, errors } = await launch(profile)
@@ -32,7 +30,17 @@ test('task actions lead to drafts and material review, then return to the origin
       path.join(profile, '测试项目', '方案说明.md'),
       '# 方案说明\n任务页提供新建、并行做方案和审阅结果三个入口。\n'
     )
+    await page.getByRole('button', { name: '新标签页', exact: true }).first().click()
+    await page.getByRole('combobox').filter({ visible: true }).fill('Codex')
+    await page
+      .locator('#tab-create-entry-results')
+      .getByRole('option')
+      .filter({ hasText: 'Codex' })
+      .first()
+      .click()
     const toolbar = page.locator('[data-forflow-session-toolbar]:visible').first()
+    await expect(toolbar.getByRole('button', { name: '对话', exact: true })).toBeEnabled()
+    await toolbar.getByRole('button', { name: '对话', exact: true }).click()
     const composer = page
       .locator('.native-chat-pane-shell:visible [contenteditable="true"]')
       .first()

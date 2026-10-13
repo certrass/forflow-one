@@ -40,8 +40,6 @@ export function applyForflowFreshProfileDefaults(
       minimaxEndpoint: 'cn',
       uiLanguage: 'zh',
       experimentalNativeChat: true,
-      openAgentTabsInChatByDefault: true,
-      experimentalStructuredNativeChat: false,
       artifactSharingEnabled: false,
       agentSkillSharingEnabled: false,
       showMobileButton: false

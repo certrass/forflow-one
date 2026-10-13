@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { useCallback, useRef, useState } from 'react'
 import {
   DEFAULT_SOURCE_CONTROL_AI_PR_CREATION_DEFAULTS,
@@ -41,6 +42,7 @@ export function useCreatePullRequestDialogFields({
 }: UseCreatePullRequestDialogFieldsOptions) {
   const resolvedPullRequestAi = settings
     ? resolveSourceControlAiForOperation({
+        translateError: translate,
         settings,
         repo,
         operation: 'pullRequest'
