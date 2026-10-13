@@ -1,3 +1,4 @@
+import { translate } from '@/i18n/i18n'
 import { useCallback, useMemo, useRef } from 'react'
 import { useAppStore } from '@/store'
 import { prChecksCacheSuffix, prCommentsCacheSuffix } from '@/store/github/cache-identity'
@@ -280,6 +281,7 @@ export function useChecksPanelReviewState(model: ChecksPanelReviewStateInput) {
       getRuntimeGitScope(settings, repo?.connectionId)
     )
     const resolved = resolveSourceControlAiForOperation({
+      translateError: translate,
       settings,
       repo,
       operation: 'pullRequest',

@@ -24,6 +24,14 @@ test('collaboration reuses session continuation and fork with source context', a
   try {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1250, 900))
     await addPrivateProject(page, profile)
+    await page.getByRole('button', { name: '新标签页', exact: true }).first().click()
+    await page.getByRole('combobox').filter({ visible: true }).fill('Claude')
+    await page
+      .locator('#tab-create-entry-results')
+      .getByRole('option')
+      .filter({ hasText: 'Claude' })
+      .first()
+      .click()
     const toolbar = page.locator('[data-forflow-session-toolbar]:visible').first()
     await expect(toolbar.getByRole('button', { name: '对话', exact: true })).toBeEnabled()
     await toolbar.getByRole('button', { name: '对话', exact: true }).click()
@@ -73,6 +81,7 @@ test('collaboration reuses session continuation and fork with source context', a
     })
     await continuation.getByRole('button', { name: '启动新会话', exact: true }).click()
     await expect(continuation).toHaveCount(0)
+    await toolbar.getByRole('button', { name: '对话', exact: true }).click()
     await expect(composer).toContainText(sourceTranscript)
     await expect(composer).toContainText('继续 Forflow One 中的上一项任务')
     await expect(page.getByText('上下文已放入新的 Claude 草稿，发送后即可继续。')).toBeVisible()

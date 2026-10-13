@@ -2,6 +2,7 @@ import type { BranchNameWorkContext } from '../../shared/branch-name-from-work'
 import type { ConversationNameContext } from '../../shared/conversation-name-generation'
 import type { CommitMessageDraftContext } from '../../shared/commit-message-generation'
 import { LOCAL_COMMIT_MESSAGE_HOST_KEY } from '../../shared/commit-message-host-key'
+import { getRuntimeDesktopSurface } from '../runtime/runtime-desktop-surface'
 import type { CommitMessagePlan } from '../../shared/commit-message-plan'
 import type { CommandTemplateBackslash } from '../../shared/commit-message-prompt'
 import type { GlobalSettings } from '../../shared/global-settings-types'
@@ -71,6 +72,7 @@ export function resolveCommitMessageSettings(
   repo?: Pick<Repo, 'sourceControlAi'> | null
 ): ResolveCommitMessageSettingsResult {
   const resolved = resolveSourceControlAiForOperation({
+    translateError: getRuntimeDesktopSurface().translateNotification,
     settings,
     repo,
     operation,

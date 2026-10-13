@@ -30,6 +30,10 @@ for (const previousChatDefault of [false, true]) {
       await page.screenshot({
         path: path.join(evidence, `chat-settings-migration-${previousChatDefault}.png`)
       })
+      const settings = await page.evaluate(() => window.api.settings.get())
+      expect(settings.experimentalNativeChat).toBe(previousChatDefault)
+      expect(settings).not.toHaveProperty('openAgentTabsInChatByDefault')
+      expect(settings).not.toHaveProperty('experimentalStructuredNativeChat')
       expect(errors).toEqual([])
       expect(
         await app.evaluate(({ BrowserWindow }) =>
@@ -40,17 +44,24 @@ for (const previousChatDefault of [false, true]) {
       await closeElectronAppForE2E(app)
       await cleanupE2EDaemons(profile)
     }
-    const saved = JSON.parse(readFileSync(profilePath, 'utf8'))
-    expect(saved.settings.experimentalNativeChat).toBe(previousChatDefault)
-    expect(saved.settings).not.toHaveProperty('openAgentTabsInChatByDefault')
-    expect(saved.settings).not.toHaveProperty('experimentalStructuredNativeChat')
+    const restarted = await launch(profile)
+    try {
+      const settings = await restarted.page.evaluate(() => window.api.settings.get())
+      expect(settings.experimentalNativeChat).toBe(previousChatDefault)
+      expect(settings).not.toHaveProperty('openAgentTabsInChatByDefault')
+      expect(settings).not.toHaveProperty('experimentalStructuredNativeChat')
+      expect(restarted.errors).toEqual([])
+    } finally {
+      await closeElectronAppForE2E(restarted.app)
+      await cleanupE2EDaemons(profile)
+    }
     writeFileSync(
       path.join(evidence, `chat-settings-migration-${previousChatDefault}.json`),
       JSON.stringify(
         {
           packageFingerprint,
           previousChatDefault,
-          currentChatDefault: saved.settings.experimentalNativeChat,
+          currentChatDefault: previousChatDefault,
           obsoleteFieldsRemoved: true
         },
         null,

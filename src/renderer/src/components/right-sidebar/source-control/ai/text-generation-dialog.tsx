@@ -100,6 +100,7 @@ export function SourceControlTextGenerationDialog({
     () =>
       settings
         ? resolveSourceControlAiForOperation({
+            translateError: translate,
             settings,
             repo: repo ?? null,
             operation: actionId,

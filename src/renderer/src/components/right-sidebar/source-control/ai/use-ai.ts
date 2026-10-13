@@ -72,6 +72,7 @@ export function useSourceControlAi({
     () =>
       settings
         ? resolveSourceControlAiForOperation({
+            translateError: translate,
             settings,
             repo: activeRepo,
             operation: 'commitMessage',
@@ -85,6 +86,7 @@ export function useSourceControlAi({
       return DEFAULT_SOURCE_CONTROL_AI_PR_CREATION_DEFAULTS
     }
     const resolved = resolveSourceControlAiForOperation({
+      translateError: translate,
       settings,
       repo: activeRepo,
       operation: 'pullRequest',

@@ -3671,6 +3671,22 @@
         "resolveComments": "Review comment resolution",
         "resolveConflicts": "Conflict resolution"
       },
+      "validation": {
+        "chat": {
+          "chooseAgent": "The default agent cannot generate this text. Choose an agent in Settings → Chat → Chat names.",
+          "emptyCommand": "Enter a custom command in Settings → Chat → Chat names.",
+          "emptyTemplate": "Enter a command template for this action in Settings → Chat → Chat names.",
+          "missingModel": "No model is available. Choose a model or another agent in Settings → Chat → Chat names.",
+          "unsupportedAgent": "The selected agent cannot generate this text. Choose another agent in Settings → Chat → Chat names."
+        },
+        "git": {
+          "chooseAgent": "The default agent cannot generate this text. Choose an agent in Settings → Git → Source Control AI.",
+          "emptyCommand": "Enter a custom command in Settings → Git → Source Control AI.",
+          "emptyTemplate": "Enter a command template for this action in Settings → Git → Source Control AI.",
+          "missingModel": "No model is available. Choose a model or another agent in Settings → Git → Source Control AI.",
+          "unsupportedAgent": "The selected agent cannot generate this text. Choose another agent in Settings → Git → Source Control AI."
+        }
+      },
       "variables": {
         "assistantMessage": "The initial agent response, when Orca has one available.",
         "baseBranch": "The target branch selected in the Create PR composer.",
@@ -3790,6 +3806,8 @@
     },
     "workbench": {
       "changesHint": "Inspect changed files in this workspace",
+      "enableError": "Could not enable chat. Please try again.",
+      "enableHint": "Choose Chat to enable the conversation view",
       "files": "Files and results",
       "parallel": "Parallel task",
       "parallelHint": "Create a separate workspace for another task",

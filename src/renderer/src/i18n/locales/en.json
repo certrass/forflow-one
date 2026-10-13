@@ -20217,6 +20217,23 @@
         "firstPrompt": "The first user request that created the Orca workspace.",
         "assistantMessage": "The initial agent response, when Orca has one available.",
         "linkedIssue": "The GitHub issue number linked to this workspace. Empty when no GitHub issue is linked (including GitLab-linked workspaces). Prefer instructional templates: a bare \"Fixes #{linkedIssue}\" becomes \"Fixes #\" when unlinked."
+      },
+      "validation": {
+        "inheritedAgent": "The default agent, {{agent}}, cannot generate this text. Choose an agent for this action; your chat default stays the same.",
+        "git": {
+          "chooseAgent": "The default agent cannot generate this text. Choose an agent in Settings → Git → Source Control AI.",
+          "unsupportedAgent": "The selected agent cannot generate this text. Choose another agent in Settings → Git → Source Control AI.",
+          "emptyCommand": "Enter a custom command in Settings → Git → Source Control AI.",
+          "emptyTemplate": "Enter a command template for this action in Settings → Git → Source Control AI.",
+          "missingModel": "No model is available. Choose a model or another agent in Settings → Git → Source Control AI."
+        },
+        "chat": {
+          "chooseAgent": "The default agent cannot generate this text. Choose an agent in Settings → Chat → Chat names.",
+          "unsupportedAgent": "The selected agent cannot generate this text. Choose another agent in Settings → Chat → Chat names.",
+          "emptyCommand": "Enter a custom command in Settings → Chat → Chat names.",
+          "emptyTemplate": "Enter a command template for this action in Settings → Chat → Chat names.",
+          "missingModel": "No model is available. Choose a model or another agent in Settings → Chat → Chat names."
+        }
       }
     },
     "accessibility": {

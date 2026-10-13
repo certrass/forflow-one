@@ -9,6 +9,7 @@ import {
   type CustomAgentId,
   getCommitMessageAgentCapability,
   isCustomAgentId,
+  type DefaultTuiAgentPreference,
   listCommitMessageAgentCapabilities
 } from '../../../../shared/commit-message-agent-spec'
 import { getAgentCatalog, type AgentCatalogEntry } from '@/lib/agent-catalog'
@@ -137,10 +138,25 @@ export function getSourceControlActionAgentSupportText(actionId: AiActionId): st
 
 export function getSourceControlActionAgentWarningText(
   actionId: AiActionId,
-  selectedAgent: TuiAgent | CustomAgentId | null | undefined
+  selectedAgent: TuiAgent | CustomAgentId | null | undefined,
+  defaultTuiAgent?: DefaultTuiAgentPreference
 ): string | null {
   if (!AI_TEXT_ACTION_ID_SET.has(actionId)) {
     return null
+  }
+
+  if (
+    !selectedAgent &&
+    defaultTuiAgent &&
+    defaultTuiAgent !== 'blank' &&
+    !TEXT_GENERATION_AGENT_ID_SET.has(defaultTuiAgent)
+  ) {
+    const agentLabel = getAgentCatalog().find((agent) => agent.id === defaultTuiAgent)?.label
+    return translate(
+      'forflow.sourceControl.validation.inheritedAgent',
+      'The default agent, {{agent}}, cannot generate this text. Choose an agent for this action; your chat default stays the same.',
+      { agent: agentLabel ?? defaultTuiAgent }
+    )
   }
 
   if (selectedAgent && !isCustomAgentId(selectedAgent)) {

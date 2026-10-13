@@ -64,6 +64,7 @@ export type ResolveSourceControlAiResult =
   | { ok: false; error: string }
 
 type ResolveSourceControlAiInput = {
+  translateError?: (key: string, fallback: string) => string
   settings: Pick<
     GlobalSettings,
     'defaultTuiAgent' | 'agentCmdOverrides' | 'commitMessageAi' | 'sourceControlAi'
@@ -123,6 +124,11 @@ export function resolveSourceControlAiForOperation(
       ? 'Settings -> Chat -> Chat names'
       : 'Settings -> Git -> Source Control AI'
   const agentPurpose = input.operation === 'conversationName' ? 'chat name' : 'Source Control AI'
+  const errorCopy = (kind: string, fallback: string): string =>
+    input.translateError?.(
+      `forflow.sourceControl.validation.${input.operation === 'conversationName' ? 'chat' : 'git'}.${kind}`,
+      fallback
+    ) ?? fallback
   const prCreationDefaults = resolvePrCreationDefaults(
     source,
     repoOverrides,
@@ -132,7 +138,10 @@ export function resolveSourceControlAiForOperation(
   if (!actionRecipe.commandInputTemplate.trim()) {
     return {
       ok: false,
-      error: `Command template is empty for ${OPERATION_LABEL[input.operation]}.`
+      error: errorCopy(
+        'emptyTemplate',
+        `Command template is empty for ${OPERATION_LABEL[input.operation]}.`
+      )
     }
   }
   const preferredAgent = hasActionAgentRecipe(actionRecipe) ? actionRecipe.agentId : source.agentId
@@ -144,7 +153,10 @@ export function resolveSourceControlAiForOperation(
   if (!agentChoice) {
     return {
       ok: false,
-      error: `Choose a supported ${agentPurpose} agent for this action in ${settingsPath}. ${supportedAgentSummary()}`
+      error: errorCopy(
+        'chooseAgent',
+        `Choose a supported ${agentPurpose} agent for this action in ${settingsPath}. ${supportedAgentSummary()}`
+      )
     }
   }
 
@@ -164,7 +176,7 @@ export function resolveSourceControlAiForOperation(
     if (!customAgentCommand) {
       return {
         ok: false,
-        error: `Custom command is empty. Add one in ${settingsPath}.`
+        error: errorCopy('emptyCommand', `Custom command is empty. Add one in ${settingsPath}.`)
       }
     }
     return {
@@ -194,14 +206,20 @@ export function resolveSourceControlAiForOperation(
   if (!resolvedAgent || isCustomAgentId(resolvedAgent)) {
     return {
       ok: false,
-      error: `Choose a supported ${agentPurpose} agent for this action in ${settingsPath}. ${supportedAgentSummary()}`
+      error: errorCopy(
+        'chooseAgent',
+        `Choose a supported ${agentPurpose} agent for this action in ${settingsPath}. ${supportedAgentSummary()}`
+      )
     }
   }
   const spec = getCommitMessageAgentSpec(resolvedAgent)
   if (!spec) {
     return {
       ok: false,
-      error: `Agent "${resolvedAgent}" does not support ${input.operation === 'conversationName' ? '' : 'Source Control AI '}${OPERATION_LABEL[input.operation]}. ${supportedAgentSummary()}`
+      error: errorCopy(
+        'unsupportedAgent',
+        `Agent "${resolvedAgent}" does not support ${input.operation === 'conversationName' ? '' : 'Source Control AI '}${OPERATION_LABEL[input.operation]}. ${supportedAgentSummary()}`
+      )
     }
   }
   const hostKey = input.discoveryHostKey ?? LOCAL_COMMIT_MESSAGE_HOST_KEY
@@ -228,7 +246,10 @@ export function resolveSourceControlAiForOperation(
         : defaultModelId
     )
   if (!model) {
-    return { ok: false, error: `No model is available for ${spec.label}.` }
+    return {
+      ok: false,
+      error: errorCopy('missingModel', `No model is available for ${spec.label}.`)
+    }
   }
   const thinkingLevel = resolveThinkingLevel({
     model,
