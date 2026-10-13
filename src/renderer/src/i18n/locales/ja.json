@@ -10888,7 +10888,7 @@
                   "fixChecks": "失敗したホスト型レビューチェックから Agent を開始します。",
                   "resolveConflicts": "ローカルまたはホストされたレビューのマージ競合に対して Agent を開始します。",
                   "customCommand": "カスタムコマンド",
-                  "supportedAgents": "このレシピでサポートされている Agent: {{value0}}。",
+                  "supportedAgents": "Codex、Claude などの対応Agent、またはカスタムコマンドを選択してください。",
                   "unsupportedSavedAgent": "{{value0}} はこのテキスト生成レシピを実行できません。以下からサポートされている Agent のいずれかを選択してください。",
                   "resolveComments": "選択した未解決の PR または MR コメントから Agent を開始します。",
                   "fixPushFailure": "pre-pushフックまたはgit pushが失敗したときに Agent を起動します。"
@@ -17905,8 +17905,7 @@
         "agentNotSignedIn": "{{agent}} にサインインしてください。",
         "thenSendAgain": "その後、メッセージをもう一度送信してください。",
         "runCommandWhenDone": "終わったら /{{command}} を実行してください。",
-        "commandAfterAnswer": "Agent の質問または承認に回答してから、/{{command}} を実行してください。",
-        "sessionNotRestored": "{{agent}} は以前のセッションを再開できなかったため、このチャットは新しいセッションで続行します。{{agent}} は以前のメッセージを覚えていません。"
+        "commandAfterAnswer": "Agent の質問または承認に回答してから、/{{command}} を実行してください。"
       },
       "writeNotice": {
         "notDoneReadHistory": "このチャットの履歴を読み込めませんでした。",

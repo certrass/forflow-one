@@ -10851,7 +10851,7 @@
                   "fixChecks": "실패한 호스팅 PR 체크에서 agent를 시작합니다.",
                   "resolveConflicts": "로컬 또는 호스팅 PR 병합 충돌에 대한 agent를 시작합니다.",
                   "customCommand": "사용자 지정 명령",
-                  "supportedAgents": "이 레시피에 지원되는 agent: {{value0}}.",
+                  "supportedAgents": "Codex, Claude 등 지원되는 Agent를 선택하거나 사용자 지정 명령을 사용하세요.",
                   "unsupportedSavedAgent": "{{value0}}은(는) 이 텍스트 생성 레시피를 실행할 수 없습니다. 아래에서 지원되는 agent 중 하나를 선택하세요.",
                   "resolveComments": "선택한 해결되지 않은 PR 또는 MR 댓글에서 agent를 시작합니다.",
                   "fixPushFailure": "pre-push 훅이나 git push가 실패할 때 에이전트를 시작합니다."
@@ -17905,8 +17905,7 @@
         "agentNotSignedIn": "{{agent}}에 로그인하세요.",
         "thenSendAgain": "그런 다음 메시지를 다시 보내세요.",
         "runCommandWhenDone": "작업이 끝나면 /{{command}}을(를) 실행하세요.",
-        "commandAfterAnswer": "에이전트의 질문 또는 승인에 응답한 다음 /{{command}}을(를) 실행하세요.",
-        "sessionNotRestored": "{{agent}}이(가) 이전 세션을 다시 열 수 없어 이 채팅은 새 세션에서 계속됩니다. {{agent}}은(는) 이전 메시지를 기억하지 않습니다."
+        "commandAfterAnswer": "에이전트의 질문 또는 승인에 응답한 다음 /{{command}}을(를) 실행하세요."
       },
       "writeNotice": {
         "notDoneReadHistory": "이 채팅의 기록을 불러오지 못했습니다.",

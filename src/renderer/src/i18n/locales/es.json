@@ -10866,7 +10866,7 @@
                   "fixChecks": "Inicia un agente a partir de checks fallidos de una review alojada.",
                   "resolveConflicts": "Inicia un agente para conflictos de merge locales o de una review alojada.",
                   "customCommand": "Comando personalizado",
-                  "supportedAgents": "Agentes compatibles con esta receta: {{value0}}.",
+                  "supportedAgents": "Elige Codex, Claude u otro agente compatible, o usa un comando personalizado.",
                   "unsupportedSavedAgent": "{{value0}} no puede ejecutar esta acción de generación de texto. Elige uno de los agentes compatibles a continuación.",
                   "resolveComments": "Inicia un agente a partir de comentarios de PR o MR sin resolver seleccionados.",
                   "fixPushFailure": "Inicia un agente cuando falla un hook pre-push o un git push."
@@ -17870,8 +17870,7 @@
         "agentNotSignedIn": "Inicia sesión en {{agent}}.",
         "thenSendAgain": "Después, envía tu mensaje de nuevo.",
         "runCommandWhenDone": "Ejecute /{{command}} cuando termine.",
-        "commandAfterAnswer": "Responda a la pregunta o aprobación del agente y luego ejecute /{{command}}.",
-        "sessionNotRestored": "{{agent}} no pudo reabrir su sesión anterior, así que este chat continúa en una nueva. {{agent}} no recuerda los mensajes anteriores."
+        "commandAfterAnswer": "Responda a la pregunta o aprobación del agente y luego ejecute /{{command}}."
       },
       "writeNotice": {
         "notDoneReadHistory": "No se pudo cargar el historial de este chat.",
