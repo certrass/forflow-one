@@ -1,4 +1,11 @@
 export const FORFLOW_COMMAND_SUMMARIES: Readonly<Record<string, string>> = {
+  'environment status': '查看托管服务器的版本、终端和待处理工作',
+  'environment update': '将托管服务器更新到当前应用版本',
+  'environment rollback': '将托管服务器恢复到上一版本',
+  'environment recover': '完成或撤销中断的服务器更新、回退或停止操作',
+  'environment stop': '停止托管服务器并取消本机关联',
+  'environment forget': '移除已无法连接的托管服务器关联',
+  'environment cancel-stop': '撤回尚未执行的服务器停止操作',
   'host name': '读取或设置执行主机向客户端报告的名称',
   'profile state exports': '列出保留的配置备份与导出文件',
   'profile state rollback': '从保留的配置备份恢复状态，或保留当前 JSON 配置',

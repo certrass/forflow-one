@@ -27,7 +27,6 @@ describe('reviewable task prompt in existing workspace launch paths', () => {
         prompt: '',
         draftPrompt: goal,
         settings: null,
-        repoConnectionId: platform === 'linux' ? 'ssh-1' : null,
         platform,
         shell: platform === 'win32' ? 'cmd' : 'posix',
         isRemote: platform === 'linux',

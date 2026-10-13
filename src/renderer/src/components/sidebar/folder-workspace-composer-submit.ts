@@ -10,7 +10,6 @@ import type { ProjectGroup } from '../../../../shared/project-group-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import { resolveLocalWindowsAgentStartupShell } from '../../../../shared/windows-terminal-shell'
 import type { LaunchSource } from '../../../../shared/telemetry-events'
-import type { SessionOptionValue } from '../../../../shared/native-chat-session-options'
 import type { TaskSourceContext } from '../../../../shared/task-source-context'
 import { folderWorkspaceKey } from '../../../../shared/workspace-scope'
 import {
@@ -57,7 +56,6 @@ type SubmitFolderWorkspaceCreateParams = {
   agentCmdOverrides: Record<string, string> | undefined
   agentArgs?: string | null
   agentEnv?: Record<string, string>
-  sessionOptions?: Record<string, SessionOptionValue>
   terminalWindowsShell?: string | null
   isRemote?: boolean
   launchSource?: LaunchSource
@@ -79,7 +77,6 @@ export async function submitFolderWorkspaceCreate({
   agentCmdOverrides,
   agentArgs,
   agentEnv,
-  sessionOptions,
   terminalWindowsShell,
   launchSource = 'sidebar',
   runtimeEnvironmentId = null,
@@ -111,7 +108,6 @@ export async function submitFolderWorkspaceCreate({
           agentCmdOverrides,
           agentArgs,
           agentEnv,
-          sessionOptions,
           platform: launchPlatform,
           shell: launchShell,
           isRemote: launchIsRemote
@@ -123,7 +119,6 @@ export async function submitFolderWorkspaceCreate({
             cmdOverrides: agentCmdOverrides ?? {},
             agentArgs,
             agentEnv,
-            sessionOptions,
             platform: launchPlatform,
             shell: launchShell,
             isRemote: launchIsRemote,
@@ -146,8 +141,7 @@ export async function submitFolderWorkspaceCreate({
           executionHostId: getNewWorkspaceProjectGroupHostId(projectGroup)
         },
         prompt: launchDraftPrompt ?? note,
-        promptDelivery: launchDraftPrompt ? 'draft' : 'auto-submit',
-        initialSessionOptions: startupPlan?.sessionOptions
+        promptDelivery: launchDraftPrompt ? 'draft' : 'auto-submit'
       })
     : null
   const structuredLaunch = plan?.route === 'structured-native-chat'
@@ -188,11 +182,7 @@ export async function submitFolderWorkspaceCreate({
           launchConfig: startupPlan.launchConfig,
           ...(startupPlan.launchToken ? { launchToken: startupPlan.launchToken } : {}),
           launchAgent: quickAgent,
-          ...(startupPlan.sessionOptions ? { sessionOptions: startupPlan.sessionOptions } : {}),
           ...(startupPlan.draftPrompt ? { draftPrompt: startupPlan.draftPrompt } : {}),
-          // Why: view-mode only. The argv-prefill plan sets no draftPrompt, so
-          // without this the tab opens in chat with nothing mirrored into it.
-          ...(launchDraftPrompt ? { launchDraftText: launchDraftPrompt } : {}),
           ...(startupPlan.startupCommandDelivery
             ? { startupCommandDelivery: startupPlan.startupCommandDelivery }
             : {}),

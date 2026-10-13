@@ -16,6 +16,7 @@ import { promptForGpuFallbackRestart } from '../crash-reporting/gpu-fallback-res
 import { engageGpuFallbackAfterCrashBurst } from '../crash-reporting/gpu-fallback-engagement'
 import { recordCrashBreadcrumb } from '../crash-reporting/crash-breadcrumb-store'
 import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
+import { GpuCrashDiagnosticsRecorder } from '../crash-reporting/gpu-crash-diagnostics'
 import {
   isInstallDirAclRepairExhausted,
   isInstallDirAclRepairPending,
@@ -26,6 +27,19 @@ import { mainProcessState as state, gpuFallbackEnvironment } from './main-proces
 import { createGpuAccelerationAboutPanelOptions } from '../menu/gpu-acceleration-about-panel'
 import { translateMain } from '../i18n/main-i18n'
 import { isForflowBuild } from '../../shared/product-branding'
+
+export function createGpuCrashDiagnosticsRecorder(): GpuCrashDiagnosticsRecorder | null {
+  if (process.platform !== 'win32') {
+    return null
+  }
+  return new GpuCrashDiagnosticsRecorder({
+    provider: {
+      getGPUInfo: (infoType) => app.getGPUInfo(infoType),
+      getGPUFeatureStatus: () => app.getGPUFeatureStatus()
+    },
+    recordBreadcrumb: (data) => recordDurableCrashBreadcrumb('gpu_crash_hardware', data)
+  })
+}
 
 export function updateGpuAccelerationAboutPanel(): void {
   app.setAboutPanelOptions(

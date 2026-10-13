@@ -20,11 +20,7 @@ execFileSync(
   process.execPath,
   [
     pnpm,
-    'exec',
-    'vitest',
-    'run',
-    '--config',
-    'config/vitest.config.ts',
+    'test',
     ...suite,
     ...process.argv.slice(2),
     '--reporter=default',

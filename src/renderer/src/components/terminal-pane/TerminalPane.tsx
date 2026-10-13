@@ -1,17 +1,11 @@
-import { forwardRef } from 'react'
 import { TerminalPaneSurface } from './TerminalPaneSurface'
 import { useTerminalPaneController } from './use-terminal-pane-controller'
-import type { TerminalPaneHandle, TerminalPaneProps } from './terminal-pane-types'
+import type { TerminalPaneProps } from './terminal-pane-types'
 import { isForflowBuild } from '../../../../shared/product-branding'
 import { ForflowSessionToolbar } from './ForflowSessionToolbar'
 
-export type { TerminalPaneHandle } from './terminal-pane-types'
-
-function TerminalPane(
-  props: TerminalPaneProps,
-  ref: React.ForwardedRef<TerminalPaneHandle>
-): React.JSX.Element {
-  const controller = useTerminalPaneController(props, ref)
+export default function TerminalPane(props: TerminalPaneProps): React.JSX.Element {
+  const controller = useTerminalPaneController(props)
   if (!isForflowBuild() || props.showSplitButton === false) {
     return <TerminalPaneSurface controller={controller} />
   }
@@ -24,5 +18,3 @@ function TerminalPane(
     </div>
   )
 }
-
-export default forwardRef(TerminalPane)

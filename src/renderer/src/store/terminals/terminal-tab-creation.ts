@@ -1,3 +1,5 @@
+import { isCompanionAgent } from '../../../../shared/forflow-companion'
+import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { warnIfZCodeCannotOpenSession } from '@/components/terminal-pane/zcode-missing-tui-notice'
 import { clearWorktreeSleepIntent } from '@/lib/worktree-sleep-intent'
 import type { TerminalTab } from '../../../../shared/terminal-tab-types'
@@ -17,6 +19,7 @@ import {
   updateGroup
 } from '../slices/tab-group-state'
 import { createBrowserUuid } from '@/lib/browser-uuid'
+import { ownsGlobalSelection } from '../global-selection-owner'
 import { getLocalProjectExecutionRuntimeContext } from '@/lib/local-preflight-context'
 import type { TerminalSlice, TerminalStoreGet, TerminalStoreSet } from './terminal-state'
 import {
@@ -87,8 +90,9 @@ export function createTerminalTabCreationActions(
             ? options.initialLeafId
             : undefined
         // Why: startup delivery is pane-owned; pin its first leaf so an aborted/remounted renderer retries against the same spawn reservation.
+        // Why a bare leaf id too: a host launch lays out its pane before the process it attaches to exists.
         const initialLeafId =
-          options?.initialPtyId || options?.pendingStartup
+          options?.initialPtyId || options?.pendingStartup || requestedInitialLeafId
             ? (requestedInitialLeafId ?? createBrowserUuid())
             : undefined
         const shouldActivate = options?.activate !== false
@@ -97,6 +101,12 @@ export function createTerminalTabCreationActions(
         const quickCommandLabel = options?.quickCommandLabel?.trim()
         const startupCwd = options?.startupCwd
         const remoteConnectionId = getRemoteConnectionIdForWorktree(s, worktreeId)
+        const viewMode =
+          options?.viewMode ??
+          (isCompanionAgent(options?.launchAgent) &&
+          isNativeChatTranscriptLocalReadable(remoteConnectionId)
+            ? 'chat'
+            : undefined)
         const isRemoteWorktree = Boolean(remoteConnectionId)
         const isWslWorktree = worktreeUsesWslPath(s, worktreeId)
         const createdShellOverride = resolveCreatedTabShellOverride(
@@ -131,6 +141,8 @@ export function createTerminalTabCreationActions(
           ...(startupCwd && startupCwd.length > 0 ? { startupCwd } : {}),
           ...(options?.forceHostRuntime ? { forceHostRuntime: true } : {}),
           ...(options?.launchAgent ? { launchAgent: options.launchAgent } : {}),
+          ...(viewMode ? { viewMode } : {}),
+          ...(options?.agentLaunchPane ? { agentLaunchPane: options.agentLaunchPane } : {}),
           // Why: mark click-caused (not work-caused) spawns so updateTabPtyId skips the activity/sortEpoch bump that would reorder Recent/Smart on click.
           ...(options?.pendingActivationSpawn ? { pendingActivationSpawn: true } : {})
         }
@@ -206,7 +218,7 @@ export function createTerminalTabCreationActions(
           sortOrder: cleanedGroupOrder.length,
           createdAt: tab.createdAt,
           // Why: omit for non-agent tabs so they keep the implicit 'terminal' view mode.
-          ...(options?.viewMode ? { viewMode: options.viewMode } : {})
+          ...(viewMode ? { viewMode } : {})
         }
         const nextGroupOrder = dedupeTabOrder([...cleanedGroupOrder, unifiedTab.id])
         const nextRecent = shouldActivate
@@ -249,9 +261,8 @@ export function createTerminalTabCreationActions(
             ...s.layoutByWorktree,
             [worktreeId]: s.layoutByWorktree[worktreeId] ?? { type: 'leaf', groupId: group.id }
           },
-          // Why: the global selection is the main window's; a tab in another worktree (or the floating workspace) activates only within its own group.
           activeTabId:
-            shouldActivate && s.activeWorktreeId === worktreeId
+            shouldActivate && ownsGlobalSelection(s, worktreeId)
               ? tab.id
               : orphanCleanupPatch.activeTabId,
           activeTabIdByWorktree: {

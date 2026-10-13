@@ -1,6 +1,7 @@
+import { FORFLOW_COMPANION_AGENT_CONFIG } from './forflow-companion-agent-config'
 import type { TuiAgent } from './tui-agent'
 import { getOrcaCliCommandNameForPlatform } from './orca-cli-command-name'
-import type { TuiAgentConfig } from './tui-agent-config-types'
+import type { TuiAgentConfig, TuiAgentConfigSource } from './tui-agent-config-types'
 
 export type {
   AgentPromptInjectionMode,
@@ -9,12 +10,6 @@ export type {
   TuiAgentConfig,
   TuiAgentDetectionRuntime
 } from './tui-agent-config-types'
-
-/** Authoring form: `launchCmd` and `expectedProcess` default to `detectCmd` (true for most agents). */
-type TuiAgentConfigSource = Omit<TuiAgentConfig, 'launchCmd' | 'expectedProcess'> & {
-  launchCmd?: string
-  expectedProcess?: string
-}
 
 function resolveTuiAgentConfig(source: TuiAgentConfigSource): TuiAgentConfig {
   return {
@@ -25,24 +20,7 @@ function resolveTuiAgentConfig(source: TuiAgentConfigSource): TuiAgentConfig {
 }
 
 const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
-  aily: {
-    detectCmd: 'lark-cli',
-    detectRequiredCommands: ['forflow'],
-    launchCmd: 'forflow aily',
-    expectedProcess: 'forflow-aily',
-    promptInjectionMode: 'argv',
-    argvPromptSeparator: '--',
-    draftPromptFlag: '--prefill'
-  },
-  workbuddy: {
-    detectCmd: 'workbuddy',
-    detectRequiredCommands: ['forflow'],
-    launchCmd: 'forflow workbuddy',
-    expectedProcess: 'forflow-workbuddy',
-    promptInjectionMode: 'argv',
-    argvPromptSeparator: '--',
-    draftPromptFlag: '--prefill'
-  },
+  ...FORFLOW_COMPANION_AGENT_CONFIG,
   claude: {
     detectCmd: 'claude',
     promptInjectionMode: 'argv',
@@ -297,7 +275,9 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     submitRetryDelayMs: 1200
   },
   rovo: {
-    detectCmd: 'rovo',
+    // Why: Rovo Dev is an `acli` subcommand with no binary of its own on PATH; `acli rovodev run [instruction]` is one-shot.
+    detectCmd: 'acli',
+    launchCmd: 'acli rovodev run',
     promptInjectionMode: 'stdin-after-start'
   },
   hermes: {

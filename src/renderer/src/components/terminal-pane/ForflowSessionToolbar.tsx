@@ -58,7 +58,7 @@ export function ForflowSessionToolbar({
   } = controller
   const agent = resolveAgentForLeaf(activePane?.leafId ?? null)
   const chatSelected = effectiveChatViewMode && activePaneIsChatLeaf
-  const chatSupported = controller.isChatEligibleForLeaf(activePane?.leafId ?? null, true)
+  const chatSupported = controller.isChatEligibleForLeaf(activePane?.leafId ?? null)
   const canOpenChat = activePaneCanToggleChat || chatSupported
   const status = !canOpenChat
     ? agent
@@ -86,7 +86,7 @@ export function ForflowSessionToolbar({
         current.activePane?.leafId !== expected.leafId ||
         current.resolveAgentForLeaf(expected.leafId) !== expected.agent ||
         !current.isActive ||
-        !current.isChatEligibleForLeaf(expected.leafId, true)
+        !current.isChatEligibleForLeaf(expected.leafId)
       ) {
         return
       }

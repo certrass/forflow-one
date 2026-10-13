@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 export function shouldShowNativeChatWorking(args: {
   isConversation: boolean
   working: boolean
@@ -32,4 +34,36 @@ export function shouldClearNativeChatWorkingSuppression(args: {
     return true
   }
   return false
+}
+
+export function useNativeChatWorkingSuppression({
+  working,
+  interrupted,
+  workingEpoch,
+  setInterrupted
+}: {
+  working: boolean
+  interrupted: boolean
+  workingEpoch: number | null
+  setInterrupted: (value: boolean) => void
+}): void {
+  const previousWorkingEpochRef = useRef<number | null>(null)
+  useEffect(() => {
+    if (
+      shouldClearNativeChatWorkingSuppression({
+        working: working,
+        interrupted: interrupted,
+        workingEpoch: workingEpoch,
+        previousWorkingEpoch: previousWorkingEpochRef.current
+      })
+    ) {
+      setInterrupted(false)
+    }
+    if (working && workingEpoch != null) {
+      previousWorkingEpochRef.current = workingEpoch
+    }
+    if (!working) {
+      previousWorkingEpochRef.current = null
+    }
+  }, [working, interrupted, workingEpoch, setInterrupted])
 }

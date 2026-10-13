@@ -1,3 +1,4 @@
+import { getPendingSetupDetail } from './project-host-setup-detail'
 import { translate } from '@/i18n/i18n'
 import {
   getExecutionHostLabel,
@@ -9,6 +10,7 @@ import {
 import type { ExecutionHostRegistryEntry } from '../../../shared/execution-host-registry'
 import { isHostLocalProjectId } from '../../../shared/project-host-setup-projection'
 import { isEphemeralVmRuntimeEnvironment } from '../../../shared/runtime-environments'
+import { isMergedAwayExecutionHost } from '../../../shared/managed-orcad-execution-host'
 import {
   PROJECT_HOST_SETUP_RUNTIME_CAPABILITY,
   WORKSPACE_RUN_CONTEXT_RUNTIME_CAPABILITY
@@ -173,7 +175,10 @@ function buildNeedsSetupOptions({
       (host) =>
         !readySetupByHost.has(host.id) &&
         !isEphemeralVmProjectHost(host) &&
-        !isRuntimeOwnedSshSetupHost(host.id)
+        !isRuntimeOwnedSshSetupHost(host.id) &&
+        !isMergedAwayExecutionHost(host) &&
+        // Why: a machine whose other id already holds the project shows that ready row only.
+        !host.aliasHostIds?.some((aliasHostId) => readySetupByHost.has(aliasHostId))
     )
     .map((host) => {
       const pendingSetup = pendingSetupByHost.get(host.id)
@@ -300,24 +305,6 @@ function getHostConnectAction(
     return { kind: 'runtime', environmentId: parsed.environmentId }
   }
   return undefined
-}
-
-function getPendingSetupDetail(setup: ProjectHostSetup): string {
-  switch (setup.setupState) {
-    case 'not-set-up':
-      return translate(
-        'forflow.desktopCopy.9c40dd9bfb',
-        'Project tracked on this host but not set up'
-      )
-    case 'setting-up':
-      return translate('forflow.desktopCopy.4919551845', 'Project setup is in progress')
-    case 'error':
-      return translate('forflow.desktopCopy.7e9727e4aa', 'Project setup needs attention')
-    case 'unsupported':
-      return translate('forflow.desktopCopy.e379e914c5', 'Project is unsupported on this host')
-    case 'ready':
-      return setup.path
-  }
 }
 
 function compareProjectHostSetupOptions(

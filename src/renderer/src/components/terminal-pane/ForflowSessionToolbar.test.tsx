@@ -180,7 +180,7 @@ describe('Forflow session toolbar', () => {
   })
 })
 
-it.each(['Continue in New Session…', 'Fork Agent Session…'])(
+it.each(['Hand Off to Another Agent', 'Fork Agent Session…'])(
   'routes %s through the existing action for the active pane',
   (action) => {
     const controller = fixture()
@@ -192,7 +192,7 @@ it.each(['Continue in New Session…', 'Fork Agent Session…'])(
     fireEvent.click(screen.getByRole('menuitem', { name: action }))
     expect(controller.contextMenu.runForPane).toHaveBeenCalledWith(1, expect.any(Function))
     expect(
-      action === 'Continue in New Session…'
+      action === 'Hand Off to Another Agent'
         ? controller.contextMenu.onContinueAgentSessionInNewSession
         : controller.contextMenu.onForkAgentSession
     ).toHaveBeenCalledOnce()
@@ -207,7 +207,7 @@ it('keeps folder continuation available without offering a Git worktree fork', (
     button: 0,
     ctrlKey: false
   })
-  expect(screen.getByRole('menuitem', { name: 'Continue in New Session…' })).toBeTruthy()
+  expect(screen.getByRole('menuitem', { name: 'Hand Off to Another Agent' })).toBeTruthy()
   expect(screen.queryByRole('menuitem', { name: 'Fork Agent Session…' })).toBeNull()
 })
 
@@ -221,7 +221,7 @@ it.each(['missing-pane', 'hidden'])('does not offer source actions for a %s sess
     button: 0,
     ctrlKey: false
   })
-  expect(screen.queryByRole('menuitem', { name: 'Continue in New Session…' })).toBeNull()
+  expect(screen.queryByRole('menuitem', { name: 'Hand Off to Another Agent' })).toBeNull()
   expect(screen.queryByRole('menuitem', { name: 'Fork Agent Session…' })).toBeNull()
 })
 

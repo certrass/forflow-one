@@ -9,8 +9,8 @@
   "upstream": {
     "name": "Orca",
     "repository": "https://github.com/stablyai/orca.git",
-    "tag": "v1.4.222",
-    "commit": "4bb6f2072b07c1f0664b809551f77754700570e4",
+    "tag": "v1.4.224",
+    "commit": "2bb20586ebc39d605e16d95f57420e20a16e7485",
     "license": "MIT"
   }
 }
