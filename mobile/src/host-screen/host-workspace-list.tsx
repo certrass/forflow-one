@@ -14,6 +14,7 @@ import { getWorktreeStatus } from '../worktree/workspace-list-sections'
 import { repoColor } from '../worktree/repo-color'
 import { hostScreenStyles as styles } from './host-screen-styles'
 import type { HostScreenController } from './use-host-screen-controller'
+import { MobileWorkspaceStartHint } from './MobileWorkspaceStartHint'
 
 export function HostWorkspaceList({ controller }: { controller: HostScreenController }) {
   const {
@@ -89,11 +90,11 @@ export function HostWorkspaceList({ controller }: { controller: HostScreenContro
           <MobileSearchField
             value={state.search}
             onChangeText={state.setSearch}
-            placeholder="Search worktrees…"
+            placeholder="搜索工作区…"
             autoFocus
             // Why: new key per open remounts the focus effect across rapid toggles so the keyboard reappears.
             focusKey={state.showSearch}
-            accessibilityLabel="Search worktrees"
+            accessibilityLabel="搜索工作区"
           />
         </View>
       )}
@@ -112,6 +113,14 @@ export function HostWorkspaceList({ controller }: { controller: HostScreenContro
         <SectionList
           ref={activeWorktreeScroll.sectionListRef}
           sections={sections}
+          ListHeaderComponent={
+            !embedded &&
+            connState === 'connected' &&
+            !state.search &&
+            settings.activeFilterCount === 0 ? (
+              <MobileWorkspaceStartHint />
+            ) : null
+          }
           keyExtractor={(w) => w.sectionListKey ?? getWorktreeRowIdentity(w)}
           stickySectionHeadersEnabled={false}
           // Why: keep the search IME up while tapping clear / scrolling results.

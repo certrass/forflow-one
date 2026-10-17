@@ -29,7 +29,11 @@ export function useMobileInstallQr(
     let cancelled = false
     void (async () => {
       try {
-        const dataUrl = await renderQrDataUrl(getInstallCopy(platform, iosChannel).url)
+        const url = getInstallCopy(platform, iosChannel).url
+        if (!url) {
+          return
+        }
+        const dataUrl = await renderQrDataUrl(url)
         if (!cancelled) {
           setInstallQrUrl(dataUrl)
         }

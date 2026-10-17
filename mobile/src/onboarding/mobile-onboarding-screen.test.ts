@@ -40,7 +40,7 @@ vi.mock('expo-router', () => ({
 }))
 
 vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }))
-vi.mock('../components/OrcaLogo', () => ({ OrcaLogo: 'OrcaLogo' }))
+vi.mock('../components/ForflowLogo', () => ({ ForflowLogo: 'ForflowLogo' }))
 vi.mock('./MobileOnboardingPage', () => ({ MobileOnboardingPage: 'MobileOnboardingPage' }))
 vi.mock('../notifications/mobile-notifications', () => ({
   ensureNotificationPermissions: mocks.ensureNotificationPermissions
@@ -121,7 +121,7 @@ describe('MobileOnboardingScreen', () => {
     mocks.setRemotePushEnabled.mockRejectedValueOnce(new Error('disk full'))
     await renderScreen()
     await act(async () => pages()[0].props.onNotificationChoice('enable'))
-    expect(pages()[0].props.error).toBe('Notification settings could not be updated. Try again.')
+    expect(pages()[0].props.error).toBe('未能更新通知设置，请重试。')
     expect(mocks.replace).not.toHaveBeenCalled()
     await act(async () => pages()[0].props.onNotificationChoice('enable'))
     expect(mocks.setRemotePushEnabled).toHaveBeenCalledTimes(2)
@@ -145,7 +145,7 @@ describe('MobileOnboardingScreen', () => {
     await renderScreen()
 
     await act(async () => pages()[0].props.onSessionChoice('chat'))
-    expect(pages()[0].props.error).toBe('Your choice could not be saved. Try again.')
+    expect(pages()[0].props.error).toBe('未能保存选择，请重试。')
 
     await act(async () => pages()[0].props.onSessionChoice('chat'))
     expect(mocks.saveDefaultSessionView).toHaveBeenCalledTimes(2)
@@ -187,3 +187,6 @@ describe('MobileOnboardingScreen', () => {
     expect(pages()[1].props).toMatchObject({ active: true, busyChoice: null })
   })
 })
+
+// Keep carousel coverage for the optional notification step; default suppression has its own test.
+vi.mock('../forflow/mobile-connection-policy', () => ({ FORFLOW_MOBILE_REMOTE_PUSH_ENABLED: true }))

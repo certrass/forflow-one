@@ -1,19 +1,19 @@
 import { QrCode } from 'lucide-react-native'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { colors, radii, spacing } from '../theme/mobile-theme'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 
 const ONBOARDING_STEPS = [
   {
-    title: 'Open Orca desktop',
-    desc: 'Go to Settings → Mobile and generate a pairing QR code.'
+    title: '打开 Forflow One 桌面端',
+    desc: '进入「设置 → 手机」，选择本地网络并生成配对码。'
   },
   {
-    title: 'Scan the code',
-    desc: 'Tap the button above to open the scanner. Point at the QR code on your screen.'
+    title: '扫描配对码',
+    desc: '使用上方按钮扫描电脑上的二维码，也可以粘贴配对码。'
   },
   {
-    title: "You're connected",
-    desc: 'Your desktop will appear here. Everything is encrypted end-to-end.'
+    title: '选择工作区，开始对话',
+    desc: '配对后打开工作区，选择智能体并发送任务，也可以继续已有会话。'
   }
 ]
 
@@ -24,30 +24,35 @@ export function MobileHomeEmptyState(props: {
   onPairDesktop: () => void
 }) {
   return (
-    <View
-      style={[
+    <ScrollView
+      contentContainerStyle={[
         styles.emptyContainer,
-        { paddingBottom: props.bottomInset },
+        { paddingBottom: props.bottomInset + spacing.xl },
         props.isWideLayout && {
           maxWidth: props.contentMaxWidth,
           width: '100%',
           alignSelf: 'center'
         }
       ]}
+      showsVerticalScrollIndicator={false}
     >
       <View style={styles.emptyHero}>
-        <Text style={styles.emptyTitle}>Connect your desktop</Text>
+        <Text style={styles.emptyTitle}>在手机上继续工作</Text>
         <Text style={styles.emptyBody}>
-          Pair with Orca on your computer to check on your agents, jump into any terminal, and drive
-          work from your phone.
+          连接电脑上的 Forflow
+          One，继续智能体对话、查看任务进展。请让手机和电脑处于同一局域网，或通过已有 VPN 互通。
         </Text>
-        <Pressable style={styles.primaryButton} onPress={props.onPairDesktop}>
+        <Pressable
+          accessibilityRole="button"
+          style={styles.primaryButton}
+          onPress={props.onPairDesktop}
+        >
           <QrCode size={17} color={colors.bgBase} />
-          <Text style={styles.primaryButtonText}>Pair Desktop</Text>
+          <Text style={styles.primaryButtonText}>配对桌面端</Text>
         </Pressable>
       </View>
       <View style={styles.stepsSection}>
-        <Text style={styles.sectionHeading}>How it works</Text>
+        <Text style={styles.sectionHeading}>开始连接</Text>
         {ONBOARDING_STEPS.map((step, index) => (
           <View key={step.title} style={[styles.stepRow, index > 0 && styles.stepRowBorder]}>
             <View style={styles.stepNum}>
@@ -60,18 +65,18 @@ export function MobileHomeEmptyState(props: {
           </View>
         ))}
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  emptyContainer: { flex: 1 },
+  emptyContainer: { flexGrow: 1 },
   emptyHero: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingBottom: 40
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xl
   },
   emptyTitle: {
     fontSize: 22,
@@ -91,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.surfaceBright,
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: radii.card
@@ -99,11 +104,9 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: colors.bgBase, fontSize: 15, fontWeight: '700' },
   stepsSection: { paddingHorizontal: spacing.xl },
   sectionHeading: {
-    fontSize: 11,
+    fontSize: typography.bodySize,
     fontWeight: '600',
     color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
     marginBottom: spacing.sm,
     paddingHorizontal: spacing.xs
   },
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: colors.bgRaised,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     alignItems: 'center',
@@ -133,5 +136,5 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: 3
   },
-  stepDesc: { fontSize: 12, color: colors.textMuted, lineHeight: 17 }
+  stepDesc: { fontSize: typography.bodySize, color: colors.textSecondary, lineHeight: 22 }
 })

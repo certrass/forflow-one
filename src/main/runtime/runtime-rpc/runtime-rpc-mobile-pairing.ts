@@ -1,4 +1,5 @@
 import type { MobilePairingConnectionMode } from '../../../shared/mobile-pairing-connection-mode'
+import { isForflowPrivateDeployment } from '../../forflow/deployment-policy'
 import {
   mobileRelayMintFailureFromUnknown,
   type MobileRelayMintFailure
@@ -84,7 +85,10 @@ export class RuntimeRpcMobilePairing extends RuntimeRpcPairing {
     generation: number
   ): Promise<MobilePairingOffer> {
     // Why: the renderer is outside the trust boundary, so only an explicit local-only value may suppress Relay provisioning.
-    const connectionMode = args.connectionMode === 'local-only' ? 'local-only' : 'automatic'
+    const connectionMode =
+      isForflowPrivateDeployment() || args.connectionMode === 'local-only'
+        ? 'local-only'
+        : 'automatic'
     const pending = this.deviceRegistry?.getPendingDevice('mobile')
     // Why: connection policy is part of the credential, so rotate on any policy switch — an old-policy QR must not pair under the new one.
     const switchingPendingMode =

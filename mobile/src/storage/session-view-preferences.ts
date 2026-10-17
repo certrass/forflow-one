@@ -6,8 +6,8 @@ export type MobileSessionView = 'terminal' | 'chat'
 const DEFAULT_SESSION_VIEW_KEY = 'orca:defaultSessionView'
 const NATIVE_CHAT_TABS_PREFIX = 'orca:nativeChatTabs:'
 
-// Why: default stays terminal so native chat remains strictly opt-in.
-export const DEFAULT_SESSION_VIEW: MobileSessionView = 'terminal'
+// Saved choices and per-tab overrides still take precedence; unsupported agents keep their terminal.
+export const DEFAULT_SESSION_VIEW: MobileSessionView = 'chat'
 
 let defaultViewWriteBarrier: Promise<void> | null = null
 const overrideUpdateBarriers = new Map<string, Promise<void>>()
@@ -45,7 +45,11 @@ export async function readDefaultSessionViewPreference(): Promise<DefaultSession
 
 /** Global (per-device) default for how supported agent sessions open. */
 export async function loadDefaultSessionView(): Promise<MobileSessionView> {
-  return (await readDefaultSessionViewPreference()).value ?? DEFAULT_SESSION_VIEW
+  const preference = await readDefaultSessionViewPreference()
+  if (!preference.loaded || (preference.hasStoredValue && preference.value === null)) {
+    return 'terminal'
+  }
+  return preference.value ?? DEFAULT_SESSION_VIEW
 }
 
 export function saveDefaultSessionView(view: MobileSessionView): Promise<void> {

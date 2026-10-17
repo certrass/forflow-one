@@ -9,6 +9,7 @@ import {
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
 import { MobileRelayBetaNotice } from './MobileRelayBetaNotice'
+import { isForflowBuild } from '../../../../shared/product-branding'
 export { getMobileSettingsPaneSearchEntries }
 
 const ORCA_IOS_APP_STORE_URL = 'https://apps.apple.com/app/orca-ide/id6766130217'
@@ -31,36 +32,40 @@ export function MobileSettingsPane(): React.JSX.Element {
         className="space-y-3 py-2"
       >
         <div className="space-y-2 text-xs text-muted-foreground">
-          <p>
-            {translate(
-              'auto.components.settings.MobileSettingsPane.installIntro',
-              'Install Orca Mobile from the'
-            )}{' '}
-            <button
-              type="button"
-              onClick={() => void window.api.shell.openUrl(ORCA_IOS_APP_STORE_URL)}
-              className="cursor-pointer underline underline-offset-2 hover:text-foreground"
-            >
-              {translate('auto.components.settings.MobileSettingsPane.b5a2ed83ff', 'App Store')}
-            </button>
-            {' · '}
-            <button
-              type="button"
-              // Why: Android is moving to Google Play soon, but until then
-              // link directly to the pinned APK asset for the current mobile release.
-              onClick={() => void window.api.shell.openUrl(ORCA_ANDROID_APK_URL)}
-              className="cursor-pointer underline underline-offset-2 hover:text-foreground"
-            >
+          {isForflowBuild() ? (
+            <p>安装管理员提供的 Forflow One 手机端后，在同一局域网或已有 VPN 内扫描下方配对码。</p>
+          ) : (
+            <p>
               {translate(
-                'auto.components.settings.MobileSettingsPane.androidApkLabel',
-                'Android APK'
+                'auto.components.settings.MobileSettingsPane.installIntro',
+                'Install Orca Mobile from the'
+              )}{' '}
+              <button
+                type="button"
+                onClick={() => void window.api.shell.openUrl(ORCA_IOS_APP_STORE_URL)}
+                className="cursor-pointer underline underline-offset-2 hover:text-foreground"
+              >
+                {translate('auto.components.settings.MobileSettingsPane.b5a2ed83ff', 'App Store')}
+              </button>
+              {' · '}
+              <button
+                type="button"
+                // Why: Android is moving to Google Play soon, but until then
+                // link directly to the pinned APK asset for the current mobile release.
+                onClick={() => void window.api.shell.openUrl(ORCA_ANDROID_APK_URL)}
+                className="cursor-pointer underline underline-offset-2 hover:text-foreground"
+              >
+                {translate(
+                  'auto.components.settings.MobileSettingsPane.androidApkLabel',
+                  'Android APK'
+                )}
+              </button>
+              {translate(
+                'auto.components.settings.MobileSettingsPane.installOutro',
+                ', then pair below.'
               )}
-            </button>
-            {translate(
-              'auto.components.settings.MobileSettingsPane.installOutro',
-              ', then pair below.'
-            )}
-          </p>
+            </p>
+          )}
           <MobileRelayBetaNotice />
         </div>
       </SearchableSetting>

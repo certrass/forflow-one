@@ -1,5 +1,7 @@
-import { readFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import { createElement } from 'react'
+import { act, create, type ReactTestRenderer } from 'react-test-renderer'
+import { describe, expect, it, vi } from 'vitest'
+import { MobileHomeResumeCard } from '../home/MobileHomeResumeCard'
 import {
   isResumeTargetConfirmedMissing,
   selectHomeResumeCard,
@@ -7,10 +9,13 @@ import {
 } from './home-resume-card'
 import type { HomeWorktreeSummary, HostWorktreeInfo } from './home-worktree-info'
 
-const resumeCardSource = readFileSync(
-  new URL('../home/MobileHomeResumeCard.tsx', import.meta.url),
-  'utf8'
-)
+vi.mock('react-native', () => ({
+  Pressable: 'Pressable',
+  Text: 'Text',
+  View: 'View',
+  StyleSheet: { create: <T>(styles: T) => styles }
+}))
+vi.mock('lucide-react-native', () => ({ ArrowUpRight: 'ArrowUpRight' }))
 
 function worktree(worktreeId: string): HomeWorktreeSummary {
   return {
@@ -58,7 +63,7 @@ describe('home resume card', () => {
     expect(after?.actionable).toBe(true)
   })
 
-  it('leaves Tasks first when no host has resume history at all', () => {
+  it('omits resume when no host has workspace history', () => {
     expect(
       selectHomeResumeCard(input({ worktreeInfo: { 'host-1': info('host-1', null) } }))
     ).toBeNull()
@@ -122,9 +127,31 @@ describe('home resume card', () => {
     })
   })
 
-  it('renders the home Resume card inert until its host connects', () => {
-    expect(resumeCardSource).toContain('disabled={!props.card.actionable}')
-    expect(resumeCardSource).toContain('!props.card.actionable && styles.cardDisabled')
+  it('keeps the cached workspace readable but inert until its host connects', async () => {
+    const card = { hostId: 'host-1', worktree: worktree('repo::/tmp/wt'), actionable: false }
+    const onOpen = vi.fn()
+    let renderer!: ReactTestRenderer
+    await act(() => {
+      renderer = create(createElement(MobileHomeResumeCard, { card, onOpen }))
+    })
+    try {
+      const button = () => renderer.root.findByProps({ accessibilityRole: 'button' })
+      expect(button().props.disabled).toBe(true)
+      expect(button().props.accessibilityState).toEqual({ disabled: true })
+      expect(button().props.accessibilityLabel).toContain('连接电脑后继续')
+      expect(JSON.stringify(renderer.toJSON())).toContain('repo::/tmp/wt')
+      expect(onOpen).not.toHaveBeenCalled()
+
+      const connected = { ...card, actionable: true }
+      await act(() =>
+        renderer.update(createElement(MobileHomeResumeCard, { card: connected, onOpen }))
+      )
+      expect(button().props.disabled).toBe(false)
+      act(() => button().props.onPress())
+      expect(onOpen).toHaveBeenCalledWith(connected)
+    } finally {
+      act(() => renderer.unmount())
+    }
   })
 })
 

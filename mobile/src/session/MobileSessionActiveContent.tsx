@@ -87,10 +87,11 @@ export function MobileSessionActiveContent({
     </View>
   ) : showEmptyState ? (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyText}>No tabs in this session</Text>
+      <Text style={styles.emptyText}>选择智能体，开始第一段对话</Text>
       {createError ? <Text style={styles.createError}>{createError}</Text> : null}
       <View style={styles.emptyActions}>
         <Pressable
+          accessibilityRole="button"
           style={[
             styles.createButton,
             (createTabBusy || connState !== 'connected') && styles.createButtonDisabled
@@ -102,7 +103,7 @@ export function MobileSessionActiveContent({
           }}
         >
           <Text style={styles.createButtonText}>
-            {createTabBusy ? 'Creating...' : 'Create Tab'}
+            {createTabBusy ? '正在创建…' : '选择智能体或工具'}
           </Text>
         </Pressable>
       </View>
@@ -177,17 +178,17 @@ export function MobileSessionActiveContent({
       )}
       <Text style={styles.emptyText}>
         {isPendingTerminalRecoveryParked
-          ? 'Terminal is taking longer than expected'
-          : activePendingTerminalTab.title || 'Loading terminal'}
+          ? '终端加载较慢，请稍后重试'
+          : activePendingTerminalTab.title || '正在加载终端…'}
       </Text>
       {isPendingTerminalRecoveryParked && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retry loading terminal"
+          accessibilityLabel="重新加载终端"
           style={({ pressed }) => [styles.createButton, pressed && styles.newTerminalButtonPressed]}
           onPress={() => void retryPendingTerminalRecovery()}
         >
-          <Text style={styles.createButtonText}>Retry</Text>
+          <Text style={styles.createButtonText}>重试</Text>
         </Pressable>
       )}
     </View>

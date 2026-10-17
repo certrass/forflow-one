@@ -1,10 +1,14 @@
-# Orca Mobile
+# Forflow One Mobile
 
-React Native companion app for Orca. Monitor worktrees, view terminal output, and send commands from your phone.
+Forflow One 的 React Native 手机端。通过局域网或已有 VPN 连接桌面端，查看工作区、继续会话并操作终端。
+
+当前版本为 `0.1.0`，iOS Bundle ID / Android 包名为 `cn.forflow.one.mobile`。手机使用独立设备配对授权，不读取原版 Orca 的配对凭据；本版本关闭云中继、云推送和诊断上传。企业账号仍由 Forflow One 桌面端管理。
+
+首次使用、iOS 构建和验证范围见 [手机端交付记录](../docs/forflow/mobile-source-20261005.md)。以下调试协议和脚本沿用上游实现。
 
 Local development uses two processes:
 
-- Orca desktop/Electron from the repo root. This hosts the mobile WebSocket RPC server on port `6768`.
+- Forflow One desktop/Electron from the repo root. This hosts the mobile WebSocket RPC server on port `6768`.
 - Expo Metro from `mobile/`. This serves the React Native app on port `8081`.
 
 Unless a command says otherwise, run mobile app commands from the `mobile/` directory.
@@ -14,16 +18,16 @@ Unless a command says otherwise, run mobile app commands from the `mobile/` dire
 - Node.js 24+
 - pnpm
 - Xcode and/or Android Studio tooling for simulator or device builds
-- Expo Go on your phone, or a development client build when native modules are needed
+- A native development client or Release build; Expo Go does not include this app's custom native modules
 - Phone and desktop on the same LAN when testing a physical phone
 
-## Start Desktop Orca
+## Start Desktop Forflow One
 
 From the repository root:
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev:forflow
 ```
 
 Confirm the mobile RPC server is listening:
@@ -32,17 +36,17 @@ Confirm the mobile RPC server is listening:
 lsof -nP -iTCP:6768 -sTCP:LISTEN
 ```
 
-Restart `pnpm dev` after changing Electron main-process code. Metro hot reload only applies to the mobile JavaScript bundle.
+Restart `pnpm dev:forflow` after changing Electron main-process code. Metro hot reload only applies to the mobile JavaScript bundle.
 
 ## Start The Mobile App
 
 ```bash
 cd mobile
-pnpm install
-pnpm start
+pnpm install --frozen-lockfile
+pnpm start --dev-client
 ```
 
-Scan the Expo QR code with your phone's camera on iOS, or Expo Go on Android.
+Install the native development client before opening the Metro QR code. The Metro QR loads the app; the desktop pairing QR authorizes access to your computer.
 
 For a native dev-client build:
 
@@ -52,11 +56,11 @@ pnpm exec expo run:ios
 pnpm start --dev-client
 ```
 
-## Pair With Desktop Orca
+## Pair With Desktop Forflow One
 
-1. Open Orca desktop.
+1. Open Forflow One desktop.
 2. Go to Settings > Mobile.
-3. Scan the pairing QR code from the mobile app.
+3. Select a LAN or VPN address reachable from the phone, then scan or paste the pairing code in the mobile app.
 4. Confirm the mobile host endpoint is `ws://<desktop-ip>:6768`.
 
 For the Android emulator, use `ws://10.0.2.2:6768`. For a physical phone, use the desktop LAN IP, for example `ws://192.168.0.179:6768`.
@@ -67,15 +71,17 @@ If the phone has a stale host entry, remove it from the app and pair again.
 
 ### Android Phone
 
-1. Install Expo Go from Google Play
-2. Run `pnpm start`, scan QR with Expo Go
-3. For native modules: `pnpm exec expo run:android`
-4. Run with `pnpm start --dev-client`
+1. Configure Android Studio and a connected device.
+2. Build and install with `pnpm exec expo run:android`.
+3. Run with `pnpm start --dev-client`.
+
+Android native installation has not been validated for this Forflow build.
 
 ### iOS Simulator
 
 1. Install Xcode from the App Store
-2. Run `pnpm start --ios` to open in iOS Simulator
+2. Install an iOS simulator runtime and CocoaPods.
+3. Run `pnpm exec expo run:ios` for a native development build, or use the Release build instructions in the delivery record.
 
 ## Physical Phone Debugging
 

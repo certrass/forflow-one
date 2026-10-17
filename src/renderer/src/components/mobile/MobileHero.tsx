@@ -1,3 +1,4 @@
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Copy } from 'lucide-react'
 import { cn } from '../../lib/utils'
@@ -130,93 +131,108 @@ export function HeroFlow({
           inert={stepIdx !== 0}
         >
           <div className="mp-step2-layout">
-            <div className="mp-step2-copy">
-              <div className="mp-eyebrow-row">
-                <div className="mp-step-num">{stepIdx + 1}</div>
-                <span className="mp-eyebrow">
-                  {translate('auto.components.mobile.MobileHero.92ddfdfa1f', 'Step 1 of 2')}
-                </span>
+            {isForflowBuild() ? (
+              <div className="mp-step2-copy">
+                <h2 className="mp-h2">安装 Forflow One 手机端</h2>
+                <p className="mp-lead-sm">
+                  使用管理员提供的 Forflow One 手机安装包。安装完成后点击继续，通过本地网络或已有
+                  VPN 配对此电脑。
+                </p>
               </div>
-              <h2 className="mp-h2">
-                {translate('auto.components.mobile.MobileHero.0d9b33299e', 'Get the app.')}
-              </h2>
-              <p className="mp-lead-sm">
-                {translate(
-                  'auto.components.mobile.MobileHero.e75647ace0',
-                  'Scan the QR with your phone or open the install link to grab Orca Mobile.'
-                )}
-              </p>
-              <div className="mp-tab-toggle">
-                <button
-                  type="button"
-                  className={cn(platform === 'ios' && 'is-active')}
-                  aria-pressed={platform === 'ios'}
-                  onClick={() => onPlatformChange('ios')}
-                >
-                  <IosBrandIcon />
-                  {translate('auto.components.mobile.MobileHero.711e6f4b47', 'iOS')}
-                </button>
-                <button
-                  type="button"
-                  className={cn(platform === 'android' && 'is-active')}
-                  aria-pressed={platform === 'android'}
-                  onClick={() => onPlatformChange('android')}
-                >
-                  <AndroidLogo />
-                  {translate('auto.components.mobile.MobileHero.ac1eb64952', 'Android')}
-                </button>
-              </div>
-              {platform === 'ios' ? (
-                <div
-                  className="mp-channel-toggle"
-                  role="radiogroup"
-                  aria-label={translate(
-                    'auto.components.mobile.MobileHero.channel.group',
-                    'Release channel'
-                  )}
-                >
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={iosChannel === 'preview'}
-                    className={cn(iosChannel === 'preview' && 'is-active')}
-                    onClick={() => onIosChannelChange('preview')}
-                  >
-                    {translate('auto.components.mobile.MobileHero.channel.preview', 'Preview')}
-                  </button>
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={iosChannel === 'stable'}
-                    className={cn(iosChannel === 'stable' && 'is-active')}
-                    onClick={() => onIosChannelChange('stable')}
-                  >
-                    {translate('auto.components.mobile.MobileHero.channel.stable', 'Stable')}
-                  </button>
-                  <span className="mp-channel-tagline">{getChannelTagline(iosChannel)}</span>
+            ) : (
+              <>
+                <div className="mp-step2-copy">
+                  <div className="mp-eyebrow-row">
+                    <div className="mp-step-num">{stepIdx + 1}</div>
+                    <span className="mp-eyebrow">
+                      {translate('auto.components.mobile.MobileHero.92ddfdfa1f', 'Step 1 of 2')}
+                    </span>
+                  </div>
+                  <h2 className="mp-h2">
+                    {translate('auto.components.mobile.MobileHero.0d9b33299e', 'Get the app.')}
+                  </h2>
+                  <p className="mp-lead-sm">
+                    {translate(
+                      'auto.components.mobile.MobileHero.e75647ace0',
+                      'Scan the QR with your phone or open the install link to grab Orca Mobile.'
+                    )}
+                  </p>
+                  <div className="mp-tab-toggle">
+                    <button
+                      type="button"
+                      className={cn(platform === 'ios' && 'is-active')}
+                      aria-pressed={platform === 'ios'}
+                      onClick={() => onPlatformChange('ios')}
+                    >
+                      <IosBrandIcon />
+                      {translate('auto.components.mobile.MobileHero.711e6f4b47', 'iOS')}
+                    </button>
+                    <button
+                      type="button"
+                      className={cn(platform === 'android' && 'is-active')}
+                      aria-pressed={platform === 'android'}
+                      onClick={() => onPlatformChange('android')}
+                    >
+                      <AndroidLogo />
+                      {translate('auto.components.mobile.MobileHero.ac1eb64952', 'Android')}
+                    </button>
+                  </div>
+                  {platform === 'ios' ? (
+                    <div
+                      className="mp-channel-toggle"
+                      role="radiogroup"
+                      aria-label={translate(
+                        'auto.components.mobile.MobileHero.channel.group',
+                        'Release channel'
+                      )}
+                    >
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={iosChannel === 'preview'}
+                        className={cn(iosChannel === 'preview' && 'is-active')}
+                        onClick={() => onIosChannelChange('preview')}
+                      >
+                        {translate('auto.components.mobile.MobileHero.channel.preview', 'Preview')}
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={iosChannel === 'stable'}
+                        className={cn(iosChannel === 'stable' && 'is-active')}
+                        onClick={() => onIosChannelChange('stable')}
+                      >
+                        {translate('auto.components.mobile.MobileHero.channel.stable', 'Stable')}
+                      </button>
+                      <span className="mp-channel-tagline">{getChannelTagline(iosChannel)}</span>
+                    </div>
+                  ) : null}
+                  <div className="mp-inline-actions">
+                    <button type="button" className="mp-ghost-action" onClick={onOpenInstallUrl}>
+                      {installCopy.ctaLabel}
+                    </button>
+                    <button type="button" className="mp-text-link" onClick={onCopyInstallUrl}>
+                      <Copy className="size-3.5" />
+                      {translate(
+                        'auto.components.mobile.MobileHero.aa97420ba4',
+                        'Copy install link'
+                      )}
+                    </button>
+                  </div>
+                  {platform === 'android' ? (
+                    <MobileAndroidInstallHelp onOpenGuide={onOpenAndroidInstallGuide} />
+                  ) : null}
                 </div>
-              ) : null}
-              <div className="mp-inline-actions">
-                <button type="button" className="mp-ghost-action" onClick={onOpenInstallUrl}>
-                  {installCopy.ctaLabel}
-                </button>
-                <button type="button" className="mp-text-link" onClick={onCopyInstallUrl}>
-                  <Copy className="size-3.5" />
-                  {translate('auto.components.mobile.MobileHero.aa97420ba4', 'Copy install link')}
-                </button>
-              </div>
-              {platform === 'android' ? (
-                <MobileAndroidInstallHelp onOpenGuide={onOpenAndroidInstallGuide} />
-              ) : null}
-            </div>
-            <div className="mp-qr mp-qr-large">
-              {installQrUrl ? (
-                <img
-                  src={installQrUrl}
-                  alt={translate('auto.components.mobile.MobileHero.3241f3c26a', 'Install QR')}
-                />
-              ) : null}
-            </div>
+                <div className="mp-qr mp-qr-large">
+                  {installQrUrl ? (
+                    <img
+                      src={installQrUrl}
+                      alt={translate('auto.components.mobile.MobileHero.3241f3c26a', 'Install QR')}
+                    />
+                  ) : null}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

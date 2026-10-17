@@ -44,7 +44,8 @@ export function applyForflowFreshProfileDefaults(
       experimentalStructuredNativeChat: false,
       artifactSharingEnabled: false,
       agentSkillSharingEnabled: false,
-      showMobileButton: false
+      showMobileButton: true,
+      mobilePairingConnectionMode: 'local-only'
     }
   }
 }

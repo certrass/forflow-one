@@ -95,6 +95,26 @@ export const mobileOnboardingStyles = StyleSheet.create({
     alignSelf: 'center',
     paddingBottom: spacing.lg
   },
+  modeGuide: {
+    width: '100%',
+    maxWidth: 420,
+    marginTop: spacing.xl,
+    padding: spacing.lg,
+    gap: spacing.sm,
+    borderRadius: radii.card,
+    backgroundColor: colors.bgPanel
+  },
+  modeTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.bodySize,
+    fontWeight: '600'
+  },
+  modeBody: {
+    color: colors.textSecondary,
+    fontSize: typography.bodySize,
+    lineHeight: 21,
+    marginBottom: spacing.sm
+  },
   disclosure: {
     color: colors.textSecondary,
     fontSize: typography.metaSize,

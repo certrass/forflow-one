@@ -66,11 +66,11 @@ describe('MobileHostCard', () => {
     const buttons = renderer.root.findAllByType('Pressable')
     expect(buttons).toHaveLength(2)
     expect(buttons[0].props.accessibilityRole).toBe('button')
-    expect(buttons[0].props.accessibilityLabel).toBe('Open Desk, Disconnected')
+    expect(buttons[0].props.accessibilityLabel).toBe('打开 Desk, 未连接')
     expect(buttons[1].props.accessibilityRole).toBe('button')
-    expect(buttons[1].props.accessibilityLabel).toBe('Actions for Desk')
+    expect(buttons[1].props.accessibilityLabel).toBe('Desk 的更多操作')
     expect(buttons[1].props.hitSlop).toBe(8)
-    expect(buttons[1].props.style({ pressed: false })[0]).toMatchObject({ width: 40, height: 40 })
+    expect(buttons[1].props.style({ pressed: false })[0]).toMatchObject({ width: 44, height: 44 })
     expect(renderer.root.findAllByType('MoreVertical')).toHaveLength(1)
     expect(renderer.root.findAllByType('ChevronRight')).toHaveLength(0)
 
@@ -117,7 +117,7 @@ describe('MobileHostCard', () => {
 
     const navigationButton = renderer.root.findAllByType('Pressable')[0]
     expect(navigationButton.props.accessibilityLabel).toBe(
-      'Open Desk, Connected, Direct via Tailscale, 3 worktrees, 2 active'
+      '打开 Desk, 已连接, Direct via Tailscale, 3 个工作区, 2 个活跃'
     )
   })
 
@@ -154,12 +154,12 @@ describe('MobileHostCard', () => {
 
     const navigationButton = renderer.root.findAllByType('Pressable')[0]
     expect(navigationButton.props.accessibilityLabel).toBe(
-      'Open Desk, Connected, Orca Relay, Worktree list unavailable'
+      '打开 Desk, 已连接, Orca Relay, 暂时无法读取工作区列表'
     )
     expect(
       renderer.root
         .findAllByType('Text')
-        .some((node) => node.children.includes('Worktree list unavailable'))
+        .some((node) => node.children.includes('暂时无法读取工作区列表'))
     ).toBe(true)
   })
 
@@ -193,7 +193,7 @@ describe('MobileHostCard', () => {
 
     const navigationButton = renderer.root.findAllByType('Pressable')[0]
     expect(navigationButton.props.accessibilityLabel).toBe(
-      "Open Desk, Can't reach desktop, Update desktop Orca and sign in to connect from anywhere"
+      '打开 Desk, 无法连接电脑, 请确认 Forflow One 桌面端已打开，且手机与电脑处于同一局域网或 VPN。'
     )
   })
 
@@ -238,7 +238,7 @@ describe('MobileHostCard', () => {
     const texts = renderer.root.findAllByType('Text').map((node) => node.props.children)
     expect(texts).toContainEqual("Check it's awake, Orca is running, and you're signed in")
     expect(renderer.root.findAllByType('Pressable')[0]?.props.accessibilityLabel).toBe(
-      "Open Host 1, Host 1 is offline, Check it's awake, Orca is running, and you're signed in"
+      "打开 Host 1, Host 1 is offline, Check it's awake, Orca is running, and you're signed in"
     )
   })
 })

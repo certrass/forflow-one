@@ -1,12 +1,8 @@
-import { openExternalLink } from '../platform/external-link'
 import { useRouteHandoff } from '../navigation/route-handoff'
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 import type { CompatVerdict } from '../transport/protocol-compat'
 import type { MobileWebBundleCompatVerdict } from '../transport/mobile-web-bundle-compat'
-
-const RELEASES_URL = 'https://github.com/stablyai/orca/releases'
-const IOS_APP_STORE_URL = 'itms-apps://apps.apple.com/app/orca-ide/id6766130217'
 
 /** Every wall this screen renders: the protocol one and the bundle one. Both are terminal — there
  *  is no native workspace to fall back to, so the only way out is updating one of the two apps. */
@@ -19,7 +15,7 @@ type Props = {
 }
 
 const DESKTOP_TOO_OLD_BODY =
-  'This paired desktop app is too old for your current Orca Mobile app. Update Orca on your computer, then try this host again.'
+  '桌面端版本较旧，请使用管理员提供的 Forflow One 安装包更新电脑端，再重新连接。'
 
 /** What clears the wall. `refresh-bundle` is the one that no store can: the cached workspace is
  *  older than this host's client floor, so a download fixes it and an app update does not. */
@@ -41,26 +37,26 @@ function blockRemedy(verdict: BlockedVerdict): BlockRemedy {
 function blockTitle(remedy: BlockRemedy): string {
   switch (remedy) {
     case 'update-mobile':
-      return 'Update Orca Mobile'
+      return '请更新 Forflow One 手机端'
     case 'update-desktop':
-      return 'Update Orca on your computer'
+      return '请更新桌面端 Forflow One'
     case 'refresh-bundle':
-      return 'Refresh the mobile workspace'
+      return '刷新手机工作区'
   }
 }
 
-function blockBody(verdict: BlockedVerdict, remedy: BlockRemedy, storeName: string): string {
+function blockBody(verdict: BlockedVerdict, remedy: BlockRemedy): string {
   if (remedy === 'refresh-bundle') {
-    return 'The workspace cached for this host is older than the desktop expects. Reconnect to this host to download the current one.'
+    return '此电脑的手机工作区缓存较旧，请重新连接以获取当前版本。'
   }
   if (verdict.reason === 'mobile-too-old') {
-    return `This desktop needs a newer Orca Mobile app. Update Orca Mobile from ${storeName}, then try this host again.`
+    return '请使用管理员提供的安装包更新 Forflow One 手机端，再重新连接。'
   }
   if (verdict.reason === 'bundle-unavailable') {
-    return 'This paired desktop app does not include the mobile workspace yet. Update Orca on your computer, then try this host again.'
+    return '此桌面端尚未包含手机工作区，请先更新电脑上的 Forflow One。'
   }
   if (remedy === 'update-mobile') {
-    return `This desktop's mobile workspace needs a newer Orca Mobile app. Update Orca Mobile from ${storeName}, then try this host again.`
+    return '此工作区需要更新的手机端，请使用管理员提供的 Forflow One 安装包更新。'
   }
   return DESKTOP_TOO_OLD_BODY
 }
@@ -68,43 +64,18 @@ function blockBody(verdict: BlockedVerdict, remedy: BlockRemedy, storeName: stri
 export function ProtocolBlockScreen({ verdict }: Props) {
   const router = useRouteHandoff()
   const remedy = blockRemedy(verdict)
-  // Why: Android APKs ship through GitHub Releases until a Play Store listing exists.
-  const mobileUpdateTarget =
-    Platform.OS === 'ios'
-      ? { label: 'Open App Store', url: IOS_APP_STORE_URL, storeName: 'the App Store' }
-      : { label: 'Open GitHub Releases', url: RELEASES_URL, storeName: 'GitHub Releases' }
-  // No download to offer when the fix is a refetch: reconnecting is what this screen leaves you to do.
-  const primaryAction =
-    remedy === 'refresh-bundle'
-      ? null
-      : remedy === 'update-mobile'
-        ? { label: mobileUpdateTarget.label, url: mobileUpdateTarget.url }
-        : { label: 'Open GitHub Releases', url: RELEASES_URL }
-
   const title = blockTitle(remedy)
-  const body = blockBody(verdict, remedy, mobileUpdateTarget.storeName)
+  const body = blockBody(verdict, remedy)
   const recoveryNote =
     remedy === 'refresh-bundle'
-      ? 'If this message stays, remove this host and pair it again.'
-      : 'Already updated? Go back to Hosts and refresh the connection. If this message stays, remove this host and pair it again.'
+      ? '如果仍无法连接，请移除此设备后重新配对。'
+      : '已经更新？返回设备列表重新连接。如果仍无法连接，请移除此设备后重新配对。'
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.body}>{body}</Text>
-        {primaryAction ? (
-          <Pressable
-            style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
-            onPress={() => {
-              // The seam: this screen is in the tasks page closure, where react-native's `openURL`
-              // calls a `window.open` both shells refuse and resolves anyway.
-              openExternalLink(primaryAction.url)
-            }}
-          >
-            <Text style={styles.primaryButtonText}>{primaryAction.label}</Text>
-          </Pressable>
-        ) : null}
         <Pressable
           style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}
           onPress={() => {
@@ -114,7 +85,7 @@ export function ProtocolBlockScreen({ verdict }: Props) {
             router.replace('/')
           }}
         >
-          <Text style={styles.secondaryButtonText}>Back to hosts</Text>
+          <Text style={styles.secondaryButtonText}>返回设备列表</Text>
         </Pressable>
         <Text style={styles.recoveryNote}>{recoveryNote}</Text>
       </View>

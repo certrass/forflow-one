@@ -1,5 +1,6 @@
 import { ensureDesktopNotificationChannel } from './desktop-notification-channel'
 import { AppState } from 'react-native'
+import { FORFLOW_MOBILE_REMOTE_PUSH_ENABLED } from '../forflow/mobile-connection-policy'
 import { startMobilePushLeaseRenewal } from './mobile-push-lease-renewal'
 import {
   loadNotificationDeliveryPreferences,
@@ -224,6 +225,9 @@ async function reconcileAllHosts(): Promise<void> {
  * detaches the client on disconnect; the host's tracked state survives it.
  */
 export function attachPushRegistration(hostId: string, client: PushClient): () => void {
+  if (!FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    return () => {}
+  }
   const state = hostState(hostId)
   if (state.connection.client !== client) {
     state.capabilityProbeStop?.()
@@ -251,6 +255,9 @@ export function attachPushRegistration(hostId: string, client: PushClient): () =
 
 // Consent completion covers local persistence; host reconciliation runs in the background.
 export async function setRemotePushEnabled(enabled: boolean): Promise<void> {
+  if (enabled && !FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    throw new Error('此版本使用桌面直连，尚未配置 Forflow One 推送服务。')
+  }
   consentGeneration++
   await savePushNotificationsEnabled(enabled)
   try {
@@ -304,6 +311,9 @@ export async function unregisterPushForRemovedHost(hostId: string): Promise<() =
 
 /** A rolled token stops delivering, so re-register every connected host at once. */
 export function startPushTokenSync(): () => void {
+  if (!FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    return () => {}
+  }
   const stopLease = startMobilePushLeaseRenewal(reconcileAllHosts)
   const stopToken = addPushTokenListener((token) => {
     tokenPromise = Promise.resolve(token)

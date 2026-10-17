@@ -1,4 +1,5 @@
 import { clampUtf8TextPrefix } from '../../../src/shared/utf8-byte-limits'
+import { FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED } from '../forflow/mobile-connection-policy'
 
 const CONNECTION_DIAGNOSTICS_ENDPOINT = 'https://www.onorca.dev/v1/feedback'
 const SUBMISSION_TIMEOUT_MS = 10_000
@@ -17,6 +18,9 @@ export async function submitConnectionDiagnostics(
   submission: ConnectionDiagnosticsSubmission,
   fetchImpl: typeof fetch = fetch
 ): Promise<ConnectionDiagnosticsSubmissionResult> {
+  if (!FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED) {
+    return { ok: false, error: '此版本不上传诊断。请复制诊断信息后交给管理员。' }
+  }
   const report = boundConnectionDiagnosticsReport(submission.report)
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), SUBMISSION_TIMEOUT_MS)

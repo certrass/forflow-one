@@ -11,7 +11,7 @@ import { classifyConnection, verdictDisplayLabel } from './connection-health'
 // phone that is suspended mid-dial resumes in 'connecting'/'handshaking', where
 // the nudge did nothing: the user waited out the remainder of the 12s connect
 // budget on a socket opened over a network path that no longer existed, and
-// then the *preserved* backoff delay — up to 60s of "Connecting…" against a
+// then the *preserved* backoff delay — up to 60s of "正在连接…" against a
 // desktop that was answering the whole time. By the next foreground the client
 // had landed in 'reconnecting', where the nudge works, so it connected at once.
 
@@ -116,7 +116,7 @@ function suspend(backgroundMs: number): void {
 }
 
 // Steps the clock one second at a time and reports how long the user has to sit
-// on "Connecting…" before the client opens its next socket.
+// on "正在连接…" before the client opens its next socket.
 async function millisecondsUntilNextDial(dialsBefore: number): Promise<number> {
   const limitMs = 180_000
   for (let elapsedMs = 0; elapsedMs <= limitMs; elapsedMs += 1_000) {
@@ -181,7 +181,7 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
     expect(client.getState()).toBe('connected')
   })
 
-  it('does not strand the user on "Connecting…" for a minute after returning', async () => {
+  it('does not strand the user on "正在连接…" for a minute after returning', async () => {
     const client = connect(TAILSCALE_ENDPOINT, 'token', 'server-key')
     latest().authenticate()
     latest().close()
@@ -206,7 +206,7 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
 
     latest().authenticate()
     expect(client.getState()).toBe('connected')
-    expect(label(client, TAILSCALE_ENDPOINT)).toBe('Connected')
+    expect(label(client, TAILSCALE_ENDPOINT)).toBe('已连接')
 
     client.close()
   })
@@ -219,8 +219,8 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
       await vi.advanceTimersByTimeAsync(12_000 + 60_000)
     }
     // Four failed dials is past WARNING_ATTEMPTS, so the card reads "Can't
-    // connect — check Tailscale" rather than a neutral "Connecting…".
-    expect(label(client, TAILSCALE_ENDPOINT)).toBe("Can't connect — check Tailscale")
+    // connect — 请检查 Tailscale" rather than a neutral "正在连接…".
+    expect(label(client, TAILSCALE_ENDPOINT)).toBe('暂时无法连接 — 请检查 Tailscale')
     await advanceUntilDialing(client)
     const doomed = latest()
 
@@ -231,7 +231,7 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
     latest().authenticate()
     expect(client.getState()).toBe('connected')
     expect(client.getReconnectAttempt()).toBe(0)
-    expect(label(client, TAILSCALE_ENDPOINT)).toBe('Connected')
+    expect(label(client, TAILSCALE_ENDPOINT)).toBe('已连接')
 
     client.close()
   })
@@ -243,7 +243,7 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
 
     // The desktop really is gone. Abandoning the stale dial must book the failure
     // it represents, or each visit resets the counter faster than it can climb and
-    // the card reassures the user with "Connecting…" indefinitely (issue #10119).
+    // the card reassures the user with "正在连接…" indefinitely (issue #10119).
     for (let visit = 0; visit < 14; visit++) {
       await advanceUntilDialing(client)
       suspend(30_000)
@@ -251,11 +251,11 @@ describe('foregrounding a phone that was suspended mid-dial', () => {
     }
 
     expect(client.getReconnectAttempt()).toBeGreaterThanOrEqual(12)
-    expect(label(client, TAILSCALE_ENDPOINT)).toBe("Can't reach desktop — check Tailscale")
+    expect(label(client, TAILSCALE_ENDPOINT)).toBe('无法连接电脑 — 请检查 Tailscale')
 
     // And the escalation is not sticky: the desktop comes back, the card clears.
     latest().authenticate()
-    expect(label(client, TAILSCALE_ENDPOINT)).toBe('Connected')
+    expect(label(client, TAILSCALE_ENDPOINT)).toBe('已连接')
 
     client.close()
   })

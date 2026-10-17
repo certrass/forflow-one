@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications'
+import { FORFLOW_MOBILE_REMOTE_PUSH_ENABLED } from '../forflow/mobile-connection-policy'
 import type {
   MobilePushApnsEnvironment,
   MobilePushPlatform
@@ -33,6 +34,9 @@ function toMobilePushToken(raw: { type: string; data: unknown }): MobilePushToke
  * The native push token, or null if registration is unavailable or fails.
  */
 export async function getDevicePushToken(): Promise<MobilePushToken | null> {
+  if (!FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    return null
+  }
   try {
     return toMobilePushToken(await Notifications.getDevicePushTokenAsync())
   } catch {
@@ -42,6 +46,9 @@ export async function getDevicePushToken(): Promise<MobilePushToken | null> {
 
 /** Providers can roll a token while the app runs; the old one stops delivering. */
 export function addPushTokenListener(listener: (token: MobilePushToken) => void): () => void {
+  if (!FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    return () => {}
+  }
   try {
     const subscription = Notifications.addPushTokenListener((raw) => {
       const token = toMobilePushToken(raw)

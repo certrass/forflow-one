@@ -15,7 +15,7 @@ import {
 } from './mobile-relay-host-overlay-store'
 import type { MobileRelayHostOverlay } from './mobile-relay-host-overlay'
 
-const STORAGE_KEY = 'orca:mobile-relay:host-overlays:v2'
+const STORAGE_KEY = 'forflow-one:mobile-relay:host-overlays:v2'
 const OVERLAY: MobileRelayHostOverlay = {
   v: 2,
   hostId: 'host-1',

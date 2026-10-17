@@ -1,4 +1,8 @@
 import { AppState, Platform } from 'react-native'
+import {
+  assertForflowHostProfile,
+  FORFLOW_MOBILE_RELAY_ENABLED
+} from '../forflow/mobile-connection-policy'
 import { connect, type RpcClient } from './rpc-client'
 import { createStableLogicalRpcClient } from './stable-logical-rpc-client'
 import type { ConnectionLogSink, HostProfile } from './types'
@@ -6,13 +10,14 @@ import { directPathForEndpoint } from './mobile-direct-endpoint-probe'
 import { startMobileEndpointLifecycle } from './mobile-endpoint-lifecycle'
 
 export function openHostLogicalClient(host: HostProfile, onLog: ConnectionLogSink): RpcClient {
+  assertForflowHostProfile(host)
   // Why: the stable facade owns app-visible RPC/subscription state while the
   // direct socket remains a replaceable first physical generation.
   const logical = createStableLogicalRpcClient(
     connect(host.endpoint, host.deviceToken, host.publicKeyB64, { onLog }),
     directPathForEndpoint(host, host.endpoint)
   )
-  if (Platform.OS === 'web') {
+  if (Platform.OS === 'web' || !FORFLOW_MOBILE_RELAY_ENABLED) {
     return logical
   }
 

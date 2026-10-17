@@ -6,8 +6,8 @@ import { classifyConnection, verdictDisplayLabel } from './connection-health'
 // at connecting". Each scenario below is a way a cellular link fails and what the
 // user is shown while it does. On the parent commit ws.onopen reset
 // reconnectAttempt before the E2EE handshake completed and classifyConnection
-// reverted to "Connecting…" on every redial, so no escalation assertion here
-// could pass: the label looped "Connecting…" forever.
+// reverted to "正在连接…" on every redial, so no escalation assertion here
+// could pass: the label looped "正在连接…" forever.
 
 vi.mock('./e2ee', () => ({
   generateKeyPair: () => ({ publicKey: new Uint8Array(32), secretKey: new Uint8Array(32) }),
@@ -147,7 +147,7 @@ function observe(endpoint: string, durationMs: number): Sample[] {
 }
 
 function isEscalated(label: string): boolean {
-  return label !== 'Connecting…' && label !== 'Reconnecting…'
+  return label !== '正在连接…' && label !== '正在重新连接…'
 }
 
 function labelsAfterFirstEscalation(samples: Sample[]): Sample[] {
@@ -182,12 +182,12 @@ describe('issue #10119 — what a phone shows while it cannot reach the desktop'
     // The failure counter survives ws.onopen, so both connection-health gates
     // (warning >= 3, unreachable >= 12) are reachable.
     expect(Math.max(...samples.map((s) => s.attempts))).toBeGreaterThanOrEqual(12)
-    expect(samples.some((s) => s.label === "Can't connect")).toBe(true)
-    expect(samples.some((s) => s.label === "Can't reach desktop")).toBe(true)
+    expect(samples.some((s) => s.label === '暂时无法连接')).toBe(true)
+    expect(samples.some((s) => s.label === '无法连接电脑')).toBe(true)
 
-    // Once escalated, no later redial reverts the label to "Connecting…".
+    // Once escalated, no later redial reverts the label to "正在连接…".
     const after = labelsAfterFirstEscalation(samples)
-    expect(after.every((s) => s.label !== 'Connecting…')).toBe(true)
+    expect(after.every((s) => s.label !== '正在连接…')).toBe(true)
 
     // Growing backoff: the pinned counter burned a socket every ~5.6s (~160 in
     // 15 min); with the tiered delays plus the 90s trickle it stays modest.
@@ -200,10 +200,10 @@ describe('issue #10119 — what a phone shows while it cannot reach the desktop'
     const samples = observe('ws://relay.example:443', 900_000)
 
     expect(Math.max(...samples.map((s) => s.attempts))).toBeGreaterThanOrEqual(12)
-    expect(samples.some((s) => s.label === "Can't reach desktop")).toBe(true)
+    expect(samples.some((s) => s.label === '无法连接电脑')).toBe(true)
 
     const after = labelsAfterFirstEscalation(samples)
-    expect(after.every((s) => s.label !== 'Connecting…')).toBe(true)
+    expect(after.every((s) => s.label !== '正在连接…')).toBe(true)
   })
 
   it('latches "Can\'t connect" on a blackholed LAN endpoint instead of reverting each dial', () => {
@@ -214,23 +214,23 @@ describe('issue #10119 — what a phone shows while it cannot reach the desktop'
     const first = samples.find((s) => isEscalated(s.label))
     expect(first?.atMs ?? Infinity).toBeLessThanOrEqual(40_000)
 
-    // Every later 12s dial window used to flip the label back to "Connecting…".
+    // Every later 12s dial window used to flip the label back to "正在连接…".
     const after = labelsAfterFirstEscalation(samples)
-    expect(after.every((s) => s.label !== 'Connecting…')).toBe(true)
+    expect(after.every((s) => s.label !== '正在连接…')).toBe(true)
   })
 
   it('holds "Can\'t reach desktop" through every trickle dial once past the give-up cap', () => {
     carrier = { kind: 'blackhole' }
     const samples = observe('ws://192.168.0.56:6769', 900_000)
 
-    const firstUnreachable = samples.findIndex((s) => s.label === "Can't reach desktop")
+    const firstUnreachable = samples.findIndex((s) => s.label === '无法连接电脑')
     expect(firstUnreachable).toBeGreaterThan(0)
 
     // The loop has given up internally (attempts held at the cap); the label
     // must say so through the 12s of every 90s trickle dial, not just between them.
     const after = samples.slice(firstUnreachable)
     expect(after.every((s) => s.attempts >= 12)).toBe(true)
-    expect(after.every((s) => s.label === "Can't reach desktop")).toBe(true)
+    expect(after.every((s) => s.label === '无法连接电脑')).toBe(true)
   })
 
   it('resets the failure counter only once a handshake actually completes', () => {
@@ -268,23 +268,23 @@ describe('issue #10119 — what a phone shows while it cannot reach the desktop'
     client.close()
   })
 
-  it('escalates past "Connecting…" while every wedged dial swallows its close event', () => {
+  it('escalates past "正在连接…" while every wedged dial swallows its close event', () => {
     carrier = { kind: 'wedged-open-then-silent' }
     const samples = observe('ws://192.168.0.56:6769', 900_000)
 
     expect(Math.max(...samples.map((s) => s.attempts))).toBeGreaterThanOrEqual(12)
-    expect(samples.some((s) => s.label === "Can't reach desktop")).toBe(true)
+    expect(samples.some((s) => s.label === '无法连接电脑')).toBe(true)
 
     const after = labelsAfterFirstEscalation(samples)
-    expect(after.every((s) => s.label !== 'Connecting…')).toBe(true)
+    expect(after.every((s) => s.label !== '正在连接…')).toBe(true)
   })
 
   it('contrast: an endpoint that RSTs escalates the same way', () => {
     carrier = { kind: 'refused' }
     const samples = observe('ws://192.168.0.56:6769', 60_000)
 
-    expect(samples.some((s) => s.label === "Can't connect")).toBe(true)
+    expect(samples.some((s) => s.label === '暂时无法连接')).toBe(true)
     const after = labelsAfterFirstEscalation(samples)
-    expect(after.every((s) => s.label !== 'Connecting…')).toBe(true)
+    expect(after.every((s) => s.label !== '正在连接…')).toBe(true)
   })
 })

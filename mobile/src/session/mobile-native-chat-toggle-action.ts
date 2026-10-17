@@ -26,7 +26,7 @@ export function getMobileNativeChatToggleActions(args: {
   const isChat = isTabChatView(tab.id)
   return [
     {
-      label: isChat ? 'Switch to terminal view' : 'Switch to chat view',
+      label: isChat ? '切换到命令终端' : '切换到聊天界面',
       icon: isChat ? SquareTerminal : MessageSquare,
       onPress: () => {
         onClose()

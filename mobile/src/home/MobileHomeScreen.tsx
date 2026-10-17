@@ -30,6 +30,7 @@ import { isResumeTargetConfirmedMissing, type HomeResumeCard } from '../worktree
 import { MobileHomeEmptyState } from './MobileHomeEmptyState'
 import { MobileHomeHostList } from './MobileHomeHostList'
 import { MobileHomeListFooter } from './MobileHomeListFooter'
+import { MobileHomeListHeader } from './MobileHomeListHeader'
 import { MobileHomeTopBar } from './MobileHomeTopBar'
 import { useMobileHomeData } from './use-mobile-home-data'
 
@@ -82,7 +83,7 @@ export function MobileHomeScreen() {
     } else if (host.credentialStatus === 'temporarily-unavailable') {
       void loadHostCatalog()
         .then(data.setHostCatalog)
-        .catch(() => Alert.alert('Could not check pairing', 'Please try again.'))
+        .catch(() => Alert.alert('暂时无法检查配对', '请稍后重试。'))
     } else {
       data.router.push(`/h/${host.id}`)
     }
@@ -107,7 +108,7 @@ export function MobileHomeScreen() {
       data.setHostCatalog(await loadHostCatalog())
     } catch {
       setConfirmRemove(host)
-      Alert.alert('Could not remove host', 'Please try again.')
+      Alert.alert('暂时无法移除电脑', '请稍后重试。')
     }
   }
 
@@ -129,14 +130,19 @@ export function MobileHomeScreen() {
           footer={
             <MobileHomeListFooter
               accountsHosts={data.accountsHosts}
-              connectedHosts={data.connectedHosts}
               primaryHost={data.primaryHost}
               primaryTaskProviders={data.primaryTaskProviders}
+              stats={data.stats}
+              onOpenAccounts={openMobileAccounts}
+              onOpenTasks={openTasks}
+            />
+          }
+          header={
+            <MobileHomeListHeader
+              connectedHosts={data.connectedHosts}
               resumeCard={data.resumeCard}
               onCreateWorkspace={(hostId) => data.router.push(hostNewWorktreeRoute(hostId))}
-              onOpenAccounts={openMobileAccounts}
               onOpenResume={openResume}
-              onOpenTasks={openTasks}
               onPairDesktop={() => data.router.push('/pair-scan')}
             />
           }
@@ -146,7 +152,6 @@ export function MobileHomeScreen() {
           hosts={data.sortedHostCatalog}
           hostStates={data.hostStates}
           isWideLayout={isWideLayout}
-          stats={data.stats}
           worktreeInfo={data.worktreeInfo}
           onOpen={openHost}
           onLongPress={(host) => {
@@ -184,9 +189,10 @@ export function MobileHomeScreen() {
       />
       <ConfirmModal
         visible={confirmRemove != null}
-        title="Remove Host"
-        message={`Remove "${confirmRemove?.name}"? You can re-pair later.`}
-        confirmLabel="Remove"
+        title="移除电脑"
+        message={`移除「${confirmRemove?.name}」？之后可以重新配对。`}
+        confirmLabel="移除"
+        cancelLabel="取消"
         destructive
         onConfirm={() => void handleRemove()}
         onCancel={() => setConfirmRemove(null)}

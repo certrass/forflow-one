@@ -6,6 +6,7 @@ import { BottomDrawer } from './BottomDrawer'
 
 export type ActionSheetAction = {
   label: string
+  section?: string
   icon?: LucideIcon
   renderIcon?: () => ReactNode
   destructive?: boolean
@@ -62,8 +63,16 @@ export function ActionSheetContent({ title, message, actions, onClose }: Content
           const customIcon = action.renderIcon?.()
           return (
             <View key={action.label}>
-              {i > 0 && <View style={styles.separator} />}
+              {action.section && action.section !== actions[i - 1]?.section ? (
+                <Text accessibilityRole="header" style={styles.sectionTitle}>
+                  {action.section}
+                </Text>
+              ) : i > 0 ? (
+                <View style={styles.separator} />
+              ) : null}
               <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ disabled: Boolean(action.disabled || action.loading) }}
                 style={({ pressed }) => [
                   styles.action,
                   action.disabled && styles.actionDisabled,
@@ -169,6 +178,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md
   },
   action: {
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm + 2,
@@ -200,5 +210,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: typography.metaSize,
     color: colors.textMuted
+  },
+  sectionTitle: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+    color: colors.textSecondary,
+    fontSize: typography.metaSize,
+    fontWeight: '600'
   }
 })

@@ -270,3 +270,12 @@ describe('mobile relay pairing recovery', () => {
     expect(deps.clearJournal).not.toHaveBeenCalled()
   })
 })
+
+// Exercise the retained upstream algorithm; Forflow defaults are tested in mobile-cloud-boundary.test.ts.
+vi.mock('../forflow/mobile-connection-policy', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../forflow/mobile-connection-policy')>()),
+  FORFLOW_MOBILE_REMOTE_PUSH_ENABLED: true,
+  FORFLOW_MOBILE_RELAY_ENABLED: true,
+  FORFLOW_MOBILE_DIAGNOSTICS_UPLOAD_ENABLED: true,
+  assertForflowPairingOffer: () => {}
+}))

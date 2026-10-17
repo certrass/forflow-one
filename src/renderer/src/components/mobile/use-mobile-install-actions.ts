@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import { toast } from 'sonner'
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { translate } from '@/i18n/i18n'
@@ -16,14 +17,23 @@ export function useMobileInstallActions(
   const mountedRef = useMountedRef()
 
   const openInstallUrl = useCallback((): void => {
-    void window.api.shell.openUrl(getInstallCopy(platform, iosChannel).url)
+    const url = getInstallCopy(platform, iosChannel).url
+    if (url) {
+      void window.api.shell.openUrl(url)
+    }
   }, [iosChannel, platform])
 
   const openAndroidInstallGuide = useCallback((): void => {
+    if (isForflowBuild()) {
+      return
+    }
     void window.api.shell.openUrl(ANDROID_INSTALL_GUIDE_URL)
   }, [])
 
   const copyInstallUrl = useCallback(async (): Promise<void> => {
+    if (isForflowBuild()) {
+      return
+    }
     try {
       await window.api.ui.writeClipboardText(getInstallCopy(platform, iosChannel).url)
       if (mountedRef.current) {

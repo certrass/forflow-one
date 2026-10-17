@@ -8,8 +8,8 @@ export const pairScanStyles = StyleSheet.create({
     padding: spacing.lg
   },
   backButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',

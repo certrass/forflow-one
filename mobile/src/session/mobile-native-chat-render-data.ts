@@ -1,8 +1,5 @@
 import { formatAgentTypeLabel } from '../../../src/shared/agent-type-label'
-import {
-  formatNativeChatEmptyStateCopy,
-  type NativeChatEmptyStateCopy
-} from '../../../src/shared/native-chat-empty-state'
+import type { NativeChatEmptyStateCopy } from '../../../src/shared/native-chat-empty-state'
 import { stripNoiseMessages } from '../../../src/shared/native-chat-noise'
 import { foldToolMessages } from '../../../src/shared/native-chat-tool-fold'
 import { isImageRefBlock, type NativeChatMessage } from '../../../src/shared/native-chat-types'
@@ -12,16 +9,13 @@ import {
 } from './mobile-native-chat-image-transcript-markers'
 import type { MobileNativeChatStatus } from './use-mobile-native-chat-session'
 
-/** The centered empty-state copy for a chat with no messages, mirroring the
- *  desktop `NativeChatEmptyState` (shared copy + agent label) so the two surfaces
- *  stay in lockstep. Returns null when the list should stay bare (idle, or the
- *  loading spinner owns the view). */
+/** Chinese first-message guidance; loading and idle keep their own presentation. */
 export function mobileNativeChatEmptyState(
   status: MobileNativeChatStatus,
   agent: string | null,
   error?: string
 ): NativeChatEmptyStateCopy | null {
-  const agentLabel = agent ? formatAgentTypeLabel(agent) : 'the agent'
+  const agentLabel = agent ? formatAgentTypeLabel(agent) : '智能体'
   switch (status) {
     // A live agent with no transcript yet — an unwritten transcript file, or a
     // loaded-but-empty one — is "start a chat"; invite the first message instead
@@ -29,9 +23,15 @@ export function mobileNativeChatEmptyState(
     case 'waiting-session':
     case 'awaiting-transcript':
     case 'ready':
-      return formatNativeChatEmptyStateCopy('empty', agentLabel)
+      return {
+        title: `和 ${agentLabel} 开始对话`,
+        subtitle: '在下方输入你想完成的事，点击发送按钮，回复会显示在这里。'
+      }
     case 'error': {
-      const copy = formatNativeChatEmptyStateCopy('error', agentLabel)
+      const copy = {
+        title: '暂时无法读取对话',
+        subtitle: '请检查与电脑的连接，也可以切换到终端查看。'
+      }
       return error ? { ...copy, subtitle: error } : copy
     }
     default:

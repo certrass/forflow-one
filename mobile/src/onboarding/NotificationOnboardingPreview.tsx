@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native'
-import { OrcaLogo } from '../components/OrcaLogo'
+import { ForflowLogo } from '../components/ForflowLogo'
 import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 import { useReducedMotionEnabled } from './use-reduced-motion'
 
@@ -89,7 +89,7 @@ function SampleBanner({ notification }: { notification: (typeof SAMPLE_NOTIFICAT
   return (
     <View style={styles.card}>
       <View style={styles.appIcon}>
-        <OrcaLogo size={14} />
+        <ForflowLogo size={14} />
       </View>
       <View style={styles.cardCopy}>
         <View style={styles.cardMeta}>

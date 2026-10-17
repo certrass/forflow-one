@@ -13,8 +13,8 @@ import {
   writePairingKeychainItem
 } from './pairing-keychain'
 
-const JOURNAL_STORAGE_KEY = 'orca:mobile-relay:pairing-journal:v1'
-const JOURNAL_SECRET_KEY = 'orca.mobile-relay.pairing-journal.v1'
+const JOURNAL_STORAGE_KEY = 'forflow-one:mobile-relay:pairing-journal:v1'
+const JOURNAL_SECRET_KEY = 'forflow-one.mobile-relay.pairing-journal.v1'
 let journalMutation: Promise<void> = Promise.resolve()
 
 export async function saveMobileRelayPairingJournal(

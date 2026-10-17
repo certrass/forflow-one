@@ -151,7 +151,7 @@ describe('MobileNativeChatView', () => {
     const props = { structuredActivityUi: true, agentWorking: true, canStop: false }
     await render(props)
     const stops = () =>
-      renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Stop the agent')
+      renderer!.root.findAll((node) => node.props.accessibilityLabel === '停止智能体')
     expect(stops()).toHaveLength(0)
     await update({ ...props, canStop: true })
     expect(stops()).toHaveLength(1)
@@ -323,7 +323,7 @@ describe('MobileNativeChatView', () => {
     expect(scrollToOffset).toHaveBeenCalledOnce()
     expect(scrollToOffset).toHaveBeenLastCalledWith({ animated: false, offset: 1_300 })
     expect(
-      renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Scroll to latest')
+      renderer!.root.findAll((node) => node.props.accessibilityLabel === '滚动到最新消息')
     ).toHaveLength(0)
   })
 
@@ -336,7 +336,7 @@ describe('MobileNativeChatView', () => {
 
       act(() => list().props.onScrollBeginDrag?.({}))
       expect(
-        renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Scroll to latest')
+        renderer!.root.findAll((node) => node.props.accessibilityLabel === '滚动到最新消息')
       ).toHaveLength(0)
 
       act(() => {
@@ -417,7 +417,7 @@ describe('MobileNativeChatView', () => {
     expect(scrollToEnd).not.toHaveBeenCalled()
     expect(scrollToOffset).not.toHaveBeenCalled()
     expect(
-      renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Scroll to latest')
+      renderer!.root.findAll((node) => node.props.accessibilityLabel === '滚动到最新消息')
     ).toHaveLength(1)
   })
 
@@ -486,7 +486,7 @@ describe('MobileNativeChatView', () => {
       expect(scrollToEnd).toHaveBeenCalledOnce()
       expect(scrollToEnd).toHaveBeenLastCalledWith({ animated: false })
       expect(
-        renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Scroll to latest')
+        renderer!.root.findAll((node) => node.props.accessibilityLabel === '滚动到最新消息')
       ).toHaveLength(0)
     } finally {
       vi.useRealTimers()
@@ -540,7 +540,7 @@ describe('MobileNativeChatView', () => {
       expect(scrollToEnd).not.toHaveBeenCalled()
       expect(scrollToOffset).not.toHaveBeenCalled()
       expect(
-        renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Scroll to latest')
+        renderer!.root.findAll((node) => node.props.accessibilityLabel === '滚动到最新消息')
       ).toHaveLength(1)
     } finally {
       vi.useRealTimers()
@@ -578,7 +578,7 @@ describe('MobileNativeChatView', () => {
     scrollToEnd.mockClear()
 
     const chevron = renderer!.root.find(
-      (node) => node.props.accessibilityLabel === 'Scroll to latest'
+      (node) => node.props.accessibilityLabel === '滚动到最新消息'
     )
     act(() => chevron.props.onPress())
     expect(scrollToEnd).toHaveBeenLastCalledWith({ animated: false })
@@ -647,7 +647,7 @@ describe('MobileNativeChatView', () => {
       })
 
       expect(composer().props.disabled).toBe(true)
-      expect(composer().props.placeholder).toBe('Waiting for terminal…')
+      expect(composer().props.placeholder).toBe('正在准备输入…')
     } finally {
       vi.useRealTimers()
     }
@@ -671,7 +671,7 @@ describe('MobileNativeChatView', () => {
       })
 
       expect(composer().props.disabled).toBe(false)
-      expect(composer().props.placeholder).toBe('Message, @files, /commands')
+      expect(composer().props.placeholder).toBe('输入任务或问题，@ 引用文件，/ 查看命令')
     } finally {
       vi.useRealTimers()
     }
@@ -773,7 +773,7 @@ describe('MobileNativeChatView', () => {
       expect(footerProps()).toBeNull()
       expect(rowProps('a1').activeTurnIsWorking).toBe(true)
       expect(
-        renderer!.root.findAll((node) => node.props.accessibilityLabel === 'Stop the agent')
+        renderer!.root.findAll((node) => node.props.accessibilityLabel === '停止智能体')
       ).toHaveLength(1)
       expect(renderer!.root.findAll((node) => node.type === testCase.cardType)).toHaveLength(1)
 

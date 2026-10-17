@@ -62,17 +62,17 @@ describe('homeHostWorktreeSummary', () => {
   }
 
   it('summarizes a freshly loaded catalog', () => {
-    expect(homeHostWorktreeSummary(loaded, provenAt)).toBe('12 worktrees · 2 active')
+    expect(homeHostWorktreeSummary(loaded, provenAt)).toBe('12 个工作区 · 2 个活跃')
     expect(
       homeHostWorktreeSummary({ ...loaded, totalWorktrees: 1, activeCount: 0 }, provenAt)
-    ).toBe('1 worktree')
+    ).toBe('1 个工作区')
   })
 
   it('keeps showing the last proven counts after a failed refresh', () => {
     const afterFailure = markHomeWorktreeCatalogUnavailable(loaded, 'host-1')
 
     expect(homeHostWorktreeSummary(afterFailure, provenAt + 30_000)).toBe(
-      'Last known: 12 worktrees · 2 active'
+      '上次记录：12 个工作区 · 2 个活跃'
     )
   })
 
@@ -83,39 +83,37 @@ describe('homeHostWorktreeSummary', () => {
     // headline case: the counts are history, not nothing.
     expect(
       homeHostWorktreeSummary(afterFailure, provenAt + HOME_WORKTREE_COUNTS_LIVE_MAX_AGE_MS + 1)
-    ).toBe('Last known: 12 worktrees · 2 active')
+    ).toBe('上次记录：12 个工作区 · 2 个活跃')
     expect(homeHostWorktreeSummary(afterFailure, provenAt + 3 * 86_400_000)).toBe(
-      'Last known: 12 worktrees · 2 active'
+      '上次记录：12 个工作区 · 2 个活跃'
     )
   })
 
   it('stops calling aged-out counts live even while a refresh is only pending', () => {
     // A snapshot rehydrated from a previous app session describes a host we have not reached yet.
     expect(homeHostWorktreeSummary(loaded, provenAt + HOME_WORKTREE_COUNTS_LIVE_MAX_AGE_MS)).toBe(
-      '12 worktrees · 2 active'
+      '12 个工作区 · 2 个活跃'
     )
     expect(
       homeHostWorktreeSummary(loaded, provenAt + HOME_WORKTREE_COUNTS_LIVE_MAX_AGE_MS + 1)
-    ).toBe('Last known: 12 worktrees · 2 active')
+    ).toBe('上次记录：12 个工作区 · 2 个活跃')
     expect(homeHostWorktreeSummary(loaded, provenAt + 3 * 86_400_000)).toBe(
-      'Last known: 12 worktrees · 2 active'
+      '上次记录：12 个工作区 · 2 个活跃'
     )
   })
 
   it('treats counts persisted before age stamping as no longer live', () => {
     const preUpgrade: HostWorktreeInfo = { ...loaded, countsProvenAt: undefined }
 
-    expect(homeHostWorktreeSummary(preUpgrade, provenAt)).toBe(
-      'Last known: 12 worktrees · 2 active'
-    )
+    expect(homeHostWorktreeSummary(preUpgrade, provenAt)).toBe('上次记录：12 个工作区 · 2 个活跃')
     expect(
       homeHostWorktreeSummary(markHomeWorktreeCatalogUnavailable(preUpgrade, 'host-1'), provenAt)
-    ).toBe('Last known: 12 worktrees · 2 active')
+    ).toBe('上次记录：12 个工作区 · 2 个活跃')
   })
 
   it('reports unavailable only when no catalog ever loaded', () => {
     expect(homeHostWorktreeSummary(markHomeWorktreeCatalogUnavailable(undefined, 'host-1'))).toBe(
-      'Worktree list unavailable'
+      '暂时无法读取工作区列表'
     )
     expect(homeHostWorktreeSummary(undefined)).toBeNull()
   })

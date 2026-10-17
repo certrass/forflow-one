@@ -1,4 +1,5 @@
 import { wasPushDismissed } from './push-dismissal-watermarks'
+import { FORFLOW_MOBILE_REMOTE_PUSH_ENABLED } from '../forflow/mobile-connection-policy'
 import * as TaskManager from 'expo-task-manager'
 import * as Notifications from 'expo-notifications'
 import { readOrcaPushPayload } from './push-payload'
@@ -35,6 +36,9 @@ TaskManager.defineTask<Notifications.NotificationTaskPayload>(
 )
 
 export async function registerPushDismissalTask(): Promise<void> {
+  if (!FORFLOW_MOBILE_REMOTE_PUSH_ENABLED) {
+    return
+  }
   if (await TaskManager.isAvailableAsync()) {
     await Notifications.registerTaskAsync(TASK_NAME)
   }

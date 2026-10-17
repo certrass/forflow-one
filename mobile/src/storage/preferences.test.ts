@@ -52,13 +52,16 @@ describe('session view preference', () => {
     vi.mocked(AsyncStorage.setItem).mockReset()
   })
 
-  it('defaults to terminal and persists the chat default', async () => {
+  it('defaults new devices to chat while preserving a saved terminal choice', async () => {
     vi.mocked(AsyncStorage.getItem).mockResolvedValue(null)
-    await expect(loadDefaultSessionView()).resolves.toBe('terminal')
+    await expect(loadDefaultSessionView()).resolves.toBe('chat')
     expect(AsyncStorage.getItem).toHaveBeenCalledWith('orca:defaultSessionView')
 
     await saveDefaultSessionView('chat')
     expect(AsyncStorage.setItem).toHaveBeenCalledWith('orca:defaultSessionView', 'chat')
+
+    vi.mocked(AsyncStorage.getItem).mockResolvedValue('terminal')
+    await expect(loadDefaultSessionView()).resolves.toBe('terminal')
 
     vi.mocked(AsyncStorage.getItem).mockResolvedValue('bogus')
     await expect(loadDefaultSessionView()).resolves.toBe('terminal')

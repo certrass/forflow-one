@@ -57,15 +57,15 @@ export function homeHostWorktreeSummary(
   }
   // Why (STA-3123): a catalog that never loaded must not assert a count the host has not proven.
   if (info.catalogUnavailable && !info.staleCounts) {
-    return 'Worktree list unavailable'
+    return '暂时无法读取工作区列表'
   }
-  const counts = `${info.totalWorktrees} worktree${info.totalWorktrees === 1 ? '' : 's'}${
-    info.activeCount > 0 ? ` · ${info.activeCount} active` : ''
+  const counts = `${info.totalWorktrees} 个工作区${
+    info.activeCount > 0 ? ` · ${info.activeCount} 个活跃` : ''
   }`
   // Age bounds liveness, not the counts themselves: a failed refresh — or a rehydrated snapshot the
   // host has not re-confirmed — is still the last thing it told us, so keep it and drop the claim
   // that it is current.
-  return info.staleCounts || !provenRecently(info, now) ? `Last known: ${counts}` : counts
+  return info.staleCounts || !provenRecently(info, now) ? `上次记录：${counts}` : counts
 }
 
 function provenRecently(info: HostWorktreeInfo, now: number): boolean {

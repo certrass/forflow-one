@@ -1,4 +1,5 @@
 import { isTailscaleEndpoint } from '../../../src/shared/remote-runtime-tailscale-hint'
+import { assertForflowDirectEndpoint } from '../forflow/mobile-connection-policy'
 
 const HOST_REACHABILITY_TIMEOUT_MS = 4000
 
@@ -8,6 +9,7 @@ export async function testHostReachability(endpoint: string): Promise<boolean> {
   return new Promise((resolve) => {
     let ws: WebSocket
     try {
+      assertForflowDirectEndpoint(endpoint)
       ws = new WebSocket(endpoint)
     } catch {
       resolve(false)

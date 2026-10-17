@@ -19,7 +19,7 @@ import {
 
 type Status = 'awaiting-confirm' | 'connecting' | 'error'
 
-// Why: cap how long the user stares at "Connecting…" during pairing.
+// Why: cap how long the user stares at "正在连接…" during pairing.
 // rpc-client retries forever by design (good for live sessions), but for
 // the *initial* pair we want a hard ceiling so a half-broken Tailscale
 // route surfaces an actionable error with the log visible, instead of
@@ -133,8 +133,8 @@ export default function PairConfirmScreen() {
       setStatus('error')
       setErrorMessage(
         timedOut
-          ? `Couldn't connect within ${PAIRING_OVERALL_TIMEOUT_MS / 1000}s — see log below for where it stalled`
-          : `Pairing failed: ${err instanceof Error ? err.message : String(err)}`
+          ? `${PAIRING_OVERALL_TIMEOUT_MS / 1000} 秒内未能连接。请保持电脑端开启，确认两端在同一局域网或 VPN 内，然后重新生成配对码。`
+          : `配对失败：${err instanceof Error ? err.message : String(err)}`
       )
     }
   }
@@ -143,23 +143,28 @@ export default function PairConfirmScreen() {
 
   return (
     <View ref={setPairConfirmRootRef} style={[styles.container, containerPadding]}>
-      <Pressable style={styles.backButton} onPress={cancel}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="返回首页"
+        style={styles.backButton}
+        onPress={cancel}
+      >
         <ChevronLeft size={22} color={colors.textSecondary} />
       </Pressable>
 
       <View style={styles.content}>
         {offer && resolvedStatus === 'awaiting-confirm' && (
           <>
-            <Text style={styles.title}>Pair with this desktop?</Text>
+            <Text style={styles.title}>连接这台电脑？</Text>
             <Text style={styles.subtitle}>
-              You opened a pairing link from your desktop. Confirm to add it to your hosts.
+              确认添加这台 Forflow One 桌面端。请核对配对码来自你要连接的电脑。
             </Text>
             <View style={styles.actionStack}>
               <Pressable style={styles.primaryButton} onPress={() => void confirm()}>
-                <Text style={styles.primaryButtonText}>Pair</Text>
+                <Text style={styles.primaryButtonText}>确认配对</Text>
               </Pressable>
               <Pressable style={styles.secondaryButton} onPress={cancel}>
-                <Text style={styles.secondaryButtonText}>Cancel</Text>
+                <Text style={styles.secondaryButtonText}>取消</Text>
               </Pressable>
             </View>
           </>
@@ -168,9 +173,9 @@ export default function PairConfirmScreen() {
         {resolvedStatus === 'connecting' && (
           <>
             <ActivityIndicator size="large" color={colors.textSecondary} />
-            <Text style={styles.connectingText}>Connecting…</Text>
+            <Text style={styles.connectingText}>正在连接…</Text>
             <View style={styles.logSlot}>
-              <ConnectionLog entries={logs} title="Pairing log" />
+              <ConnectionLog entries={logs} title="配对日志" />
             </View>
           </>
         )}
@@ -180,12 +185,12 @@ export default function PairConfirmScreen() {
             <Text style={styles.errorText}>{resolvedErrorMessage}</Text>
             {logs.length > 0 && (
               <View style={styles.logSlot}>
-                <ConnectionLog entries={logs} title="Pairing log" />
+                <ConnectionLog entries={logs} title="配对日志" />
               </View>
             )}
             <View style={styles.actionStack}>
               <Pressable style={styles.primaryButton} onPress={cancel}>
-                <Text style={styles.primaryButtonText}>Back to home</Text>
+                <Text style={styles.primaryButtonText}>返回首页</Text>
               </Pressable>
             </View>
           </>
@@ -202,8 +207,8 @@ const styles = StyleSheet.create({
     padding: spacing.lg
   },
   backButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',

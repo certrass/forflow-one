@@ -1,4 +1,5 @@
 import { Platform } from 'react-native'
+import { assertForflowPairingOffer } from '../forflow/mobile-connection-policy'
 import type {
   DeviceCredentialInstalled,
   MobileRelayEndpoint
@@ -135,6 +136,7 @@ async function runPairing(
   clients: Set<PairingCandidateClient>,
   isDisposed: () => boolean
 ): Promise<{ hostId: string }> {
+  assertForflowPairingOffer(offer)
   const now = dependencies.now()
   // Why: every pairing artifact must share the preserved host id so re-pairing
   // updates one card instead of publishing a second identity (STA-1840).

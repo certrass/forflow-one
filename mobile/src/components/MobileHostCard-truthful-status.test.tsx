@@ -74,20 +74,20 @@ describe('MobileHostCard', () => {
   }
 
   it('renders the counts the host proved', async () => {
-    expect(await renderCard(loaded)).toContain('12 worktrees · 2 active')
+    expect(await renderCard(loaded)).toContain('12 个工作区 · 2 个活跃')
   })
 
   it('keeps rendering the last proven counts after a failed refresh', async () => {
     // The regression this card shipped once: the caller dropped the counts the
     // failure path deliberately preserved.
     expect(await renderCard(markHomeWorktreeCatalogUnavailable(loaded, 'host-1'))).toContain(
-      'Last known: 12 worktrees · 2 active'
+      '上次记录：12 个工作区 · 2 个活跃'
     )
   })
 
   it('never asserts a count for a catalog that failed with nothing proven', async () => {
     expect(await renderCard(markHomeWorktreeCatalogUnavailable(undefined, 'host-1'))).toContain(
-      'Worktree list unavailable'
+      '暂时无法读取工作区列表'
     )
   })
 
@@ -98,7 +98,7 @@ describe('MobileHostCard', () => {
       path: 'relay'
     })
 
-    expect(lines).toContain('Connecting via Relay…')
+    expect(lines).toContain('正在通过中继连接…')
     expect(lines).not.toContain(' · Orca Relay')
   })
 
@@ -109,7 +109,7 @@ describe('MobileHostCard', () => {
       path: 'relay'
     })
 
-    expect(lines).toContain('Connecting via Relay…')
+    expect(lines).toContain('正在通过中继连接…')
     expect(lines).not.toContain(' · Orca Relay')
   })
 
@@ -136,8 +136,8 @@ describe('MobileHostCard', () => {
   it('shows no worktree line before the first read lands', async () => {
     const lines = await renderCard(undefined)
 
-    expect(lines).not.toContain('0 worktrees')
-    expect(lines).not.toContain('Worktree list unavailable')
+    expect(lines).not.toContain('0 个工作区')
+    expect(lines).not.toContain('暂时无法读取工作区列表')
   })
 
   it('offers re-pairing when the credential is missing', async () => {
@@ -147,9 +147,9 @@ describe('MobileHostCard', () => {
       credentialStatus: 'missing'
     })
 
-    expect(lines).toContain('Pairing invalid')
-    expect(lines).toContain('Tap to re-pair with your desktop')
-    expect(lines).not.toContain('12 worktrees · 2 active')
+    expect(lines).toContain('配对已失效')
+    expect(lines).toContain('点按以重新配对电脑')
+    expect(lines).not.toContain('12 个工作区 · 2 个活跃')
   })
 
   it('offers a retry without declaring a transient read failure invalid', async () => {
@@ -159,8 +159,8 @@ describe('MobileHostCard', () => {
       credentialStatus: 'temporarily-unavailable'
     })
 
-    expect(lines).toContain('Pairing temporarily unavailable')
-    expect(lines).toContain('Unlock your phone, then tap to retry')
-    expect(lines).not.toContain('Pairing invalid')
+    expect(lines).toContain('暂时无法读取配对凭据')
+    expect(lines).toContain('解锁手机后点按重试')
+    expect(lines).not.toContain('配对已失效')
   })
 })

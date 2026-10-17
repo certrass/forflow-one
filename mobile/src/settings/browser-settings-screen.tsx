@@ -14,7 +14,7 @@ import { colors, radii, spacing, typography } from '../theme/mobile-theme'
 const LINK_MODE_OPTIONS: PickerOption<MobileTerminalLinkOpenMode>[] = [
   {
     value: 'orca-browser',
-    label: 'Orca browser on desktop',
+    label: 'Forflow One 桌面浏览器',
     subtitle: 'Open in the streamed browser from your paired desktop.'
   },
   {

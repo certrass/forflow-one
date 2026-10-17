@@ -21,34 +21,32 @@ function user(id: string, text: string): NativeChatMessage {
 }
 
 describe('mobileNativeChatEmptyState', () => {
-  it('invites a first message naming the agent, matching desktop copy', () => {
+  it('invites a first message naming the agent', () => {
     // waiting-session (live agent, no transcript) and ready (loaded, empty) both
-    // resolve to the shared "empty" copy with the agent label substituted.
+    // invite a first message without claiming startup is incomplete.
     const waiting = mobileNativeChatEmptyState('waiting-session', 'claude')
     expect(waiting).toEqual({
-      title: 'Start a chat with Claude',
-      subtitle: 'Ask Claude to inspect code, explain output, or make a change.'
+      title: '和 Claude 开始对话',
+      subtitle: '在下方输入你想完成的事，点击发送按钮，回复会显示在这里。'
     })
-    expect(mobileNativeChatEmptyState('ready', 'codex')?.title).toBe('Start a chat with Codex')
+    expect(mobileNativeChatEmptyState('ready', 'codex')?.title).toBe('和 Codex 开始对话')
   })
 
   it('invites a first message while the transcript file is still unwritten', () => {
     // The spinner is already gone by then, so a bare list would read as broken.
     expect(mobileNativeChatEmptyState('awaiting-transcript', 'claude')?.title).toBe(
-      'Start a chat with Claude'
+      '和 Claude 开始对话'
     )
   })
 
   it('falls back to "the agent" when the agent is unknown', () => {
-    expect(mobileNativeChatEmptyState('waiting-session', null)?.title).toBe(
-      'Start a chat with the agent'
-    )
+    expect(mobileNativeChatEmptyState('waiting-session', null)?.title).toBe('和 智能体 开始对话')
   })
 
   it('prefers the provided error message over the default subtitle', () => {
     expect(mobileNativeChatEmptyState('error', 'claude', 'boom')?.subtitle).toBe('boom')
     expect(mobileNativeChatEmptyState('error', 'claude')?.subtitle).toBe(
-      'The transcript could not be read. Toggle back to the terminal to keep working.'
+      '请检查与电脑的连接，也可以切换到终端查看。'
     )
   })
 

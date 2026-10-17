@@ -28,9 +28,9 @@ import {
   writePairingKeychainItem
 } from './pairing-keychain'
 
-const GENERATION_KEY = 'orca:pairing-keychain-generation'
-const TOKEN_KEY = 'orca.host-token.host-1782629088232'
-const TOKEN_PRESENCE_KEY = `orca:pairing-keychain-presence:${TOKEN_KEY}`
+const GENERATION_KEY = 'forflow-one:pairing-keychain-generation'
+const TOKEN_KEY = 'forflow-one.host-token.host-1782629088232'
+const TOKEN_PRESENCE_KEY = `forflow-one:pairing-keychain-presence:${TOKEN_KEY}`
 
 // Why: the exact Android failure from #6600 — expo maps a null-message GeneralSecurityException to this.
 const ENCRYPT_REJECTION = new Error(
@@ -64,15 +64,16 @@ describe('pairing keychain', () => {
     secureStoreMock.getItemAsync.mockResolvedValue(null)
   })
 
-  it('writes under the default keychain service so existing installs keep their tokens', async () => {
+  it('writes under the independent Forflow keychain service', async () => {
     await writePairingKeychainItem(TOKEN_KEY, 'token')
 
     expect(secureStoreMock.setItemAsync).toHaveBeenCalledTimes(1)
     const [key, value, options] = secureStoreMock.setItemAsync.mock.calls[0]!
     expect(key).toBe(TOKEN_KEY)
     expect(value).toBe('token')
-    // Why: passing any keychainService would change the keystore alias and orphan every already-stored token.
-    expect(serviceOf(options as Options)).toBeUndefined()
+    expect(options).toMatchObject({ keychainAccessible: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY' })
+    // Forflow must never read the upstream default keychain service.
+    expect(serviceOf(options)).toBe('cn.forflow.one.mobile.pairing.v0')
     expect(generationRecord).toBeNull()
   })
 
@@ -80,7 +81,7 @@ describe('pairing keychain', () => {
     // Why: simulate the unverified alias-local case; no affected physical device was available.
     secureStoreMock.setItemAsync.mockImplementation(
       async (_k: string, _v: string, options: Options) => {
-        if (serviceOf(options) === undefined) {
+        if (serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
       }
@@ -89,7 +90,7 @@ describe('pairing keychain', () => {
     await writePairingKeychainItem(TOKEN_KEY, 'token')
 
     const rotated = secureStoreMock.setItemAsync.mock.calls.at(-1)!
-    expect(serviceOf(rotated[2] as Options)).toBe('orca.pairing.v1')
+    expect(serviceOf(rotated[2])).toBe('cn.forflow.one.mobile.pairing.v1')
     expect(rotated[1]).toBe('token')
     expect(generationRecord).toBe('1')
   })
@@ -111,7 +112,7 @@ describe('pairing keychain', () => {
     expect(generationRecord).toBe('1:pending')
     expect(secureStoreMock.setItemAsync).toHaveBeenCalledTimes(1)
     expect(serviceOf(secureStoreMock.setItemAsync.mock.calls[0]![2] as Options)).toBe(
-      'orca.pairing.v1'
+      'cn.forflow.one.mobile.pairing.v1'
     )
   })
 
@@ -123,7 +124,7 @@ describe('pairing keychain', () => {
     expect(generationRecord).toBe('1')
     expect(secureStoreMock.setItemAsync).toHaveBeenCalledTimes(1)
     expect(serviceOf(secureStoreMock.setItemAsync.mock.calls[0]![2] as Options)).toBe(
-      'orca.pairing.v1'
+      'cn.forflow.one.mobile.pairing.v1'
     )
   })
 
@@ -147,7 +148,7 @@ describe('pairing keychain', () => {
     })
     secureStoreMock.setItemAsync.mockImplementation(
       async (_k: string, _v: string, options: Options) => {
-        if (serviceOf(options) === undefined) {
+        if (serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
       }
@@ -156,7 +157,7 @@ describe('pairing keychain', () => {
     await expect(writePairingKeychainItem(TOKEN_KEY, 'token')).rejects.toBe(ENCRYPT_REJECTION)
 
     const rotatedWrites = secureStoreMock.setItemAsync.mock.calls.filter(
-      (call) => serviceOf(call[2] as Options) !== undefined
+      (call) => serviceOf(call[2]) !== 'cn.forflow.one.mobile.pairing.v0'
     )
     expect(rotatedWrites).toHaveLength(0)
     expect(generationRecord).toBeNull()
@@ -173,7 +174,7 @@ describe('pairing keychain', () => {
     secureStoreMock.setItemAsync.mockImplementation(
       async (_k: string, _v: string, options: Options) => {
         const service = serviceOf(options)
-        if (service === undefined) {
+        if (service === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
         order.push(`store:${service}`)
@@ -182,7 +183,11 @@ describe('pairing keychain', () => {
 
     await writePairingKeychainItem(TOKEN_KEY, 'token')
 
-    expect(order).toEqual(['record:1:pending', 'store:orca.pairing.v1', 'record:1'])
+    expect(order).toEqual([
+      'record:1:pending',
+      'store:cn.forflow.one.mobile.pairing.v1',
+      'record:1'
+    ])
   })
 
   it('keeps a successful rotated write reachable when confirmation storage fails', async () => {
@@ -197,7 +202,7 @@ describe('pairing keychain', () => {
     })
     secureStoreMock.setItemAsync.mockImplementation(
       async (_k: string, _v: string, options: Options) => {
-        if (serviceOf(options) === undefined) {
+        if (serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0') {
           throw ENCRYPT_REJECTION
         }
       }
@@ -207,7 +212,7 @@ describe('pairing keychain', () => {
 
     expect(generationRecord).toBe('1:pending')
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === 'orca.pairing.v1' ? 'token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v1' ? 'token' : null
     )
     await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('token')
   })
@@ -215,7 +220,7 @@ describe('pairing keychain', () => {
   it('reads through the rotated service once a rotation has been committed', async () => {
     generationRecord = '1'
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === 'orca.pairing.v1' ? 'rotated-token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v1' ? 'rotated-token' : null
     )
 
     await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('rotated-token')
@@ -224,7 +229,7 @@ describe('pairing keychain', () => {
   it('falls back to a retired service so rotation does not orphan a still-readable token', async () => {
     generationRecord = '2'
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === undefined ? 'legacy-token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0' ? 'legacy-token' : null
     )
 
     await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('legacy-token')
@@ -236,7 +241,7 @@ describe('pairing keychain', () => {
     generationRecord = '1'
     const currentError = new Error('Could not decrypt the value')
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) => {
-      if (serviceOf(options) === 'orca.pairing.v1') {
+      if (serviceOf(options) === 'cn.forflow.one.mobile.pairing.v1') {
         throw currentError
       }
       return 'legacy-token'
@@ -277,7 +282,7 @@ describe('pairing keychain', () => {
 
     resetPairingKeychainForTests()
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === undefined ? 'legacy-token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0' ? 'legacy-token' : null
     )
 
     // Why: Android cannot distinguish absent from undecryptable, and a throw here left every
@@ -294,7 +299,7 @@ describe('pairing keychain', () => {
   it('reads an older value while a newly recorded alias has no item yet', async () => {
     generationRecord = '1:pending'
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === undefined ? 'legacy-token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v0' ? 'legacy-token' : null
     )
 
     await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('legacy-token')
@@ -308,7 +313,7 @@ describe('pairing keychain', () => {
       return null
     })
     secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-      serviceOf(options) === 'orca.pairing.v2' ? 'rotated-token' : null
+      serviceOf(options) === 'cn.forflow.one.mobile.pairing.v2' ? 'rotated-token' : null
     )
 
     await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('rotated-token')
@@ -334,7 +339,11 @@ describe('pairing keychain', () => {
     const services = secureStoreMock.deleteItemAsync.mock.calls.map((call) =>
       serviceOf(call[1] as Options)
     )
-    expect(services).toEqual(['orca.pairing.v2', 'orca.pairing.v1', undefined])
+    expect(services).toEqual([
+      'cn.forflow.one.mobile.pairing.v2',
+      'cn.forflow.one.mobile.pairing.v1',
+      'cn.forflow.one.mobile.pairing.v0'
+    ])
     expect(asyncStorageMock.removeItem).toHaveBeenCalledWith(TOKEN_PRESENCE_KEY)
   })
 
@@ -342,7 +351,7 @@ describe('pairing keychain', () => {
     generationRecord = '2'
     const deleteError = new Error('delete failed')
     secureStoreMock.deleteItemAsync.mockImplementation(async (_k: string, options: Options) => {
-      if (serviceOf(options) === 'orca.pairing.v2') {
+      if (serviceOf(options) === 'cn.forflow.one.mobile.pairing.v2') {
         throw deleteError
       }
     })
@@ -374,7 +383,7 @@ describe('pairing keychain', () => {
     async (raw) => {
       generationRecord = raw
       secureStoreMock.getItemAsync.mockImplementation(async (_k: string, options: Options) =>
-        serviceOf(options) === 'orca.pairing.v2' ? 'rotated-token' : null
+        serviceOf(options) === 'cn.forflow.one.mobile.pairing.v2' ? 'rotated-token' : null
       )
 
       await expect(readPairingKeychainItem(TOKEN_KEY)).resolves.toBe('rotated-token')

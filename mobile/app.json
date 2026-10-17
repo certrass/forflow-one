@@ -1,26 +1,26 @@
 {
   "expo": {
-    "name": "Orca",
-    "slug": "orca-mobile",
-    "version": "0.0.51",
+    "name": "Forflow One",
+    "slug": "forflow-one-mobile",
+    "version": "0.1.0",
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/forflow-app-icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "orca",
+    "scheme": "forflow-one-mobile",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/forflow-app-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#111111"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.stably.orca.mobile",
+      "bundleIdentifier": "cn.forflow.one.mobile",
       "buildNumber": "1",
       "infoPlist": {
-        "NSLocalNetworkUsageDescription": "Orca connects to the desktop app on your LAN.",
-        "NSMicrophoneUsageDescription": "Allow Orca to record voice dictation and transcribe it on your paired desktop.",
-        "NSPhotoLibraryUsageDescription": "Allow Orca to attach photos from your library to a terminal session on your paired desktop.",
+        "NSLocalNetworkUsageDescription": "Forflow One 通过局域网连接你配对的桌面端。",
+        "NSMicrophoneUsageDescription": "允许 Forflow One 录音，并交给已配对的桌面端转写。",
+        "NSPhotoLibraryUsageDescription": "允许 Forflow One 将你选择的照片发送到已配对的桌面会话。",
         "NSAppTransportSecurity": {
           "NSAllowsLocalNetworking": true,
           "NSExceptionDomains": {
@@ -68,15 +68,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/forflow-mark.png",
         "backgroundColor": "#111111"
       },
       "usesCleartextTraffic": true,
       "allowBackup": false,
       "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS"],
-      "package": "com.stably.orca.mobile",
-      "versionCode": 18,
-      "googleServicesFile": "./google-services.json"
+      "package": "cn.forflow.one.mobile",
+      "versionCode": 1
     },
     "plugins": [
       "expo-router",
@@ -85,22 +84,22 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/forflow-app-icon.png",
           "backgroundColor": "#111111"
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Orca to use the camera for QR code scanning.",
-          "microphonePermission": "Allow Orca to use your microphone for voice dictation sent to your paired desktop for transcription.",
+          "cameraPermission": "允许 Forflow One 使用相机扫描桌面配对码。",
+          "microphonePermission": "允许 Forflow One 录音，并交给已配对的桌面端转写。",
           "recordAudioAndroid": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Orca to attach photos from your library to a terminal session on your paired desktop."
+          "photosPermission": "允许 Forflow One 将你选择的照片发送到已配对的桌面会话。"
         }
       ],
       [

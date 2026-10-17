@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from '@/store'
+import { isForflowBuild } from '../../../../shared/product-branding'
 import {
   resolveMobilePairingConnectionMode,
   type MobilePairingConnectionMode
@@ -22,5 +23,5 @@ export function useMobilePairingConnectionMode(): [
   useEffect(() => {
     setConnectionMode(resolveMobilePairingConnectionMode(savedConnectionMode))
   }, [savedConnectionMode])
-  return [connectionMode, setConnectionMode]
+  return [isForflowBuild() ? 'local-only' : connectionMode, setConnectionMode]
 }
